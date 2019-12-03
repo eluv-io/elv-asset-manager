@@ -1,0 +1,21 @@
+@import "~elv-components-js/src/stylesheets/defaults";
+@import "~elv-components-js/src/stylesheets/styles";
+
+.app-version {
+  display: none;
+}
+
+html {
+  color: $elv-color-text-dark;
+  font-size: 16px;
+}
+
+body,
+.app,
+.app-container,
+main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  max-width: 100%;
+}
