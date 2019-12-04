@@ -1,4 +1,5 @@
 import "./static/stylesheets/app.scss";
+import "elv-components-js/src/utils/LimitedMap";
 
 import React from "react";
 import {render} from "react-dom";

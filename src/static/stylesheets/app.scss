@@ -21,6 +21,11 @@ main {
   max-width: 100%;
 }
 
+h1 {
+  font-weight: 400;
+  text-align: center;
+}
+
 .app-container {
   margin: $elv-spacing-s;
 }
@@ -30,6 +35,7 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  margin-bottom: $elv-spacing-l;
 
   .browser-container {
     width: 25rem;
@@ -46,6 +52,11 @@ main {
   }
 
   .back {
+    margin-bottom: $elv-spacing-s;
+  }
+
+  h2 {
+    font-weight: 400;
     margin-bottom: $elv-spacing-s;
   }
 
@@ -76,6 +87,7 @@ main {
       font-size: $elv-font-m;
       height: 100%;
       margin: 0;
+      max-width: 100%;
       outline: 0;
       padding: $elv-spacing-xs;
       width: 100%;
@@ -85,5 +97,87 @@ main {
         color: $elv-color-white;
       }
     }
+  }
+}
+
+.asset-form-container {
+  align-items: center;
+  border-bottom: 1px solid $elv-color-lightgray;
+  display: flex;
+  flex-direction: column;
+  padding: $elv-spacing-m;
+
+  button {
+    max-width: 120px;
+  }
+
+  h3 {
+    text-align: center;
+  }
+}
+
+.asset-form-clips-container {
+  margin: $elv-spacing-s 0;
+  width: 100%;
+}
+
+.order-buttons-container {
+  display: flex;
+  flex-direction: column;
+  font-size: $elv-font-m;
+  position: absolute;
+  right: $elv-spacing-m;
+
+  .order-button {
+    background: transparent;
+    border: 0;
+    color: $elv-color-text-light;
+    cursor: pointer;
+
+    &:hover {
+      color: $elv-color-text-dark;
+    }
+  }
+
+  .placeholder {
+    &::after {
+      content: ".";
+      visibility: hidden;
+    }
+  }
+}
+
+.asset-form-clip {
+  border: 1px solid $elv-color-lightgray;
+  border-bottom: 0;
+  display: flex;
+
+  padding: $elv-spacing-xxs 0;
+  position: relative;
+
+  &:last-child {
+    border-bottom: 1px solid $elv-color-lightgray;
+  }
+
+  span {
+    padding: $elv-spacing-xxs $elv-spacing-s;
+  }
+
+  .clip-title {
+    flex-grow: 1;
+  }
+
+  .remove-button {
+    height: 50%;
+    position: absolute;
+    right: $elv-spacing-xxs;
+    top: 25%;
+  }
+}
+
+.asset-form-modal {
+  .-elv-modal-content {
+    min-height: 80%;
+    min-width: 80%;
   }
 }

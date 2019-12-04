@@ -1,5 +1,4 @@
 import {observable, action, flow} from "mobx";
-import "elv-components-js/src/utils/LimitedMap";
 
 class ContentStore {
   @observable libraries = [];
@@ -45,7 +44,7 @@ class ContentStore {
     const objectInfo = (
       yield this.rootStore.client.ContentObjects({
         libraryId,
-        filterOptions: {select: ["name", "public"]}
+        filterOptions: {select: ["name", "public", "asset_metadata"]}
       })
     ).contents || [];
 
@@ -53,14 +52,14 @@ class ContentStore {
     yield objectInfo.limitedMap(
       5,
       async ({id, versions}) => {
-        const metadata = versions[0].meta;
-
-        const name = (metadata.public ? metadata.public.name : metadata.name) || metadata.name || objectId;
+        const metadata = versions[0].meta || {};
+        const name = (metadata.asset_metadata || {}).title || (metadata.public || {}).name || metadata.name;
 
         objects.push({
           id,
           objectId: id,
           name,
+          assetType: (metadata.asset_metadata || {}).asset_type,
           sortKey: name.startsWith("iq__") ? `zz${name}` : name
         });
       }

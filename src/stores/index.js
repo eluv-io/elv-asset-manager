@@ -2,6 +2,7 @@ import {configure, observable, action, flow} from "mobx";
 
 import {FrameClient} from "elv-client-js/src/FrameClient";
 import ContentStore from "./Content";
+import FormStore from "./Form";
 
 // Force strict mode so mutations are only allowed within actions.
 configure({
@@ -12,6 +13,13 @@ class RootStore {
   @observable client;
   @observable balance = 0;
   @observable params = {};
+  @observable assetMetadata;
+  @observable assetName;
+
+  constructor() {
+    this.contentStore = new ContentStore(this);
+    this.formStore = new FormStore(this);
+  }
 
   @action.bound
   InitializeClient = flow(function * () {
@@ -37,9 +45,34 @@ class RootStore {
       throw Error("Missing query parameter 'libraryId'");
     } else if(!this.params.objectId) {
       throw Error("Missing query parameter 'objectId'");
+    } else if(!this.params.versionHash) {
+      throw Error("Missing query parameter 'versionHash'");
     }
+
+    this.assetName =
+      (yield this.client.ContentObjectMetadata({
+        versionHash: this.params.versionHash,
+        metadataSubtree: "asset_metadata/title"
+      })) ||
+      (yield this.client.ContentObjectMetadata({
+        versionHash: this.params.versionHash,
+        metadataSubtree: "public/name"
+      })) ||
+      (yield this.client.ContentObjectMetadata({
+        versionHash: this.params.versionHash,
+        metadataSubtree: "name"
+      }));
+
+    this.assetMetadata = yield this.client.ContentObjectMetadata({
+      versionHash: this.params.versionHash,
+      metadataSubtree: "asset_metadata"
+    });
+
+    yield this.formStore.InitializeFormData();
   })
 }
 
 export const rootStore = new RootStore();
-export const contentStore = new ContentStore(rootStore);
+export const contentStore = rootStore.contentStore;
+export const formStore = rootStore.formStore;
+

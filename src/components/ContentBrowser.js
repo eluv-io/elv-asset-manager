@@ -57,7 +57,10 @@ class BrowserList extends React.Component {
 
 BrowserList.propTypes = {
   header: PropTypes.string.isRequired,
-  subHeader: PropTypes.string,
+  subHeader: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.element
+  ]),
   list: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string,
@@ -95,6 +98,12 @@ class ContentBrowser extends React.Component {
     } else if(!this.state.objectId) {
       const library = this.props.contentStore.libraries
         .find(({libraryId}) => libraryId === this.state.libraryId);
+
+      let list = this.props.contentStore.objects[this.state.libraryId] || [];
+      if(this.props.assetTypes && this.props.assetTypes.length > 0) {
+        list = list.filter(item => this.props.assetTypes.includes(item.assetType));
+      }
+
       content = (
         <React.Fragment>
           <Action
@@ -107,7 +116,7 @@ class ContentBrowser extends React.Component {
             key={`browser-list-${this.state.libraryId}`}
             header="Choose an object"
             subHeader={library.name}
-            list={this.props.contentStore.objects[this.state.libraryId]}
+            list={list}
             Load={async () => await this.props.contentStore.LoadObjects(this.state.libraryId)}
             Select={objectId => this.setState({objectId})}
           />
@@ -130,7 +139,7 @@ class ContentBrowser extends React.Component {
           <BrowserList
             key={`browser-list-${this.state.objectId}`}
             header="Choose a version"
-            subHeader={`${library.name} - ${object.name}`}
+            subHeader={<React.Fragment><div>{library.name}</div><div>{object.name}</div></React.Fragment>}
             list={this.props.contentStore.versions[this.state.objectId]}
             Load={async () => await this.props.contentStore.LoadVersions(this.state.libraryId, this.state.objectId)}
             Select={versionHash => this.props.onComplete({
@@ -145,10 +154,19 @@ class ContentBrowser extends React.Component {
 
     return (
       <div className="content-browser">
+        <h2>{this.props.header}</h2>
         { content}
       </div>
     );
   }
 }
+
+ContentBrowser.propTypes = {
+  header: PropTypes.string,
+  assetTypes: PropTypes.arrayOf(PropTypes.string),
+  playableOnly: PropTypes.bool,
+  onComplete: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired
+};
 
 export default ContentBrowser;
