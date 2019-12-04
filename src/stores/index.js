@@ -1,6 +1,7 @@
 import {configure, observable, action, flow} from "mobx";
 
 import {FrameClient} from "elv-client-js/src/FrameClient";
+import ContentStore from "./Content";
 
 // Force strict mode so mutations are only allowed within actions.
 configure({
@@ -41,3 +42,4 @@ class RootStore {
 }
 
 export const rootStore = new RootStore();
+export const contentStore = new ContentStore(rootStore);
