@@ -25,11 +25,6 @@ module.exports = {
       "Access-Control-Allow-Methods": "POST"
     }
   },
-  resolve: {
-    alias: {
-      configuration: Path.join(__dirname, "configuration.json")
-    }
-  },
   optimization: {
     minimizer: [
       new TerserPlugin({
@@ -49,14 +44,11 @@ module.exports = {
   mode: "development",
   devtool: "eval-source-map",
   plugins: [
-    new CopyWebpackPlugin([
-      {
-        from: Path.join(__dirname, "configuration.js"),
-        to: Path.join(__dirname, "dist", "configuration.js")
-      }
-    ]),
+    new webpack.optimize.LimitChunkCountPlugin({
+      maxChunks: 1,
+    }),
     new HtmlWebpackPlugin({
-      title: "Eluvio Stream Sample",
+      title: "Eluvio Video Asset Manager",
       template: Path.join(__dirname, "src", "index.html"),
       inject: "body",
       cache: false,
@@ -65,7 +57,6 @@ module.exports = {
       favicon: "node_modules/elv-components-js/src/icons/favicon.png"
     }),
     new HtmlWebpackInlineSourcePlugin()
-    , new BundleAnalyzerPlugin()
   ],
   module: {
     rules: [

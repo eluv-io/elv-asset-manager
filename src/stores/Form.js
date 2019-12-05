@@ -1,4 +1,5 @@
 import {observable, action, flow} from "mobx";
+import UrlJoin from "url-join";
 
 class FormStore {
   @observable clips = [];
@@ -10,6 +11,69 @@ class FormStore {
     this.rootStore = rootStore;
     this.targets = {};
   }
+
+  CreateLink(versionHash, linkTarget="/meta/asset_metadata") {
+    if(versionHash === this.rootStore.params.versionHash) {
+      return {
+        "/": UrlJoin("./", linkTarget)
+      };
+    } else {
+      return {
+        "/": UrlJoin("/qfab", versionHash, linkTarget)
+      };
+    }
+  }
+
+  @action.bound
+  SaveAsset = flow(function * () {
+    const client = this.rootStore.client;
+
+    const {libraryId, objectId} = this.rootStore.params;
+
+    const writeToken = (yield client.EditContentObject({
+      libraryId,
+      objectId
+    })).write_token;
+
+    let clips = {};
+    this.clips.forEach(({versionHash}, index) => {
+      clips[index.toString()] = this.CreateLink(versionHash);
+    });
+
+    yield client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "asset_metadata/clips",
+      metadata: clips
+    });
+
+    let trailers = {};
+    this.trailers.forEach(({versionHash}, index) => {
+      trailers[index.toString()] = this.CreateLink(versionHash);
+    });
+
+    yield client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "asset_metadata/trailers",
+      metadata: trailers
+    });
+
+    yield client.FinalizeContentObject({
+      libraryId,
+      objectId,
+      writeToken
+    });
+
+    yield client.SendMessage({
+      options: {
+        operation: "Complete",
+        message: "Successfully updated asset"
+      }
+    });
+  });
 
   @action.bound
   AddClip = flow(function * ({key, versionHash}) {

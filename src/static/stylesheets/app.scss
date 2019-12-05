@@ -21,13 +21,15 @@ main {
   max-width: 100%;
 }
 
-h1 {
-  font-weight: 400;
-  text-align: center;
+.app-container {
+  align-items: center;
+  margin: $elv-spacing-s;
 }
 
-.app-container {
-  margin: $elv-spacing-s;
+h1 {
+  font-size: $elv-font-xxl;
+  font-weight: 400;
+  text-align: center;
 }
 
 .content-browser {
@@ -100,12 +102,46 @@ h1 {
   }
 }
 
-.asset-form-container {
+.asset-form {
+  max-width: 75rem;
+  position: relative;
+  width: 100%;
+}
+
+.asset-form-save-button {
+  height: 30px;
+  position: absolute;
+  right: $elv-spacing-m;
+  top: 0;
+  width: 150px;
+
+  &.-elv-button {
+    &.-elv-button {
+      background-color: $elv-color-lightblue;
+      border: 1px solid $elv-color-lightblue;
+    }
+
+    &:not(:active) {
+      &:hover {
+        background-color: $elv-color-white;
+        border: 1px solid $elv-color-mediumblue;
+        color: $elv-color-mediumblue;
+      }
+    }
+  }
+}
+
+.asset-form-section-container {
   align-items: center;
   border-bottom: 1px solid $elv-color-lightgray;
   display: flex;
   flex-direction: column;
+  margin-top: $elv-spacing-m;
   padding: $elv-spacing-m;
+
+  &:last-child {
+    border: 0;
+  }
 
   button {
     max-width: 120px;
@@ -121,37 +157,10 @@ h1 {
   width: 100%;
 }
 
-.order-buttons-container {
-  display: flex;
-  flex-direction: column;
-  font-size: $elv-font-m;
-  position: absolute;
-  right: $elv-spacing-m;
-
-  .order-button {
-    background: transparent;
-    border: 0;
-    color: $elv-color-text-light;
-    cursor: pointer;
-
-    &:hover {
-      color: $elv-color-text-dark;
-    }
-  }
-
-  .placeholder {
-    &::after {
-      content: ".";
-      visibility: hidden;
-    }
-  }
-}
-
 .asset-form-clip {
   border: 1px solid $elv-color-lightgray;
   border-bottom: 0;
   display: flex;
-
   padding: $elv-spacing-xxs 0;
   position: relative;
 
@@ -168,16 +177,53 @@ h1 {
   }
 
   .remove-button {
-    height: 50%;
-    position: absolute;
-    right: $elv-spacing-xxs;
-    top: 25%;
+    height: $elv-font-l;
+  }
+}
+
+.asset-form-clip-actions {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  padding-right: $elv-spacing-xs;
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  & > * {
+    margin: 0 $elv-spacing-xxs;
+  }
+}
+
+.order-buttons-container {
+  display: flex;
+  flex-direction: column;
+  font-size: $elv-font-m;
+
+  .order-button {
+    background: transparent;
+    border: 0;
+    color: $elv-color-mediumgray;
+    cursor: pointer;
+
+    &:hover {
+      color: $elv-color-text-dark;
+    }
+  }
+
+  .placeholder {
+    &::after {
+      content: ".";
+      visibility: hidden;
+    }
   }
 }
 
 .asset-form-modal {
   .-elv-modal-content {
-    min-height: 80%;
-    min-width: 80%;
+    min-height: 70%;
+    min-width: 70%;
   }
 }
+

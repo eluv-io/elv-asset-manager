@@ -63,10 +63,10 @@ class RootStore {
         metadataSubtree: "name"
       }));
 
-    this.assetMetadata = yield this.client.ContentObjectMetadata({
+    this.assetMetadata = (yield this.client.ContentObjectMetadata({
       versionHash: this.params.versionHash,
       metadataSubtree: "asset_metadata"
-    });
+    })) || {};
 
     yield this.formStore.InitializeFormData();
   })

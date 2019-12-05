@@ -71,18 +71,20 @@ class Clips extends React.Component {
       <div key={`clip-${versionHash}-${index}`} className="asset-form-clip">
         <span>{index + 1}</span>
         <span className="clip-title">{title} {id ? `(${id})` : ""}</span>
-        { this.OrderButtons(index) }
-        <IconButton
-          icon={RemoveIcon}
-          className="remove-button"
-          label={`Remove ${title}`}
-          onClick={async () => {
-            await Confirm({
-              message: `Are you sure you want to remove the ${this.props.name} '${title}'?`,
-              onConfirm: () => this.props.formStore.RemoveClip({key: this.props.storeKey, index})
-            });
-          }}
-        />
+        <div className="asset-form-clip-actions">
+          { this.OrderButtons(index) }
+          <IconButton
+            icon={RemoveIcon}
+            className="remove-button"
+            label={`Remove ${title}`}
+            onClick={async () => {
+              await Confirm({
+                message: `Are you sure you want to remove the ${this.props.name} '${title}'?`,
+                onConfirm: () => this.props.formStore.RemoveClip({key: this.props.storeKey, index})
+              });
+            }}
+          />
+        </div>
       </div>
     );
   }
@@ -108,7 +110,7 @@ class Clips extends React.Component {
 
   render() {
     return (
-      <div className="asset-form-container">
+      <div className="asset-form-section-container">
         <h3>{this.props.header}</h3>
         <div className="asset-form-clips-container">
           {this.props.formStore[this.props.storeKey].map((clip, i) => this.Clip(clip, i))}
