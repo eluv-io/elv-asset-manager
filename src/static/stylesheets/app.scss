@@ -1,5 +1,6 @@
 @import "~elv-components-js/src/stylesheets/defaults";
 @import "~elv-components-js/src/stylesheets/styles";
+@import "./file_browser";
 
 .app-version {
   display: none;
@@ -148,12 +149,13 @@ h1 {
   }
 
   h3 {
+    margin-bottom: $elv-spacing-m;
     text-align: center;
   }
 }
 
 .asset-form-clips-container {
-  margin: $elv-spacing-s 0;
+  padding-bottom: $elv-spacing-s;
   width: 100%;
 }
 
@@ -177,7 +179,7 @@ h1 {
   }
 
   .remove-button {
-    height: $elv-font-l;
+    height: $elv-font-xl;
   }
 }
 
@@ -220,9 +222,39 @@ h1 {
   }
 }
 
+.asset-form-images-container {
+  max-width: 100%;
+  padding-bottom: $elv-spacing-s;
+  width: 100%;
+}
+
+.asset-form-image-entry {
+  align-items: center;
+  display: grid;
+  grid-column-gap: 1rem;
+  grid-template-columns: 2rem 1fr 2fr 2rem;
+
+  .preview-icon {
+    padding-left: $elv-spacing-xs;
+    cursor: pointer;
+  }
+
+  input {
+    font-size: $elv-font-l;
+  }
+
+  svg {
+    &.-elv-icon {
+      height: $elv-font-xxl;
+    }
+  }
+}
+
 .asset-form-modal {
   .-elv-modal-content {
-    min-height: 70%;
+    max-height: 70%;
+    max-width: 70%;
+    min-height: 50%;
     min-width: 70%;
   }
 }

@@ -5,6 +5,10 @@ class ContentStore {
   @observable objects = {};
   @observable versions = {};
 
+  @observable files = {};
+  @observable baseFileUrls = {};
+  @observable mimeTypes = {};
+
   constructor(rootStore) {
     this.rootStore = rootStore;
   }
@@ -78,6 +82,33 @@ class ContentStore {
       id: hash,
       versionHash: hash,
       name: i === 0 ? `Latest Version (${hash})` : hash
+    }));
+  });
+
+  @action.bound
+  LoadFiles = flow(function * (versionHash) {
+    if(this.files[versionHash]) { return; }
+
+    this.files[versionHash] = (yield this.rootStore.client.ContentObjectMetadata({
+      versionHash,
+      metadataSubtree: "files"
+    })) || {};
+
+    this.mimeTypes[versionHash] = (yield this.rootStore.client.ContentObjectMetadata({
+      versionHash,
+      metadataSubtree: "mime_types"
+    })) || {};
+
+    this.LoadBaseFileUrl(versionHash);
+  });
+
+  @action.bound
+  LoadBaseFileUrl = flow(function * (versionHash) {
+    if(this.baseFileUrls[versionHash]) { return; }
+
+    this.baseFileUrls[versionHash] = (yield this.rootStore.client.FileUrl({
+      versionHash,
+      filePath: "/"
     }));
   });
 }

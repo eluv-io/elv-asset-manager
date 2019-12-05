@@ -35,6 +35,7 @@ class FormStore {
       objectId
     })).write_token;
 
+    // Clips
     let clips = {};
     this.clips.forEach(({versionHash}, index) => {
       clips[index.toString()] = this.CreateLink(versionHash);
@@ -48,6 +49,7 @@ class FormStore {
       metadata: clips
     });
 
+    // Trailers
     let trailers = {};
     this.trailers.forEach(({versionHash}, index) => {
       trailers[index.toString()] = this.CreateLink(versionHash);
@@ -59,6 +61,25 @@ class FormStore {
       writeToken,
       metadataSubtree: "asset_metadata/trailers",
       metadata: trailers
+    });
+
+    // Images
+    let images = {};
+    this.images.forEach(({imageKey, imagePath, targetHash}) => {
+      if(!imagePath) { return; }
+
+      images[imageKey] = {
+        default: this.CreateLink(targetHash, UrlJoin("files", imagePath)),
+        "240": this.CreateLink(targetHash, UrlJoin("files", imagePath))
+      };
+    });
+
+    yield client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "asset_metadata/images",
+      metadata: images
     });
 
     yield client.FinalizeContentObject({
@@ -95,6 +116,29 @@ class FormStore {
     const clip = this[key][i1];
     this[key][i1] = this[key][i2];
     this[key][i2] = clip;
+  }
+
+  @action.bound
+  UpdateImage({index, imageKey, imagePath, targetHash}) {
+    this.images[index] = {
+      imageKey,
+      imagePath,
+      targetHash
+    };
+  }
+
+  @action.bound
+  AddImage() {
+    this.images.push({
+      imageKey: "",
+      imagePath: undefined,
+      targetHash: this.rootStore.params.versionHash
+    });
+  }
+
+  @action.bound
+  RemoveImage(index) {
+    this.images = this.images.filter((_, i) => i !== index);
   }
 
   // Retrieve information about a clip and add it to targets cache (if not present)
@@ -150,6 +194,74 @@ class FormStore {
     return clips;
   });
 
+  LoadImages = flow(function * (metadata) {
+    let images = [];
+    let imageTargets = [];
+    if(metadata) {
+      Object.keys(metadata).forEach(async imageKey => {
+        const link = metadata[imageKey].default;
+
+        if(!link) {
+          return;
+        }
+
+        let targetHash = this.rootStore.params.versionHash;
+        let imagePath = link["/"].replace(/^\.\/files\//, "");
+        if(link["/"].startsWith("/qfab/")) {
+          targetHash = link["/"].split("/")[2];
+          imagePath = link["/"].split("/").slice(4).join("/");
+        }
+
+        if(!imageTargets.includes(targetHash)) {
+          imageTargets.push(targetHash);
+        }
+
+        images.push({
+          imageKey,
+          imagePath,
+          targetHash
+        });
+      });
+    }
+
+    const mandatoryImages = [
+      "main_slider_background_desktop",
+      "main_slider_background_mobile",
+      "poster",
+      "primary_portrait",
+      "primary_landscape",
+      "screenshot",
+      "thumbnail",
+      "slider_background_desktop",
+      "slider_background_mobile",
+      "title_detail_hero_desktop",
+      "title_detail_hero_mobile",
+      "title_treatment",
+      "title_treatment_wht"
+    ];
+
+    mandatoryImages.forEach(imageKey => {
+      if(images.find(info => info.imageKey === imageKey)) { return; }
+
+      images.push({
+        imageKey,
+        imagePath: undefined,
+        targetHash: this.rootStore.params.versionHash
+      });
+    });
+
+    images = images.sort((a, b) => a.imageKey < b.imageKey ? -1 : 1);
+
+    // Ensure all base URLs are set for previews
+    yield Promise.all(
+      imageTargets.map(async versionHash =>
+        await this.rootStore.contentStore.LoadBaseFileUrl(versionHash)
+      )
+    );
+
+    return images;
+  });
+
   InitializeFormData = flow(function * () {
     const assetMetadata = this.rootStore.assetMetadata;
 
@@ -160,6 +272,8 @@ class FormStore {
     if(assetMetadata.trailers) {
       this.trailers = yield this.LoadClips(assetMetadata.trailers);
     }
+
+    this.images = yield this.LoadImages(assetMetadata.images);
   })
 }
 

@@ -25,6 +25,25 @@ class Clips extends React.Component {
     this.CloseModal();
   }
 
+  ActivateModal() {
+    this.setState({
+      modal: (
+        <Modal
+          className="asset-form-modal"
+          closable={true}
+          OnClickOutside={this.CloseModal}
+        >
+          <ContentBrowser
+            header="Clip Selection"
+            assetTypes={this.props.assetTypes}
+            onComplete={this.AddClip}
+            onCancel={this.CloseModal}
+          />
+        </Modal>
+      )
+    });
+  }
+
   CloseModal() {
     this.setState({modal: null});
   }
@@ -87,25 +106,6 @@ class Clips extends React.Component {
         </div>
       </div>
     );
-  }
-
-  ActivateModal() {
-    this.setState({
-      modal: (
-        <Modal
-          className="asset-form-modal"
-          closable={true}
-          OnClickOutside={this.CloseModal}
-        >
-          <ContentBrowser
-            header="Clip Selection"
-            assetTypes={this.props.assetTypes}
-            onComplete={this.AddClip}
-            onCancel={this.CloseModal}
-          />
-        </Modal>
-      )
-    });
   }
 
   render() {
