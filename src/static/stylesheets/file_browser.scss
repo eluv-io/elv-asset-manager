@@ -1,17 +1,20 @@
 @import "~elv-components-js/src/stylesheets/defaults";
 @import "~elv-components-js/src/stylesheets/styles";
 
+$preview-background: rgba(255, 255, 255, 0.9);
+
 .file-image-preview-tooltip {
   &.file-image-preview-tooltip {
-    background: $elv-color-white;
-    max-width: 25rem;
+    @include elv-cropped-image(auto, auto, 0, 18rem, 13rem);
+    background: $preview-background;
+    border: 1px solid $elv-color-lightgray;
+    border-radius: 5px;
+    height: 15rem;
+    max-height: 20rem;
+    max-width: 20rem;
+    min-width: 10rem;
     opacity: 1;
-  }
-
-  .file-image-preview {
-    opacity: 1;
-    padding: $elv-spacing-xs;
-    width: 100%;
+    padding: $elv-spacing-s;
   }
 }
 

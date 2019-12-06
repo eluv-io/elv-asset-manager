@@ -1,6 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Action, ImageIcon, ToolTip} from "elv-components-js";
+import {Action, CroppedIcon, ImageIcon, ToolTip} from "elv-components-js";
 import UrlJoin from "url-join";
 import PreviewIcon from "../static/icons/image.svg";
 import URI from "urijs";
@@ -21,9 +21,9 @@ class Images extends React.Component {
         key={`preview-icon-${imageKey}`}
         className={"file-image-preview-tooltip"}
         content={
-          <img
-            src={uri.toString()}
-            alt={imagePath}
+          <CroppedIcon
+            icon={uri.toString()}
+            title={imagePath}
             className="file-image-preview"
           />
         }

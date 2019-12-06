@@ -5,7 +5,7 @@ import PrettyBytes from "pretty-bytes";
 import UrlJoin from "url-join";
 import URI from "urijs";
 import Path from "path";
-import {IconButton, ImageIcon, Modal, ToolTip} from "elv-components-js";
+import {CroppedIcon, IconButton, ImageIcon, Modal, ToolTip} from "elv-components-js";
 import AsyncComponent from "./AsyncComponent";
 
 import AddFileIcon from "../static/icons/file-plus.svg";
@@ -73,7 +73,13 @@ class FileBrowser extends React.Component {
         key={`preview-${name}`}
         fixed={true}
         className={"file-image-preview-tooltip"}
-        content={<img src={fileUrl} alt={name} className="file-image-preview"/>}
+        content={
+          <CroppedIcon
+            icon={fileUrl}
+            title={name}
+            className="file-image-preview"
+          />
+        }
       >
         <ImageIcon
           icon={PreviewIcon}

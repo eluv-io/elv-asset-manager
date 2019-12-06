@@ -1,7 +1,8 @@
-import {observable, action, flow} from "mobx";
+import {observable, action, flow, toJS} from "mobx";
 import UrlJoin from "url-join";
 
 class FormStore {
+  @observable assetInfo = {};
   @observable clips = [];
   @observable trailers = [];
   @observable images = [];
@@ -34,6 +35,14 @@ class FormStore {
       libraryId,
       objectId
     })).write_token;
+
+    yield client.MergeMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "asset_metadata",
+      metadata: toJS(this.assetInfo)
+    });
 
     // Clips
     let clips = {};
@@ -97,6 +106,11 @@ class FormStore {
   });
 
   @action.bound
+  UpdateAssetInfo(key, value) {
+    this.assetInfo[key] = value;
+  }
+
+  @action.bound
   AddClip = flow(function * ({key, versionHash}) {
     yield this.RetrieveClip(versionHash);
 
@@ -139,6 +153,16 @@ class FormStore {
   @action.bound
   RemoveImage(index) {
     this.images = this.images.filter((_, i) => i !== index);
+  }
+
+  LoadAssetInfo(metadata) {
+    return {
+      title: metadata.title || "",
+      synopsis: metadata.synopsis || "",
+      ip_title_id: metadata.ip_title_id || "",
+      title_type: metadata.title_type || "franchise",
+      asset_type: metadata.asset_type || "primary"
+    };
   }
 
   // Retrieve information about a clip and add it to targets cache (if not present)
@@ -263,7 +287,9 @@ class FormStore {
   });
 
   InitializeFormData = flow(function * () {
-    const assetMetadata = this.rootStore.assetMetadata;
+    const assetMetadata = this.rootStore.assetMetadata || {};
+
+    this.assetInfo = this.LoadAssetInfo(assetMetadata);
 
     if(assetMetadata.clips) {
       this.clips = yield this.LoadClips(assetMetadata.clips);
