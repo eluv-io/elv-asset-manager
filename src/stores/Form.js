@@ -6,7 +6,7 @@ class FormStore {
   @observable clips = [];
   @observable trailers = [];
   @observable images = [];
-  @observable galleries = [];
+  @observable gallery = [];
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -24,6 +24,23 @@ class FormStore {
       };
     }
   }
+
+  InitializeFormData = flow(function * () {
+    const assetMetadata = this.rootStore.assetMetadata || {};
+
+    this.assetInfo = this.LoadAssetInfo(assetMetadata);
+
+    if(assetMetadata.clips) {
+      this.clips = yield this.LoadClips(assetMetadata.clips);
+    }
+
+    if(assetMetadata.trailers) {
+      this.trailers = yield this.LoadClips(assetMetadata.trailers);
+    }
+
+    this.images = yield this.LoadImages(assetMetadata.images, true);
+    this.gallery = yield this.LoadGallery(assetMetadata.gallery);
+  })
 
   @action.bound
   SaveAsset = flow(function * () {
@@ -91,6 +108,29 @@ class FormStore {
       metadata: images
     });
 
+    // Gallery
+    let gallery = {};
+    this.gallery.forEach(({title, description, imagePath, targetHash}, index) => {
+      if(!imagePath) { return; }
+
+      gallery[index.toString()] = {
+        title,
+        description,
+        image: {
+          default: this.CreateLink(targetHash, UrlJoin("files", imagePath)),
+          "240": this.CreateLink(targetHash, UrlJoin("files", imagePath))
+        }
+      };
+    });
+
+    yield client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "asset_metadata/gallery",
+      metadata: gallery
+    });
+
     yield client.FinalizeContentObject({
       libraryId,
       objectId,
@@ -110,6 +150,7 @@ class FormStore {
     this.assetInfo[key] = value;
   }
 
+  // Clips/trailers
   @action.bound
   AddClip = flow(function * ({key, versionHash}) {
     yield this.RetrieveClip(versionHash);
@@ -132,6 +173,7 @@ class FormStore {
     this[key][i2] = clip;
   }
 
+  // Images
   @action.bound
   UpdateImage({index, imageKey, imagePath, targetHash}) {
     this.images[index] = {
@@ -155,6 +197,40 @@ class FormStore {
     this.images = this.images.filter((_, i) => i !== index);
   }
 
+  // Gallery images
+  @action.bound
+  UpdateGalleryImage({index, title, description, imagePath, targetHash}) {
+    this.gallery[index] = {
+      title,
+      description,
+      imagePath,
+      targetHash
+    };
+  }
+
+  @action.bound
+  AddGalleryImage() {
+    this.gallery.push({
+      title: "",
+      description: "",
+      imagePath: undefined,
+      targetHash: this.rootStore.params.versionHash
+    });
+  }
+
+  @action.bound
+  RemoveGalleryImage(index) {
+    this.gallery = this.gallery.filter((_, i) => i !== index);
+  }
+
+  @action.bound
+  SwapGalleryImage(i1, i2) {
+    const image = this.gallery[i1];
+    this.gallery[i1] = this.gallery[i2];
+    this.gallery[i2] = image;
+  }
+
+  // Load methods
   LoadAssetInfo(metadata) {
     return {
       title: metadata.title || "",
@@ -201,6 +277,8 @@ class FormStore {
 
         if(isNaN(index)) { return; }
 
+        if(!metadata[key] || !metadata[key]["/"]) { return; }
+
         let targetHash = this.rootStore.params.versionHash;
         if(metadata[key]["/"].startsWith("/qfab/")) {
           targetHash = metadata[key]["/"].split("/")[2];
@@ -218,14 +296,14 @@ class FormStore {
     return clips;
   });
 
-  LoadImages = flow(function * (metadata) {
+  LoadImages = flow(function * (metadata, includeMandatory=false) {
     let images = [];
     let imageTargets = [];
     if(metadata) {
       Object.keys(metadata).forEach(async imageKey => {
         const link = metadata[imageKey].default;
 
-        if(!link) {
+        if(!link || !link["/"]) {
           return;
         }
 
@@ -248,31 +326,35 @@ class FormStore {
       });
     }
 
-    const mandatoryImages = [
-      "main_slider_background_desktop",
-      "main_slider_background_mobile",
-      "poster",
-      "primary_portrait",
-      "primary_landscape",
-      "screenshot",
-      "thumbnail",
-      "slider_background_desktop",
-      "slider_background_mobile",
-      "title_detail_hero_desktop",
-      "title_detail_hero_mobile",
-      "title_treatment",
-      "title_treatment_wht"
-    ];
+    if(includeMandatory) {
+      const mandatoryImages = [
+        "main_slider_background_desktop",
+        "main_slider_background_mobile",
+        "poster",
+        "primary_portrait",
+        "primary_landscape",
+        "screenshot",
+        "thumbnail",
+        "slider_background_desktop",
+        "slider_background_mobile",
+        "title_detail_hero_desktop",
+        "title_detail_hero_mobile",
+        "title_treatment",
+        "title_treatment_wht"
+      ];
 
-    mandatoryImages.forEach(imageKey => {
-      if(images.find(info => info.imageKey === imageKey)) { return; }
+      mandatoryImages.forEach(imageKey => {
+        if(images.find(info => info.imageKey === imageKey)) {
+          return;
+        }
 
-      images.push({
-        imageKey,
-        imagePath: undefined,
-        targetHash: this.rootStore.params.versionHash
+        images.push({
+          imageKey,
+          imagePath: undefined,
+          targetHash: this.rootStore.params.versionHash
+        });
       });
-    });
+    }
 
     images = images.sort((a, b) => a.imageKey < b.imageKey ? -1 : 1);
 
@@ -286,21 +368,54 @@ class FormStore {
     return images;
   });
 
-  InitializeFormData = flow(function * () {
-    const assetMetadata = this.rootStore.assetMetadata || {};
+  LoadGallery = flow(function * (metadata) {
+    let images = [];
+    let imageTargets = [];
+    if(metadata) {
+      Object.keys(metadata).forEach(async imageIndex => {
+        const index = parseInt(imageIndex);
 
-    this.assetInfo = this.LoadAssetInfo(assetMetadata);
+        if(isNaN(index)) { return; }
 
-    if(assetMetadata.clips) {
-      this.clips = yield this.LoadClips(assetMetadata.clips);
+        const imageInfo = metadata[imageIndex];
+        const link = imageInfo.image && imageInfo.image.default;
+
+        if(!link || !link["/"]) {
+          return;
+        }
+
+        let targetHash = this.rootStore.params.versionHash;
+        let imagePath = link["/"].replace(/^\.\/files\//, "");
+        if(link["/"].startsWith("/qfab/")) {
+          targetHash = link["/"].split("/")[2];
+          imagePath = link["/"].split("/").slice(4).join("/");
+        }
+
+        if(!imageTargets.includes(targetHash)) {
+          imageTargets.push(targetHash);
+        }
+
+        images[index] = {
+          title: imageInfo.title || "",
+          description: imageInfo.description || "",
+          imagePath,
+          targetHash
+        };
+      });
     }
 
-    if(assetMetadata.trailers) {
-      this.trailers = yield this.LoadClips(assetMetadata.trailers);
-    }
+    // Remove any missing entries
+    images = images.filter(image => image);
 
-    this.images = yield this.LoadImages(assetMetadata.images);
-  })
+    // Ensure all base URLs are set for previews
+    yield Promise.all(
+      imageTargets.map(async versionHash =>
+        await this.rootStore.contentStore.LoadBaseFileUrl(versionHash)
+      )
+    );
+
+    return images;
+  });
 }
 
 export default FormStore;

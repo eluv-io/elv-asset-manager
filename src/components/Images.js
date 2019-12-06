@@ -1,47 +1,21 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Action, CroppedIcon, ImageIcon, ToolTip} from "elv-components-js";
-import UrlJoin from "url-join";
-import PreviewIcon from "../static/icons/image.svg";
-import URI from "urijs";
+import {Action, IconButton} from "elv-components-js";
 import FileSelection from "./FileBrowser";
+import PreviewIcon from "./PreviewIcon";
+
+import DeleteIcon from "../static/icons/trash.svg";
 
 @inject("formStore")
 @inject("contentStore")
 @observer
 class Images extends React.Component {
-  PreviewIcon({imageKey, imagePath, targetHash}) {
-    if(!imagePath) { return <div className="preview-icon" />; }
-
-    const uri = URI(this.props.contentStore.baseFileUrls[targetHash]);
-    uri.path(UrlJoin(uri.path(), imagePath).replace("//", "/"));
-
-    return (
-      <ToolTip
-        key={`preview-icon-${imageKey}`}
-        className={"file-image-preview-tooltip"}
-        content={
-          <CroppedIcon
-            icon={uri.toString()}
-            title={imagePath}
-            className="file-image-preview"
-          />
-        }
-      >
-        <ImageIcon
-          icon={PreviewIcon}
-          label={"Preview " + imageKey}
-          className="preview-icon"
-        />
-      </ToolTip>
-    );
-  }
-
   Image(imageInfo, index) {
     return (
       <div key={`image-${index}`} className="asset-form-image-entry asset-form-clip">
-        { this.PreviewIcon(imageInfo) }
+        <PreviewIcon {...imageInfo} />
         <input
+          placeholder="Key..."
           className="image-key-input"
           value={imageInfo.imageKey}
           onChange={event => this.props.formStore.UpdateImage({
@@ -50,7 +24,7 @@ class Images extends React.Component {
             imageKey: event.target.value
           })}
         />
-        <div className="image-path">{imageInfo.imagePath}</div>
+        <div className="image-path" title={imageInfo.imagePath}>{imageInfo.imagePath}</div>
         <FileSelection
           header={`Select an image for '${imageInfo.imageKey}'`}
           versionHash={imageInfo.targetHash}
@@ -59,6 +33,11 @@ class Images extends React.Component {
             index,
             imagePath,
           })}
+        />
+        <IconButton
+          icon={DeleteIcon}
+          title={`Remove ${imageInfo.imageKey || "image"}`}
+          onClick={() => this.props.formStore.RemoveImage(index)}
         />
       </div>
     );

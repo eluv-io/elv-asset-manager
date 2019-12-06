@@ -4,6 +4,7 @@ import {Action, Confirm} from "elv-components-js";
 import Clips from "./Clips";
 import Images from "./Images";
 import AssetInfo from "./AssetInfo";
+import Gallery from "./Gallery";
 
 @inject("rootStore")
 @inject("formStore")
@@ -29,6 +30,7 @@ class AssetForm extends React.Component {
           <Clips storeKey="clips" header="Clips" name="Clip" assetTypes={["trailer"]}/>
           <Clips storeKey="trailers" header="Trailers" name="Trailer" assetTypes={["trailer"]}/>
           <Images />
+          <Gallery />
         </div>
       </div>
     );

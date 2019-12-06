@@ -5,13 +5,13 @@ import PrettyBytes from "pretty-bytes";
 import UrlJoin from "url-join";
 import URI from "urijs";
 import Path from "path";
-import {CroppedIcon, IconButton, ImageIcon, Modal, ToolTip} from "elv-components-js";
+import {IconButton, ImageIcon, Modal} from "elv-components-js";
 import AsyncComponent from "./AsyncComponent";
+import PreviewIcon from "./PreviewIcon";
 
 import AddFileIcon from "../static/icons/file-plus.svg";
 import DirectoryIcon from "../static/icons/directory.svg";
 import FileIcon from "../static/icons/file.svg";
-import PreviewIcon from "../static/icons/image.svg";
 import BackIcon from "../static/icons/directory_back.svg";
 
 class FileBrowser extends React.Component {
@@ -57,7 +57,7 @@ class FileBrowser extends React.Component {
     return uri.toString();
   }
 
-  FileIcon(name, fileUrl) {
+  FileIcon(name) {
     const extension = name.split(".").pop();
     const mimeType = (this.props.mimeTypes || {})[extension] || "";
     const isImage =
@@ -69,24 +69,11 @@ class FileBrowser extends React.Component {
     }
 
     return (
-      <ToolTip
-        key={`preview-${name}`}
-        fixed={true}
-        className={"file-image-preview-tooltip"}
-        content={
-          <CroppedIcon
-            icon={fileUrl}
-            title={name}
-            className="file-image-preview"
-          />
-        }
-      >
-        <ImageIcon
-          icon={PreviewIcon}
-          label={"Preview " + name}
-          className="preview-icon"
-        />
-      </ToolTip>
+      <PreviewIcon
+        imageKey={name}
+        imagePath={UrlJoin(this.state.path, name)}
+        targetHash={this.props.versionHash}
+      />
     );
   }
 
@@ -98,7 +85,6 @@ class FileBrowser extends React.Component {
     }
 
     const size = PrettyBytes(info.size || 0);
-    const fileUrl = this.FileUrl(this.state.path, name);
     return (
       <tr
         key={`entry-${this.state.path}-${name}`}
@@ -107,7 +93,7 @@ class FileBrowser extends React.Component {
         onClick={() => this.props.Select(UrlJoin(this.state.path, name).replace(/^\.\//, ""))}
       >
         <td className="item-icon">
-          { this.FileIcon(name, fileUrl) }
+          { this.FileIcon(name) }
         </td>
         <td title={name}>{ name }</td>
         <td title={size} className="info-cell">{ size }</td>
@@ -236,6 +222,7 @@ class FileSelection extends React.Component {
           <FileBrowser
             header={this.props.header}
             Select={this.SelectFile}
+            versionHash={this.props.versionHash}
             baseFileUrl={this.props.contentStore.baseFileUrls[this.props.versionHash]}
             files={this.props.contentStore.files[this.props.versionHash]}
             mimeTypes={this.props.contentStore.mimeTypes[this.props.versionHash]}

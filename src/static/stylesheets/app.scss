@@ -33,6 +33,25 @@ h1 {
   text-align: center;
 }
 
+button {
+  svg {
+    stroke: $elv-color-darkergray;
+
+    &:hover {
+      stroke: $elv-color-black;
+    }
+  }
+}
+
+.preview-icon {
+  cursor: pointer;
+  padding: $elv-spacing-xxs;
+
+  &:hover {
+    stroke: $elv-color-black;
+  }
+}
+
 .content-browser {
   align-items: center;
   display: flex;
@@ -158,31 +177,32 @@ h1 {
   width: 100%;
 }
 
+
+label {
+  color: $elv-color-text-light;
+}
+
+select {
+  width: 100%;
+}
+
+textarea {
+  font-family: inherit;
+  height: 7rem;
+  padding: $elv-spacing-xxs;
+}
+
+input,
+textarea {
+  font-size: $elv-font-l;
+}
+
 .asset-form-input {
   align-items: center;
   display: grid;
   grid-gap: 1rem;
   grid-template-columns: 7rem 1fr;
   margin-bottom: $elv-spacing-xs;
-
-  label {
-    color: $elv-color-text-light;
-  }
-
-  select {
-    width: 100%;
-  }
-
-  textarea {
-    font-family: inherit;
-    height: 5rem;
-    padding: $elv-spacing-xs $elv-spacing-xxs;
-  }
-
-  input,
-  textarea {
-    font-size: $elv-font-l;
-  }
 }
 
 .asset-form-clips-container {
@@ -259,26 +279,38 @@ h1 {
   width: 100%;
 }
 
-.asset-form-image-entry {
+.image-path {
+  @include elv-ellipsis;
+  font-size: $elv-font-s;
+}
+
+.asset-form-image-entry,
+.asset-form-gallery-image-entry {
   align-items: center;
   display: grid;
   grid-column-gap: 1rem;
-  grid-template-columns: 2rem 1fr 2fr 2rem;
-
-  .preview-icon {
-    cursor: pointer;
-    padding-left: $elv-spacing-xs;
-  }
+  padding: $elv-spacing-xxs;
 
   input {
     font-size: $elv-font-l;
   }
 
-  svg {
-    &.-elv-icon {
-      height: $elv-font-xxl;
-    }
+  button {
+    height: $elv-font-xl;
   }
+
+  textarea {
+    font-size: $elv-font-m;
+    height: 3.5rem;
+  }
+}
+
+.asset-form-image-entry {
+  grid-template-columns: 2rem 1fr 2fr 1.5rem 2rem;
+}
+
+.asset-form-gallery-image-entry {
+  grid-template-columns: 2rem 2fr 3fr 2fr 1rem 1rem 1.5rem;
 }
 
 .asset-form-modal {
