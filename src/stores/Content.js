@@ -8,6 +8,7 @@ class ContentStore {
   @observable files = {};
   @observable baseFileUrls = {};
   @observable mimeTypes = {};
+  @observable playoutOptions = {};
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -109,6 +110,18 @@ class ContentStore {
     this.baseFileUrls[versionHash] = (yield this.rootStore.client.FileUrl({
       versionHash,
       filePath: "/"
+    }));
+  });
+
+  @action.bound
+  LoadPlayoutOptions = flow(function * (versionHash) {
+    if(this.playoutOptions[versionHash]) { return; }
+
+    this.playoutOptions[versionHash] = (yield this.rootStore.client.PlayoutOptions({
+      versionHash,
+      linkPath: "asset_metadata/sources/default",
+      protocols: ["hls"],
+      drms: ["aes-128"]
     }));
   });
 }

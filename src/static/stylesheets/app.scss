@@ -52,6 +52,22 @@ button {
   }
 }
 
+.video-preview-icon {
+  &.video-preview-icon-playing {
+    svg {
+      stroke: $elv-color-mediumblue;
+    }
+  }
+}
+
+.video-preview {
+  max-width: 100%;
+
+  video {
+    width: 100%;
+  }
+}
+
 .content-browser {
   align-items: center;
   display: flex;
@@ -217,7 +233,8 @@ textarea {
   padding: $elv-spacing-xxs 0;
   position: relative;
 
-  &:last-child {
+  &:last-child,
+  &.asset-form-clip-with-preview {
     border-bottom: 1px solid $elv-color-lightgray;
   }
 
