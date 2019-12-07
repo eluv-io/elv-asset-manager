@@ -59,7 +59,8 @@ const Clip = ({index, clip, name, length, Swap, Remove}) => {
           className={`video-preview-icon ${showPreview ? "video-preview-icon-playing" : ""}`}
           onClick={() => setShowPreview(!showPreview)}
         />
-        <span className="clip-title">{title} {id ? `(${id})` : ""}</span>
+        <div>{title} {id ? `(${id})` : ""}</div>
+        <div className="clip-target-hash">{versionHash}</div>
         <OrderButtons index={index} length={length} Swap={Swap}/>
         <IconButton
           icon={RemoveIcon}

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "license": "MIT",
-  "homepage": "https://github.com/eluv-io/elv-video-asset-manager",
+  "homepage": "https://github.com/eluv-io/video-asset-manager",
   "scripts": {
     "serve": "webpack-dev-server --hot --port 8085",
     "build": "rm -rf dist/* && NODE_ENV=production node ./node_modules/webpack-cli/bin/cli.js -p --progress --colors --devtool none",

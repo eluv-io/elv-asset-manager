@@ -292,7 +292,15 @@ textarea {
 }
 
 .asset-form-clip {
-  grid-template-columns: 2rem 1fr 2rem 2rem;
+  grid-template-columns: 2rem 3fr 4fr 2rem 2rem;
+
+  div {
+    @include elv-ellipsis;
+  }
+
+  .clip-target-hash {
+    font-size: $elv-font-s;
+  }
 
   .video-preview-icon {
     margin-left: $elv-spacing-xxs;
