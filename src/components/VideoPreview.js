@@ -31,7 +31,7 @@ class VideoPreview extends React.Component {
         <video
           crossOrigin="anonymous"
           ref={this.InitializeVideo}
-          autoPlay={false}
+          autoPlay={true}
           controls
           preload="auto"
         />

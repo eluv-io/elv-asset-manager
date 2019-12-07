@@ -55,24 +55,23 @@ const Clip = ({index, clip, name, length, Swap, Remove}) => {
       <div key={`clip-${versionHash}-${index}`} className={`asset-form-clip ${showPreview ? "asset-form-clip-with-preview" : ""}`}>
         <IconButton
           icon={PlayIcon}
+          title={`Preview ${title}`}
           className={`video-preview-icon ${showPreview ? "video-preview-icon-playing" : ""}`}
           onClick={() => setShowPreview(!showPreview)}
         />
         <span className="clip-title">{title} {id ? `(${id})` : ""}</span>
-        <div className="asset-form-clip-actions">
-          <OrderButtons index={index} length={length} Swap={Swap}/>
-          <IconButton
-            icon={RemoveIcon}
-            className="remove-button"
-            label={`Remove ${title}`}
-            onClick={async () => {
-              await Confirm({
-                message: `Are you sure you want to remove the ${name} '${title}'?`,
-                onConfirm: Remove
-              });
-            }}
-          />
-        </div>
+        <OrderButtons index={index} length={length} Swap={Swap}/>
+        <IconButton
+          icon={RemoveIcon}
+          className="remove-button"
+          label={`Remove ${title}`}
+          onClick={async () => {
+            await Confirm({
+              message: `Are you sure you want to remove the ${name} '${title}'?`,
+              onConfirm: Remove
+            });
+          }}
+        />
       </div>
       { preview }
     </React.Fragment>

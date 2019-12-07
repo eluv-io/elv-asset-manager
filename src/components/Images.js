@@ -12,7 +12,7 @@ import DeleteIcon from "../static/icons/trash.svg";
 class Images extends React.Component {
   Image(imageInfo, index) {
     return (
-      <div key={`image-${index}`} className="asset-form-image-entry asset-form-clip">
+      <div key={`image-${index}`} className="asset-form-image-entry">
         <PreviewIcon {...imageInfo} />
         <input
           placeholder="Key..."

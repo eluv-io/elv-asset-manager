@@ -47,7 +47,7 @@ class Gallery extends React.Component {
 
   Image(imageInfo, index) {
     return (
-      <div key={`image-${index}`} className="asset-form-gallery-image-entry asset-form-clip">
+      <div key={`image-${index}`} className="asset-form-gallery-image-entry">
         <PreviewIcon {...imageInfo} />
         <input
           placeholder="Title..."
