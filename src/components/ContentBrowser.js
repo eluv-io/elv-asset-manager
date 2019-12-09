@@ -28,18 +28,15 @@ class BrowserList extends React.Component {
           onChange={event => this.setState({filter: event.target.value})}
           value={this.state.filter}
         />
-        <ul className="browser">
+        <ul className={`browser ${this.props.hashes ? "mono" : ""}`}>
           {(this.props.list || [])
             .filter(({name}) => name.toLowerCase().includes(this.state.filter.toLowerCase()))
             .map(({id, name, assetType}) => {
               return (
                 <li key={`browse-entry-${id}`}>
-                  <button
-                    className={assetType ? "with-hint" : ""}
-                    onClick={() => this.props.Select(id)}
-                  >
-                    <span>{name}</span>
-                    {assetType ? <span className="hint">{assetType}</span> : null}
+                  <button onClick={() => this.props.Select(id)}>
+                    <div>{name}</div>
+                    {assetType ? <div className="hint">{assetType}</div> : null}
                   </button>
                 </li>
               );
@@ -71,6 +68,7 @@ BrowserList.propTypes = {
       id: PropTypes.string
     })
   ),
+  hashes: PropTypes.bool,
   Load: PropTypes.func.isRequired,
   Select: PropTypes.func.isRequired
 };
@@ -145,6 +143,7 @@ class ContentBrowser extends React.Component {
             header="Choose a version"
             subHeader={<React.Fragment><div>{library.name}</div><div>{object.name}</div></React.Fragment>}
             list={this.props.contentStore.versions[this.state.objectId]}
+            hashes={true}
             Load={async () => await this.props.contentStore.LoadVersions(this.state.libraryId, this.state.objectId)}
             Select={versionHash => this.props.onComplete({
               libraryId: this.state.libraryId,

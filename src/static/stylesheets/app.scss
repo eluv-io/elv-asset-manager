@@ -134,7 +134,6 @@ button {
     }
 
     button {
-      @include elv-ellipsis;
       background: transparent;
       border: 0;
       cursor: pointer;
@@ -142,22 +141,30 @@ button {
       height: 100%;
       margin: 0;
       max-width: 100%;
+      min-height: 2.5rem;
       outline: 0;
       padding: $elv-spacing-xs;
       width: 100%;
+
+      div {
+        @include elv-ellipsis;
+      }
 
       &:hover {
         background: $elv-color-mediumblue;
         color: $elv-color-text-white;
 
-        span {
+        div {
           color: $elv-color-text-white;
         }
       }
+    }
 
-      &.with-hint {
-        display: grid;
-        grid-template-columns: 3fr 1fr;
+    &.mono {
+      button {
+        @include elv-ellipsis;
+        font-family: $elv-font-monospace;
+        font-size: $elv-font-s;
       }
     }
   }
