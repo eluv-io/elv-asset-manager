@@ -10,6 +10,10 @@ class VideoPreview extends React.Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      errorMessage: ""
+    };
+
     this.Preview = this.Preview.bind(this);
     this.InitializeVideo = this.InitializeVideo.bind(this);
   }
@@ -17,15 +21,26 @@ class VideoPreview extends React.Component {
   InitializeVideo(element) {
     if(!element) { return; }
 
-    const playoutUrl = this.props.contentStore.playoutOptions[this.props.versionHash].hls.playoutMethods.clear.playoutUrl;
+    try {
+      this.setState({errorMessage: undefined});
+      const playoutUrl = this.props.contentStore.playoutOptions[this.props.versionHash].hls.playoutMethods.clear.playoutUrl;
 
-    const player = new HLSPlayer();
+      const player = new HLSPlayer();
 
-    player.loadSource(playoutUrl);
-    player.attachMedia(element);
+      player.loadSource(playoutUrl);
+      player.attachMedia(element);
+    } catch (error) {
+      this.setState({errorMessage: "Error loading video preview"});
+      // eslint-disable-next-line no-console
+      console.error(error);
+    }
   }
 
   Preview() {
+    if(this.state.errorMessage) {
+      return <div className="error-message">{this.state.errorMessage}</div>;
+    }
+
     return (
       <div className="video-preview">
         <video

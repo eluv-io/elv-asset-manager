@@ -3,49 +3,14 @@ import {inject, observer} from "mobx-react";
 import {Action, IconButton} from "elv-components-js";
 import FileSelection from "./FileBrowser";
 import PreviewIcon from "./PreviewIcon";
+import OrderButtons from "./OrderButtons";
 
 import DeleteIcon from "../static/icons/trash.svg";
 
 @inject("formStore")
-@inject("contentStore")
 @observer
 class Gallery extends React.Component {
-  OrderButtons(index) {
-    let upButton = <div className="placeholder" />;
-    if(index > 0) {
-      upButton = (
-        <button
-          title={"Move up"}
-          onClick={() => this.props.formStore.SwapGalleryImage(index, index - 1)}
-          className="order-button"
-        >
-          ▲
-        </button>
-      );
-    }
-
-    let downButton = <div className="placeholder" />;
-    if(index < this.props.formStore.gallery.length - 1) {
-      downButton = (
-        <button
-          title={"Move down"}
-          onClick={() => this.props.formStore.SwapGalleryImage(index, index + 1)}
-          className="order-button"
-        >
-          ▼
-        </button>
-      );
-    }
-
-    return (
-      <div className="order-buttons-container">
-        {upButton}
-        {downButton}
-      </div>
-    );
-  }
-
-  Image(imageInfo, index) {
+  GalleryImage(imageInfo, index) {
     return (
       <div key={`image-${index}`} className="asset-form-gallery-image-entry">
         <PreviewIcon {...imageInfo} />
@@ -70,7 +35,11 @@ class Gallery extends React.Component {
           })}
         />
         <div className="image-path" title={imageInfo.imagePath}>{imageInfo.imagePath}</div>
-        { this.OrderButtons(index) }
+        <OrderButtons
+          index={index}
+          length={this.props.formStore.gallery.length}
+          Swap={this.props.formStore.SwapGalleryImage}
+        />
         <FileSelection
           header={`Select an image for '${imageInfo.imageKey}'`}
           versionHash={imageInfo.targetHash}
@@ -94,7 +63,7 @@ class Gallery extends React.Component {
       <div className="asset-form-section-container">
         <h3>Gallery</h3>
         <div className="asset-form-images-container">
-          {this.props.formStore.gallery.map((image, i) => this.Image(image, i))}
+          {this.props.formStore.gallery.map((image, i) => this.GalleryImage(image, i))}
         </div>
         <Action onClick={this.props.formStore.AddGalleryImage}>Add Image</Action>
       </div>

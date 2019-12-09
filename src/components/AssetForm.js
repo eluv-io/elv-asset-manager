@@ -5,6 +5,7 @@ import Clips from "./Clips";
 import Images from "./Images";
 import AssetInfo from "./AssetInfo";
 import Gallery from "./Gallery";
+import Playlists from "./Playlists";
 
 @inject("rootStore")
 @inject("formStore")
@@ -31,6 +32,7 @@ class AssetForm extends React.Component {
           <Clips storeKey="trailers" header="Trailers" name="Trailer" assetTypes={["trailer"]}/>
           <Images />
           <Gallery />
+          <Playlists />
         </div>
       </div>
     );

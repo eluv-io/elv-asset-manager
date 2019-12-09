@@ -7,6 +7,7 @@ class FormStore {
   @observable trailers = [];
   @observable images = [];
   @observable gallery = [];
+  @observable playlists = [];
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -40,109 +41,7 @@ class FormStore {
 
     this.images = yield this.LoadImages(assetMetadata.images, true);
     this.gallery = yield this.LoadGallery(assetMetadata.gallery);
-  })
-
-  @action.bound
-  SaveAsset = flow(function * () {
-    const client = this.rootStore.client;
-
-    const {libraryId, objectId} = this.rootStore.params;
-
-    const writeToken = (yield client.EditContentObject({
-      libraryId,
-      objectId
-    })).write_token;
-
-    yield client.MergeMetadata({
-      libraryId,
-      objectId,
-      writeToken,
-      metadataSubtree: "asset_metadata",
-      metadata: toJS(this.assetInfo)
-    });
-
-    // Clips
-    let clips = {};
-    this.clips.forEach(({versionHash}, index) => {
-      clips[index.toString()] = this.CreateLink(versionHash);
-    });
-
-    yield client.ReplaceMetadata({
-      libraryId,
-      objectId,
-      writeToken,
-      metadataSubtree: "asset_metadata/clips",
-      metadata: clips
-    });
-
-    // Trailers
-    let trailers = {};
-    this.trailers.forEach(({versionHash}, index) => {
-      trailers[index.toString()] = this.CreateLink(versionHash);
-    });
-
-    yield client.ReplaceMetadata({
-      libraryId,
-      objectId,
-      writeToken,
-      metadataSubtree: "asset_metadata/trailers",
-      metadata: trailers
-    });
-
-    // Images
-    let images = {};
-    this.images.forEach(({imageKey, imagePath, targetHash}) => {
-      if(!imagePath) { return; }
-
-      images[imageKey] = {
-        default: this.CreateLink(targetHash, UrlJoin("files", imagePath)),
-        "240": this.CreateLink(targetHash, UrlJoin("files", imagePath))
-      };
-    });
-
-    yield client.ReplaceMetadata({
-      libraryId,
-      objectId,
-      writeToken,
-      metadataSubtree: "asset_metadata/images",
-      metadata: images
-    });
-
-    // Gallery
-    let gallery = {};
-    this.gallery.forEach(({title, description, imagePath, targetHash}, index) => {
-      if(!imagePath) { return; }
-
-      gallery[index.toString()] = {
-        title,
-        description,
-        image: {
-          default: this.CreateLink(targetHash, UrlJoin("files", imagePath)),
-          "240": this.CreateLink(targetHash, UrlJoin("files", imagePath))
-        }
-      };
-    });
-
-    yield client.ReplaceMetadata({
-      libraryId,
-      objectId,
-      writeToken,
-      metadataSubtree: "asset_metadata/gallery",
-      metadata: gallery
-    });
-
-    yield client.FinalizeContentObject({
-      libraryId,
-      objectId,
-      writeToken
-    });
-
-    yield client.SendMessage({
-      options: {
-        operation: "Complete",
-        message: "Successfully updated asset"
-      }
-    });
+    this.playlists = yield this.LoadPlaylists(assetMetadata.playlists);
   });
 
   @action.bound
@@ -152,25 +51,43 @@ class FormStore {
 
   // Clips/trailers
   @action.bound
-  AddClip = flow(function * ({key, versionHash}) {
+  AddClip = flow(function * ({key, playlistIndex, versionHash}) {
     yield this.RetrieveClip(versionHash);
 
-    this[key].push({
-      versionHash,
-      ...this.targets[versionHash]
-    });
+    if(playlistIndex !== undefined) {
+      this.playlists[playlistIndex].clips.push({
+        versionHash,
+        ...this.targets[versionHash]
+      });
+    } else {
+      this[key].push({
+        versionHash,
+        ...this.targets[versionHash]
+      });
+    }
   });
 
   @action.bound
-  RemoveClip({key, index}) {
-    this[key] = this[key].filter((_, i) => i !== index);
+  RemoveClip({key, playlistIndex, index}) {
+    if(playlistIndex !== undefined) {
+      this.playlists[playlistIndex].clips =
+        this.playlists[playlistIndex].clips.filter((_, i) => i !== index);
+    } else {
+      this[key] = this[key].filter((_, i) => i !== index);
+    }
   }
 
   @action.bound
-  SwapClip({key, i1, i2}) {
-    const clip = this[key][i1];
-    this[key][i1] = this[key][i2];
-    this[key][i2] = clip;
+  SwapClip({key, playlistIndex, i1, i2}) {
+    if(playlistIndex !== undefined) {
+      const clip = this.playlists[playlistIndex].clips[i1];
+      this.playlists[playlistIndex].clips[i1] = this.playlists[playlistIndex].clips[i2];
+      this.playlists[playlistIndex].clips[i2] = clip;
+    } else {
+      const clip = this[key][i1];
+      this[key][i1] = this[key][i2];
+      this[key][i2] = clip;
+    }
   }
 
   // Images
@@ -228,6 +145,28 @@ class FormStore {
     const image = this.gallery[i1];
     this.gallery[i1] = this.gallery[i2];
     this.gallery[i2] = image;
+  }
+
+  // Playlists
+  @action.bound
+  AddPlaylist() {
+    this.playlists.push({
+      playlistKey: "",
+      clips: []
+    });
+  }
+
+  @action.bound
+  UpdatePlaylist({index, playlistKey}) {
+    this.playlists[index] = {
+      ...this.playlists[index],
+      playlistKey
+    };
+  }
+
+  @action.bound
+  RemovePlaylist(index) {
+    this.playlists = this.playlists.filter((_, i) => i !== index);
   }
 
   // Load methods
@@ -415,6 +354,146 @@ class FormStore {
     );
 
     return images;
+  });
+
+  LoadPlaylists = flow(function * (metadata) {
+    let playlists = [];
+    if(metadata) {
+      yield Promise.all(
+        Object.keys(metadata).map(async playlistKey => {
+          playlists.push({
+            playlistKey,
+            clips: await this.LoadClips(metadata[playlistKey])
+          });
+        })
+      );
+    }
+
+    return playlists;
+  });
+
+  @action.bound
+  SaveAsset = flow(function * () {
+    const client = this.rootStore.client;
+
+    const {libraryId, objectId} = this.rootStore.params;
+
+    const writeToken = (yield client.EditContentObject({
+      libraryId,
+      objectId
+    })).write_token;
+
+    yield client.MergeMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "asset_metadata",
+      metadata: toJS(this.assetInfo)
+    });
+
+    // Clips
+    let clips = {};
+    this.clips.forEach(({versionHash}, index) => {
+      clips[index.toString()] = this.CreateLink(versionHash);
+    });
+
+    yield client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "asset_metadata/clips",
+      metadata: clips
+    });
+
+    // Trailers
+    let trailers = {};
+    this.trailers.forEach(({versionHash}, index) => {
+      trailers[index.toString()] = this.CreateLink(versionHash);
+    });
+
+    yield client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "asset_metadata/trailers",
+      metadata: trailers
+    });
+
+    // Images
+    let images = {};
+    this.images.forEach(({imageKey, imagePath, targetHash}) => {
+      if(!imageKey || !imagePath) { return; }
+
+      images[imageKey] = {
+        default: this.CreateLink(targetHash, UrlJoin("files", imagePath)),
+        "240": this.CreateLink(targetHash, UrlJoin("files", imagePath))
+      };
+    });
+
+    yield client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "asset_metadata/images",
+      metadata: images
+    });
+
+    // Gallery
+    let gallery = {};
+    this.gallery.forEach(({title, description, imagePath, targetHash}, index) => {
+      if(!imagePath) { return; }
+
+      gallery[index.toString()] = {
+        title,
+        description,
+        image: {
+          default: this.CreateLink(targetHash, UrlJoin("files", imagePath)),
+          "240": this.CreateLink(targetHash, UrlJoin("files", imagePath))
+        }
+      };
+    });
+
+    yield client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "asset_metadata/gallery",
+      metadata: gallery
+    });
+
+    // Playlists
+    let playlists = {};
+    this.playlists.forEach(({playlistKey, clips}) => {
+      if(!playlistKey) { return; }
+
+      let playlistClips = {};
+      clips.forEach(({versionHash}, index) => {
+        playlistClips[index.toString()] = this.CreateLink(versionHash);
+      });
+
+      playlists[playlistKey] = playlistClips;
+    });
+
+    yield client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "asset_metadata/playlists",
+      metadata: playlists
+    });
+
+    yield client.FinalizeContentObject({
+      libraryId,
+      objectId,
+      writeToken
+    });
+
+    yield client.SendMessage({
+      options: {
+        operation: "Complete",
+        message: "Successfully updated asset"
+      }
+    });
   });
 }
 

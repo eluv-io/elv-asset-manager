@@ -4,44 +4,10 @@ import {Action, IconButton, Modal, Confirm} from "elv-components-js";
 import PropTypes from "prop-types";
 import ContentBrowser from "./ContentBrowser";
 import VideoPreview from "./VideoPreview";
+import OrderButtons from "./OrderButtons";
 
 import RemoveIcon from "../static/icons/trash.svg";
 import PlayIcon from "../static/icons/play-circle.svg";
-
-const OrderButtons = ({index, length, Swap}) => {
-  let upButton = <div className="placeholder" />;
-  if(index > 0) {
-    upButton = (
-      <button
-        title={"Move up"}
-        onClick={() => Swap(index, index - 1)}
-        className="order-button"
-      >
-        ▲
-      </button>
-    );
-  }
-
-  let downButton = <div className="placeholder" />;
-  if(index < length - 1) {
-    downButton = (
-      <button
-        title={"Move down"}
-        onClick={() => Swap(index, index + 1)}
-        className="order-button"
-      >
-        ▼
-      </button>
-    );
-  }
-
-  return (
-    <div className="order-buttons-container">
-      {upButton}
-      {downButton}
-    </div>
-  );
-};
 
 const Clip = ({index, clip, name, length, Swap, Remove}) => {
   const {versionHash, title, id} = clip;
@@ -96,7 +62,11 @@ class Clips extends React.Component {
   }
 
   AddClip({versionHash}) {
-    this.props.formStore.AddClip({key: this.props.storeKey, versionHash});
+    this.props.formStore.AddClip({
+      key: this.props.storeKey,
+      playlistIndex: this.props.playlistIndex,
+      versionHash
+    });
     this.CloseModal();
   }
 
@@ -124,17 +94,31 @@ class Clips extends React.Component {
   }
 
   render() {
+    const clips = this.props.playlistIndex !== undefined ?
+      this.props.formStore.playlists[this.props.playlistIndex].clips :
+      this.props.formStore[this.props.storeKey];
+
     return (
       <div className="asset-form-section-container">
         <h3>{this.props.header}</h3>
         <div className="asset-form-clips-container">
-          {this.props.formStore[this.props.storeKey].map((clip, i) =>
+          {clips.map((clip, index) =>
             <Clip
-              index={i}
+              index={index}
+              key={`asset-clip-${this.props.storeKey || this.props.playlistIndex}-${index}`}
               clip={clip}
-              length={this.props.formStore[this.props.storeKey].length}
-              Swap={(i1, i2) => this.props.formStore.SwapClip({key: this.props.storeKey, i1, i2})}
-              Remove={() => this.props.formStore.RemoveClip({key: this.props.storeKey, index})}
+              length={clips.length}
+              Swap={(i1, i2) => this.props.formStore.SwapClip({
+                key: this.props.storeKey,
+                playlistIndex: this.props.playlistIndex,
+                i1,
+                i2
+              })}
+              Remove={() => this.props.formStore.RemoveClip({
+                key: this.props.storeKey,
+                playlistIndex: this.props.playlistIndex,
+                index
+              })}
             />
           )}
         </div>
@@ -148,7 +132,8 @@ class Clips extends React.Component {
 }
 
 Clips.propTypes = {
-  storeKey: PropTypes.string.isRequired,
+  storeKey: PropTypes.string,
+  playlistIndex: PropTypes.number,
   header: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   assetTypes: PropTypes.arrayOf(PropTypes.string)
