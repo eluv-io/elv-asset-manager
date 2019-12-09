@@ -79,10 +79,10 @@ class ContentStore {
 
     const versions = (yield this.rootStore.client.ContentObjectVersions({libraryId, objectId})).versions || [];
 
-    this.versions[objectId] = versions.map(({hash}, i) => ({
+    this.versions[objectId] = versions.map(({hash}) => ({
       id: hash,
       versionHash: hash,
-      name: i === 0 ? `Latest Version (${hash})` : hash
+      name: hash
     }));
   });
 

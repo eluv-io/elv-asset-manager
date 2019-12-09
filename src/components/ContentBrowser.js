@@ -31,11 +31,15 @@ class BrowserList extends React.Component {
         <ul className="browser">
           {(this.props.list || [])
             .filter(({name}) => name.toLowerCase().includes(this.state.filter.toLowerCase()))
-            .map(({id, name}) => {
+            .map(({id, name, assetType}) => {
               return (
                 <li key={`browse-entry-${id}`}>
-                  <button onClick={() => this.props.Select(id)}>
-                    { name }
+                  <button
+                    className={assetType ? "with-hint" : ""}
+                    onClick={() => this.props.Select(id)}
+                  >
+                    <span>{name}</span>
+                    {assetType ? <span className="hint">{assetType}</span> : null}
                   </button>
                 </li>
               );

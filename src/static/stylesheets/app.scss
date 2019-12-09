@@ -43,6 +43,10 @@ button {
   }
 }
 
+.hint {
+  color: $elv-color-text-lighter;
+}
+
 .preview-icon {
   cursor: pointer;
   padding: $elv-spacing-xxs;
@@ -123,7 +127,6 @@ button {
     li {
       border: 1px solid $elv-color-gray;
       border-bottom: 0;
-      padding: $elv-spacing-xxs;
 
       &:last-child {
         border-bottom: 1px solid $elv-color-gray;
@@ -145,7 +148,16 @@ button {
 
       &:hover {
         background: $elv-color-mediumblue;
-        color: $elv-color-white;
+        color: $elv-color-text-white;
+
+        span {
+          color: $elv-color-text-white;
+        }
+      }
+
+      &.with-hint {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
       }
     }
   }
@@ -322,13 +334,14 @@ textarea {
 }
 
 .asset-form-clip {
-  grid-template-columns: 2rem 3fr 4fr 2rem 2rem;
+  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 2rem 2rem;
 
   div {
     @include elv-ellipsis;
   }
 
   .clip-target-hash {
+    font-family: $elv-font-monospace;
     font-size: $elv-font-s;
   }
 

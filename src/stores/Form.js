@@ -204,7 +204,12 @@ class FormStore {
         metadataSubtree: "asset_metadata/ip_title_id"
       });
 
-      this.targets[versionHash] = {id, title};
+      const assetType = yield client.ContentObjectMetadata({
+        versionHash: versionHash,
+        metadataSubtree: "asset_metadata/asset_type"
+      });
+
+      this.targets[versionHash] = {id, assetType, title};
     }
   });
 

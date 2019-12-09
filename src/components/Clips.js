@@ -10,7 +10,7 @@ import RemoveIcon from "../static/icons/trash.svg";
 import PlayIcon from "../static/icons/play-circle.svg";
 
 const Clip = ({index, clip, name, length, Swap, Remove}) => {
-  const {versionHash, title, id} = clip;
+  const {versionHash, title, id, assetType} = clip;
 
   const [showPreview, setShowPreview] = useState(false);
 
@@ -25,6 +25,7 @@ const Clip = ({index, clip, name, length, Swap, Remove}) => {
           className={`video-preview-icon ${showPreview ? "video-preview-icon-playing" : ""}`}
           onClick={() => setShowPreview(!showPreview)}
         />
+        <div className="hint">{assetType}</div>
         <div>{title} {id ? `(${id})` : ""}</div>
         <div className="clip-target-hash">{versionHash}</div>
         <OrderButtons index={index} length={length} Swap={Swap}/>
