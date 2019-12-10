@@ -49,7 +49,10 @@ class ContentStore {
     const objectInfo = (
       yield this.rootStore.client.ContentObjects({
         libraryId,
-        filterOptions: {select: ["name", "public", "asset_metadata"]}
+        filterOptions: {
+          select: ["name", "public", "asset_metadata"],
+          limit: 10000
+        }
       })
     ).contents || [];
 
