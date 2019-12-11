@@ -2,6 +2,7 @@ import {observable, action, flow} from "mobx";
 
 class ContentStore {
   @observable libraries = [];
+  @observable objectLists = {};
   @observable objects = {};
   @observable versions = {};
 
@@ -50,7 +51,7 @@ class ContentStore {
       yield this.rootStore.client.ContentObjects({
         libraryId,
         filterOptions: {
-          select: ["name", "public", "asset_metadata"],
+          select: ["name", "public", "asset_metadata/title", "asset_metadata/asset_type"],
           limit: 10000
         }
       })
