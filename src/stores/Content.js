@@ -51,7 +51,7 @@ class ContentStore {
       yield this.rootStore.client.ContentObjects({
         libraryId,
         filterOptions: {
-          select: ["name", "public", "asset_metadata/title", "asset_metadata/asset_type"],
+          select: ["name", "public/name", "public/asset_metadata/title", "public/asset_metadata/asset_type"],
           limit: 10000
         }
       })
@@ -62,13 +62,16 @@ class ContentStore {
       5,
       async ({id, versions}) => {
         const metadata = versions[0].meta || {};
-        const name = (metadata.asset_metadata || {}).title || (metadata.public || {}).name || metadata.name;
+        metadata.public = metadata.public || {};
+        metadata.public.asset_metadata = metadata.public.asset_metadata || {};
+
+        const name = metadata.public.asset_metadata.title || metadata.public.name || metadata.name;
 
         objects.push({
           id,
           objectId: id,
           name,
-          assetType: (metadata.asset_metadata || {}).asset_type,
+          assetType: metadata.public.asset_metadata.asset_type,
           sortKey: name.startsWith("iq__") ? `zz${name}` : name
         });
       }
@@ -123,7 +126,7 @@ class ContentStore {
 
     this.playoutOptions[versionHash] = (yield this.rootStore.client.PlayoutOptions({
       versionHash,
-      linkPath: "asset_metadata/sources/default",
+      linkPath: "public/asset_metadata/sources/default",
       protocols: ["hls"],
       drms: ["aes-128"]
     }));

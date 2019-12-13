@@ -52,7 +52,7 @@ class RootStore {
     this.assetName =
       (yield this.client.ContentObjectMetadata({
         versionHash: this.params.versionHash,
-        metadataSubtree: "asset_metadata/title"
+        metadataSubtree: "public/asset_metadata/title"
       })) ||
       (yield this.client.ContentObjectMetadata({
         versionHash: this.params.versionHash,
@@ -65,7 +65,7 @@ class RootStore {
 
     this.assetMetadata = (yield this.client.ContentObjectMetadata({
       versionHash: this.params.versionHash,
-      metadataSubtree: "asset_metadata"
+      metadataSubtree: "public/asset_metadata"
     })) || {};
 
     yield this.formStore.InitializeFormData();

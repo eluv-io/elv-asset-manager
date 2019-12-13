@@ -14,7 +14,7 @@ class FormStore {
     this.targets = {};
   }
 
-  CreateLink(versionHash, linkTarget="/meta/asset_metadata") {
+  CreateLink(versionHash, linkTarget="/meta/public/asset_metadata") {
     if(versionHash === this.rootStore.params.versionHash) {
       return {
         "/": UrlJoin("./", linkTarget)
@@ -188,7 +188,7 @@ class FormStore {
       const title =
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
-          metadataSubtree: "asset_metadata/title"
+          metadataSubtree: "public/asset_metadata/title"
         })) ||
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
@@ -201,12 +201,12 @@ class FormStore {
 
       const id = yield client.ContentObjectMetadata({
         versionHash: versionHash,
-        metadataSubtree: "asset_metadata/ip_title_id"
+        metadataSubtree: "public/asset_metadata/ip_title_id"
       });
 
       const assetType = yield client.ContentObjectMetadata({
         versionHash: versionHash,
-        metadataSubtree: "asset_metadata/asset_type"
+        metadataSubtree: "public/asset_metadata/asset_type"
       });
 
       this.targets[versionHash] = {id, assetType, title};
@@ -392,7 +392,7 @@ class FormStore {
       libraryId,
       objectId,
       writeToken,
-      metadataSubtree: "asset_metadata",
+      metadataSubtree: "public/asset_metadata",
       metadata: toJS(this.assetInfo)
     });
 
@@ -406,7 +406,7 @@ class FormStore {
       libraryId,
       objectId,
       writeToken,
-      metadataSubtree: "asset_metadata/clips",
+      metadataSubtree: "public/asset_metadata/clips",
       metadata: clips
     });
 
@@ -420,7 +420,7 @@ class FormStore {
       libraryId,
       objectId,
       writeToken,
-      metadataSubtree: "asset_metadata/trailers",
+      metadataSubtree: "public/asset_metadata/trailers",
       metadata: trailers
     });
 
@@ -439,7 +439,7 @@ class FormStore {
       libraryId,
       objectId,
       writeToken,
-      metadataSubtree: "asset_metadata/images",
+      metadataSubtree: "public/asset_metadata/images",
       metadata: images
     });
 
@@ -462,7 +462,7 @@ class FormStore {
       libraryId,
       objectId,
       writeToken,
-      metadataSubtree: "asset_metadata/gallery",
+      metadataSubtree: "public/asset_metadata/gallery",
       metadata: gallery
     });
 
@@ -483,7 +483,7 @@ class FormStore {
       libraryId,
       objectId,
       writeToken,
-      metadataSubtree: "asset_metadata/playlists",
+      metadataSubtree: "public/asset_metadata/playlists",
       metadata: playlists
     });
 
