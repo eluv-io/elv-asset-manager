@@ -51,7 +51,14 @@ class ContentStore {
       yield this.rootStore.client.ContentObjects({
         libraryId,
         filterOptions: {
-          select: ["name", "public/name", "public/asset_metadata/title", "public/asset_metadata/asset_type"],
+          select: [
+            "name",
+            "public/name",
+            "public/asset_metadata/title",
+            "public/asset_metadata/asset_type",
+            "asset_metadata/title",
+            "asset_metadata/asset_type"
+          ],
           limit: 10000
         }
       })
@@ -64,6 +71,10 @@ class ContentStore {
         const metadata = versions[0].meta || {};
         metadata.public = metadata.public || {};
         metadata.public.asset_metadata = metadata.public.asset_metadata || {};
+        metadata.public.asset_metadata = {
+          ...(metadata.asset_metadata || {}),
+          ...metadata.public.asset_metadata
+        };
 
         const name = metadata.public.asset_metadata.title || metadata.public.name || metadata.name;
 

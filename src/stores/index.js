@@ -52,21 +52,32 @@ class RootStore {
     this.assetName =
       (yield this.client.ContentObjectMetadata({
         versionHash: this.params.versionHash,
-        metadataSubtree: "public/asset_metadata/title"
+        metadataSubtree: "public/asset_metadata/title",
+        resolveLinks: true
       })) ||
       (yield this.client.ContentObjectMetadata({
         versionHash: this.params.versionHash,
-        metadataSubtree: "public/name"
+        metadataSubtree: "public/name",
+        resolveLinks: true
       })) ||
       (yield this.client.ContentObjectMetadata({
         versionHash: this.params.versionHash,
-        metadataSubtree: "name"
+        metadataSubtree: "name",
+        resolveLinks: true
       }));
 
-    this.assetMetadata = (yield this.client.ContentObjectMetadata({
-      versionHash: this.params.versionHash,
-      metadataSubtree: "public/asset_metadata"
-    })) || {};
+    this.assetMetadata =
+      (yield this.client.ContentObjectMetadata({
+        versionHash: this.params.versionHash,
+        metadataSubtree: "public/asset_metadata",
+        resolveLinks: true
+      })) ||
+      (yield this.client.ContentObjectMetadata({
+        versionHash: this.params.versionHash,
+        metadataSubtree: "public/asset_metadata",
+        resolveLinks: false
+      }))
+      || {};
 
     yield this.formStore.InitializeFormData();
   })

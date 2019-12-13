@@ -41,6 +41,23 @@ button {
       stroke: $elv-color-black;
     }
   }
+
+  &.checkbox-button {
+    &.checkbox-button {
+      font-size: $elv-font-s;
+      max-height: 1.2rem;
+      max-width: 3.5rem;
+      min-height: 1.2rem;
+      min-width: 3.5rem;
+      padding: 0;
+    }
+
+    &:not(.checked) {
+      background: $elv-color-white;
+      border: 1px solid $elv-color-mediumgray;
+      color: $elv-color-text-light;
+    }
+  }
 }
 
 .hint {
@@ -341,7 +358,7 @@ textarea {
 }
 
 .asset-form-clip {
-  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 2rem 2rem;
+  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 3rem 2rem 2rem;
 
   div {
     @include elv-ellipsis;

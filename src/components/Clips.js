@@ -9,7 +9,7 @@ import OrderButtons from "./OrderButtons";
 import RemoveIcon from "../static/icons/trash.svg";
 import PlayIcon from "../static/icons/play-circle.svg";
 
-const Clip = ({index, clip, name, length, Swap, Remove}) => {
+const Clip = ({index, isDefault, clip, name, length, Swap, Remove, SetDefault}) => {
   const {versionHash, title, id, assetType} = clip;
 
   const [showPreview, setShowPreview] = useState(false);
@@ -28,6 +28,14 @@ const Clip = ({index, clip, name, length, Swap, Remove}) => {
         <div className="hint">{assetType}</div>
         <div>{title} {id ? `(${id})` : ""}</div>
         <div className="clip-target-hash">{versionHash}</div>
+        <Action
+          type="button"
+          label="checkbox"
+          className={`checkbox-button ${isDefault ? "checked" : ""}`}
+          onClick={() => SetDefault(index)}
+        >
+          Default
+        </Action>
         <OrderButtons index={index} length={length} Swap={Swap}/>
         <IconButton
           icon={RemoveIcon}
@@ -106,6 +114,7 @@ class Clips extends React.Component {
           {clips.map((clip, index) =>
             <Clip
               index={index}
+              isDefault={clip.isDefault}
               key={`asset-clip-${this.props.storeKey || this.props.playlistIndex}-${index}`}
               clip={clip}
               length={clips.length}
@@ -114,6 +123,11 @@ class Clips extends React.Component {
                 playlistIndex: this.props.playlistIndex,
                 i1,
                 i2
+              })}
+              SetDefault={index => this.props.formStore.SetDefaultClip({
+                key: this.props.storeKey,
+                playlistIndex: this.props.playlistIndex,
+                index
               })}
               Remove={() => this.props.formStore.RemoveClip({
                 key: this.props.storeKey,

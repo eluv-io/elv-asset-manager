@@ -90,6 +90,36 @@ class FormStore {
     }
   }
 
+  @action.bound
+  SetDefaultClip({key, playlistIndex, index}) {
+    const clips = playlistIndex !== undefined ?
+      this.playlists[playlistIndex].clips :
+      this[key];
+
+    let toUnset;
+    if(clips[index].isDefault) {
+      // Unset selected
+      toUnset = index;
+    } else {
+
+      // Unset current default
+      toUnset = clips.findIndex(clip => clip.isDefault);
+    }
+
+    if(toUnset >= 0) {
+      playlistIndex !== undefined ?
+        this.playlists[playlistIndex].clips[toUnset].isDefault = false :
+        this[key][toUnset].isDefault = false;
+    }
+
+    // Set new default
+    if(toUnset !== index) {
+      playlistIndex !== undefined ?
+        this.playlists[playlistIndex].clips[index].isDefault = true :
+        this[key][index].isDefault = true;
+    }
+  }
+
   // Images
   @action.bound
   UpdateImage({index, imageKey, imagePath, targetHash}) {
@@ -188,25 +218,30 @@ class FormStore {
       const title =
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
-          metadataSubtree: "public/asset_metadata/title"
+          metadataSubtree: "public/asset_metadata/title",
+          resolveLinks: true
         })) ||
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
-          metadataSubtree: "public/name"
+          metadataSubtree: "public/name",
+          resolveLinks: true
         })) ||
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
-          metadataSubtree: "name"
+          metadataSubtree: "name",
+          resolveLinks: true
         }));
 
       const id = yield client.ContentObjectMetadata({
         versionHash: versionHash,
-        metadataSubtree: "public/asset_metadata/ip_title_id"
+        metadataSubtree: "public/asset_metadata/ip_title_id",
+        resolveLinks: true
       });
 
       const assetType = yield client.ContentObjectMetadata({
         versionHash: versionHash,
-        metadataSubtree: "public/asset_metadata/asset_type"
+        metadataSubtree: "public/asset_metadata/asset_type",
+        resolveLinks: true
       });
 
       this.targets[versionHash] = {id, assetType, title};
@@ -215,12 +250,9 @@ class FormStore {
 
   LoadClips = flow(function * (metadata) {
     let clips = [];
+    let defaultClip;
     yield Promise.all(
       Object.keys(metadata).map(async key => {
-        const index = parseInt(key);
-
-        if(isNaN(index)) { return; }
-
         if(!metadata[key] || !metadata[key]["/"]) { return; }
 
         let targetHash = this.rootStore.params.versionHash;
@@ -230,12 +262,32 @@ class FormStore {
 
         await this.RetrieveClip(targetHash);
 
+        const clip = {
+          versionHash: targetHash,
+          isDefault: false,
+          ...this.targets[targetHash]
+        };
+
+        if(key === "default") {
+          clip.isDefault = true;
+          defaultClip = clip;
+          return;
+        }
+
+        const index = parseInt(key);
+
+        if(isNaN(index)) { return; }
+
         clips[index] = {
           versionHash: targetHash,
           ...this.targets[targetHash]
         };
       })
     );
+
+    if(defaultClip) {
+      clips.unshift(defaultClip);
+    }
 
     return clips;
   });
@@ -388,6 +440,29 @@ class FormStore {
       objectId
     })).write_token;
 
+    const assetMetadata = yield client.ContentObjectMetadata({
+      libraryId,
+      objectId,
+      metadataSubtree: "public/asset_metadata",
+    });
+
+    // If /public/asset_metadata is a link to /asset_metadata, copy over
+    if(assetMetadata && assetMetadata["/"]) {
+      const oldAssetMetadata = yield client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "asset_metadata"
+      });
+
+      yield client.ReplaceMetadata({
+        libraryId,
+        objectId,
+        writeToken,
+        metadataSubtree: "public/asset_metadata",
+        metadata: oldAssetMetadata
+      });
+    }
+
     yield client.MergeMetadata({
       libraryId,
       objectId,
@@ -398,8 +473,14 @@ class FormStore {
 
     // Clips
     let clips = {};
-    this.clips.forEach(({versionHash}, index) => {
-      clips[index.toString()] = this.CreateLink(versionHash);
+    let index = 0;
+    this.clips.forEach(({isDefault, versionHash}) => {
+      if(isDefault) {
+        clips.default = this.CreateLink(versionHash);
+      } else {
+        clips[index.toString()] = this.CreateLink(versionHash);
+        index += 1;
+      }
     });
 
     yield client.ReplaceMetadata({
@@ -412,8 +493,14 @@ class FormStore {
 
     // Trailers
     let trailers = {};
-    this.trailers.forEach(({versionHash}, index) => {
-      trailers[index.toString()] = this.CreateLink(versionHash);
+    index = 0;
+    this.trailers.forEach(({isDefault, versionHash}) => {
+      if(isDefault) {
+        trailers.default = this.CreateLink(versionHash);
+      } else {
+        trailers[index.toString()] = this.CreateLink(versionHash);
+        index += 1;
+      }
     });
 
     yield client.ReplaceMetadata({
@@ -472,8 +559,14 @@ class FormStore {
       if(!playlistKey) { return; }
 
       let playlistClips = {};
-      clips.forEach(({versionHash}, index) => {
-        playlistClips[index.toString()] = this.CreateLink(versionHash);
+      index = 0;
+      clips.forEach(({isDefault, versionHash}) => {
+        if(isDefault) {
+          playlistClips.default = this.CreateLink(versionHash);
+        } else {
+          playlistClips[index.toString()] = this.CreateLink(versionHash);
+          index += 1;
+        }
       });
 
       playlists[playlistKey] = playlistClips;
