@@ -2,6 +2,7 @@ import React from "react";
 import {inject, observer} from "mobx-react";
 import {Action, Confirm} from "elv-components-js";
 import Clips from "./Clips";
+import Titles from "./Titles";
 import Images from "./Images";
 import AssetInfo from "./AssetInfo";
 import Gallery from "./Gallery";
@@ -30,6 +31,7 @@ class AssetForm extends React.Component {
           <AssetInfo />
           <Clips storeKey="clips" header="Clips" name="Clip" assetTypes={["trailer"]}/>
           <Clips storeKey="trailers" header="Trailers" name="Trailer" assetTypes={["trailer"]}/>
+          <Titles storeKey="titles" header="Titles" name="Title" assetTypes={["primary"]}/>
           <Images />
           <Gallery />
           <Playlists />

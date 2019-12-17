@@ -67,11 +67,12 @@ class RootStore {
       }));
 
     this.assetMetadata =
+    /*
       (yield this.client.ContentObjectMetadata({
         versionHash: this.params.versionHash,
         metadataSubtree: "public/asset_metadata",
         resolveLinks: true
-      })) ||
+      })) || */
       (yield this.client.ContentObjectMetadata({
         versionHash: this.params.versionHash,
         metadataSubtree: "public/asset_metadata",

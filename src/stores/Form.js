@@ -1,5 +1,6 @@
 import {observable, action, flow, toJS} from "mobx";
 import UrlJoin from "url-join";
+var slugify = require("slugify");
 
 class FormStore {
   @observable assetInfo = {};
@@ -8,6 +9,7 @@ class FormStore {
   @observable images = [];
   @observable gallery = [];
   @observable playlists = [];
+  @observable titles = [];
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -39,6 +41,11 @@ class FormStore {
       this.trailers = yield this.LoadClips(assetMetadata.trailers);
     }
 
+    if(assetMetadata.titles) {
+      this.titles = yield this.LoadTitles(assetMetadata.titles);
+      //console.log("titles loaded: " + JSON.stringify(this.titles));
+    }
+
     this.images = yield this.LoadImages(assetMetadata.images, true);
     this.gallery = yield this.LoadGallery(assetMetadata.gallery);
     this.playlists = yield this.LoadPlaylists(assetMetadata.playlists);
@@ -47,6 +54,30 @@ class FormStore {
   @action.bound
   UpdateAssetInfo(key, value) {
     this.assetInfo[key] = value;
+  }
+
+  // Titles
+  @action.bound
+  AddTitle = flow(function * ({versionHash}) {
+    yield this.RetrieveClip(versionHash);
+
+    this.titles.push({
+      versionHash,
+      ...this.targets[versionHash]
+    });
+  });
+
+  @action.bound
+  RemoveTitle({index}) {
+    this.titles =
+      this.titles.filter((_, i) => i !== index);
+  }
+
+  @action.bound
+  SwapTitle({i1, i2}) {
+    const title = this.titles[i1];
+    this.titles[i1] = this.titles[i2];
+    this.titles[i2] = title;
   }
 
   // Clips/trailers
@@ -246,6 +277,29 @@ class FormStore {
 
       this.targets[versionHash] = {id, assetType, title};
     }
+  });
+
+  LoadTitles = flow(function * (metadata) {
+    let clips = [];
+    yield Promise.all(
+      Object.keys(metadata).map(async key => {
+        if(!metadata[key] || !metadata[key]["/"]) { return; }
+
+        let targetHash = this.rootStore.params.versionHash;
+        if(metadata[key]["/"].startsWith("/qfab/")) {
+          targetHash = metadata[key]["/"].split("/")[2];
+        }
+        await this.RetrieveClip(targetHash);
+
+        const clip = {
+          versionHash: targetHash,
+          ...this.targets[targetHash]
+        };
+        clips.push(clip);
+      })
+    );
+
+    return clips;
   });
 
   LoadClips = flow(function * (metadata) {
@@ -509,6 +563,20 @@ class FormStore {
       writeToken,
       metadataSubtree: "public/asset_metadata/trailers",
       metadata: trailers
+    });
+
+    // Titles
+    let titles = {};
+    this.titles.forEach(({title, versionHash}) => {
+      titles[slugify(title)] = this.CreateLink(versionHash);
+    });
+
+    yield client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "public/asset_metadata/titles",
+      metadata: titles
     });
 
     // Images
