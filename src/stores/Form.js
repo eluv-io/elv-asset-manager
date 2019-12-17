@@ -1,6 +1,7 @@
 import {observable, action, flow, toJS} from "mobx";
 import UrlJoin from "url-join";
-var slugify = require("slugify");
+
+var slugify = function(str) { return str.toLowerCase().replace(/ /g, "-").replace(/[^a-z0-9\-]/g,"");};
 
 class FormStore {
   @observable assetInfo = {};
@@ -19,10 +20,12 @@ class FormStore {
   CreateLink(versionHash, linkTarget="/meta/public/asset_metadata") {
     if(versionHash === this.rootStore.params.versionHash) {
       return {
+        ".": {"auto_update":{"tag":"latest"}},
         "/": UrlJoin("./", linkTarget)
       };
     } else {
       return {
+        ".": {"auto_update":{"tag":"latest"}},
         "/": UrlJoin("/qfab", versionHash, linkTarget)
       };
     }
@@ -60,11 +63,12 @@ class FormStore {
   @action.bound
   AddTitle = flow(function * ({versionHash}) {
     yield this.RetrieveClip(versionHash);
-
-    this.titles.push({
+    const title = {
       versionHash,
       ...this.targets[versionHash]
-    });
+    };
+    //console.log("Add Title: " + JSON.stringify(title));
+    this.titles.push(title);
   });
 
   @action.bound
@@ -570,6 +574,8 @@ class FormStore {
     this.titles.forEach(({title, versionHash}) => {
       titles[slugify(title)] = this.CreateLink(versionHash);
     });
+
+    // console.log("Save Titles: " + JSON.stringify(titles));
 
     yield client.ReplaceMetadata({
       libraryId,
