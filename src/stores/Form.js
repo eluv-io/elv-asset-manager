@@ -633,13 +633,11 @@ class FormStore {
       if(!playlistKey) { return; }
 
       let playlistClips = {};
-      index = 0;
-      clips.forEach(({isDefault, versionHash}) => {
+      clips.forEach(({isDefault, title, versionHash}) => {
         if(isDefault) {
           playlistClips.default = this.CreateLink(versionHash);
         } else {
-          playlistClips[index.toString()] = this.CreateLink(versionHash);
-          index += 1;
+          playlistClips[slugify(title)] = this.CreateLink(versionHash);
         }
       });
 
