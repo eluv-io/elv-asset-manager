@@ -9,16 +9,54 @@ import OrderButtons from "./OrderButtons";
 import RemoveIcon from "../static/icons/trash.svg";
 import PlayIcon from "../static/icons/play-circle.svg";
 
-const Clip = ({index, isDefault, clip, name, length, Swap, Remove, SetDefault}) => {
+const Clip = ({
+  index,
+  isDefault,
+  clip,
+  name,
+  length,
+  defaultable,
+  orderable,
+  Swap,
+  Remove,
+  SetDefault
+}) => {
   const {versionHash, title, id, assetType} = clip;
 
   const [showPreview, setShowPreview] = useState(false);
 
   const preview = showPreview ? <VideoPreview versionHash={versionHash}/> : null;
 
+  let defaultButton;
+  if(defaultable) {
+    defaultButton = (
+      <Action
+        type="button"
+        label="checkbox"
+        className={`checkbox-button ${isDefault ? "checked" : ""}`}
+        onClick={() => SetDefault(index)}
+      >
+        Default
+      </Action>
+    );
+  }
+
+  let orderButtons;
+  if(orderable) {
+    orderButtons = <OrderButtons index={index} length={length} Swap={Swap}/>;
+  }
+
   return (
     <React.Fragment>
-      <div key={`clip-${versionHash}-${index}`} className={`asset-form-clip ${showPreview ? "asset-form-clip-with-preview" : ""}`}>
+      <div
+        key={`clip-${versionHash}-${index}`}
+        className={`
+          asset-form-clip 
+          ${orderable   ? "asset-form-clip-orderable" : ""}
+          ${defaultable ? "asset-form-clip-defaultable" : ""}
+          ${showPreview ? "asset-form-clip-with-preview" : ""}
+        `}
+      >
         <IconButton
           icon={PlayIcon}
           title={`Preview ${title}`}
@@ -28,15 +66,8 @@ const Clip = ({index, isDefault, clip, name, length, Swap, Remove, SetDefault}) 
         <div className="hint">{assetType}</div>
         <div>{title} {id ? `(${id})` : ""}</div>
         <div className="clip-target-hash">{versionHash}</div>
-        <Action
-          type="button"
-          label="checkbox"
-          className={`checkbox-button ${isDefault ? "checked" : ""}`}
-          onClick={() => SetDefault(index)}
-        >
-          Default
-        </Action>
-        <OrderButtons index={index} length={length} Swap={Swap}/>
+        { defaultButton }
+        { orderButtons }
         <IconButton
           icon={RemoveIcon}
           className="remove-button"
@@ -115,6 +146,8 @@ class Clips extends React.Component {
             <Clip
               index={index}
               isDefault={clip.isDefault}
+              defaultable={this.props.defaultable}
+              orderable={this.props.orderable}
               key={`asset-clip-${this.props.storeKey || this.props.playlistIndex}-${index}`}
               clip={clip}
               length={clips.length}
@@ -151,7 +184,9 @@ Clips.propTypes = {
   playlistIndex: PropTypes.number,
   header: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  assetTypes: PropTypes.arrayOf(PropTypes.string)
+  assetTypes: PropTypes.arrayOf(PropTypes.string),
+  defaultable: PropTypes.bool,
+  orderable: PropTypes.bool
 };
 
 export default Clips;

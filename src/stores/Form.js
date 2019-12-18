@@ -1,7 +1,8 @@
-import {observable, action, flow, toJS} from "mobx";
+import {observable, action, flow} from "mobx";
 import UrlJoin from "url-join";
 
-var slugify = function(str) { return str.toLowerCase().replace(/ /g, "-").replace(/[^a-z0-9\-]/g,"");};
+const Slugify = str =>
+  str.toLowerCase().replace(/ /g, "-").replace(/[^a-z0-9\-]/g,"");
 
 class FormStore {
   @observable assetInfo = {};
@@ -37,16 +38,15 @@ class FormStore {
     this.assetInfo = this.LoadAssetInfo(assetMetadata);
 
     if(assetMetadata.clips) {
-      this.clips = yield this.LoadClips(assetMetadata.clips);
+      this.clips = yield this.LoadClips(assetMetadata.clips, true);
     }
 
     if(assetMetadata.trailers) {
-      this.trailers = yield this.LoadClips(assetMetadata.trailers);
+      this.trailers = yield this.LoadClips(assetMetadata.trailers, true);
     }
 
     if(assetMetadata.titles) {
-      this.titles = yield this.LoadTitles(assetMetadata.titles);
-      //console.log("titles loaded: " + JSON.stringify(this.titles));
+      this.titles = yield this.LoadClips(assetMetadata.titles);
     }
 
     this.images = yield this.LoadImages(assetMetadata.images, true);
@@ -57,31 +57,6 @@ class FormStore {
   @action.bound
   UpdateAssetInfo(key, value) {
     this.assetInfo[key] = value;
-  }
-
-  // Titles
-  @action.bound
-  AddTitle = flow(function * ({versionHash}) {
-    yield this.RetrieveClip(versionHash);
-    const title = {
-      versionHash,
-      ...this.targets[versionHash]
-    };
-    //console.log("Add Title: " + JSON.stringify(title));
-    this.titles.push(title);
-  });
-
-  @action.bound
-  RemoveTitle({index}) {
-    this.titles =
-      this.titles.filter((_, i) => i !== index);
-  }
-
-  @action.bound
-  SwapTitle({i1, i2}) {
-    const title = this.titles[i1];
-    this.titles[i1] = this.titles[i2];
-    this.titles[i2] = title;
   }
 
   // Clips/trailers
@@ -238,6 +213,7 @@ class FormStore {
   LoadAssetInfo(metadata) {
     return {
       title: metadata.title || "",
+      display_title: metadata.display_title || "",
       synopsis: metadata.synopsis || "",
       ip_title_id: metadata.ip_title_id || "",
       title_type: metadata.title_type || "franchise",
@@ -253,12 +229,12 @@ class FormStore {
       const title =
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
-          metadataSubtree: "public/asset_metadata/display_title",
+          metadataSubtree: "public/asset_metadata/title",
           resolveLinks: true
         })) ||
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
-          metadataSubtree: "public/asset_metadata/title",
+          metadataSubtree: "public/asset_metadata/display_title",
           resolveLinks: true
         })) ||
         (yield client.ContentObjectMetadata({
@@ -288,30 +264,7 @@ class FormStore {
     }
   });
 
-  LoadTitles = flow(function * (metadata) {
-    let clips = [];
-    yield Promise.all(
-      Object.keys(metadata).map(async key => {
-        if(!metadata[key] || !metadata[key]["/"]) { return; }
-
-        let targetHash = this.rootStore.params.versionHash;
-        if(metadata[key]["/"].startsWith("/qfab/")) {
-          targetHash = metadata[key]["/"].split("/")[2];
-        }
-        await this.RetrieveClip(targetHash);
-
-        const clip = {
-          versionHash: targetHash,
-          ...this.targets[targetHash]
-        };
-        clips.push(clip);
-      })
-    );
-
-    return clips;
-  });
-
-  LoadClips = flow(function * (metadata) {
+  LoadClips = flow(function * (metadata, ordered=false) {
     let clips = [];
     let defaultClip;
     yield Promise.all(
@@ -337,13 +290,32 @@ class FormStore {
           return;
         }
 
-        clips.push(clip);
+        if(ordered) {
+          // Keys are ordered indices
+          const index = parseInt(key);
+          clips.push(clip);
+
+          if(isNaN(index)) {
+            return;
+          }
+
+          clips[index] = {
+            versionHash: targetHash,
+            ...this.targets[targetHash]
+          };
+        } else {
+          clips.push(clip);
+        }
       })
     );
 
+    // Put default at front of list
     if(defaultClip) {
       clips.unshift(defaultClip);
     }
+
+    // Filter any missing indices
+    clips = clips.filter(clip => clip);
 
     return clips;
   });
@@ -474,12 +446,10 @@ class FormStore {
     if(metadata) {
       yield Promise.all(
         Object.keys(metadata).map(async playlistKey => {
-          let item = {
+          playlists.push({
             playlistKey,
-            clips: await this.LoadClips(metadata[playlistKey])
-          };
-
-          playlists.push(item);
+            clips: await this.LoadClips(metadata[playlistKey], true)
+          });
         })
       );
     }
@@ -497,37 +467,6 @@ class FormStore {
       libraryId,
       objectId
     })).write_token;
-
-    const assetMetadata = yield client.ContentObjectMetadata({
-      libraryId,
-      objectId,
-      metadataSubtree: "public/asset_metadata",
-    });
-
-    // If /public/asset_metadata is a link to /asset_metadata, copy over
-    if(assetMetadata && assetMetadata["/"]) {
-      const oldAssetMetadata = yield client.ContentObjectMetadata({
-        libraryId,
-        objectId,
-        metadataSubtree: "asset_metadata"
-      });
-
-      yield client.ReplaceMetadata({
-        libraryId,
-        objectId,
-        writeToken,
-        metadataSubtree: "public/asset_metadata",
-        metadata: oldAssetMetadata
-      });
-    }
-
-    yield client.MergeMetadata({
-      libraryId,
-      objectId,
-      writeToken,
-      metadataSubtree: "public/asset_metadata",
-      metadata: toJS(this.assetInfo)
-    });
 
     // Clips
     let clips = {};
@@ -572,10 +511,8 @@ class FormStore {
     // Titles
     let titles = {};
     this.titles.forEach(({title, versionHash}) => {
-      titles[slugify(title)] = this.CreateLink(versionHash);
+      titles[Slugify(title)] = this.CreateLink(versionHash);
     });
-
-    // console.log("Save Titles: " + JSON.stringify(titles));
 
     yield client.ReplaceMetadata({
       libraryId,
@@ -637,7 +574,7 @@ class FormStore {
         if(isDefault) {
           playlistClips.default = this.CreateLink(versionHash);
         } else {
-          playlistClips[slugify(title)] = this.CreateLink(versionHash);
+          playlistClips[Slugify(title)] = this.CreateLink(versionHash);
         }
       });
 
