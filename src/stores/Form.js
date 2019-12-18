@@ -337,14 +337,7 @@ class FormStore {
           return;
         }
 
-        const index = parseInt(key);
-
-        if(isNaN(index)) { return; }
-
-        clips[index] = {
-          versionHash: targetHash,
-          ...this.targets[targetHash]
-        };
+        clips.push(clip);
       })
     );
 
@@ -481,10 +474,12 @@ class FormStore {
     if(metadata) {
       yield Promise.all(
         Object.keys(metadata).map(async playlistKey => {
-          playlists.push({
+          let item = {
             playlistKey,
             clips: await this.LoadClips(metadata[playlistKey])
-          });
+          };
+
+          playlists.push(item);
         })
       );
     }
