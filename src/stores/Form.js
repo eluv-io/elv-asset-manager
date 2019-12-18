@@ -253,6 +253,11 @@ class FormStore {
       const title =
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
+          metadataSubtree: "public/asset_metadata/display_title",
+          resolveLinks: true
+        })) ||
+        (yield client.ContentObjectMetadata({
+          versionHash: versionHash,
           metadataSubtree: "public/asset_metadata/title",
           resolveLinks: true
         })) ||
