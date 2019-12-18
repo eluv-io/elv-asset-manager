@@ -17,6 +17,12 @@ class AssetInfo extends React.Component {
           />
 
           <Input
+            name="display_title"
+            value={this.props.formStore.assetInfo.display_title}
+            onChange={display_title => this.props.formStore.UpdateAssetInfo("display_title", display_title)}
+          />
+
+          <Input
             name="ip_title_id"
             value={this.props.formStore.assetInfo.ip_title_id}
             onChange={ip_title_id => this.props.formStore.UpdateAssetInfo("ip_title_id", ip_title_id)}

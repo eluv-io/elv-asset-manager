@@ -1,5 +1,8 @@
-import {observable, action, flow, toJS} from "mobx";
+import {observable, action, flow} from "mobx";
 import UrlJoin from "url-join";
+
+const Slugify = str =>
+  str.toLowerCase().replace(/ /g, "-").replace(/[^a-z0-9\-]/g,"");
 
 class FormStore {
   @observable assetInfo = {};
@@ -8,6 +11,7 @@ class FormStore {
   @observable images = [];
   @observable gallery = [];
   @observable playlists = [];
+  @observable titles = [];
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -17,10 +21,12 @@ class FormStore {
   CreateLink(versionHash, linkTarget="/meta/public/asset_metadata") {
     if(versionHash === this.rootStore.params.versionHash) {
       return {
+        ".": {"auto_update":{"tag":"latest"}},
         "/": UrlJoin("./", linkTarget)
       };
     } else {
       return {
+        ".": {"auto_update":{"tag":"latest"}},
         "/": UrlJoin("/qfab", versionHash, linkTarget)
       };
     }
@@ -32,11 +38,15 @@ class FormStore {
     this.assetInfo = this.LoadAssetInfo(assetMetadata);
 
     if(assetMetadata.clips) {
-      this.clips = yield this.LoadClips(assetMetadata.clips);
+      this.clips = yield this.LoadClips(assetMetadata.clips, true);
     }
 
     if(assetMetadata.trailers) {
-      this.trailers = yield this.LoadClips(assetMetadata.trailers);
+      this.trailers = yield this.LoadClips(assetMetadata.trailers, true);
+    }
+
+    if(assetMetadata.titles) {
+      this.titles = yield this.LoadClips(assetMetadata.titles);
     }
 
     this.images = yield this.LoadImages(assetMetadata.images, true);
@@ -203,6 +213,7 @@ class FormStore {
   LoadAssetInfo(metadata) {
     return {
       title: metadata.title || "",
+      display_title: metadata.display_title || "",
       synopsis: metadata.synopsis || "",
       ip_title_id: metadata.ip_title_id || "",
       title_type: metadata.title_type || "franchise",
@@ -219,6 +230,11 @@ class FormStore {
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
           metadataSubtree: "public/asset_metadata/title",
+          resolveLinks: true
+        })) ||
+        (yield client.ContentObjectMetadata({
+          versionHash: versionHash,
+          metadataSubtree: "public/asset_metadata/display_title",
           resolveLinks: true
         })) ||
         (yield client.ContentObjectMetadata({
@@ -248,7 +264,7 @@ class FormStore {
     }
   });
 
-  LoadClips = flow(function * (metadata) {
+  LoadClips = flow(function * (metadata, ordered=false) {
     let clips = [];
     let defaultClip;
     yield Promise.all(
@@ -274,20 +290,32 @@ class FormStore {
           return;
         }
 
-        const index = parseInt(key);
+        if(ordered) {
+          // Keys are ordered indices
+          const index = parseInt(key);
+          clips.push(clip);
 
-        if(isNaN(index)) { return; }
+          if(isNaN(index)) {
+            return;
+          }
 
-        clips[index] = {
-          versionHash: targetHash,
-          ...this.targets[targetHash]
-        };
+          clips[index] = {
+            versionHash: targetHash,
+            ...this.targets[targetHash]
+          };
+        } else {
+          clips.push(clip);
+        }
       })
     );
 
+    // Put default at front of list
     if(defaultClip) {
       clips.unshift(defaultClip);
     }
+
+    // Filter any missing indices
+    clips = clips.filter(clip => clip);
 
     return clips;
   });
@@ -420,7 +448,7 @@ class FormStore {
         Object.keys(metadata).map(async playlistKey => {
           playlists.push({
             playlistKey,
-            clips: await this.LoadClips(metadata[playlistKey])
+            clips: await this.LoadClips(metadata[playlistKey], true)
           });
         })
       );
@@ -439,37 +467,6 @@ class FormStore {
       libraryId,
       objectId
     })).write_token;
-
-    const assetMetadata = yield client.ContentObjectMetadata({
-      libraryId,
-      objectId,
-      metadataSubtree: "public/asset_metadata",
-    });
-
-    // If /public/asset_metadata is a link to /asset_metadata, copy over
-    if(assetMetadata && assetMetadata["/"]) {
-      const oldAssetMetadata = yield client.ContentObjectMetadata({
-        libraryId,
-        objectId,
-        metadataSubtree: "asset_metadata"
-      });
-
-      yield client.ReplaceMetadata({
-        libraryId,
-        objectId,
-        writeToken,
-        metadataSubtree: "public/asset_metadata",
-        metadata: oldAssetMetadata
-      });
-    }
-
-    yield client.MergeMetadata({
-      libraryId,
-      objectId,
-      writeToken,
-      metadataSubtree: "public/asset_metadata",
-      metadata: toJS(this.assetInfo)
-    });
 
     // Clips
     let clips = {};
@@ -509,6 +506,20 @@ class FormStore {
       writeToken,
       metadataSubtree: "public/asset_metadata/trailers",
       metadata: trailers
+    });
+
+    // Titles
+    let titles = {};
+    this.titles.forEach(({title, versionHash}) => {
+      titles[Slugify(title)] = this.CreateLink(versionHash);
+    });
+
+    yield client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "public/asset_metadata/titles",
+      metadata: titles
     });
 
     // Images
@@ -559,13 +570,11 @@ class FormStore {
       if(!playlistKey) { return; }
 
       let playlistClips = {};
-      index = 0;
-      clips.forEach(({isDefault, versionHash}) => {
+      clips.forEach(({isDefault, title, versionHash}) => {
         if(isDefault) {
           playlistClips.default = this.CreateLink(versionHash);
         } else {
-          playlistClips[index.toString()] = this.CreateLink(versionHash);
-          index += 1;
+          playlistClips[Slugify(title)] = this.CreateLink(versionHash);
         }
       });
 

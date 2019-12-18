@@ -23,6 +23,8 @@ class Playlists extends React.Component {
             playlistIndex={index}
             header="Playlist Clips"
             name="Clip"
+            orderable
+            defaultable
           />
         </div>
         <IconButton
