@@ -1,4 +1,4 @@
-import {observable, action, flow} from "mobx";
+import {observable, action, flow, toJS} from "mobx";
 import UrlJoin from "url-join";
 
 const Slugify = str =>
@@ -57,6 +57,10 @@ class FormStore {
   @action.bound
   UpdateAssetInfo(key, value) {
     this.assetInfo[key] = value;
+
+    if(key === "display_title") {
+      this.assetInfo.url_slug = Slugify(value);
+    }
   }
 
   // Clips/trailers
@@ -214,6 +218,7 @@ class FormStore {
     return {
       title: metadata.title || "",
       display_title: metadata.display_title || "",
+      url_slug: Slugify(metadata.display_title || ""),
       synopsis: metadata.synopsis || "",
       ip_title_id: metadata.ip_title_id || "",
       title_type: metadata.title_type || "franchise",
@@ -248,6 +253,28 @@ class FormStore {
           resolveLinks: true
         }));
 
+      const displayTitle =
+        (yield client.ContentObjectMetadata({
+          versionHash: versionHash,
+          metadataSubtree: "public/asset_metadata/display_title",
+          resolveLinks: true
+        })) ||
+        (yield client.ContentObjectMetadata({
+          versionHash: versionHash,
+          metadataSubtree: "public/asset_metadata/title",
+          resolveLinks: true
+        })) ||
+        (yield client.ContentObjectMetadata({
+          versionHash: versionHash,
+          metadataSubtree: "public/name",
+          resolveLinks: true
+        })) ||
+        (yield client.ContentObjectMetadata({
+          versionHash: versionHash,
+          metadataSubtree: "name",
+          resolveLinks: true
+        }));
+
       const id = yield client.ContentObjectMetadata({
         versionHash: versionHash,
         metadataSubtree: "public/asset_metadata/ip_title_id",
@@ -260,7 +287,13 @@ class FormStore {
         resolveLinks: true
       });
 
-      this.targets[versionHash] = {id, assetType, title};
+      const playable = !!(yield client.ContentObjectMetadata({
+        versionHash: versionHash,
+        metadataSubtree: "public/asset_metadata/sources/default",
+        resolveLinks: true
+      }));
+
+      this.targets[versionHash] = {id, assetType, title, displayTitle, playable};
     }
   });
 
@@ -468,6 +501,15 @@ class FormStore {
       objectId
     })).write_token;
 
+    // Asset Info
+    yield client.MergeMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "public/asset_metadata",
+      metadata: toJS(this.assetInfo)
+    });
+
     // Clips
     let clips = {};
     let index = 0;
@@ -510,8 +552,8 @@ class FormStore {
 
     // Titles
     let titles = {};
-    this.titles.forEach(({title, versionHash}) => {
-      titles[Slugify(title)] = this.CreateLink(versionHash);
+    this.titles.forEach(({displayTitle, versionHash}) => {
+      titles[Slugify(displayTitle)] = this.CreateLink(versionHash);
     });
 
     yield client.ReplaceMetadata({
@@ -570,11 +612,11 @@ class FormStore {
       if(!playlistKey) { return; }
 
       let playlistClips = {};
-      clips.forEach(({isDefault, title, versionHash}) => {
+      clips.forEach(({isDefault, displayTitle, versionHash}) => {
         if(isDefault) {
           playlistClips.default = this.CreateLink(versionHash);
         } else {
-          playlistClips[Slugify(title)] = this.CreateLink(versionHash);
+          playlistClips[Slugify(displayTitle)] = this.CreateLink(versionHash);
         }
       });
 

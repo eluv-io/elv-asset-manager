@@ -273,6 +273,19 @@ textarea {
   font-size: $elv-font-l;
 }
 
+input {
+  &:read-only {
+    background: transparent;
+    border: 0;
+    color: $elv-color-text-lighter;
+    cursor: auto;
+
+    &:focus {
+      outline: 0;
+    }
+  }
+}
+
 .asset-form-input {
   align-items: center;
   display: grid;
@@ -372,6 +385,17 @@ textarea {
 
   .video-preview-icon {
     margin-left: $elv-spacing-xxs;
+
+    &.video-preview-icon-not-playable {
+      svg {
+        cursor: auto;
+        stroke: $elv-color-lightgray;
+      }
+
+      &:focus {
+        outline: 0;
+      }
+    }
   }
 }
 
