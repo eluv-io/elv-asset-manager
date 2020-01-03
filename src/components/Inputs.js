@@ -1,12 +1,13 @@
 import React from "react";
 
-export const Input = ({label, name, value, onChange}) => {
+export const Input = ({label, name, value, readonly=false, onChange}) => {
   return (
     <div className="asset-form-input">
       <label htmlFor={name}>{label || name}</label>
       <input
         name={name}
         value={value}
+        readOnly={readonly}
         onChange={event => onChange(event.target.value)}
       />
     </div>

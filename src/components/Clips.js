@@ -12,6 +12,7 @@ import PlayIcon from "../static/icons/play-circle.svg";
 const Clip = ({
   index,
   isDefault,
+  isPlayable,
   clip,
   name,
   length,
@@ -60,8 +61,12 @@ const Clip = ({
         <IconButton
           icon={PlayIcon}
           title={`Preview ${title}`}
-          className={`video-preview-icon ${showPreview ? "video-preview-icon-playing" : ""}`}
-          onClick={() => setShowPreview(!showPreview)}
+          className={`
+            video-preview-icon
+            ${isPlayable ? "" : "video-preview-icon-not-playable"}
+            ${showPreview ? "video-preview-icon-playing" : ""}
+          `}
+          onClick={() => isPlayable ? setShowPreview(!showPreview) : ""}
         />
         <div className="hint">{assetType}</div>
         <div>{title} {id ? `(${id})` : ""}</div>
@@ -145,6 +150,7 @@ class Clips extends React.Component {
           {clips.map((clip, index) =>
             <Clip
               index={index}
+              isPlayable={clip.playable}
               isDefault={clip.isDefault}
               defaultable={this.props.defaultable}
               orderable={this.props.orderable}
