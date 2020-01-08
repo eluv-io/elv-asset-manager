@@ -1,6 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Action, IconButton} from "elv-components-js";
+import {Action, Confirm, IconButton} from "elv-components-js";
 import FileSelection from "./FileBrowser";
 import PreviewIcon from "./PreviewIcon";
 import OrderButtons from "./OrderButtons";
@@ -52,7 +52,12 @@ class Gallery extends React.Component {
         <IconButton
           icon={DeleteIcon}
           title={`Remove ${imageInfo.imageKey || "image"}`}
-          onClick={() => this.props.formStore.RemoveGalleryImage(index)}
+          onClick={() =>
+            Confirm({
+              message: "Are you sure you want to remove this image?",
+              onConfirm: () => this.props.formStore.RemoveGalleryImage(index)
+            })
+          }
         />
       </div>
     );

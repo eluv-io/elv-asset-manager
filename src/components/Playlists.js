@@ -1,36 +1,49 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Action, IconButton} from "elv-components-js";
+import {Action, Confirm, IconButton} from "elv-components-js";
 import Clips from "./Clips";
 
 import DeleteIcon from "../static/icons/trash.svg";
+import {Input} from "./Inputs";
+import OrderButtons from "./OrderButtons";
 
 @inject("formStore")
 @observer
 class Playlists extends React.Component {
-  Playlist(playlist, index) {
+  Playlist(playlist, index, length) {
     return (
       <div className="asset-form-playlist" key={`playlist-${index}`}>
-        <input
-          name="playlistKey"
-          placeholder="Key..."
-          value={playlist.playlistKey}
-          onChange={event => this.props.formStore.UpdatePlaylist({index, playlistKey: event.target.value})}
-        />
-        <div className="playlist-clip-container">
-          <Clips
-            assetTypes={["clip", "primary", "trailer"]}
-            playlistIndex={index}
-            header="Playlist Clips"
-            name="Clip"
-            orderable
-            defaultable
+        <div className="asset-form-playlist-key">
+          <Input
+            name="playlistKey"
+            label="Playlist Key"
+            value={playlist.playlistKey}
+            onChange={playlistKey => this.props.formStore.UpdatePlaylist({index, playlistKey})}
+          />
+          <OrderButtons
+            index={index}
+            length={length}
+            Swap={(i1, i2) => this.props.formStore.SwapPlaylist(i1, i2)}
+          />
+          <IconButton
+            icon={DeleteIcon}
+            className="remove-playlist-button"
+            onClick={() =>
+              Confirm({
+                message: "Are you sure you want to remove this playlist?",
+                onConfirm: () => this.props.formStore.RemovePlaylist(index)
+              })
+            }
           />
         </div>
-        <IconButton
-          icon={DeleteIcon}
-          className="remove-playlist-button"
-          onClick={() => this.props.formStore.RemovePlaylist(index)}
+
+        <Clips
+          assetTypes={["clip", "primary", "trailer"]}
+          playlistIndex={index}
+          header={`'${playlist.playlistKey}' Clips`}
+          name="Clip"
+          orderable
+          defaultable
         />
       </div>
     );
@@ -42,7 +55,7 @@ class Playlists extends React.Component {
         <h3>Playlists</h3>
         <div className="asset-form-playlists-container">
           {this.props.formStore.playlists.map((playlist, index) =>
-            this.Playlist(playlist, index)
+            this.Playlist(playlist, index, this.props.formStore.playlists.length)
           )}
         </div>
         <Action onClick={this.props.formStore.AddPlaylist}>Add Playlist</Action>

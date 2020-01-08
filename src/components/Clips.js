@@ -69,8 +69,8 @@ const Clip = ({
           onClick={() => isPlayable ? setShowPreview(!showPreview) : ""}
         />
         <div className="hint">{assetType}</div>
-        <div>{title} {id ? `(${id})` : ""}</div>
-        <div className="clip-target-hash">{versionHash}</div>
+        <div title={title}>{title} {id ? `(${id})` : ""}</div>
+        <div className="clip-target-hash" title={versionHash}>{versionHash}</div>
         { defaultButton }
         { orderButtons }
         <IconButton
@@ -79,7 +79,7 @@ const Clip = ({
           label={`Remove ${title}`}
           onClick={async () => {
             await Confirm({
-              message: `Are you sure you want to remove the ${name} '${title}'?`,
+              message: `Are you sure you want to remove ${name ? `the ${name}` : ""} '${title}'?`,
               onConfirm: Remove
             });
           }}

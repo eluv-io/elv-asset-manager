@@ -430,15 +430,37 @@ input {
 
 .asset-form-playlist {
   align-items: baseline;
-  grid-template-columns: 1fr 2fr 2rem;
   padding: $elv-spacing-m $elv-spacing-s;
   position: relative;
   width: 100%;
 
+  .asset-form-input {
+    margin: 0;
+  }
+
   .asset-form-section-container {
     margin: 0;
     padding: 0;
+
+    h3 {
+      font-size: $elv-font-l;
+      font-weight: 500;
+    }
   }
 
+  .remove-playlist-button {
+    padding-left: $elv-spacing-xs;
+  }
+
+  .asset-form-playlist-key {
+    align-items: center;
+    display: flex;
+    padding-bottom: $elv-spacing-m;
+
+    .asset-form-input {
+      flex-grow: 1;
+      padding-right: $elv-spacing-s;
+    }
+  }
 }
 

@@ -195,7 +195,7 @@ class FormStore {
   @action.bound
   AddPlaylist() {
     this.playlists.push({
-      playlistKey: "",
+      playlistKey: "New Playlist",
       clips: []
     });
   }
@@ -211,6 +211,13 @@ class FormStore {
   @action.bound
   RemovePlaylist(index) {
     this.playlists = this.playlists.filter((_, i) => i !== index);
+  }
+
+  @action.bound
+  SwapPlaylist(i1, i2) {
+    const playlist = this.playlists[i1];
+    this.playlists[i1] = this.playlists[i2];
+    this.playlists[i2] = playlist;
   }
 
   // Load methods
@@ -476,18 +483,33 @@ class FormStore {
 
   LoadPlaylists = flow(function * (metadata) {
     let playlists = [];
+    let unorderedPlaylists = [];
     if(metadata) {
       yield Promise.all(
-        Object.keys(metadata).map(async playlistKey => {
-          playlists.push({
-            playlistKey,
-            clips: await this.LoadClips(metadata[playlistKey], true)
-          });
+        Object.keys(metadata).sort().map(async playlistIndex => {
+          if(isNaN(parseInt(playlistIndex))) {
+            // Old format - playlistIndex is the playlist key
+            unorderedPlaylists.push({
+              playlistKey: playlistIndex,
+              clips: await this.LoadClips(metadata[playlistIndex], true)
+            });
+          } else {
+            // Proper format: [index]: { [playlistKey]: ... }
+            const playlistKey = Object.keys(metadata[playlistIndex])[0];
+
+            playlists[parseInt(playlistIndex)] = {
+              playlistKey,
+              clips: await this.LoadClips(metadata[playlistIndex][playlistKey], true)
+            };
+          }
         })
       );
     }
 
-    return playlists;
+    return [
+      ...playlists.filter(playlist => playlist),
+      ...unorderedPlaylists
+    ];
   });
 
   @action.bound
@@ -608,7 +630,7 @@ class FormStore {
 
     // Playlists
     let playlists = {};
-    this.playlists.forEach(({playlistKey, clips}) => {
+    this.playlists.forEach(({playlistKey, clips}, index) => {
       if(!playlistKey) { return; }
 
       let playlistClips = {};
@@ -620,7 +642,9 @@ class FormStore {
         }
       });
 
-      playlists[playlistKey] = playlistClips;
+      playlists[index.toString()] = {
+        [playlistKey]: playlistClips
+      };
     });
 
     yield client.ReplaceMetadata({
