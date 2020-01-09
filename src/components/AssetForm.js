@@ -30,7 +30,7 @@ class AssetForm extends React.Component {
           <AssetInfo />
           <Clips storeKey="clips" header="Clips" name="Clip" assetTypes={["trailer"]} defaultable orderable />
           <Clips storeKey="trailers" header="Trailers" name="Trailer" assetTypes={["trailer"]} defaultable orderable />
-          <Clips storeKey="titles" header="Titles" name="Title" assetTypes={["primary"]} />
+          <Clips storeKey="titles" header="Titles" name="Title" assetTypes={["primary"]} orderable />
           <Images />
           <Gallery />
           <Playlists />

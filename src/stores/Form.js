@@ -38,15 +38,15 @@ class FormStore {
     this.assetInfo = this.LoadAssetInfo(assetMetadata);
 
     if(assetMetadata.clips) {
-      this.clips = yield this.LoadClips(assetMetadata.clips, true);
+      this.clips = yield this.LoadClips(assetMetadata.clips);
     }
 
     if(assetMetadata.trailers) {
-      this.trailers = yield this.LoadClips(assetMetadata.trailers, true);
+      this.trailers = yield this.LoadClips(assetMetadata.trailers);
     }
 
     if(assetMetadata.titles) {
-      this.titles = yield this.LoadClips(assetMetadata.titles);
+      this.titles = yield this.LoadClips(assetMetadata.titles, true);
     }
 
     this.images = yield this.LoadImages(assetMetadata.images, true);
@@ -304,47 +304,62 @@ class FormStore {
     }
   });
 
-  LoadClips = flow(function * (metadata, ordered=false) {
+  LoadClips = flow(function * (metadata) {
     let clips = [];
+    let unorderedClips = [];
     let defaultClip;
+
     yield Promise.all(
       Object.keys(metadata).map(async key => {
-        if(!metadata[key] || !metadata[key]["/"]) { return; }
+        try {
+          if(!metadata[key]) { return; }
 
-        let targetHash = this.rootStore.params.versionHash;
-        if(metadata[key]["/"].startsWith("/qfab/")) {
-          targetHash = metadata[key]["/"].split("/")[2];
-        }
+          // Titles have slugs
+          // {"0": { "<slug>": { <link> }}} instead of {"0": { <link> }}
+          const hasSlug = !metadata[key]["/"];
+          const slug = hasSlug ? Object.keys(metadata[key])[0] : undefined;
 
-        await this.RetrieveClip(targetHash);
+          let targetHash = this.rootStore.params.versionHash;
+          if(hasSlug) {
+            if(metadata[key][slug]["/"].startsWith("/qfab/")) {
+              targetHash = metadata[key][slug]["/"].split("/")[2];
+            }
+          } else {
+            if(metadata[key]["/"].startsWith("/qfab/")) {
+              targetHash = metadata[key]["/"].split("/")[2];
+            }
+          }
 
-        const clip = {
-          versionHash: targetHash,
-          isDefault: false,
-          ...this.targets[targetHash]
-        };
+          await this.RetrieveClip(targetHash);
 
-        if(key === "default") {
-          clip.isDefault = true;
-          defaultClip = clip;
-          return;
-        }
+          const clip = {
+            versionHash: targetHash,
+            isDefault: false,
+            ...this.targets[targetHash]
+          };
 
-        if(ordered) {
-          // Keys are ordered indices
-          const index = parseInt(key);
-          clips.push(clip);
-
-          if(isNaN(index)) {
+          if(key === "default") {
+            clip.isDefault = true;
+            defaultClip = clip;
             return;
           }
 
-          clips[index] = {
-            versionHash: targetHash,
-            ...this.targets[targetHash]
-          };
-        } else {
-          clips.push(clip);
+          // Keys are ordered indices
+          const index = parseInt(key);
+          if(isNaN(index)) {
+            // Key not an index, just add it to the back of the list
+            unorderedClips.push(clip);
+            return;
+          }
+
+          clips[index] = clip;
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error(`Failed to load clip '${key}':`);
+          // eslint-disable-next-line no-console
+          console.error(toJS(metadata));
+          // eslint-disable-next-line no-console
+          console.error(error);
         }
       })
     );
@@ -353,6 +368,11 @@ class FormStore {
     if(defaultClip) {
       clips.unshift(defaultClip);
     }
+
+    clips = [
+      ...clips,
+      ...unorderedClips
+    ];
 
     // Filter any missing indices
     clips = clips.filter(clip => clip);
@@ -365,28 +385,37 @@ class FormStore {
     let imageTargets = [];
     if(metadata) {
       Object.keys(metadata).forEach(async imageKey => {
-        const link = metadata[imageKey].default;
+        try {
+          const link = metadata[imageKey].default;
 
-        if(!link || !link["/"]) {
-          return;
+          if(!link || !link["/"]) {
+            return;
+          }
+
+          let targetHash = this.rootStore.params.versionHash;
+          let imagePath = link["/"].replace(/^\.\/files\//, "");
+          if(link["/"].startsWith("/qfab/")) {
+            targetHash = link["/"].split("/")[2];
+            imagePath = link["/"].split("/").slice(4).join("/");
+          }
+
+          if(!imageTargets.includes(targetHash)) {
+            imageTargets.push(targetHash);
+          }
+
+          images.push({
+            imageKey,
+            imagePath,
+            targetHash
+          });
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error(`Failed to load image '${imageKey}':`);
+          // eslint-disable-next-line no-console
+          console.error(toJS(metadata));
+          // eslint-disable-next-line no-console
+          console.error(error);
         }
-
-        let targetHash = this.rootStore.params.versionHash;
-        let imagePath = link["/"].replace(/^\.\/files\//, "");
-        if(link["/"].startsWith("/qfab/")) {
-          targetHash = link["/"].split("/")[2];
-          imagePath = link["/"].split("/").slice(4).join("/");
-        }
-
-        if(!imageTargets.includes(targetHash)) {
-          imageTargets.push(targetHash);
-        }
-
-        images.push({
-          imageKey,
-          imagePath,
-          targetHash
-        });
       });
     }
 
@@ -408,9 +437,7 @@ class FormStore {
       ];
 
       mandatoryImages.forEach(imageKey => {
-        if(images.find(info => info.imageKey === imageKey)) {
-          return;
-        }
+        if(images.find(info => info.imageKey === imageKey)) { return; }
 
         images.push({
           imageKey,
@@ -437,34 +464,41 @@ class FormStore {
     let imageTargets = [];
     if(metadata) {
       Object.keys(metadata).forEach(async imageIndex => {
-        const index = parseInt(imageIndex);
+        try {
+          const index = parseInt(imageIndex);
 
-        if(isNaN(index)) { return; }
+          if(isNaN(index)) { return; }
 
-        const imageInfo = metadata[imageIndex];
-        const link = imageInfo.image && imageInfo.image.default;
+          const imageInfo = metadata[imageIndex];
+          const link = imageInfo.image && imageInfo.image.default;
 
-        if(!link || !link["/"]) {
-          return;
+          if(!link || !link["/"]) { return; }
+
+          let targetHash = this.rootStore.params.versionHash;
+          let imagePath = link["/"].replace(/^\.\/files\//, "");
+          if(link["/"].startsWith("/qfab/")) {
+            targetHash = link["/"].split("/")[2];
+            imagePath = link["/"].split("/").slice(4).join("/");
+          }
+
+          if(!imageTargets.includes(targetHash)) {
+            imageTargets.push(targetHash);
+          }
+
+          images[index] = {
+            title: imageInfo.title || "",
+            description: imageInfo.description || "",
+            imagePath,
+            targetHash
+          };
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error(`Failed to load gallery '${imageIndex}':`);
+          // eslint-disable-next-line no-console
+          console.error(toJS(metadata));
+          // eslint-disable-next-line no-console
+          console.error(error);
         }
-
-        let targetHash = this.rootStore.params.versionHash;
-        let imagePath = link["/"].replace(/^\.\/files\//, "");
-        if(link["/"].startsWith("/qfab/")) {
-          targetHash = link["/"].split("/")[2];
-          imagePath = link["/"].split("/").slice(4).join("/");
-        }
-
-        if(!imageTargets.includes(targetHash)) {
-          imageTargets.push(targetHash);
-        }
-
-        images[index] = {
-          title: imageInfo.title || "",
-          description: imageInfo.description || "",
-          imagePath,
-          targetHash
-        };
       });
     }
 
@@ -574,8 +608,10 @@ class FormStore {
 
     // Titles
     let titles = {};
-    this.titles.forEach(({displayTitle, versionHash}) => {
-      titles[Slugify(displayTitle)] = this.CreateLink(versionHash);
+    this.titles.forEach(({displayTitle, versionHash}, index) => {
+      titles[index] = {
+        [Slugify(displayTitle)]: this.CreateLink(versionHash)
+      };
     });
 
     yield client.ReplaceMetadata({
