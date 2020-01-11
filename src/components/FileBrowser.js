@@ -162,7 +162,7 @@ class FileBrowser extends React.Component {
     }
 
     return (
-      <div className="file-browser">
+      <div className="file-browser-container">
         <h3>{this.props.header}</h3>
         <table>
           <thead>
