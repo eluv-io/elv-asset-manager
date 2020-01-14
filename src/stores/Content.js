@@ -70,6 +70,12 @@ class ContentStore {
       async ({id, versions}) => {
         const metadata = versions[0].meta || {};
         metadata.public = metadata.public || {};
+
+        // TODO: Temporary - Remove when content is fixed
+        if((metadata.public.name || "").toLowerCase().startsWith("z_old")) {
+          return;
+        }
+
         metadata.public.asset_metadata = metadata.public.asset_metadata || {};
         metadata.public.asset_metadata = {
           ...(metadata.asset_metadata || {}),
