@@ -8,7 +8,7 @@
 
 html {
   color: $elv-color-text-dark;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 body,
@@ -27,7 +27,15 @@ main {
   margin: $elv-spacing-s;
 }
 
-h1 {
+h1,
+h2,
+h3 {
+  font-size: $elv-font-xxl;
+  font-weight: 400;
+  text-align: center;
+}
+
+h3 {
   font-size: $elv-font-xxl;
   font-weight: 400;
   text-align: center;
@@ -44,6 +52,9 @@ button {
 
   &.checkbox-button {
     &.checkbox-button {
+      background: $elv-color-lightblue;
+      border: 1px solid $elv-color-lightblue;
+      color: $elv-color-white;
       font-size: $elv-font-s;
       max-height: 1.2rem;
       max-width: 3.5rem;
@@ -189,6 +200,7 @@ button {
 
 .asset-form {
   max-width: 75rem;
+  padding-top: $elv-spacing-l;
   position: relative;
   width: 100%;
 
@@ -204,11 +216,40 @@ button {
   }
 }
 
+.sticky {
+  align-items: center;
+  background: $elv-color-bg-white;
+  border-bottom: 2px solid $elv-color-lightgray;
+  display: flex;
+  height: $elv-spacing-xl;
+  justify-content: space-around;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+
+  h1 {
+    width: 100%;
+  }
+}
+
+.asset-form-page-selection {
+  font-size: $elv-font-l;
+
+  &.-elv-tab-container {
+    margin-top: $elv-spacing-l;
+
+    .-elv-tab {
+      flex-grow: 1;
+    }
+  }
+}
+
 .asset-form-save-button {
   height: 30px;
   position: absolute;
-  right: $elv-spacing-m;
-  top: 0;
+  right: $elv-spacing-s;
   width: 150px;
 
   &.-elv-button {
@@ -240,7 +281,7 @@ button {
   }
 
   button {
-    max-width: 120px;
+    max-width: 130px;
   }
 
   h3 {
@@ -335,7 +376,8 @@ input {
 .asset-form-clip,
 .asset-form-image-entry,
 .asset-form-gallery-image-entry,
-.asset-form-playlist {
+.asset-form-playlist,
+.asset-form-credit {
   align-items: center;
   border: 1px solid $elv-color-lightgray;
   border-bottom: 0;
@@ -360,6 +402,10 @@ input {
   textarea {
     font-size: $elv-font-m;
     height: 3.5rem;
+  }
+
+  &:hover {
+    background: $elv-color-bg-light-dark;
   }
 }
 
@@ -394,6 +440,64 @@ input {
 
       &:focus {
         outline: 0;
+      }
+    }
+  }
+}
+
+.asset-form-credits-container,
+.asset-form-credits {
+  width: 100%;
+}
+
+.asset-form-credits-group {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin: $elv-spacing-m 0;
+
+  h3 {
+    min-height: $elv-font-xxl;
+  }
+
+  .asset-form-credits-group-info {
+    margin-bottom: $elv-spacing-s;
+    width: 40%;
+  }
+}
+
+.asset-form-credits-group-header {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  .remove-credit-group-button {
+    height: $elv-font-xxl;
+    margin-left: $elv-spacing-s;
+  }
+}
+
+.asset-form-credit {
+  border: 0;
+  grid-template-columns: 1fr 1fr 1fr 2rem 2rem;
+  width: 100%;
+
+  label {
+    text-align: center;
+  }
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  .add-credit-button {
+    svg {
+      stroke: $elv-color-mediumblue;
+    }
+
+    &:hover {
+      svg {
+        stroke: $elv-color-lightblue;
       }
     }
   }

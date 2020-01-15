@@ -1,39 +1,82 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Action, Confirm} from "elv-components-js";
+import {Action, Confirm, Tabs} from "elv-components-js";
 import Clips from "./Clips";
 import Images from "./Images";
 import AssetInfo from "./AssetInfo";
 import Gallery from "./Gallery";
 import Playlists from "./Playlists";
+import Credits from "./Credits";
+
+const FORMS = [
+  ["Info", "INFO"],
+  ["Credits", "CREDITS"],
+  ["Clips", "CLIPS"],
+  ["Trailers", "TRAILERS"],
+  ["Titles", "TITLES"],
+  ["Images", "IMAGES"],
+  ["Gallery", "GALLERY"],
+  ["Playlists", "PLAYLISTS"]
+];
 
 @inject("rootStore")
 @inject("formStore")
 @observer
 class AssetForm extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      form: "INFO"
+    };
+  }
+
+  CurentForm() {
+    switch (this.state.form) {
+      case "INFO":
+        return <AssetInfo />;
+      case "CREDITS":
+        return <Credits />;
+      case "CLIPS":
+        return <Clips storeKey="clips" header="Clips" name="Clip" assetTypes={["trailer"]} defaultable orderable />;
+      case "TRAILERS":
+        return <Clips storeKey="trailers" header="Trailers" name="Trailer" assetTypes={["trailer"]} defaultable orderable />;
+      case "TITLES":
+        return <Clips storeKey="titles" header="Titles" name="Title" assetTypes={["primary"]} orderable />;
+      case "IMAGES":
+        return <Images />;
+      case "GALLERY":
+        return <Gallery />;
+      case "PLAYLISTS":
+        return <Playlists />;
+    }
+  }
+
   render() {
     return (
       <div className="asset-form">
-        <h1>Manage '{this.props.rootStore.assetName}'</h1>
-        <Action
-          className="asset-form-save-button"
-          onClick={async () => {
-            await Confirm({
-              message: "Are you sure you want to save your changes?",
-              onConfirm: this.props.formStore.SaveAsset
-            });
-          }}
-        >
-          Save
-        </Action>
+        <div className="sticky">
+          <h1>Managing '{this.props.formStore.assetInfo.title || this.props.rootStore.assetName}'</h1>
+          <Action
+            className="asset-form-save-button"
+            onClick={async () => {
+              await Confirm({
+                message: "Are you sure you want to save your changes?",
+                onConfirm: this.props.formStore.SaveAsset
+              });
+            }}
+          >
+            Save
+          </Action>
+        </div>
+        <Tabs
+          className="asset-form-page-selection"
+          selected={this.state.form}
+          onChange={form => this.setState({form})}
+          options={FORMS}
+        />
         <div className="asset-form-container">
-          <AssetInfo />
-          <Clips storeKey="clips" header="Clips" name="Clip" assetTypes={["trailer"]} defaultable orderable />
-          <Clips storeKey="trailers" header="Trailers" name="Trailer" assetTypes={["trailer"]} defaultable orderable />
-          <Clips storeKey="titles" header="Titles" name="Title" assetTypes={["primary"]} orderable />
-          <Images />
-          <Gallery />
-          <Playlists />
+          { this.CurentForm() }
         </div>
       </div>
     );

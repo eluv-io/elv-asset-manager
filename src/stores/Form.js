@@ -12,6 +12,7 @@ class FormStore {
   @observable gallery = [];
   @observable playlists = [];
   @observable titles = [];
+  @observable credits = {};
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -36,6 +37,7 @@ class FormStore {
     const assetMetadata = this.rootStore.assetMetadata || {};
 
     this.assetInfo = this.LoadAssetInfo(assetMetadata);
+    this.credits = this.LoadCredits((assetMetadata.info || {}).talent);
 
     if(assetMetadata.clips) {
       this.clips = yield this.LoadClips(assetMetadata.clips);
@@ -61,6 +63,55 @@ class FormStore {
     if(key === "display_title") {
       this.assetInfo.url_slug = Slugify(value);
     }
+  }
+
+  // Credits
+
+  @action.bound
+  AddCreditGroup() {
+    this.credits.push({
+      group: "",
+      talentType: "",
+      credits: []
+    });
+  }
+
+  @action.bound
+  RemoveCreditGroup({groupIndex}) {
+    this.credits =
+      this.credits.filter((_, i) => i !== groupIndex);
+  }
+
+  @action.bound
+  UpdateCreditGroup({groupIndex, key, value}) {
+    this.credits[groupIndex][key] = value;
+  }
+
+  @action.bound
+  AddCredit({groupIndex}) {
+    this.credits[groupIndex].credits.push({
+      character_name: "",
+      talent_first_name: "",
+      talent_last_name: ""
+    });
+  }
+
+  @action.bound
+  UpdateCredit({groupIndex, creditIndex, key, value}) {
+    this.credits[groupIndex].credits[creditIndex][key] = value;
+  }
+
+  @action.bound
+  SwapCredit({groupIndex, i1, i2}) {
+    const credit = this.credits[groupIndex].credits[i1];
+    this.credits[groupIndex].credits[i1] = this.credits[groupIndex].credits[i2];
+    this.credits[groupIndex].credits[i2] = credit;
+  }
+
+  @action.bound
+  RemoveCredit({groupIndex, creditIndex}) {
+    this.credits[groupIndex].credits =
+      this.credits[groupIndex].credits.filter((_, i) => i !== creditIndex);
   }
 
   // Clips/trailers
@@ -231,6 +282,21 @@ class FormStore {
       title_type: metadata.title_type || "franchise",
       asset_type: metadata.asset_type || "primary"
     };
+  }
+
+  LoadCredits(metadata) {
+    if(!metadata) { return []; }
+
+    let credits = [];
+    Object.keys(metadata).map(group => {
+      credits.push({
+        group,
+        talentType: (metadata[group][0] || {}).talent_type,
+        credits: metadata[group]
+      });
+    });
+
+    return credits;
   }
 
   // Retrieve information about a clip and add it to targets cache (if not present)
@@ -564,6 +630,26 @@ class FormStore {
       writeToken,
       metadataSubtree: "public/asset_metadata",
       metadata: toJS(this.assetInfo)
+    });
+
+    // Credits
+    let credits = {};
+    this.credits.map(group => {
+      credits[group.group] =
+        group.credits.map((credit, index) => ({
+          ...credit,
+          talent_type: group.talentType,
+          talent_note_seq_id: (index + 1).toString().padStart(2, "0")
+        }));
+    });
+
+    // Asset Info
+    yield client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "public/asset_metadata/info/talent",
+      metadata: toJS(credits)
     });
 
     // Clips

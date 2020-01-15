@@ -33,7 +33,12 @@ const Clip = ({
     defaultButton = (
       <Action
         type="button"
-        label="checkbox"
+        label="default"
+        additionalProps={{
+          role: "checkbox",
+          "aria-checked": isDefault
+        }}
+        title={isDefault ? "Remove default" : "Make default"}
         className={`checkbox-button ${isDefault ? "checked" : ""}`}
         onClick={() => SetDefault(index)}
       >

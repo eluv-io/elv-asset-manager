@@ -41,7 +41,7 @@ class Playlists extends React.Component {
           assetTypes={["clip", "primary", "trailer"]}
           playlistIndex={index}
           header={`'${playlist.playlistKey}' Clips`}
-          name="Clip"
+          name="Clip to Playlist"
           orderable
           defaultable
         />
