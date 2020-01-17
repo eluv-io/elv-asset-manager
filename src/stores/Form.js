@@ -288,11 +288,25 @@ class FormStore {
     if(!metadata) { return []; }
 
     let credits = [];
-    Object.keys(metadata).map(group => {
+    Object.keys(metadata).map(groupName => {
+      let withSeqId = [];
+      let withoutSeqId = [];
+
+      metadata[groupName].forEach(credit => {
+        if(credit.talent_note_seq_id) {
+          const index = parseInt(credit.talent_note_seq_id) - 1;
+          withSeqId[index] = credit;
+        } else {
+          withoutSeqId.push(credit);
+        }
+      });
+
       credits.push({
-        group,
-        talentType: (metadata[group][0] || {}).talent_type,
-        credits: metadata[group]
+        group: groupName,
+        talentType: (metadata[groupName][0] || {}).talent_type,
+        credits: withSeqId
+          .filter(credit => credit)
+          .concat(withoutSeqId)
       });
     });
 
