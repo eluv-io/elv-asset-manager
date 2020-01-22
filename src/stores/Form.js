@@ -317,53 +317,21 @@ class FormStore {
   RetrieveClip = flow(function * (versionHash) {
     const client = this.rootStore.client;
 
-    if(!this.targets[versionHash]) {
-      const title =
-        (yield client.ContentObjectMetadata({
-          versionHash: versionHash,
-          metadataSubtree: "public/asset_metadata/title"
-        })) ||
-        (yield client.ContentObjectMetadata({
-          versionHash: versionHash,
-          metadataSubtree: "public/asset_metadata/display_title"
-        })) ||
-        (yield client.ContentObjectMetadata({
-          versionHash: versionHash,
-          metadataSubtree: "public/name"
-        })) ||
-        (yield client.ContentObjectMetadata({
-          versionHash: versionHash,
-          metadataSubtree: "name"
-        }));
+    if(this.targets[versionHash]) { return; }
 
-      const displayTitle =
-        (yield client.ContentObjectMetadata({
-          versionHash: versionHash,
-          metadataSubtree: "public/asset_metadata/display_title"
-        })) || title;
+    const assetMetadata = (yield client.ContentObjectMetadata({
+      versionHash,
+      metadataSubtree: "public/asset_metadata"
+    })) || {};
 
-      const slug = yield client.ContentObjectMetadata({
-        versionHash: versionHash,
-        metadataSubtree: "public/asset_metadata/slug"
-      });
-
-      const id = yield client.ContentObjectMetadata({
-        versionHash: versionHash,
-        metadataSubtree: "public/asset_metadata/ip_title_id"
-      });
-
-      const assetType = yield client.ContentObjectMetadata({
-        versionHash: versionHash,
-        metadataSubtree: "public/asset_metadata/asset_type"
-      });
-
-      const playable = !!(yield client.ContentObjectMetadata({
-        versionHash: versionHash,
-        metadataSubtree: "public/asset_metadata/sources/default"
-      }));
-
-      this.targets[versionHash] = {id, assetType, title, displayTitle, slug, playable};
-    }
+    this.targets[versionHash] = {
+      id: assetMetadata.ip_title_id,
+      assetType: assetMetadata.asset_type,
+      title: assetMetadata.title || assetMetadata.display_title,
+      displayTitle: assetMetadata.display_title || assetMetadata.title,
+      slug: assetMetadata.slug,
+      playable: !!(assetMetadata.sources || {}).default
+    };
   });
 
   LoadClips = flow(function * (metadata) {
