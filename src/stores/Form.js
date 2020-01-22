@@ -61,7 +61,7 @@ class FormStore {
     this.assetInfo[key] = value;
 
     if(key === "display_title") {
-      this.assetInfo.url_slug = Slugify(value);
+      this.assetInfo.slug = Slugify(value);
     }
   }
 
@@ -276,7 +276,7 @@ class FormStore {
     return {
       title: metadata.title || "",
       display_title: metadata.display_title || "",
-      url_slug: Slugify(metadata.display_title || ""),
+      slug: metadata.slug || Slugify(metadata.display_title || ""),
       synopsis: metadata.synopsis || "",
       ip_title_id: metadata.ip_title_id || "",
       title_type: metadata.title_type || "franchise",
@@ -321,66 +321,48 @@ class FormStore {
       const title =
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
-          metadataSubtree: "public/asset_metadata/title",
-          resolveLinks: true
+          metadataSubtree: "public/asset_metadata/title"
         })) ||
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
-          metadataSubtree: "public/asset_metadata/display_title",
-          resolveLinks: true
+          metadataSubtree: "public/asset_metadata/display_title"
         })) ||
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
-          metadataSubtree: "public/name",
-          resolveLinks: true
+          metadataSubtree: "public/name"
         })) ||
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
-          metadataSubtree: "name",
-          resolveLinks: true
+          metadataSubtree: "name"
         }));
 
       const displayTitle =
         (yield client.ContentObjectMetadata({
           versionHash: versionHash,
-          metadataSubtree: "public/asset_metadata/display_title",
-          resolveLinks: true
-        })) ||
-        (yield client.ContentObjectMetadata({
-          versionHash: versionHash,
-          metadataSubtree: "public/asset_metadata/title",
-          resolveLinks: true
-        })) ||
-        (yield client.ContentObjectMetadata({
-          versionHash: versionHash,
-          metadataSubtree: "public/name",
-          resolveLinks: true
-        })) ||
-        (yield client.ContentObjectMetadata({
-          versionHash: versionHash,
-          metadataSubtree: "name",
-          resolveLinks: true
-        }));
+          metadataSubtree: "public/asset_metadata/display_title"
+        })) || title;
+
+      const slug = yield client.ContentObjectMetadata({
+        versionHash: versionHash,
+        metadataSubtree: "public/asset_metadata/slug"
+      });
 
       const id = yield client.ContentObjectMetadata({
         versionHash: versionHash,
-        metadataSubtree: "public/asset_metadata/ip_title_id",
-        resolveLinks: true
+        metadataSubtree: "public/asset_metadata/ip_title_id"
       });
 
       const assetType = yield client.ContentObjectMetadata({
         versionHash: versionHash,
-        metadataSubtree: "public/asset_metadata/asset_type",
-        resolveLinks: true
+        metadataSubtree: "public/asset_metadata/asset_type"
       });
 
       const playable = !!(yield client.ContentObjectMetadata({
         versionHash: versionHash,
-        metadataSubtree: "public/asset_metadata/sources/default",
-        resolveLinks: true
+        metadataSubtree: "public/asset_metadata/sources/default"
       }));
 
-      this.targets[versionHash] = {id, assetType, title, displayTitle, playable};
+      this.targets[versionHash] = {id, assetType, title, displayTitle, slug, playable};
     }
   });
 
@@ -708,11 +690,18 @@ class FormStore {
 
     // Titles
     let titles = {};
-    this.titles.forEach(({displayTitle, versionHash}, index) => {
-      titles[index] = {
-        [Slugify(displayTitle)]: this.CreateLink(versionHash)
-      };
-    });
+    yield Promise.all(
+      this.titles.map(async ({displayTitle, versionHash}, index) => {
+        const slug = (await client.ContentObjectMetadata({
+          versionHash,
+          metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
+        })) || Slugify(displayTitle);
+
+        titles[index] = {
+          [slug]: this.CreateLink(versionHash)
+        };
+      })
+    );
 
     yield client.ReplaceMetadata({
       libraryId,
@@ -766,22 +755,31 @@ class FormStore {
 
     // Playlists
     let playlists = {};
-    this.playlists.forEach(({playlistKey, clips}, index) => {
-      if(!playlistKey) { return; }
+    yield Promise.all(
+      this.playlists.map(async ({playlistKey, clips}, index) => {
+        if(!playlistKey) { return; }
 
-      let playlistClips = {};
-      clips.forEach(({isDefault, displayTitle, versionHash}) => {
-        if(isDefault) {
-          playlistClips.default = this.CreateLink(versionHash);
-        } else {
-          playlistClips[Slugify(displayTitle)] = this.CreateLink(versionHash);
-        }
-      });
+        let playlistClips = {};
+        await Promise.all(
+          clips.map(async ({isDefault, displayTitle, versionHash}) => {
+            if(isDefault) {
+              playlistClips.default = this.CreateLink(versionHash);
+            } else {
+              const slug = (await client.ContentObjectMetadata({
+                versionHash,
+                metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
+              })) || Slugify(displayTitle);
 
-      playlists[index.toString()] = {
-        [playlistKey]: playlistClips
-      };
-    });
+              playlistClips[slug] = this.CreateLink(versionHash);
+            }
+          })
+        );
+
+        playlists[index.toString()] = {
+          [playlistKey]: playlistClips
+        };
+      })
+    );
 
     yield client.ReplaceMetadata({
       libraryId,

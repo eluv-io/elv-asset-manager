@@ -23,9 +23,9 @@ class AssetInfo extends React.Component {
           />
 
           <Input
-            name="url_slug"
-            value={this.props.formStore.assetInfo.url_slug}
-            readonly={true}
+            name="slug"
+            value={this.props.formStore.assetInfo.slug}
+            onChange={slug => this.props.formStore.UpdateAssetInfo("slug", slug)}
           />
 
           <Input

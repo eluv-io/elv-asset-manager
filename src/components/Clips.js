@@ -22,7 +22,7 @@ const Clip = ({
   Remove,
   SetDefault
 }) => {
-  const {versionHash, title, id, assetType} = clip;
+  const {versionHash, title, id, slug, assetType} = clip;
 
   const [showPreview, setShowPreview] = useState(false);
 
@@ -75,7 +75,7 @@ const Clip = ({
         />
         <div className="hint">{assetType}</div>
         <div title={title}>{title} {id ? `(${id})` : ""}</div>
-        <div className="clip-target-hash" title={versionHash}>{versionHash}</div>
+        <div className="clip-target-hash" title={`${slug || ""} ${versionHash}`}>{versionHash}</div>
         { defaultButton }
         { orderButtons }
         <IconButton
