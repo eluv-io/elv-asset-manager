@@ -40,6 +40,12 @@ class AssetInfo extends React.Component {
             onChange={synopsis => this.props.formStore.UpdateAssetInfo("synopsis", synopsis)}
           />
 
+          <Input
+            name="original_broadcaster"
+            value={this.props.formStore.assetInfo.original_broadcaster}
+            onChange={original_broadcaster => this.props.formStore.UpdateAssetInfo("original_broadcaster", original_broadcaster)}
+          />
+
           <Selection
             name="title_type"
             value={this.props.formStore.assetInfo.title_type}
