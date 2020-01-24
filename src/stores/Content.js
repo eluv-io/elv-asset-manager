@@ -30,7 +30,7 @@ class ContentStore {
           objectId: libraryId.replace("ilib", "iq__")
         });
 
-        const name = (metadata.public ? metadata.public.name : metadata.name) || metadata.name || libraryId;
+        const name = (metadata.public ? metadata.public.name : metadata.name) || metadata.name || libraryId || "";
         libraries.push({
           id: libraryId,
           libraryId,
@@ -82,7 +82,7 @@ class ContentStore {
           ...metadata.public.asset_metadata
         };
 
-        const name = metadata.public.asset_metadata.title || metadata.public.name || metadata.name;
+        const name = metadata.public.asset_metadata.title || metadata.public.name || metadata.name || "";
 
         objects.push({
           id,

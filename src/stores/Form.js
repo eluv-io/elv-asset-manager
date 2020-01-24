@@ -354,11 +354,11 @@ class FormStore {
 
           let targetHash = this.rootStore.params.versionHash;
           if(hasSlug) {
-            if(metadata[key][slug]["/"].startsWith("/qfab/")) {
+            if((metadata[key][slug]["/"] || "").startsWith("/qfab/")) {
               targetHash = metadata[key][slug]["/"].split("/")[2];
             }
           } else {
-            if(metadata[key]["/"].startsWith("/qfab/")) {
+            if((metadata[key]["/"] || "").startsWith("/qfab/")) {
               targetHash = metadata[key]["/"].split("/")[2];
             }
           }

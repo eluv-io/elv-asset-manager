@@ -23,7 +23,9 @@ class VideoPreview extends React.Component {
 
     try {
       this.setState({errorMessage: undefined});
-      const playoutUrl = this.props.contentStore.playoutOptions[this.props.versionHash].hls.playoutMethods.clear.playoutUrl;
+      const playoutMethods = this.props.contentStore.playoutOptions[this.props.versionHash].hls.playoutMethods;
+      // Prefer AES playout
+      const playoutUrl = (playoutMethods["aes-128"] || playoutMethods.clear).playoutUrl;
 
       const player = new HLSPlayer();
 
