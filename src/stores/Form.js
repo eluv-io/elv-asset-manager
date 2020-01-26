@@ -297,7 +297,7 @@ class FormStore {
       original_broadcaster: info.original_broadcaster || "",
       mpaa_rating: info.mpaa_rating,
       tv_rating: info.tv_rating || "",
-      genre: info.genre.map(genre => genre.toUpperCase()) || [],
+      genre: info.genre || [],
       release_date
     };
   }

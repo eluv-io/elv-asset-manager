@@ -65,7 +65,7 @@ export const MultiSelect = ({label, name, values, onChange, options}) => {
 
   const Add = () => {
     let newValues = [...toJS(values)];
-    newValues.push(Object.keys(options)[0]);
+    newValues.push(options[0]);
 
     onChange(newValues);
   };
@@ -78,8 +78,6 @@ export const MultiSelect = ({label, name, values, onChange, options}) => {
 
     onChange(newValues);
   };
-
-  const selectOptions = Object.keys(options).map(value => [options[value], value]);
 
   return (
     <div className="asset-form-input asset-form-multi-select">
@@ -100,8 +98,8 @@ export const MultiSelect = ({label, name, values, onChange, options}) => {
               value={selected}
               onChange={event => Update(index, event)}
             >
-              {selectOptions.map(([label, option])  =>
-                <option value={option} key={`asset-form-${name}-${option}-${index}`}>{label}</option>
+              {options.map(option  =>
+                <option value={option} key={`asset-form-${name}-${option}-${index}`}>{option}</option>
               )}
             </select>
 
