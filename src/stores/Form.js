@@ -275,6 +275,16 @@ class FormStore {
   LoadAssetInfo(metadata) {
     const info = (metadata.info || {});
 
+    let release_date = { year: "", month: "", day: ""};
+    if(info.release_date) {
+      const date = new Date(info.release_date);
+      release_date = {
+        year: date.getFullYear(),
+        month: date.getMonth() + 1,
+        day: date.getDate() + 1
+      };
+    }
+
     return {
       title: metadata.title || "",
       display_title: metadata.display_title || "",
@@ -283,7 +293,12 @@ class FormStore {
       ip_title_id: metadata.ip_title_id || "",
       title_type: metadata.title_type || "franchise",
       asset_type: metadata.asset_type || "primary",
-      original_broadcaster: info.original_broadcaster || ""
+      creator: info.creator || "",
+      original_broadcaster: info.original_broadcaster || "",
+      mpaa_rating: info.mpaa_rating,
+      tv_rating: info.tv_rating || "",
+      genre: info.genre.map(genre => genre.toUpperCase()) || [],
+      release_date
     };
   }
 
@@ -579,6 +594,14 @@ class FormStore {
     ];
   });
 
+  FormatDate(date) {
+    if(!date.year) { date.year = new Date().getUTCFullYear(); }
+    if(!date.month) { date.month = new Date().getMonth() + 1; }
+    if(!date.day) { date.day = new Date().getDate() + 1; }
+
+    return `${date.year}-${date.month.toString().padStart(2, "0")}-${date.day.toString().padStart(2, "0")}`;
+  }
+
   @action.bound
   SaveAsset = flow(function * () {
     try {
@@ -591,9 +614,27 @@ class FormStore {
         objectId
       })).write_token;
 
+      const infoFields = [
+        "original_broadcaster",
+        "creator",
+        "mpaa_rating",
+        "tv_rating",
+        "release_date"
+      ];
+
+      // Move fields that belong in the info subtree and remove from main tree
       const assetInfo = toJS(this.assetInfo);
-      assetInfo.info = {original_broadcaster: assetInfo.original_broadcaster};
-      delete assetInfo.original_broadcaster;
+      assetInfo.release_date = this.FormatDate(assetInfo.release_date);
+      assetInfo.info = {};
+      infoFields.forEach(name => {
+        assetInfo.info[name] = assetInfo[name];
+        delete assetInfo[name];
+      });
+
+      let genre = assetInfo.genre;
+      genre = genre.filter((a, b) => genre.indexOf(a) === b).sort();
+
+      delete assetInfo.genre;
 
       // Asset Info
       yield client.MergeMetadata({
@@ -602,6 +643,15 @@ class FormStore {
         writeToken,
         metadataSubtree: "public/asset_metadata",
         metadata: assetInfo
+      });
+
+      // Genre must be replaced, or else it will be merged
+      yield client.ReplaceMetadata({
+        libraryId,
+        objectId,
+        writeToken,
+        metadataSubtree: "public/asset_metadata/info/genre",
+        metadata: genre
       });
 
       // Credits
@@ -788,6 +838,8 @@ class FormStore {
       console.error("Save failed:");
       // eslint-disable-next-line no-console
       console.error(error);
+
+      throw error;
     }
   });
 }

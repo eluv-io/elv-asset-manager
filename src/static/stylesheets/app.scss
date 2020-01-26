@@ -301,21 +301,25 @@ label {
 }
 
 select {
+  border: 1px solid $elv-color-mediumgray;
   width: 100%;
 }
 
 textarea {
   font-family: inherit;
   height: 7rem;
-  padding: $elv-spacing-xxs;
+  padding: $elv-spacing-xs;
 }
 
 input,
-textarea {
+textarea,
+select {
   font-size: $elv-font-l;
 }
 
 input {
+  padding: 0 $elv-spacing-xs;
+
   &:read-only {
     background: transparent;
     border: 0;
@@ -334,6 +338,37 @@ input {
   grid-gap: 1rem;
   grid-template-columns: 8rem 1fr;
   margin-bottom: $elv-spacing-xs;
+}
+
+.asset-form-date {
+  grid-template-columns: 8rem 1fr 1fr 1fr;
+}
+
+.asset-form-multi-select {
+  label {
+    align-items: center;
+    align-self: baseline;
+    display: flex;
+
+    button {
+      margin-left: $elv-spacing-xxs;
+      padding: $elv-spacing-mxs;
+    }
+  }
+
+  select {
+    margin-bottom: $elv-spacing-xs;
+  }
+
+  .asset-form-multi-select-selections {
+    display: grid;
+    grid-template-columns: 1fr 2.5rem;
+
+    button {
+      margin: 0 $elv-spacing-xxs;
+      padding: $elv-spacing-xxs;
+    }
+  }
 }
 
 .order-buttons-container {
