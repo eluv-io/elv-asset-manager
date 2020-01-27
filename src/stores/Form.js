@@ -38,19 +38,9 @@ class FormStore {
 
     this.assetInfo = this.LoadAssetInfo(assetMetadata);
     this.credits = this.LoadCredits((assetMetadata.info || {}).talent);
-
-    if(assetMetadata.clips) {
-      this.clips = yield this.LoadClips(assetMetadata.clips);
-    }
-
-    if(assetMetadata.trailers) {
-      this.trailers = yield this.LoadClips(assetMetadata.trailers);
-    }
-
-    if(assetMetadata.titles) {
-      this.titles = yield this.LoadClips(assetMetadata.titles, true);
-    }
-
+    this.clips = yield this.LoadClips(assetMetadata.clips);
+    this.trailers = yield this.LoadClips(assetMetadata.trailers);
+    this.titles = yield this.LoadClips(assetMetadata.titles, true);
     this.images = yield this.LoadImages(assetMetadata.images, true);
     this.gallery = yield this.LoadGallery(assetMetadata.gallery);
     this.playlists = yield this.LoadPlaylists(assetMetadata.playlists);
@@ -353,6 +343,8 @@ class FormStore {
   });
 
   LoadClips = flow(function * (metadata) {
+    if(!metadata) { return []; }
+
     let clips = [];
     let unorderedClips = [];
     let defaultClip;
@@ -508,47 +500,48 @@ class FormStore {
   });
 
   LoadGallery = flow(function * (metadata) {
+    if(!metadata) { return []; }
+
     let images = [];
     let imageTargets = [];
-    if(metadata) {
-      Object.keys(metadata).forEach(async imageIndex => {
-        try {
-          const index = parseInt(imageIndex);
 
-          if(isNaN(index)) { return; }
+    Object.keys(metadata).forEach(async imageIndex => {
+      try {
+        const index = parseInt(imageIndex);
 
-          const imageInfo = metadata[imageIndex];
-          const link = imageInfo.image && imageInfo.image.default;
+        if(isNaN(index)) { return; }
 
-          if(!link || !link["/"]) { return; }
+        const imageInfo = metadata[imageIndex];
+        const link = imageInfo.image && imageInfo.image.default;
 
-          let targetHash = this.rootStore.params.versionHash;
-          let imagePath = link["/"].replace(/^\.\/files\//, "");
-          if(link["/"].startsWith("/qfab/")) {
-            targetHash = link["/"].split("/")[2];
-            imagePath = link["/"].split("/").slice(4).join("/");
-          }
+        if(!link || !link["/"]) { return; }
 
-          if(!imageTargets.includes(targetHash)) {
-            imageTargets.push(targetHash);
-          }
-
-          images[index] = {
-            title: imageInfo.title || "",
-            description: imageInfo.description || "",
-            imagePath,
-            targetHash
-          };
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.error(`Failed to load gallery '${imageIndex}':`);
-          // eslint-disable-next-line no-console
-          console.error(toJS(metadata));
-          // eslint-disable-next-line no-console
-          console.error(error);
+        let targetHash = this.rootStore.params.versionHash;
+        let imagePath = link["/"].replace(/^\.\/files\//, "");
+        if(link["/"].startsWith("/qfab/")) {
+          targetHash = link["/"].split("/")[2];
+          imagePath = link["/"].split("/").slice(4).join("/");
         }
-      });
-    }
+
+        if(!imageTargets.includes(targetHash)) {
+          imageTargets.push(targetHash);
+        }
+
+        images[index] = {
+          title: imageInfo.title || "",
+          description: imageInfo.description || "",
+          imagePath,
+          targetHash
+        };
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(`Failed to load gallery '${imageIndex}':`);
+        // eslint-disable-next-line no-console
+        console.error(toJS(metadata));
+        // eslint-disable-next-line no-console
+        console.error(error);
+      }
+    });
 
     // Remove any missing entries
     images = images.filter(image => image);
@@ -564,6 +557,8 @@ class FormStore {
   });
 
   LoadPlaylists = flow(function * (metadata) {
+    if(!metadata) { return []; }
+
     let playlists = [];
     let unorderedPlaylists = [];
     if(metadata) {
