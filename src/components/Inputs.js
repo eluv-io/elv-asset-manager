@@ -27,7 +27,7 @@ export const Input = ({label, name, value, readonly=false, onChange}) => {
 
 export const TextArea = ({label, name, value, onChange}) => {
   return (
-    <div className="asset-form-input">
+    <div className="asset-form-input asset-form-textarea">
       <label htmlFor={name}>{label || FormatName(name)}</label>
       <textarea
         name={name}

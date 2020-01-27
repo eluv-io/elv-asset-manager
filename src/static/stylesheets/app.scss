@@ -336,12 +336,18 @@ input {
   align-items: center;
   display: grid;
   grid-gap: 1rem;
-  grid-template-columns: 8rem 1fr;
+  grid-template-columns: 10rem 1fr;
   margin-bottom: $elv-spacing-xs;
 }
 
+.asset-form-textarea {
+  label {
+    align-self: baseline;
+  }
+}
+
 .asset-form-date {
-  grid-template-columns: 8rem 1fr 1fr 1fr;
+  grid-template-columns: 10rem 1fr 1fr 1fr;
 }
 
 .asset-form-multi-select {

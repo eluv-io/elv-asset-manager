@@ -279,14 +279,19 @@ class FormStore {
       title: metadata.title || "",
       display_title: metadata.display_title || "",
       slug: metadata.slug || Slugify(metadata.display_title || ""),
-      synopsis: metadata.synopsis || "",
       ip_title_id: metadata.ip_title_id || "",
       title_type: metadata.title_type || "franchise",
       asset_type: metadata.asset_type || "primary",
       creator: info.creator || "",
+      synopsis: info.synopsis || metadata.synopsis || "",
       original_broadcaster: info.original_broadcaster || "",
-      mpaa_rating: info.mpaa_rating,
+      runtime: info.runtime || "",
+      copyright: info.copyright || "",
+      mgm_internal_rating: info.mgm_internal_rating || "",
+      mpaa_rating: info.mpaa_rating || "",
+      mpaa_rating_reason: info.mpaa_rating_reason || "",
       tv_rating: info.tv_rating || "",
+      tv_rating_reason: info.tv_rating_reason || "",
       genre: info.genre || [],
       release_date
     };
@@ -610,10 +615,15 @@ class FormStore {
       })).write_token;
 
       const infoFields = [
-        "original_broadcaster",
+        "copyright",
         "creator",
+        "mgm_internal_rating",
         "mpaa_rating",
+        "mpaa_rating_reason",
+        "original_broadcaster",
+        "runtime",
         "tv_rating",
+        "tv_rating_reason",
         "release_date"
       ];
 
@@ -625,6 +635,9 @@ class FormStore {
         assetInfo.info[name] = assetInfo[name];
         delete assetInfo[name];
       });
+
+      // Put synopsis in both places
+      assetInfo.info.synopsis = assetInfo.synopsis;
 
       let genre = assetInfo.genre;
       genre = genre.filter((a, b) => genre.indexOf(a) === b).sort();

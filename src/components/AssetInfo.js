@@ -122,6 +122,12 @@ class AssetInfo extends React.Component {
           />
 
           <Input
+            name="copyright"
+            value={this.props.formStore.assetInfo.copyright}
+            onChange={copyright => this.props.formStore.UpdateAssetInfo("copyright", copyright)}
+          />
+
+          <Input
             name="original_broadcaster"
             value={this.props.formStore.assetInfo.original_broadcaster}
             onChange={original_broadcaster => this.props.formStore.UpdateAssetInfo("original_broadcaster", original_broadcaster)}
@@ -136,15 +142,44 @@ class AssetInfo extends React.Component {
           />
 
           <Input
+            name="runtime"
+            value={this.props.formStore.assetInfo.runtime}
+            onChange={runtime => this.props.formStore.UpdateAssetInfo("runtime", runtime)}
+          />
+
+          <Input
+            name="mgm_internal_rating"
+            label="MGM Internal Rating"
+            value={this.props.formStore.assetInfo.mgm_internal_rating}
+            onChange={mgm_internal_rating => this.props.formStore.UpdateAssetInfo("mgm_internal_rating", mgm_internal_rating)}
+          />
+
+          <Input
             name="mpaa_rating"
+            label="MPAA Rating"
             value={this.props.formStore.assetInfo.mpaa_rating}
             onChange={mpaa_rating => this.props.formStore.UpdateAssetInfo("mpaa_rating", mpaa_rating)}
           />
 
           <Input
+            name="mpaa_rating_reason"
+            label="MPAA Rating Reason"
+            value={this.props.formStore.assetInfo.mpaa_rating_reason}
+            onChange={mpaa_rating_reason => this.props.formStore.UpdateAssetInfo("mpaa_rating_reason", mpaa_rating_reason)}
+          />
+
+          <Input
             name="tv_rating"
+            label="TV Rating"
             value={this.props.formStore.assetInfo.tv_rating}
             onChange={tv_rating => this.props.formStore.UpdateAssetInfo("tv_rating", tv_rating)}
+          />
+
+          <Input
+            name="tv_rating_reason"
+            label="TV Rating Reason"
+            value={this.props.formStore.assetInfo.tv_rating_reason}
+            onChange={tv_rating_reason => this.props.formStore.UpdateAssetInfo("tv_rating_reason", tv_rating_reason)}
           />
 
           <MultiSelect
