@@ -148,6 +148,18 @@ class AssetInfo extends React.Component {
           />
 
           <Input
+            name="number_of_seasons"
+            value={this.props.formStore.assetInfo.number_of_seasons}
+            onChange={number_of_seasons => this.props.formStore.UpdateAssetInfo("number_of_seasons", number_of_seasons)}
+          />
+
+          <Input
+            name="number_of_episodes"
+            value={this.props.formStore.assetInfo.number_of_episodes}
+            onChange={number_of_episodes => this.props.formStore.UpdateAssetInfo("number_of_episodes", number_of_episodes)}
+          />
+
+          <Input
             name="mgm_internal_rating"
             label="MGM Internal Rating"
             value={this.props.formStore.assetInfo.mgm_internal_rating}

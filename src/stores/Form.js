@@ -292,6 +292,8 @@ class FormStore {
       mpaa_rating_reason: info.mpaa_rating_reason || "",
       tv_rating: info.tv_rating || "",
       tv_rating_reason: info.tv_rating_reason || "",
+      number_of_seasons: info.number_of_seasons || "",
+      number_of_episodes: info.number_of_episodes || "",
       genre: info.genre || [],
       release_date
     };
@@ -621,6 +623,8 @@ class FormStore {
         "mpaa_rating",
         "mpaa_rating_reason",
         "original_broadcaster",
+        "number_of_episodes",
+        "number_of_seasons",
         "runtime",
         "tv_rating",
         "tv_rating_reason",
