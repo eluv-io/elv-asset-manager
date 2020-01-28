@@ -89,13 +89,23 @@ class ContentBrowser extends React.Component {
     let content;
     if(!this.state.libraryId) {
       content = (
-        <BrowserList
-          key="browser-list-libraries"
-          header="Choose a library"
-          list={this.props.contentStore.libraries}
-          Load={this.props.contentStore.LoadLibraries}
-          Select={libraryId => this.setState({libraryId})}
-        />
+        <React.Fragment>
+          <div className="content-browser-actions">
+            <Action
+              className="back tertiary"
+              onClick={this.props.onCancel}
+            >
+              Cancel
+            </Action>
+          </div>
+          <BrowserList
+            key="browser-list-libraries"
+            header="Choose a library"
+            list={this.props.contentStore.libraries}
+            Load={this.props.contentStore.LoadLibraries}
+            Select={libraryId => this.setState({libraryId})}
+          />
+        </React.Fragment>
       );
     } else if(!this.state.objectId) {
       const library = this.props.contentStore.libraries
@@ -108,12 +118,20 @@ class ContentBrowser extends React.Component {
 
       content = (
         <React.Fragment>
-          <Action
-            className="back secondary"
-            onClick={() => this.setState({libraryId: undefined})}
-          >
-            Back
-          </Action>
+          <div className="content-browser-actions">
+            <Action
+              className="back secondary"
+              onClick={() => this.setState({libraryId: undefined})}
+            >
+              Back
+            </Action>
+            <Action
+              className="back tertiary"
+              onClick={this.props.onCancel}
+            >
+              Cancel
+            </Action>
+          </div>
           <BrowserList
             key={`browser-list-${this.state.libraryId}`}
             header="Choose an object"
@@ -132,12 +150,20 @@ class ContentBrowser extends React.Component {
 
       content = (
         <React.Fragment>
-          <Action
-            className="back secondary"
-            onClick={() => this.setState({objectId: undefined})}
-          >
-            Back
-          </Action>
+          <div className="content-browser-actions">
+            <Action
+              className="back secondary"
+              onClick={() => this.setState({objectId: undefined})}
+            >
+              Back
+            </Action>
+            <Action
+              className="back tertiary"
+              onClick={this.props.onCancel}
+            >
+              Cancel
+            </Action>
+          </div>
           <BrowserList
             key={`browser-list-${this.state.objectId}`}
             header="Choose a version"
@@ -158,7 +184,7 @@ class ContentBrowser extends React.Component {
     return (
       <div className="content-browser">
         <h2>{this.props.header}</h2>
-        { content}
+        { content }
       </div>
     );
   }

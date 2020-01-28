@@ -9,7 +9,7 @@ const PreviewIcon =
   inject("contentStore")(
     observer(
       ({contentStore, imageKey, imagePath, targetHash}) => {
-        if(!imagePath) { return <div className="preview-icon" />; }
+        if(!imagePath || !contentStore.baseFileUrls[targetHash]) { return <div className="preview-icon" />; }
 
         const uri = URI(contentStore.baseFileUrls[targetHash]);
         uri.path(UrlJoin(uri.path(), imagePath).replace("//", "/"));

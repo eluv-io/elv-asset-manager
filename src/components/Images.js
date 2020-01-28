@@ -28,10 +28,11 @@ class Images extends React.Component {
         <FileSelection
           header={`Select an image for '${imageInfo.imageKey}'`}
           versionHash={imageInfo.targetHash}
-          Select={imagePath => this.props.formStore.UpdateImage({
+          Select={({imagePath, targetHash}) => this.props.formStore.UpdateImage({
             ...imageInfo,
             index,
             imagePath,
+            targetHash
           })}
         />
         <IconButton

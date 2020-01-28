@@ -9,10 +9,12 @@ import {IconButton, ImageIcon, Modal} from "elv-components-js";
 import AsyncComponent from "./AsyncComponent";
 import PreviewIcon from "./PreviewIcon";
 
+import ObjectIcon from "../static/icons/box.svg";
 import AddFileIcon from "../static/icons/file-plus.svg";
 import DirectoryIcon from "../static/icons/directory.svg";
 import FileIcon from "../static/icons/file.svg";
 import BackIcon from "../static/icons/directory_back.svg";
+import ContentBrowser from "./ContentBrowser";
 
 class FileBrowser extends React.Component {
   constructor(props) {
@@ -197,44 +199,87 @@ class FileSelection extends React.Component {
     super(props);
 
     this.state = {
-      modal: null,
+      modal: () => null,
+      versionHash: props.versionHash,
+      selectingObject: false
     };
 
     this.Selection = this.Selection.bind(this);
     this.SelectFile = this.SelectFile.bind(this);
     this.CloseModal = this.CloseModal.bind(this);
     this.ActivateModal = this.ActivateModal.bind(this);
+    this.FileBrowser = this.FileBrowser.bind(this);
+    this.ObjectSelection = this.ObjectSelection.bind(this);
   }
 
   SelectFile(imagePath) {
-    this.props.Select(imagePath);
+    this.props.Select({imagePath, targetHash: this.state.versionHash});
     this.CloseModal();
+  }
+
+  ObjectSelection() {
+    if(!this.state.selectingObject) {
+      return (
+        <IconButton
+          className="file-browser-object-select-button"
+          onClick={() => this.setState({selectingObject: true})}
+          title="Select a different object"
+          icon={ObjectIcon}
+        />
+      );
+    }
+
+    return (
+      <ContentBrowser
+        onComplete={
+          async ({versionHash}) => {
+            await this.props.contentStore.LoadFiles(versionHash);
+            this.setState({
+              selectingObject: false,
+              versionHash
+            });
+          }
+        }
+        onCancel={
+          () => this.setState({selectingObject: false})
+        }
+      />
+    );
+  }
+
+  FileBrowser() {
+    if(this.state.selectingObject) { return null; }
+
+    return (
+      <FileBrowser
+        header={this.props.header}
+        Select={this.SelectFile}
+        files={this.props.contentStore.files[this.state.versionHash]}
+        versionHash={this.state.versionHash}
+        baseFileUrl={this.props.contentStore.baseFileUrls[this.props.versionHash]}
+        mimeTypes={this.props.contentStore.mimeTypes[this.props.versionHash]}
+        extensions={this.props.extensions}
+      />
+    );
   }
 
   ActivateModal() {
     this.setState({
-      modal: (
+      modal: () => (
         <Modal
           className="asset-form-modal"
           closable={true}
           OnClickOutside={this.CloseModal}
         >
-          <FileBrowser
-            header={this.props.header}
-            Select={this.SelectFile}
-            versionHash={this.props.versionHash}
-            baseFileUrl={this.props.contentStore.baseFileUrls[this.props.versionHash]}
-            files={this.props.contentStore.files[this.props.versionHash]}
-            mimeTypes={this.props.contentStore.mimeTypes[this.props.versionHash]}
-            extensions={this.props.extensions}
-          />
+          { this.ObjectSelection() }
+          { this.FileBrowser() }
         </Modal>
       )
     });
   }
 
   CloseModal() {
-    this.setState({modal: null});
+    this.setState({modal: () => null});
   }
 
   Selection() {
@@ -245,7 +290,7 @@ class FileSelection extends React.Component {
           title="Select a file"
           icon={AddFileIcon}
         />
-        { this.state.modal }
+        { this.state.modal() }
       </div>
     );
   }

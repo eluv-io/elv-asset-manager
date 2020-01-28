@@ -43,10 +43,11 @@ class Gallery extends React.Component {
         <FileSelection
           header={`Select an image for '${imageInfo.imageKey}'`}
           versionHash={imageInfo.targetHash}
-          Select={imagePath => this.props.formStore.UpdateGalleryImage({
+          Select={({imagePath, targetHash}) => this.props.formStore.UpdateGalleryImage({
             ...imageInfo,
             index,
             imagePath,
+            targetHash
           })}
         />
         <IconButton

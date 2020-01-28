@@ -610,3 +610,25 @@ input {
   }
 }
 
+.file-browser-container {
+  svg {
+    padding: $elv-spacing-xxs;
+  }
+}
+
+.file-selection {
+  .file-browser-object-select-button {
+    height: 2.5rem;
+    margin: 0.5rem;
+    position: absolute;
+    width: 2.5rem;
+
+    svg {
+      stroke: $elv-color-mediumblue;
+
+      &:hover {
+        stroke: $elv-color-darkblue;
+      }
+    }
+  }
+}
