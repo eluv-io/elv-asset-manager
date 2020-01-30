@@ -782,7 +782,7 @@ class FormStore {
           description,
           image: {
             default: this.CreateLink(targetHash, UrlJoin("files", imagePath)),
-            "240": this.CreateLink(targetHash, UrlJoin("files", imagePath))
+            thumbnail: this.CreateLink(targetHash, UrlJoin("rep", "thumbnail", "files", imagePath))
           }
         };
       });
