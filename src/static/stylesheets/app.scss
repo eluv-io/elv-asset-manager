@@ -407,6 +407,10 @@ input {
 .asset-form-playlists-container {
   max-width: 100%;
   padding-bottom: $elv-spacing-s;
+}
+
+.asset-form-clips-container,
+.asset-form-images-container {
   width: 100%;
 }
 

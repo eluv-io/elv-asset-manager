@@ -19,14 +19,16 @@ class FormStore {
     this.targets = {};
   }
 
-  CreateLink(versionHash, linkTarget="/meta/public/asset_metadata") {
+  CreateLink(versionHash, linkTarget="/meta/public/asset_metadata", options={}) {
     if(versionHash === this.rootStore.params.versionHash) {
       return {
+        ...options,
         ".": {"auto_update":{"tag":"latest"}},
         "/": UrlJoin("./", linkTarget)
       };
     } else {
       return {
+        ...options,
         ".": {"auto_update":{"tag":"latest"}},
         "/": UrlJoin("/qfab", versionHash, linkTarget)
       };
@@ -366,14 +368,18 @@ class FormStore {
           const hasSlug = !metadata[key]["/"];
           const slug = hasSlug ? Object.keys(metadata[key])[0] : undefined;
 
+          // Order might be saved in the link
+          let order;
           let targetHash = this.rootStore.params.versionHash;
           if(hasSlug) {
             if((metadata[key][slug]["/"] || "").startsWith("/qfab/")) {
               targetHash = metadata[key][slug]["/"].split("/")[2];
+              order = metadata[key][slug].order;
             }
           } else {
             if((metadata[key]["/"] || "").startsWith("/qfab/")) {
               targetHash = metadata[key]["/"].split("/")[2];
+              order = metadata[key].order;
             }
           }
 
@@ -392,7 +398,7 @@ class FormStore {
           }
 
           // Keys are ordered indices
-          const index = parseInt(key);
+          const index = order !== undefined ? order : parseInt(key);
           if(isNaN(index)) {
             // Key not an index, just add it to the back of the list
             unorderedClips.push(clip);
@@ -575,7 +581,7 @@ class FormStore {
             // Old format - playlistIndex is the playlist key
             unorderedPlaylists.push({
               playlistKey: playlistIndex,
-              clips: await this.LoadClips(metadata[playlistIndex], true)
+              clips: await this.LoadClips(metadata[playlistIndex])
             });
           } else {
             // Proper format: [index]: { [playlistKey]: ... }
@@ -583,7 +589,7 @@ class FormStore {
 
             playlists[parseInt(playlistIndex)] = {
               playlistKey,
-              clips: await this.LoadClips(metadata[playlistIndex][playlistKey], true)
+              clips: await this.LoadClips(metadata[playlistIndex][playlistKey])
             };
           }
         })
@@ -805,16 +811,16 @@ class FormStore {
 
           let playlistClips = {};
           await Promise.all(
-            clips.map(async ({isDefault, displayTitle, versionHash}) => {
+            clips.map(async ({isDefault, displayTitle, versionHash}, index) => {
               if(isDefault) {
-                playlistClips.default = this.CreateLink(versionHash);
+                playlistClips.default = this.CreateLink(versionHash, undefined, {order: index});
               } else {
                 const slug = (await client.ContentObjectMetadata({
                   versionHash,
                   metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
                 })) || Slugify(displayTitle);
 
-                playlistClips[slug] = this.CreateLink(versionHash);
+                playlistClips[slug] = this.CreateLink(versionHash, undefined, {order: index});
               }
             })
           );
