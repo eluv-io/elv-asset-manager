@@ -74,7 +74,7 @@ class AssetInfo extends React.Component {
             name="title_type"
             value={this.props.formStore.assetInfo.title_type}
             onChange={title_type => this.props.formStore.UpdateAssetInfo("title_type", title_type)}
-            options={["episode", "feature", "franchise", "series"]}
+            options={["collection", "episode", "feature", "franchise", "season", "series", "site"]}
           />
 
           <Selection
@@ -113,6 +113,18 @@ class AssetInfo extends React.Component {
             name="synopsis"
             value={this.props.formStore.assetInfo.synopsis}
             onChange={synopsis => this.props.formStore.UpdateAssetInfo("synopsis", synopsis)}
+          />
+
+          <Input
+            name="sales_tagline"
+            value={this.props.formStore.assetInfo.sales_tagline}
+            onChange={sales_tagline => this.props.formStore.UpdateAssetInfo("sales_tagline", sales_tagline)}
+          />
+
+          <TextArea
+            name="sales_synopsis"
+            value={this.props.formStore.assetInfo.sales_synopsis}
+            onChange={sales_synopsis => this.props.formStore.UpdateAssetInfo("sales_synopsis", sales_synopsis)}
           />
 
           <Input

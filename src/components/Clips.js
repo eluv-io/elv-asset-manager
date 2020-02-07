@@ -130,6 +130,7 @@ class Clips extends React.Component {
         >
           <ContentBrowser
             header="Clip Selection"
+            titleTypes={this.props.titleTypes}
             assetTypes={this.props.assetTypes}
             onComplete={this.AddClip}
             onCancel={this.CloseModal}
@@ -196,6 +197,7 @@ Clips.propTypes = {
   header: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   assetTypes: PropTypes.arrayOf(PropTypes.string),
+  titleTypes: PropTypes.arrayOf(PropTypes.string),
   defaultable: PropTypes.bool,
   orderable: PropTypes.bool
 };

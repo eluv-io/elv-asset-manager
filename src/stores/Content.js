@@ -56,8 +56,7 @@ class ContentStore {
             "public/name",
             "public/asset_metadata/title",
             "public/asset_metadata/asset_type",
-            "asset_metadata/title",
-            "asset_metadata/asset_type"
+            "public/asset_metadata/title_type"
           ],
           limit: 10000
         }
@@ -89,6 +88,7 @@ class ContentStore {
           objectId: id,
           name,
           assetType: metadata.public.asset_metadata.asset_type,
+          titleType: metadata.public.asset_metadata.title_type,
           sortKey: name.startsWith("iq__") ? `zz${name}` : name
         });
       }

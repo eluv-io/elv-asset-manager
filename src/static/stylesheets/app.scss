@@ -105,11 +105,14 @@ button {
   }
 }
 
+.asset-form-modal > div {
+  height: 100%;
+}
+
 .content-browser {
   align-items: center;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   margin-bottom: $elv-spacing-l;
 
   .-elv-async-component-loading {
@@ -315,6 +318,10 @@ input,
 textarea,
 select {
   font-size: $elv-font-l;
+
+  &::placeholder {
+    color: $elv-color-mediumgray;
+  }
 }
 
 input {
@@ -407,6 +414,7 @@ input {
 .asset-form-playlists-container {
   max-width: 100%;
   padding-bottom: $elv-spacing-s;
+  width: 100%;
 }
 
 .asset-form-clips-container,
@@ -500,7 +508,7 @@ input {
   align-items: center;
   display: flex;
   flex-direction: column;
-  margin: $elv-spacing-m 0;
+  margin: $elv-spacing-l 0 $elv-spacing-xl;
 
   h3 {
     min-height: $elv-font-xxl;
@@ -525,11 +533,15 @@ input {
 
 .asset-form-credit {
   border: 0;
-  grid-template-columns: 1fr 1fr 1fr 2rem 2rem;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 2rem 2rem;
   width: 100%;
 
   label {
     text-align: center;
+  }
+
+  input {
+    min-width: 0;
   }
 
   &:last-child {

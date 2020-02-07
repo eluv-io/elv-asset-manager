@@ -6,6 +6,7 @@ const Slugify = str =>
 
 class FormStore {
   @observable assetInfo = {};
+  @observable seasons = [];
   @observable clips = [];
   @observable trailers = [];
   @observable images = [];
@@ -40,10 +41,11 @@ class FormStore {
 
     this.assetInfo = this.LoadAssetInfo(assetMetadata);
     this.credits = this.LoadCredits((assetMetadata.info || {}).talent);
+    this.seasons = yield this.LoadClips(assetMetadata.seasons);
     this.clips = yield this.LoadClips(assetMetadata.clips);
     this.trailers = yield this.LoadClips(assetMetadata.trailers);
-    this.titles = yield this.LoadClips(assetMetadata.titles, true);
-    this.images = yield this.LoadImages(assetMetadata.images, true);
+    this.titles = yield this.LoadClips(assetMetadata.titles);
+    this.images = yield this.LoadImages(assetMetadata.images);
     this.gallery = yield this.LoadGallery(assetMetadata.gallery);
     this.playlists = yield this.LoadPlaylists(assetMetadata.playlists);
   });
@@ -296,6 +298,8 @@ class FormStore {
       tv_rating_reason: info.tv_rating_reason || "",
       number_of_seasons: info.number_of_seasons || "",
       number_of_episodes: info.number_of_episodes || "",
+      sales_tagline: info.sales_tagline || "",
+      sales_synopsis: info.sales_synopsis || "",
       genre: info.genre || [],
       release_date
     };
@@ -311,7 +315,13 @@ class FormStore {
 
       metadata[groupName].forEach(credit => {
         // Ensure credit fields are strings
-        ["character_name", "talent_first_name", "talent_last_name"]
+        [
+          "character_name",
+          "talent_first_name",
+          "talent_last_name",
+          "other_credits",
+          "sales_display_order"
+        ]
           .forEach(key => {
             if(typeof credit[key] !== "string") {
               credit[key] = "";
@@ -640,6 +650,8 @@ class FormStore {
         "number_of_episodes",
         "number_of_seasons",
         "runtime",
+        "sales_synopsis",
+        "sales_tagline",
         "tv_rating",
         "tv_rating_reason",
         "release_date"
@@ -682,12 +694,14 @@ class FormStore {
 
       // Credits
       let credits = {};
-      this.credits.map(group => {
+      toJS(this.credits).map(group => {
         credits[group.group] =
           group.credits.map((credit, index) => ({
             ...credit,
             talent_type: group.talentType,
-            talent_note_seq_id: (index + 1).toString().padStart(2, "0")
+            talent_note_seq_id: (index + 1).toString().padStart(2, "0"),
+            sales_display_order: credit.sales_display_order ?
+              credit.sales_display_order.padStart(2, "0") : ""
           }));
       });
 
@@ -697,13 +711,38 @@ class FormStore {
         objectId,
         writeToken,
         metadataSubtree: "public/asset_metadata/info/talent",
-        metadata: toJS(credits)
+        metadata: credits
       });
+
+      // Seasons
+      if(this.assetInfo.title_type === "series") {
+        let seasons = {};
+        yield Promise.all(
+          toJS(this.seasons).map(async ({displayTitle, versionHash}, index) => {
+            const slug = (await client.ContentObjectMetadata({
+              versionHash,
+              metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
+            })) || Slugify(displayTitle);
+
+            seasons[index] = {
+              [slug]: this.CreateLink(versionHash)
+            };
+          })
+        );
+
+        yield client.ReplaceMetadata({
+          libraryId,
+          objectId,
+          writeToken,
+          metadataSubtree: "public/asset_metadata/seasons",
+          metadata: seasons
+        });
+      }
 
       // Clips
       let clips = {};
       let index = 0;
-      this.clips.forEach(({isDefault, versionHash}) => {
+      toJS(this.clips).forEach(({isDefault, versionHash}) => {
         if(isDefault) {
           clips.default = this.CreateLink(versionHash);
         } else {
@@ -723,7 +762,7 @@ class FormStore {
       // Trailers
       let trailers = {};
       index = 0;
-      this.trailers.forEach(({isDefault, versionHash}) => {
+      toJS(this.trailers).forEach(({isDefault, versionHash}) => {
         if(isDefault) {
           trailers.default = this.CreateLink(versionHash);
         } else {
@@ -743,7 +782,7 @@ class FormStore {
       // Titles
       let titles = {};
       yield Promise.all(
-        this.titles.map(async ({displayTitle, versionHash}, index) => {
+        toJS(this.titles).map(async ({displayTitle, versionHash}, index) => {
           const slug = (await client.ContentObjectMetadata({
             versionHash,
             metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
@@ -765,7 +804,7 @@ class FormStore {
 
       // Images
       let images = {};
-      this.images.forEach(({imageKey, imagePath, targetHash}) => {
+      toJS(this.images).forEach(({imageKey, imagePath, targetHash}) => {
         if(!imageKey || !imagePath) {
           return;
         }
@@ -786,7 +825,7 @@ class FormStore {
 
       // Gallery
       let gallery = {};
-      this.gallery.forEach(({title, description, imagePath, targetHash}, index) => {
+      toJS(this.gallery).forEach(({title, description, imagePath, targetHash}, index) => {
         if(!imagePath) {
           return;
         }
@@ -812,7 +851,7 @@ class FormStore {
       // Playlists
       let playlists = {};
       yield Promise.all(
-        this.playlists.map(async ({playlistKey, clips}, index) => {
+        toJS(this.playlists).map(async ({playlistKey, clips}, index) => {
           if(!playlistKey) {
             return;
           }

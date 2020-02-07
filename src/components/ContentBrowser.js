@@ -116,6 +116,10 @@ class ContentBrowser extends React.Component {
         list = list.filter(item => this.props.assetTypes.includes(item.assetType));
       }
 
+      if(this.props.titleTypes && this.props.titleTypes.length > 0) {
+        list = list.filter(item => this.props.titleTypes.includes(item.titleType));
+      }
+
       content = (
         <React.Fragment>
           <div className="content-browser-actions">
@@ -193,6 +197,7 @@ class ContentBrowser extends React.Component {
 ContentBrowser.propTypes = {
   header: PropTypes.string,
   assetTypes: PropTypes.arrayOf(PropTypes.string),
+  titleTypes: PropTypes.arrayOf(PropTypes.string),
   playableOnly: PropTypes.bool,
   onComplete: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired

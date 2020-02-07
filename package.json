@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "elv-client-js": "git+https://github.com/eluv-io/elv-client-js.git#develop",
-    "elv-components-js": "git+https://github.com/eluv-io/elv-components-js.git#develop",
+    "elv-components-js": "git+https://github.com/eluv-io/elv-components-js.git#master",
     "hls.js": "^0.12.4",
     "mobx": "^5.13.0",
     "mobx-react": "^6.1.3",

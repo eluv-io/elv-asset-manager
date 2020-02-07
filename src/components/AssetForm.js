@@ -11,6 +11,7 @@ import Credits from "./Credits";
 const FORMS = [
   ["Info", "INFO"],
   ["Credits", "CREDITS"],
+  //["Seasons", "SEASONS"] -- only present for title_type=series
   ["Clips", "CLIPS"],
   ["Trailers", "TRAILERS"],
   ["Titles", "TITLES"],
@@ -31,18 +32,31 @@ class AssetForm extends React.Component {
     };
   }
 
+  Tabs() {
+    // Inject "seasons" before clips if title is a series
+    let forms = [...FORMS];
+    if(this.props.formStore.assetInfo.title_type === "series") {
+      const insertIndex = forms.findIndex(form => form[0] === "Clips");
+      forms.splice(insertIndex, 0, ["Seasons", "SEASONS"]);
+    }
+
+    return forms;
+  }
+
   CurentForm() {
     switch (this.state.form) {
       case "INFO":
         return <AssetInfo />;
       case "CREDITS":
         return <Credits />;
+      case "SEASONS":
+        return <Clips storeKey="seasons" header="Seasons" name="Season" titleTypes={["season"]} orderable />;
       case "CLIPS":
-        return <Clips storeKey="clips" header="Clips" name="Clip" assetTypes={["trailer"]} defaultable orderable />;
+        return <Clips storeKey="clips" header="Clips" name="Clip" assetTypes={["trailer", "clip"]} defaultable orderable />;
       case "TRAILERS":
-        return <Clips storeKey="trailers" header="Trailers" name="Trailer" assetTypes={["trailer"]} defaultable orderable />;
+        return <Clips storeKey="trailers" header="Trailers" name="Trailer" assetTypes={["trailer", "clip"]} defaultable orderable />;
       case "TITLES":
-        return <Clips storeKey="titles" header="Titles" name="Title" assetTypes={["primary"]} orderable />;
+        return <Clips storeKey="titles" header="Titles" name="Title" titleTypes={["feature", "episode"]} assetTypes={["primary"]} orderable />;
       case "IMAGES":
         return <Images />;
       case "GALLERY":
@@ -73,7 +87,7 @@ class AssetForm extends React.Component {
           className="asset-form-page-selection"
           selected={this.state.form}
           onChange={form => this.setState({form})}
-          options={FORMS}
+          options={this.Tabs()}
         />
         <div className="asset-form-container">
           { this.CurentForm() }

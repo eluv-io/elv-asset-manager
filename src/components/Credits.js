@@ -56,6 +56,8 @@ class CreditsGroup extends React.Component {
             <label>Character</label>
             <label>First Name</label>
             <label>Last Name</label>
+            <label>Other Credits</label>
+            <label>Sales Display Order</label>
             <label/>
             <IconButton
               icon={AddUserIcon}
@@ -102,6 +104,28 @@ class CreditsGroup extends React.Component {
                   groupIndex: this.props.groupIndex,
                   creditIndex: index,
                   key: "talent_last_name",
+                  value: event.target.value
+                })}
+              />
+              <input
+                name="other_credits"
+                placeholder="Other Credits"
+                value={credit.other_credits}
+                onChange={event => this.props.formStore.UpdateCredit({
+                  groupIndex: this.props.groupIndex,
+                  creditIndex: index,
+                  key: "other_credits",
+                  value: event.target.value
+                })}
+              />
+              <input
+                name="sales_display_order"
+                placeholder="Sales Display Order"
+                value={credit.sales_display_order}
+                onChange={event => this.props.formStore.UpdateCredit({
+                  groupIndex: this.props.groupIndex,
+                  creditIndex: index,
+                  key: "sales_display_order",
                   value: event.target.value
                 })}
               />
