@@ -310,6 +310,14 @@ class FormStore {
       let withoutSeqId = [];
 
       metadata[groupName].forEach(credit => {
+        // Ensure credit fields are strings
+        ["character_name", "talent_first_name", "talent_last_name"]
+          .forEach(key => {
+            if(typeof credit[key] !== "string") {
+              credit[key] = "";
+            }
+          });
+
         if(credit.talent_note_seq_id) {
           const index = parseInt(credit.talent_note_seq_id) - 1;
           withSeqId[index] = credit;
