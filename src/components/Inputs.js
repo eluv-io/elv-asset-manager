@@ -11,7 +11,7 @@ const FormatName = (name) => {
     .join(" ");
 };
 
-export const Input = ({label, name, value, readonly=false, onChange}) => {
+export const Input = ({type, label, name, value, readonly=false, onChange}) => {
   return (
     <div className="asset-form-input">
       <label htmlFor={name}>{label || FormatName(name)}</label>
@@ -19,7 +19,17 @@ export const Input = ({label, name, value, readonly=false, onChange}) => {
         name={name}
         value={value}
         readOnly={readonly}
-        onChange={event => onChange(event.target.value)}
+        onChange={event => {
+          let input = event.target.value.toString();
+
+          if(type === "integer") {
+            input = input.replace(/[^0-9]/g, "");
+          } else if(type === "number") {
+            input = input.replace(/[^0-9.]/g, "").replace(/\.{2,}/g, ".");
+          }
+
+          onChange(input);
+        }}
       />
     </div>
   );

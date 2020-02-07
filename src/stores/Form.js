@@ -15,6 +15,23 @@ class FormStore {
   @observable titles = [];
   @observable credits = {};
 
+  @observable infoFields = [
+    {name: "synopsis", type: "textarea"},
+    {name: "copyright"},
+    {name: "creator"},
+    {name: "mgm_internal_rating", label: "MGM Internal Rating"},
+    {name: "mpaa_rating", label: "MPAA Rating"},
+    {name: "mpaa_rating_reason", label: "MPAA Rating Reason"},
+    {name: "original_broadcaster"},
+    {name: "number_of_episodes"},
+    {name: "number_of_seasons"},
+    {name: "runtime", type: "integer"},
+    {name: "sales_synopsis", type: "textarea"},
+    {name: "sales_tagline"},
+    {name: "tv_rating", label: "TV Rating"},
+    {name: "tv_rating_reason", label: "TV Rating Reason"},
+  ];
+
   constructor(rootStore) {
     this.rootStore = rootStore;
     this.targets = {};
@@ -38,6 +55,10 @@ class FormStore {
 
   InitializeFormData = flow(function * () {
     const assetMetadata = this.rootStore.assetMetadata || {};
+
+    if(this.rootStore.contentTypeInfoFields) {
+      this.infoFields = this.rootStore.contentTypeInfoFields;
+    }
 
     this.assetInfo = this.LoadAssetInfo(assetMetadata);
     this.credits = this.LoadCredits((assetMetadata.info || {}).talent);
@@ -279,30 +300,22 @@ class FormStore {
       };
     }
 
-    return {
+    let assetInfo = {
       title: metadata.title || "",
       display_title: metadata.display_title || "",
       slug: metadata.slug || Slugify(metadata.display_title || ""),
       ip_title_id: metadata.ip_title_id || "",
       title_type: metadata.title_type || "franchise",
       asset_type: metadata.asset_type || "primary",
-      creator: info.creator || "",
-      synopsis: info.synopsis || metadata.synopsis || "",
-      original_broadcaster: info.original_broadcaster || "",
-      runtime: info.runtime || "",
-      copyright: info.copyright || "",
-      mgm_internal_rating: info.mgm_internal_rating || "",
-      mpaa_rating: info.mpaa_rating || "",
-      mpaa_rating_reason: info.mpaa_rating_reason || "",
-      tv_rating: info.tv_rating || "",
-      tv_rating_reason: info.tv_rating_reason || "",
-      number_of_seasons: info.number_of_seasons || "",
-      number_of_episodes: info.number_of_episodes || "",
-      sales_tagline: info.sales_tagline || "",
-      sales_synopsis: info.sales_synopsis || "",
       genre: info.genre || [],
       release_date
     };
+
+    this.infoFields.forEach(({name}) => {
+      assetInfo[name] = info[name] || "";
+    });
+
+    return assetInfo;
   }
 
   LoadCredits(metadata) {
@@ -640,35 +653,27 @@ class FormStore {
         objectId
       })).write_token;
 
-      const infoFields = [
-        "copyright",
-        "creator",
-        "mgm_internal_rating",
-        "mpaa_rating",
-        "mpaa_rating_reason",
-        "original_broadcaster",
-        "number_of_episodes",
-        "number_of_seasons",
-        "runtime",
-        "sales_synopsis",
-        "sales_tagline",
-        "tv_rating",
-        "tv_rating_reason",
-        "release_date"
-      ];
-
       // Move fields that belong in the info subtree and remove from main tree
       const assetInfo = toJS(this.assetInfo);
-      assetInfo.release_date = this.FormatDate(assetInfo.release_date);
+
       assetInfo.info = {};
-      infoFields.forEach(name => {
-        assetInfo.info[name] = assetInfo[name];
+      this.infoFields.forEach(({name, type}) => {
+        if(type === "integer") {
+          assetInfo.info[name] = parseInt(assetInfo[name]);
+        } else if(type === "number") {
+          assetInfo.info[name] = parseFloat(assetInfo[name]);
+        } else {
+          assetInfo.info[name] = assetInfo[name];
+        }
+
         delete assetInfo[name];
       });
 
-      // Put synopsis in both places
-      assetInfo.info.synopsis = assetInfo.synopsis;
+      // Format release date and move into 'info'
+      assetInfo.info.release_date = this.FormatDate(assetInfo.release_date);
+      delete assetInfo.release_date;
 
+      // Format genre and remove - will be replaced separately
       let genre = assetInfo.genre;
       genre = genre.filter((a, b) => genre.indexOf(a) === b).sort();
 
