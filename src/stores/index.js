@@ -16,6 +16,7 @@ class RootStore {
   @observable assetMetadata;
   @observable assetName;
   @observable contentTypeInfoFields;
+  @observable contentTypeAssetTypes;
 
   constructor() {
     this.contentStore = new ContentStore(this);
@@ -71,18 +72,29 @@ class RootStore {
       (yield this.client.ContentObjectMetadata({
         versionHash: this.params.versionHash,
         metadataSubtree: "public/asset_metadata",
-        resolveLinks: false
+        resolveLinks: true,
+        resolveIncludeSource: true
       })) || {};
 
     const typeHash = (yield this.client.ContentObject({
       versionHash: this.params.versionHash
     })).type;
 
-    this.contentTypeInfoFields = yield this.client.ContentObjectMetadata({
-      libraryId: (yield this.client.ContentSpaceId()).replace("ispc", "ilib"),
-      objectId: this.client.utils.DecodeVersionHash(typeHash).objectId,
-      metadataSubtree: "asset_info_fields"
-    });
+    if(typeHash) {
+      const libraryId = (yield this.client.ContentSpaceId()).replace("ispc", "ilib");
+      const objectId = this.client.utils.DecodeVersionHash(typeHash).objectId;
+      this.contentTypeInfoFields = yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "asset_info_fields"
+      });
+
+      this.contentTypeAssetTypes = yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "asset_types"
+      });
+    }
 
     yield this.formStore.InitializeFormData();
   })

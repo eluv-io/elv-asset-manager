@@ -8,18 +8,6 @@ import Gallery from "./Gallery";
 import Playlists from "./Playlists";
 import Credits from "./Credits";
 
-const FORMS = [
-  ["Info", "INFO"],
-  ["Credits", "CREDITS"],
-  //["Seasons", "SEASONS"] -- only present for title_type=series
-  ["Clips", "CLIPS"],
-  ["Trailers", "TRAILERS"],
-  ["Titles", "TITLES"],
-  ["Images", "IMAGES"],
-  ["Gallery", "GALLERY"],
-  ["Playlists", "PLAYLISTS"]
-];
-
 @inject("rootStore")
 @inject("formStore")
 @observer
@@ -33,14 +21,29 @@ class AssetForm extends React.Component {
   }
 
   Tabs() {
-    // Inject "seasons" before clips if title is a series
-    let forms = [...FORMS];
-    if(this.props.formStore.assetInfo.title_type === "series") {
-      const insertIndex = forms.findIndex(form => form[0] === "Clips");
-      forms.splice(insertIndex, 0, ["Seasons", "SEASONS"]);
-    }
+    let tabs = [
+      ["Info", "INFO"],
+      ["Credits", "CREDITS"]
+    ];
 
-    return forms;
+    // Inject relevant assets
+    this.props.formStore.assetTypes.forEach(({label, for_title_types, name}) => {
+      if(
+        for_title_types &&
+        for_title_types.length > 0 &&
+        !for_title_types.includes(this.props.formStore.assetInfo.title_type)
+      ) {
+        return;
+      }
+
+      tabs.push([label, name]);
+    });
+
+    return tabs.concat([
+      ["Images", "IMAGES"],
+      ["Gallery", "GALLERY"],
+      ["Playlists", "PLAYLISTS"]
+    ]);
   }
 
   CurentForm() {
@@ -49,14 +52,6 @@ class AssetForm extends React.Component {
         return <AssetInfo />;
       case "CREDITS":
         return <Credits />;
-      case "SEASONS":
-        return <Clips storeKey="seasons" header="Seasons" name="Season" titleTypes={["season"]} orderable />;
-      case "CLIPS":
-        return <Clips storeKey="clips" header="Clips" name="Clip" assetTypes={["trailer", "clip"]} defaultable orderable />;
-      case "TRAILERS":
-        return <Clips storeKey="trailers" header="Trailers" name="Trailer" assetTypes={["trailer", "clip"]} defaultable orderable />;
-      case "TITLES":
-        return <Clips storeKey="titles" header="Titles" name="Title" titleTypes={["feature", "episode", "series", "season", "franchise"]} assetTypes={["primary"]} orderable />;
       case "IMAGES":
         return <Images />;
       case "GALLERY":
@@ -64,6 +59,26 @@ class AssetForm extends React.Component {
       case "PLAYLISTS":
         return <Playlists />;
     }
+
+    const assetType = this.props.formStore.assetTypes.find(({name}) => name === this.state.form);
+
+    if(!assetType) {
+      // eslint-disable-next-line no-console
+      console.error("Unknown asset type:", this.state.form);
+      return;
+    }
+
+    return (
+      <Clips
+        storeKey={assetType.name}
+        header={assetType.label}
+        name={assetType.label}
+        assetTypes={assetType.asset_types}
+        titleTypes={assetType.title_types}
+        defaultable={(assetType.indexed || assetType.slugged) && assetType.defaultable}
+        orderable={assetType.orderable}
+      />
+    );
   }
 
   render() {

@@ -75,7 +75,7 @@ const Clip = ({
         />
         <div className="hint">{assetType}</div>
         <div title={title}>{title} {id ? `(${id})` : ""}</div>
-        <div className="clip-target-hash" title={`${slug || ""} ${versionHash}`}>{versionHash}</div>
+        <div className="clip-slug-hash" title={`${slug || ""} ${versionHash}`}>{slug || versionHash}</div>
         { defaultButton }
         { orderButtons }
         <IconButton
@@ -147,7 +147,7 @@ class Clips extends React.Component {
   render() {
     const clips = this.props.playlistIndex !== undefined ?
       this.props.formStore.playlists[this.props.playlistIndex].clips :
-      this.props.formStore[this.props.storeKey];
+      this.props.formStore.assets[this.props.storeKey];
 
     return (
       <div className="asset-form-section-container">

@@ -413,8 +413,11 @@ input {
 .asset-form-images-container,
 .asset-form-playlists-container {
   max-width: 100%;
-  padding-bottom: $elv-spacing-s;
   width: 100%;
+
+  &:not(:empty) {
+    padding-bottom: $elv-spacing-s;
+  }
 }
 
 .asset-form-clips-container,
@@ -472,15 +475,16 @@ input {
 
 .asset-form-clip {
   grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 2rem;
-  min-height: $elv-spacing-l;
+  min-height: $elv-spacing-ml;
 
   div {
     @include elv-ellipsis;
   }
 
-  .clip-target-hash {
+  .clip-slug-hash {
+    color: $elv-color-text-light;
     font-family: $elv-font-monospace;
-    font-size: $elv-font-s;
+    font-size: $elv-font-m;
   }
 
   .video-preview-icon {
@@ -595,6 +599,10 @@ input {
   padding: $elv-spacing-m $elv-spacing-s;
   position: relative;
   width: 100%;
+
+  &:hover {
+    background: $elv-color-bg-white;
+  }
 
   .asset-form-input {
     margin: 0;
