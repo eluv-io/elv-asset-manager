@@ -1,6 +1,8 @@
 import {observable, action, flow, toJS} from "mobx";
 import UrlJoin from "url-join";
 
+require("elv-components-js/src/utils/LimitedMap");
+
 const Slugify = str =>
   (str || "").toLowerCase().replace(/ /g, "-").replace(/[^a-z0-9\-]/g,"");
 
@@ -13,39 +15,23 @@ class FormStore {
 
   @observable assets = {};
 
+  @observable assetImageKeys = [
+    "main_slider_background_desktop",
+    "main_slider_background_mobile",
+    "poster",
+    "primary_portrait",
+    "primary_landscape",
+    "screenshot",
+    "thumbnail",
+    "slider_background_desktop",
+    "slider_background_mobile",
+    "title_detail_hero_desktop",
+    "title_detail_hero_mobile",
+    "title_treatment",
+    "title_treatment_wht"
+  ];
+
   @observable assetTypes = [
-    {
-      name: "none",
-      label: "None",
-      indexed: false,
-      slugged: false,
-      orderable: true,
-      defaultable: true
-    },
-    {
-      name: "slugged",
-      label: "Slugged",
-      indexed: false,
-      slugged: true,
-      orderable: true,
-      defaultable: true
-    },
-    {
-      name: "indexed",
-      label: "Indexed",
-      indexed: true,
-      slugged: false,
-      orderable: true,
-      defaultable: true
-    },
-    {
-      name: "Both",
-      label: "both",
-      indexed: true,
-      slugged: true,
-      orderable: true,
-      defaultable: true
-    },
     {
       name: "seasons",
       label: "Seasons",
@@ -107,6 +93,7 @@ class FormStore {
   constructor(rootStore) {
     this.rootStore = rootStore;
     this.targets = {};
+    this.linkHashes = {};
   }
 
   CreateLink(versionHash, linkTarget="/meta/public/asset_metadata", options={}) {
@@ -128,17 +115,21 @@ class FormStore {
   InitializeFormData = flow(function * () {
     const assetMetadata = this.rootStore.assetMetadata || {};
 
-    if(this.rootStore.contentTypeInfoFields) {
-      this.infoFields = this.rootStore.contentTypeInfoFields;
+    if(this.rootStore.contentTypeAssetInfoFields) {
+      this.infoFields = this.rootStore.contentTypeAssetInfoFields;
     }
 
     if(this.rootStore.contentTypeAssetTypes) {
       this.assetTypes = this.rootStore.contentTypeAssetTypes;
     }
 
+    if(this.rootStore.contentTypeAssetImageKeys) {
+      this.assetImageKeys = this.rootStore.contentTypeAssetImageKeys;
+    }
+
     this.assetInfo = this.LoadAssetInfo(assetMetadata);
     this.credits = this.LoadCredits((assetMetadata.info || {}).talent);
-    this.images = yield this.LoadImages(assetMetadata.images);
+    this.images = yield this.LoadImages(assetMetadata.images, true);
     this.gallery = yield this.LoadGallery(assetMetadata.gallery);
     this.playlists = yield this.LoadPlaylists(assetMetadata.playlists);
 
@@ -214,7 +205,7 @@ class FormStore {
   // Clips/trailers
   @action.bound
   AddClip = flow(function * ({key, playlistIndex, versionHash}) {
-    yield this.RetrieveClip(versionHash);
+    yield this.RetrieveAsset(versionHash);
 
     if(playlistIndex !== undefined) {
       // Prevent duplicates
@@ -453,8 +444,26 @@ class FormStore {
     return credits;
   }
 
+  RetrieveAssetFromLink = flow(function * (linkPath) {
+    if(!this.linkHashes[linkPath]) {
+      const metadata = yield (yield this.rootStore.client.ContentObjectMetadata({
+        versionHash: this.rootStore.params.versionHash,
+        metadataSubtree: linkPath,
+        resolveLinks: true,
+        resolveIncludeSource: true
+      })) || {};
+
+      this.linkHashes[linkPath] = metadata["."].source;
+
+      // Cache metadata
+      this.RetrieveAsset(this.linkHashes[linkPath], metadata);
+    }
+
+    return this.linkHashes[linkPath];
+  });
+
   // Retrieve information about a clip and add it to targets cache (if not present)
-  RetrieveClip = flow(function * (versionHash, assetMetadata) {
+  RetrieveAsset = flow(function * (versionHash, assetMetadata) {
     if(this.targets[versionHash]) { return; }
 
     if(!assetMetadata) {
@@ -497,31 +506,19 @@ class FormStore {
       [...new Array(metadata.length).keys()] :
       Object.keys(metadata);
 
-    yield Promise.all(
-      keys.map(async key => {
+    yield keys.limitedMap(
+      10,
+      async key => {
         try {
           if(!metadata[key]) { return; }
 
-          // Extra slug is present if we haven't crossed the link boundary yet
-          const hasSlug = !metadata[key]["."];
+          const hasSlug = !metadata[key]["/"];
           const slug = hasSlug ? Object.keys(metadata[key])[0] : undefined;
 
-          const targetMetadata = slug ? metadata[key][slug] : metadata[key];
-          let targetHash = targetMetadata["."].source;
+          const targetHash = await this.RetrieveAssetFromLink(UrlJoin(linkPath, key, slug || ""));
 
-          // Order may be saved in unresolved link
-          let order;
-          if(!Array.isArray(metadata) && !hasSlug) {
-            const orderPath = UrlJoin(linkPath, key.toString(), slug || "", "order");
-            order = await this.rootStore.client.ContentObjectMetadata({
-              versionHash: this.rootStore.params.versionHash,
-              metadataSubtree: orderPath,
-              resolveLinks: false
-            });
-          }
-
-          // Cache info about clip
-          await this.RetrieveClip(targetHash, targetMetadata);
+          // Order might be saved in the link
+          let order = ((hasSlug ? metadata[key][slug] : metadata[key]) || {}).order;
 
           const clip = {
             versionHash: targetHash,
@@ -552,7 +549,7 @@ class FormStore {
           // eslint-disable-next-line no-console
           console.error(error);
         }
-      })
+      }
     );
 
     // Put default at front of list
@@ -571,7 +568,7 @@ class FormStore {
     return clips;
   });
 
-  LoadImages = flow(function * (metadata, includeMandatory=false) {
+  LoadImages = flow(function * (metadata) {
     let images = [];
     let imageTargets = [];
     if(metadata) {
@@ -610,33 +607,15 @@ class FormStore {
       });
     }
 
-    if(includeMandatory) {
-      const mandatoryImages = [
-        "main_slider_background_desktop",
-        "main_slider_background_mobile",
-        "poster",
-        "primary_portrait",
-        "primary_landscape",
-        "screenshot",
-        "thumbnail",
-        "slider_background_desktop",
-        "slider_background_mobile",
-        "title_detail_hero_desktop",
-        "title_detail_hero_mobile",
-        "title_treatment",
-        "title_treatment_wht"
-      ];
+    this.assetImageKeys.forEach(imageKey => {
+      if(images.find(info => info.imageKey === imageKey)) { return; }
 
-      mandatoryImages.forEach(imageKey => {
-        if(images.find(info => info.imageKey === imageKey)) { return; }
-
-        images.push({
-          imageKey,
-          imagePath: undefined,
-          targetHash: this.rootStore.params.versionHash
-        });
+      images.push({
+        imageKey,
+        imagePath: undefined,
+        targetHash: this.rootStore.params.versionHash
       });
-    }
+    });
 
     images = images.sort((a, b) => a.imageKey < b.imageKey ? -1 : 1);
 
