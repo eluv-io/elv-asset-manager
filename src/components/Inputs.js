@@ -35,6 +35,25 @@ export const Input = ({type, label, name, value, readonly=false, onChange}) => {
   );
 };
 
+export const Checkbox = ({label, name, value, readonly=false, onChange}) => {
+  return (
+    <div className="asset-form-input">
+      <label htmlFor={name}>{label || FormatName(name)}</label>
+      <div className="checkbox-container">
+        <input
+          name={name}
+          type="checkbox"
+          checked={!!value}
+          readOnly={readonly}
+          onChange={event => {
+            onChange(event.target.checked);
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
 export const TextArea = ({label, name, value, onChange}) => {
   return (
     <div className="asset-form-input asset-form-textarea">

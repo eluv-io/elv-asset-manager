@@ -345,6 +345,19 @@ input {
   grid-gap: 1rem;
   grid-template-columns: 10rem 1fr;
   margin-bottom: $elv-spacing-xs;
+
+  .checkbox-container {
+    align-items: center;
+    display: flex;
+    height: $elv-spacing-ml;
+
+    input {
+      cursor: pointer;
+      height: $elv-font-xl;
+      margin: 0;
+      width: $elv-font-xl;
+    }
+  }
 }
 
 .asset-form-textarea {

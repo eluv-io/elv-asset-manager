@@ -86,6 +86,7 @@ class FormStore {
     {name: "runtime", type: "integer"},
     {name: "sales_synopsis", type: "textarea"},
     {name: "sales_tagline"},
+    {name: "scripted", type: "checkbox", for_title_types: ["episode", "season", "series"],},
     {name: "tv_rating", label: "TV Rating"},
     {name: "tv_rating_reason", label: "TV Rating Reason"},
   ];
@@ -515,7 +516,7 @@ class FormStore {
           const hasSlug = !metadata[key]["/"];
           const slug = hasSlug ? Object.keys(metadata[key])[0] : undefined;
 
-          const targetHash = await this.RetrieveAssetFromLink(UrlJoin(linkPath, key, slug || ""));
+          const targetHash = await this.RetrieveAssetFromLink(UrlJoin(linkPath, key.toString(), slug || ""));
 
           // Order might be saved in the link
           let order = ((hasSlug ? metadata[key][slug] : metadata[key]) || {}).order;
@@ -753,13 +754,15 @@ class FormStore {
       const assetInfo = toJS(this.assetInfo);
 
       assetInfo.info = {};
-      this.infoFields.forEach(({name, type}) => {
-        if(type === "integer") {
-          assetInfo.info[name] = parseInt(assetInfo[name]);
-        } else if(type === "number") {
-          assetInfo.info[name] = parseFloat(assetInfo[name]);
-        } else {
-          assetInfo.info[name] = assetInfo[name];
+      this.infoFields.forEach(({name, type, for_title_types}) => {
+        if(!for_title_types || for_title_types.length == 0 || for_title_types.includes(assetInfo.title_type)) {
+          if(type === "integer") {
+            assetInfo.info[name] = parseInt(assetInfo[name]);
+          } else if(type === "number") {
+            assetInfo.info[name] = parseFloat(assetInfo[name]);
+          } else {
+            assetInfo.info[name] = assetInfo[name];
+          }
         }
 
         delete assetInfo[name];
