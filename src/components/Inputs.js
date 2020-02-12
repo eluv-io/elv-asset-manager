@@ -6,7 +6,7 @@ import RemoveIcon from "../static/icons/trash.svg";
 
 const FormatName = (name) => {
   return (name || "")
-    .split("_")
+    .split(/[_, \s]/)
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 };
