@@ -653,6 +653,10 @@ class FormStore {
         objectId
       })).write_token;
 
+      if(!writeToken) {
+        throw Error("Update request denied");
+      }
+
       // Move fields that belong in the info subtree and remove from main tree
       const assetInfo = toJS(this.assetInfo);
 
