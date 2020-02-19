@@ -56,7 +56,7 @@ class AssetForm extends React.Component {
       case "TRAILERS":
         return <Clips storeKey="trailers" header="Trailers" name="Trailer" assetTypes={["trailer", "clip"]} defaultable orderable />;
       case "TITLES":
-        return <Clips storeKey="titles" header="Titles" name="Title" titleTypes={["feature", "episode"]} assetTypes={["primary"]} orderable />;
+        return <Clips storeKey="titles" header="Titles" name="Title" titleTypes={["feature", "episode", "series", "season", "franchise"]} assetTypes={["primary"]} orderable />;
       case "IMAGES":
         return <Images />;
       case "GALLERY":
