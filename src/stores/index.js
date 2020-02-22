@@ -1,4 +1,4 @@
-import {configure, observable, action, flow} from "mobx";
+import {configure, observable, action, flow, runInAction} from "mobx";
 
 import {FrameClient} from "elv-client-js/src/FrameClient";
 import ContentStore from "./Content";
@@ -10,14 +10,16 @@ configure({
 });
 
 class RootStore {
-  @observable client;
   @observable balance = 0;
   @observable params = {};
   @observable assetMetadata;
   @observable assetName;
   @observable contentTypeAssetInfoFields;
   @observable contentTypeAssetTypes;
-  @observable contentTypeAssetImageKeys
+  @observable contentTypeAssetImageKeys;
+
+  @observable updating = false;
+  @observable updateStatus;
 
   constructor() {
     this.contentStore = new ContentStore(this);
@@ -102,7 +104,40 @@ class RootStore {
     }
 
     yield this.formStore.InitializeFormData();
-  })
+  });
+
+  @action.bound
+  UpdateLinks = flow(function * () {
+    try {
+      this.updating = true;
+      this.updateStatus = {
+        total: 1,
+        completed: 0,
+        action: ""
+      };
+
+      const callback = ({total, completed, action}) => {
+        runInAction(() => this.updateStatus = {total, completed, action});
+      };
+
+      yield this.client.UpdateContentObjectGraph({
+        libraryId: this.params.libraryId,
+        versionHash: this.params.versionHash,
+        callback
+      });
+
+      this.updateStatus.completed = this.updateStatus.total;
+      this.updateStatus.action = "Done";
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Error during link updates:");
+      // eslint-disable-next-line no-console
+      console.error(error);
+      this.updateStatus.error = error.message ? error.message : error;
+    } finally {
+      this.updating = false;
+    }
+  });
 }
 
 export const rootStore = new RootStore();

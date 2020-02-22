@@ -250,25 +250,71 @@ button {
   }
 }
 
+.asset-form-update-button,
 .asset-form-save-button {
   height: 30px;
   position: absolute;
   right: $elv-spacing-s;
   width: 150px;
+}
 
-  &.-elv-button {
-    &.-elv-button {
-      background-color: $elv-color-lightblue;
-      border: 1px solid $elv-color-lightblue;
-    }
+.asset-form-update-button {
+  left: $elv-spacing-s;
+}
 
-    &:not(:active) {
-      &:hover {
-        background-color: $elv-color-white;
-        border: 1px solid $elv-color-mediumblue;
-        color: $elv-color-mediumblue;
-      }
+.update-confirm-message {
+  display: block;
+}
+
+.asset-form-update-modal {
+  .-elv-modal-content {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    max-width: 70%;
+    min-width: 70%;
+  }
+
+  h1 {
+    height: $elv-spacing-xl;
+    position: relative;
+
+    .la-ball-spin-clockwise {
+      position: absolute;
+      right: $elv-spacing-s;
+      top: 0;
     }
+  }
+
+  .update-status {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    width: 100%;
+  }
+
+  .update-status-percentage,
+  .update-status-action {
+    text-align: center;
+  }
+
+  .update-status-percentage {
+    font-size: $elv-font-xl;
+    font-weight: 300;
+  }
+
+  .update-status-action {
+    color: $elv-color-text-light;
+    text-align: center;
+  }
+
+  .update-status-reload-button {
+    margin-top: $elv-spacing-m;
+  }
+
+  .update-status-error-message {
+    color: $elv-color-mediumred;
+    font-size: $elv-font-m;
+    text-align: center;
   }
 }
 

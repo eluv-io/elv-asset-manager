@@ -7,6 +7,7 @@ import AssetInfo from "./AssetInfo";
 import Gallery from "./Gallery";
 import Playlists from "./Playlists";
 import Credits from "./Credits";
+import LinkUpdate from "./LinkUpdate";
 
 @inject("rootStore")
 @inject("formStore")
@@ -85,6 +86,8 @@ class AssetForm extends React.Component {
     return (
       <div className="asset-form">
         <div className="sticky">
+          <LinkUpdate />
+
           <h1>Managing '{this.props.formStore.assetInfo.title || this.props.rootStore.assetName}'</h1>
           <Action
             className="asset-form-save-button"
