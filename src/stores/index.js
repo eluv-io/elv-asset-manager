@@ -18,6 +18,11 @@ class RootStore {
   @observable contentTypeAssetTypes;
   @observable contentTypeAssetImageKeys;
 
+  @observable linkStatus = {
+    updatesAvailable: false,
+    error: ""
+  };
+
   @observable updating = false;
   @observable updateStatus;
 
@@ -107,14 +112,28 @@ class RootStore {
   });
 
   @action.bound
+  LinkStatus = flow(function * () {
+    try {
+      const status = yield this.client.ContentObjectGraph({
+        libraryId: this.params.libraryId,
+        versionHash: this.params.versionHash,
+        autoUpdate: true
+      });
+
+      this.linkStatus = {
+        updatesAvailable: Object.keys(status.auto_updates).length > 0,
+        error: ""
+      };
+    } catch (error) {
+      this.linkStatus.error = error.toString();
+    }
+  });
+
+  @action.bound
   UpdateLinks = flow(function * () {
     try {
       this.updating = true;
-      this.updateStatus = {
-        total: 1,
-        completed: 0,
-        action: ""
-      };
+      this.updateStatus = {};
 
       const callback = ({total, completed, action}) => {
         runInAction(() => this.updateStatus = {total, completed, action});

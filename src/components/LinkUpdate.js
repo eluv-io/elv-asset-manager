@@ -1,13 +1,41 @@
 import React from "react";
-import {Action, BallSpin, Confirm, Modal} from "elv-components-js";
+import {Action, BallSpin, Modal} from "elv-components-js";
 import {inject, observer} from "mobx-react";
+import AsyncComponent from "./AsyncComponent";
 
 @inject("rootStore")
 @observer
-class UpdateStatusModal extends React.Component {
-  render() {
+class LinkUpdate extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showModal: false,
+      confirmed: false
+    };
+
+    this.ModalContent = this.ModalContent.bind(this);
+  }
+
+  CloseButton(text) {
+    return (
+      <Action
+        className="secondary"
+        onClick={() => this.setState({confirmed: false, showModal: false})}
+      >
+        { text || "Close" }
+      </Action>
+    );
+  }
+
+  UpdateStatus() {
     const updateStatus = this.props.rootStore.updateStatus || {};
-    const percentage = ((updateStatus.completed || 0) * 100 / (updateStatus.total || 1)).toFixed(1);
+
+    let progress, percentage;
+    if(updateStatus.total) {
+      progress = `(${updateStatus.completed}/${updateStatus.total})`;
+      percentage = `${((updateStatus.completed || 0) * 100 / updateStatus.total).toFixed(1)}%`;
+    }
 
     let reloadButton;
     if(!this.props.rootStore.updating) {
@@ -32,7 +60,7 @@ class UpdateStatusModal extends React.Component {
       status = (
         <div className="update-status">
           <span className="update-status-percentage">
-            { percentage }%
+            { percentage } {progress}
           </span>
           <span className="update-status-action">
             { updateStatus.action }
@@ -42,10 +70,7 @@ class UpdateStatusModal extends React.Component {
     }
 
     return (
-      <Modal
-        className="asset-form-update-modal"
-        closable={false}
-      >
+      <React.Fragment>
         <h1>
           Updating Links
           { this.props.rootStore.updating ? <BallSpin/> : null }
@@ -53,50 +78,91 @@ class UpdateStatusModal extends React.Component {
         { errorMessage }
         { status }
         { reloadButton }
-      </Modal>
+      </React.Fragment>
     );
   }
-}
 
-@inject("rootStore")
-@observer
-class LinkUpdate extends React.Component {
-  constructor(props) {
-    super(props);
+  Confirm() {
+    return (
+      <div className="update-confirm">
+        <div className="update-confirm-message">
+          Are you sure you want to update the links in this object?
+        </div>
+        <div className="update-confirm-message">
+          WARNING: Any unsaved changes you have made will be lost.
+        </div>
+        <div className="update-confirm-actions">
+          { this.CloseButton("Cancel") }
+          <Action
+            onClick={() => {
+              this.props.rootStore.UpdateLinks();
 
-    this.state = {
-      showModal: false
-    };
+              this.setState({
+                confirmed: true
+              });
+            }}
+          >
+            OK
+          </Action>
+        </div>
+      </div>
+    );
+  }
+
+  ModalContent() {
+    const linkStatus = this.props.rootStore.linkStatus;
+
+    if(linkStatus.error) {
+      return (
+        <div className="update-status-error-message">
+          Error: { linkStatus.error }
+
+          { this.CloseButton() }
+        </div>
+      );
+    }
+
+    if(!linkStatus.updatesAvailable) {
+      return (
+        <div className="update-status-message">
+          No updates required
+
+          { this.CloseButton() }
+        </div>
+      );
+    }
+
+    if(!this.state.confirmed) {
+      return this.Confirm();
+    }
+
+    return this.UpdateStatus();
+  }
+
+  Modal() {
+    if(!this.state.showModal) { return null; }
+
+    return (
+      <Modal
+        className={"asset-form-update-modal"}
+        closable={false}
+      >
+        <AsyncComponent
+          Load={this.props.rootStore.LinkStatus}
+          render={this.ModalContent}
+        />
+      </Modal>
+    );
   }
 
   render() {
     return (
       <React.Fragment>
-        { this.state.showModal ? <UpdateStatusModal /> : null }
+        { this.Modal() }
         <Action
           className="asset-form-update-button secondary"
-          onClick={async () => {
-            await Confirm({
-              message: (
-                <React.Fragment>
-                  <span className="update-confirm-message">
-                    Are you sure you want to update the links in this object?
-                  </span>
-                  <br />
-                  <span className="update-confirm-message">
-                    WARNING: Any unsaved changes you have made will be lost.
-                  </span>
-                </React.Fragment>
-              ),
-              onConfirm: () => {
-                this.setState({
-                  showModal: true
-                });
-
-                this.props.rootStore.UpdateLinks();
-              }
-            });
-          }}>
+          onClick={() => this.setState({showModal: true})}
+        >
           Update Links
         </Action>
       </React.Fragment>

@@ -268,11 +268,15 @@ button {
 
 .asset-form-update-modal {
   .-elv-modal-content {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    max-width: 70%;
-    min-width: 70%;
+    &.-elv-modal-content {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      max-width: 70%;
+      min-height: 12rem;
+      min-width: 70%;
+      padding: $elv-spacing-m 0;
+    }
   }
 
   h1 {
@@ -283,6 +287,32 @@ button {
       position: absolute;
       right: $elv-spacing-s;
       top: 0;
+    }
+  }
+
+  .update-confirm,
+  .update-status-message,
+  .update-status-error-message {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+    text-align: center;
+
+    button {
+      width: $elv-spacing-l;
+    }
+  }
+
+  .update-status-error-message {
+    color: $elv-color-mediumred;
+    font-size: $elv-font-l;
+  }
+
+  .update-confirm-actions {
+    button {
+      margin-right: $elv-spacing-xs;
     }
   }
 
@@ -307,14 +337,9 @@ button {
     text-align: center;
   }
 
+  .update-status-close-button,
   .update-status-reload-button {
     margin-top: $elv-spacing-m;
-  }
-
-  .update-status-error-message {
-    color: $elv-color-mediumred;
-    font-size: $elv-font-m;
-    text-align: center;
   }
 }
 
