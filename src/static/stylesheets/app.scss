@@ -558,8 +558,14 @@ input {
 }
 
 .asset-form-clip {
-  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 2rem;
+  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 4rem;
   min-height: $elv-spacing-ml;
+
+  .asset-form-clip-actions {
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+  }
 
   div {
     @include elv-ellipsis;
@@ -650,14 +656,14 @@ input {
 }
 
 .asset-form-clip-orderable {
-  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 2rem 2rem;
+  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 2rem 4rem;
 }
 
 .asset-form-clip-defaultable {
-  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 3rem 2rem;
+  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 4rem 4rem;
 
   &.asset-form-clip-orderable {
-    grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 3rem 2rem 2rem;
+    grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 4rem 2rem 4rem;
   }
 }
 

@@ -138,7 +138,7 @@ class FormStore {
     for(let i = 0; i < this.assetTypes.length; i++) {
       const name = this.assetTypes[i].name;
 
-      this.assets[name] = yield this.LoadClips(
+      this.assets[name] = yield this.LoadAssets(
         assetMetadata[name],
         `public/asset_metadata/${name}`
       );
@@ -228,6 +228,32 @@ class FormStore {
         versionHash,
         ...this.targets[versionHash]
       });
+    }
+  });
+
+  @action.bound
+  UpdateClip = flow(function * ({key, playlistIndex, index}) {
+    let clip;
+    if(playlistIndex !== undefined) {
+      clip = this.playlists[playlistIndex].clips[index];
+    } else {
+      clip = this.assets[key][index];
+    }
+
+    if(clip.versionHash !== clip.latestVersionHash) {
+      yield this.RetrieveAsset(clip.latestVersionHash);
+    }
+
+    const updatedClip = {
+      ...clip,
+      versionHash: clip.latestVersionHash,
+      ...this.targets[clip.latestVersionHash]
+    };
+
+    if(playlistIndex !== undefined) {
+      this.playlists[playlistIndex].clips[index] = updatedClip;
+    } else {
+      this.assets[key][index] = updatedClip;
     }
   });
 
@@ -457,7 +483,7 @@ class FormStore {
       this.linkHashes[linkPath] = metadata["."].source;
 
       // Cache metadata
-      this.RetrieveAsset(this.linkHashes[linkPath], metadata);
+      yield this.RetrieveAsset(this.linkHashes[linkPath], metadata);
     }
 
     return this.linkHashes[linkPath];
@@ -474,22 +500,24 @@ class FormStore {
       })) || {};
     }
 
+    const latestVersionHash = yield this.rootStore.client.LatestVersionHash({versionHash});
     this.targets[versionHash] = {
       id: assetMetadata.ip_title_id,
       assetType: assetMetadata.asset_type,
       title: assetMetadata.title || assetMetadata.display_title,
       displayTitle: assetMetadata.display_title || assetMetadata.title,
       slug: assetMetadata.slug,
-      playable: !!(assetMetadata.sources || {}).default
+      playable: !!(assetMetadata.sources || {}).default,
+      latestVersionHash
     };
   });
 
-  LoadClips = flow(function * (metadata, linkPath) {
+  LoadAssets = flow(function * (metadata, linkPath) {
     if(!metadata) { return []; }
 
-    let clips = [];
-    let unorderedClips = [];
-    let defaultClip;
+    let assets = [];
+    let unorderedAssets = [];
+    let defaultAsset;
 
     metadata = toJS(metadata);
 
@@ -521,15 +549,15 @@ class FormStore {
           // Order might be saved in the link
           let order = ((hasSlug ? metadata[key][slug] : metadata[key]) || {}).order;
 
-          const clip = {
+          const asset = {
             versionHash: targetHash,
             isDefault: false,
             ...this.targets[targetHash]
           };
 
           if(key === "default") {
-            clip.isDefault = true;
-            defaultClip = clip;
+            asset.isDefault = true;
+            defaultAsset = asset;
             return;
           }
 
@@ -537,14 +565,14 @@ class FormStore {
           const index = order !== undefined ? order : parseInt(key);
           if(isNaN(index)) {
             // Key not an index, just add it to the back of the list
-            unorderedClips.push(clip);
+            unorderedAssets.push(asset);
             return;
           }
 
-          clips[index] = clip;
+          assets[index] = asset;
         } catch (error) {
           // eslint-disable-next-line no-console
-          console.error(`Failed to load clip '${key}':`);
+          console.error(`Failed to load asset '${key}':`);
           // eslint-disable-next-line no-console
           console.error(toJS(metadata));
           // eslint-disable-next-line no-console
@@ -554,19 +582,19 @@ class FormStore {
     );
 
     // Put default at front of list
-    if(defaultClip) {
-      clips.unshift(defaultClip);
+    if(defaultAsset) {
+      assets.unshift(defaultAsset);
     }
 
-    clips = [
-      ...clips,
-      ...unorderedClips
+    assets = [
+      ...assets,
+      ...unorderedAssets
     ];
 
     // Filter any missing indices
-    clips = clips.filter(clip => clip);
+    assets = assets.filter(asset => asset);
 
-    return clips;
+    return assets;
   });
 
   LoadImages = flow(function * (metadata) {
@@ -699,7 +727,7 @@ class FormStore {
             // Old format - playlistIndex is the playlist key
             unorderedPlaylists.push({
               playlistKey: playlistIndex,
-              clips: await this.LoadClips(
+              clips: await this.LoadAssets(
                 metadata[playlistIndex],
                 `public/asset_metadata/playlists/${playlistIndex}`
               )
@@ -710,7 +738,7 @@ class FormStore {
 
             playlists[parseInt(playlistIndex)] = {
               playlistKey,
-              clips: await this.LoadClips(
+              clips: await this.LoadAssets(
                 metadata[playlistIndex][playlistKey],
                 `public/asset_metadata/playlists/${playlistIndex}/${playlistKey}`
               )
