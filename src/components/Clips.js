@@ -6,6 +6,7 @@ import ContentBrowser from "./ContentBrowser";
 import VideoPreview from "./VideoPreview";
 import OrderButtons from "./OrderButtons";
 
+import UpdateIcon from "../static/icons/arrow-up-circle.svg";
 import RemoveIcon from "../static/icons/trash.svg";
 import PlayIcon from "../static/icons/play-circle.svg";
 
@@ -20,9 +21,10 @@ const Clip = ({
   orderable,
   Swap,
   Remove,
+  Update,
   SetDefault
 }) => {
-  const {versionHash, title, id, slug, assetType} = clip;
+  const {versionHash, title, id, slug, assetType, latestVersionHash} = clip;
 
   const [showPreview, setShowPreview] = useState(false);
 
@@ -52,6 +54,23 @@ const Clip = ({
     orderButtons = <OrderButtons index={index} length={length} Swap={Swap}/>;
   }
 
+  let updateButton;
+  if(versionHash !== latestVersionHash) {
+    updateButton = (
+      <IconButton
+        icon={UpdateIcon}
+        className="update-button"
+        label={`Update ${title} to the latest version`}
+        onClick={async () => {
+          await Confirm({
+            message: `Are you sure you want to update ${name ? `the ${name}` : ""} '${title}'?`,
+            onConfirm: Update
+          });
+        }}
+      />
+    );
+  }
+
   return (
     <React.Fragment>
       <div
@@ -75,20 +94,23 @@ const Clip = ({
         />
         <div className="hint">{assetType}</div>
         <div title={title}>{title} {id ? `(${id})` : ""}</div>
-        <div className="clip-target-hash" title={`${slug || ""} ${versionHash}`}>{versionHash}</div>
+        <div className="clip-slug-hash" title={`${slug || ""} ${versionHash}`}>{slug || versionHash}</div>
         { defaultButton }
         { orderButtons }
-        <IconButton
-          icon={RemoveIcon}
-          className="remove-button"
-          label={`Remove ${title}`}
-          onClick={async () => {
-            await Confirm({
-              message: `Are you sure you want to remove ${name ? `the ${name}` : ""} '${title}'?`,
-              onConfirm: Remove
-            });
-          }}
-        />
+        <div className="asset-form-clip-actions">
+          { updateButton }
+          <IconButton
+            icon={RemoveIcon}
+            className="remove-button"
+            label={`Remove ${title}`}
+            onClick={async () => {
+              await Confirm({
+                message: `Are you sure you want to remove ${name ? `the ${name}` : ""} '${title}'?`,
+                onConfirm: Remove
+              });
+            }}
+          />
+        </div>
       </div>
       { preview }
     </React.Fragment>
@@ -147,7 +169,7 @@ class Clips extends React.Component {
   render() {
     const clips = this.props.playlistIndex !== undefined ?
       this.props.formStore.playlists[this.props.playlistIndex].clips :
-      this.props.formStore[this.props.storeKey];
+      this.props.formStore.assets[this.props.storeKey];
 
     return (
       <div className="asset-form-section-container">
@@ -170,6 +192,11 @@ class Clips extends React.Component {
                 i2
               })}
               SetDefault={index => this.props.formStore.SetDefaultClip({
+                key: this.props.storeKey,
+                playlistIndex: this.props.playlistIndex,
+                index
+              })}
+              Update={() => this.props.formStore.UpdateClip({
                 key: this.props.storeKey,
                 playlistIndex: this.props.playlistIndex,
                 index

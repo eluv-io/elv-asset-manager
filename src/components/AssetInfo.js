@@ -1,6 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Input, TextArea, Selection, Date, MultiSelect} from "./Inputs";
+import {Input, TextArea, Selection, Date, MultiSelect, Checkbox} from "./Inputs";
 
 const GENRES = [
   "Action / Adventure",
@@ -67,10 +67,28 @@ const GENRES = [
 class AssetInfo extends React.Component {
   // Generate list of inputs as defined in infoFields
   InfoFields() {
-    return this.props.formStore.infoFields.map(({name, label, type}) => {
+    // Filter fields not applicable to current title type
+    const fields = this.props.formStore.infoFields
+      .filter(({for_title_types}) =>
+        !for_title_types ||
+        for_title_types.length === 0 ||
+        for_title_types.includes(this.props.formStore.assetInfo.title_type)
+      );
+
+    return fields.map(({name, label, type}) => {
       if(type === "textarea") {
         return (
           <TextArea
+            key={`input-${name}`}
+            name={name}
+            label={label}
+            value={this.props.formStore.assetInfo[name]}
+            onChange={value => this.props.formStore.UpdateAssetInfo(name, value)}
+          />
+        );
+      } else if(type === "checkbox") {
+        return (
+          <Checkbox
             key={`input-${name}`}
             name={name}
             label={label}
@@ -102,14 +120,14 @@ class AssetInfo extends React.Component {
             name="title_type"
             value={this.props.formStore.assetInfo.title_type}
             onChange={title_type => this.props.formStore.UpdateAssetInfo("title_type", title_type)}
-            options={["collection", "episode", "feature", "franchise", "season", "series", "site"]}
+            options={this.props.formStore.assetTitleTypes}
           />
 
           <Selection
             name="asset_type"
             value={this.props.formStore.assetInfo.asset_type}
             onChange={asset_type => this.props.formStore.UpdateAssetInfo("asset_type", asset_type)}
-            options={["clip", "primary", "trailer"]}
+            options={this.props.formStore.assetAssetTypes}
           />
 
           <Input

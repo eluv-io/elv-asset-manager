@@ -35,7 +35,7 @@ class ContentStore {
           id: libraryId,
           libraryId,
           name,
-          sortKey: name.startsWith("ilib") ? `zz${name}` : name
+          sortKey: name.startsWith("ilib") ? `zz${name.toLowerCase()}` : name.toLowerCase()
         });
       }
     );

@@ -6,7 +6,7 @@ import RemoveIcon from "../static/icons/trash.svg";
 
 const FormatName = (name) => {
   return (name || "")
-    .split("_")
+    .split(/[_, \s]/)
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 };
@@ -31,6 +31,25 @@ export const Input = ({type, label, name, value, readonly=false, onChange}) => {
           onChange(input);
         }}
       />
+    </div>
+  );
+};
+
+export const Checkbox = ({label, name, value, readonly=false, onChange}) => {
+  return (
+    <div className="asset-form-input">
+      <label htmlFor={name}>{label || FormatName(name)}</label>
+      <div className="checkbox-container">
+        <input
+          name={name}
+          type="checkbox"
+          checked={!!value}
+          readOnly={readonly}
+          onChange={event => {
+            onChange(event.target.checked);
+          }}
+        />
+      </div>
     </div>
   );
 };

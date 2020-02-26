@@ -1,4 +1,4 @@
-import {configure, observable, action, flow} from "mobx";
+import {configure, observable, action, flow, runInAction} from "mobx";
 
 import {FrameClient} from "elv-client-js/src/FrameClient";
 import ContentStore from "./Content";
@@ -10,12 +10,23 @@ configure({
 });
 
 class RootStore {
-  @observable client;
   @observable balance = 0;
   @observable params = {};
   @observable assetMetadata;
   @observable assetName;
-  @observable contentTypeInfoFields;
+  @observable contentTypeAssetAssetTypes;
+  @observable contentTypeAssetTitleTypes;
+  @observable contentTypeAssetInfoFields;
+  @observable contentTypeAssetTypes;
+  @observable contentTypeAssetImageKeys;
+
+  @observable linkStatus = {
+    updatesAvailable: false,
+    error: ""
+  };
+
+  @observable updating = false;
+  @observable updateStatus;
 
   constructor() {
     this.contentStore = new ContentStore(this);
@@ -70,22 +81,97 @@ class RootStore {
     this.assetMetadata =
       (yield this.client.ContentObjectMetadata({
         versionHash: this.params.versionHash,
-        metadataSubtree: "public/asset_metadata",
-        resolveLinks: false
+        metadataSubtree: "public/asset_metadata"
       })) || {};
 
     const typeHash = (yield this.client.ContentObject({
       versionHash: this.params.versionHash
     })).type;
 
-    this.contentTypeInfoFields = yield this.client.ContentObjectMetadata({
-      libraryId: (yield this.client.ContentSpaceId()).replace("ispc", "ilib"),
-      objectId: this.client.utils.DecodeVersionHash(typeHash).objectId,
-      metadataSubtree: "asset_info_fields"
-    });
+    if(typeHash) {
+      const libraryId = (yield this.client.ContentSpaceId()).replace("ispc", "ilib");
+      const objectId = this.client.utils.DecodeVersionHash(typeHash).objectId;
+
+      this.contentTypeAssetAssetTypes = yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "asset_asset_types"
+      });
+
+      this.contentTypeAssetTitleTypes = yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "asset_title_types"
+      });
+
+      this.contentTypeAssetInfoFields = yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "asset_info_fields"
+      });
+
+      this.contentTypeAssetTypes = yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "asset_types"
+      });
+
+      this.contentTypeAssetImageKeys = yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "asset_image_keys"
+      });
+    }
 
     yield this.formStore.InitializeFormData();
-  })
+  });
+
+  @action.bound
+  LinkStatus = flow(function * () {
+    try {
+      const status = yield this.client.ContentObjectGraph({
+        libraryId: this.params.libraryId,
+        versionHash: this.params.versionHash,
+        autoUpdate: true
+      });
+
+      this.linkStatus = {
+        updatesAvailable: Object.keys(status.auto_updates).length > 0,
+        error: ""
+      };
+    } catch (error) {
+      this.linkStatus.error = error.toString();
+    }
+  });
+
+  @action.bound
+  UpdateLinks = flow(function * () {
+    try {
+      this.updating = true;
+      this.updateStatus = {};
+
+      const callback = ({total, completed, action}) => {
+        runInAction(() => this.updateStatus = {total, completed, action});
+      };
+
+      yield this.client.UpdateContentObjectGraph({
+        libraryId: this.params.libraryId,
+        versionHash: this.params.versionHash,
+        callback
+      });
+
+      this.updateStatus.completed = this.updateStatus.total;
+      this.updateStatus.action = "Done";
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Error during link updates:");
+      // eslint-disable-next-line no-console
+      console.error(error);
+      this.updateStatus.error = error.message ? error.message : error;
+    } finally {
+      this.updating = false;
+    }
+  });
 }
 
 export const rootStore = new RootStore();
