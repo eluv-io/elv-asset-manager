@@ -21,11 +21,10 @@ The potential values for `asset_type` and `title_type` presented in the form are
     "primary",
     "secondary"
   ],
-  "asset_image_keys": [
-    "poster",
-    "primary_portrait",
-    "primary_landscape",
-    "thumbnail"
+  "asset_title_types": [
+    "site",
+    "story",
+    "chapter"
   ]
 ```
 
