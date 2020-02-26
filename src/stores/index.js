@@ -14,6 +14,8 @@ class RootStore {
   @observable params = {};
   @observable assetMetadata;
   @observable assetName;
+  @observable contentTypeAssetAssetTypes;
+  @observable contentTypeAssetTitleTypes;
   @observable contentTypeAssetInfoFields;
   @observable contentTypeAssetTypes;
   @observable contentTypeAssetImageKeys;
@@ -89,6 +91,19 @@ class RootStore {
     if(typeHash) {
       const libraryId = (yield this.client.ContentSpaceId()).replace("ispc", "ilib");
       const objectId = this.client.utils.DecodeVersionHash(typeHash).objectId;
+
+      this.contentTypeAssetAssetTypes = yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "asset_asset_types"
+      });
+
+      this.contentTypeAssetTitleTypes = yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "asset_title_types"
+      });
+
       this.contentTypeAssetInfoFields = yield this.client.ContentObjectMetadata({
         libraryId,
         objectId,

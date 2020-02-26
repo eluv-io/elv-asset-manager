@@ -120,14 +120,14 @@ class AssetInfo extends React.Component {
             name="title_type"
             value={this.props.formStore.assetInfo.title_type}
             onChange={title_type => this.props.formStore.UpdateAssetInfo("title_type", title_type)}
-            options={["collection", "episode", "feature", "franchise", "season", "series", "site"]}
+            options={this.props.formStore.assetTitleTypes}
           />
 
           <Selection
             name="asset_type"
             value={this.props.formStore.assetInfo.asset_type}
             onChange={asset_type => this.props.formStore.UpdateAssetInfo("asset_type", asset_type)}
-            options={["clip", "primary", "trailer"]}
+            options={this.props.formStore.assetAssetTypes}
           />
 
           <Input

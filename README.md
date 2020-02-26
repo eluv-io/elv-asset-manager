@@ -12,6 +12,24 @@ As an example of a possible use-case, the asset may represent a season of a seri
 
 The forms the asset manager app presents can be specified in the metadata of the content type to which the app is attached. There are three areas that can be configured:
 
+### Asset and Title Types
+
+The potential values for `asset_type` and `title_type` presented in the form are configurable using the `asset_asset_types` and `asset_title_types` fields, which are both simple lists of strings:
+
+```json
+  "asset_asset_types": [
+    "primary",
+    "secondary"
+  ],
+  "asset_image_keys": [
+    "poster",
+    "primary_portrait",
+    "primary_landscape",
+    "thumbnail"
+  ]
+```
+
+
 ### Asset Info
 
 Configuring `asset_info_fields` in the content type allows for configuration of the form corresponding to info about the asset. This info will be saved in the asset under `public/asset_metadata/info`.

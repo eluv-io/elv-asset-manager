@@ -15,6 +15,22 @@ class FormStore {
 
   @observable assets = {};
 
+  @observable assetAssetTypes = [
+    "primary",
+    "clip",
+    "trailer"
+  ];
+
+  @observable assetTitleTypes = [
+    "collection",
+    "episode",
+    "feature",
+    "franchise",
+    "season",
+    "series",
+    "site"
+  ];
+
   @observable assetImageKeys = [
     "main_slider_background_desktop",
     "main_slider_background_mobile",
@@ -115,6 +131,14 @@ class FormStore {
 
   InitializeFormData = flow(function * () {
     const assetMetadata = this.rootStore.assetMetadata || {};
+
+    if(this.rootStore.contentTypeAssetAssetTypes) {
+      this.assetAssetTypes = this.rootStore.contentTypeAssetAssetTypes;
+    }
+
+    if(this.rootStore.contentTypeAssetTitleTypes) {
+      this.assetTitleTypes = this.rootStore.contentTypeAssetTitleTypes;
+    }
 
     if(this.rootStore.contentTypeAssetInfoFields) {
       this.infoFields = this.rootStore.contentTypeAssetInfoFields;
@@ -415,8 +439,8 @@ class FormStore {
       display_title: metadata.display_title || "",
       slug: metadata.slug || Slugify(metadata.display_title || ""),
       ip_title_id: metadata.ip_title_id || "",
-      title_type: metadata.title_type || "franchise",
-      asset_type: metadata.asset_type || "primary",
+      title_type: metadata.title_type || this.assetTitleTypes[0],
+      asset_type: metadata.asset_type || this.assetAssetTypes[0],
       genre: info.genre || [],
       release_date
     };

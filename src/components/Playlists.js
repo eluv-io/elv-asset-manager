@@ -38,8 +38,8 @@ class Playlists extends React.Component {
         </div>
 
         <Clips
-          assetTypes={["clip", "primary", "trailer"]}
-          titleTypes={["feature", "episode", "season", "series", "franchise", "collection"]}
+          assetTypes={this.props.formStore.assetAssetTypes}
+          titleTypes={this.props.formStore.assetTitleTypes}
           playlistIndex={index}
           header={`'${playlist.playlistKey}' Clips`}
           name="Clip"
