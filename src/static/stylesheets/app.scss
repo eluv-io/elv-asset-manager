@@ -376,7 +376,8 @@ label {
 }
 
 input,
-select {
+select,
+textarea {
   border: 1px solid $elv-color-mediumgray;
   width: 100%;
 }

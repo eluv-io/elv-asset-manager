@@ -15,11 +15,7 @@ class RootStore {
   @observable params = {};
   @observable assetMetadata;
   @observable assetName;
-  @observable contentTypeAssetAssetTypes;
-  @observable contentTypeAssetTitleTypes;
-  @observable contentTypeAssetInfoFields;
-  @observable contentTypeAssetTypes;
-  @observable contentTypeAssetImageKeys;
+  @observable titleConfiguration;
 
   @observable linkStatus = {
     updatesAvailable: false,
@@ -41,12 +37,6 @@ class RootStore {
       target: window.parent,
       timeout: 30
     });
-
-    this.balance = parseFloat(
-      yield this.client.GetBalance({
-        address: yield this.client.CurrentAccountAddress()
-      })
-    );
 
     let queryParams = window.location.search.split("?")[1];
     queryParams = queryParams.split("&");
@@ -94,35 +84,11 @@ class RootStore {
       const libraryId = (yield this.client.ContentSpaceId()).replace("ispc", "ilib");
       const objectId = this.client.utils.DecodeVersionHash(typeHash).objectId;
 
-      this.contentTypeAssetAssetTypes = yield this.client.ContentObjectMetadata({
+      this.titleConfiguration = (yield this.client.ContentObjectMetadata({
         libraryId,
         objectId,
-        metadataSubtree: "asset_asset_types"
-      });
-
-      this.contentTypeAssetTitleTypes = yield this.client.ContentObjectMetadata({
-        libraryId,
-        objectId,
-        metadataSubtree: "asset_title_types"
-      });
-
-      this.contentTypeAssetInfoFields = yield this.client.ContentObjectMetadata({
-        libraryId,
-        objectId,
-        metadataSubtree: "asset_info_fields"
-      });
-
-      this.contentTypeAssetTypes = yield this.client.ContentObjectMetadata({
-        libraryId,
-        objectId,
-        metadataSubtree: "asset_types"
-      });
-
-      this.contentTypeAssetImageKeys = yield this.client.ContentObjectMetadata({
-        libraryId,
-        objectId,
-        metadataSubtree: "asset_image_keys"
-      });
+        metadataSubtree: "public/title_configuration"
+      })) || {};
     }
 
     yield this.formStore.InitializeFormData();
