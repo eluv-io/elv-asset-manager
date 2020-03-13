@@ -2,7 +2,7 @@ import React from "react";
 import {inject, observer} from "mobx-react";
 import {Input, Selection, ToggleSection} from "./Inputs";
 
-import {Action, ImageIcon, LoadingElement} from "elv-components-js";
+import {Action, Confirm, ImageIcon, LoadingElement} from "elv-components-js";
 
 import StreamActive from "../static/icons/video.svg";
 import StreamInactive from "../static/icons/video-off.svg";
@@ -13,27 +13,21 @@ import VideoPreview from "./VideoPreview";
 @observer
 class LiveStream extends React.Component {
   ToggleStream() {
-    if(this.props.liveStore.active) {
-      // Stream active
-      return (
-        <Action
-          className="toggle-stream-button"
-          onClick={this.props.liveStore.StopStream}
-        >
-          Stop Stream
-        </Action>
-      );
-    } else {
-      // Stream inactive
-      return (
-        <Action
-          className="toggle-stream-button"
-          onClick={this.props.liveStore.StartStream}
-        >
-          Start Stream
-        </Action>
-      );
-    }
+    const active = this.props.liveStore.active;
+
+    return (
+      <Action
+        className="toggle-stream-button"
+        onClick={async () => (
+          await Confirm({
+            message: `Are you sure you want to ${active ? "stop" : "start"} the stream?`,
+            onConfirm: active ? this.props.liveStore.StopStream : this.props.liveStore.StartStream
+          })
+        )}
+      >
+        { `${active ? "Stop" : "Start"} Stream` }
+      </Action>
+    );
   }
 
   StreamPreview() {

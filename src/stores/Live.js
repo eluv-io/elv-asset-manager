@@ -91,9 +91,14 @@ class LiveStore {
   }
 
   @action.bound
-  StreamInfo = flow(function * () {
+  StreamInfo = flow(function * ({libraryId, objectId}={}) {
     const client = this.rootStore.client;
-    const {libraryId, objectId} = this.rootStore.params;
+    if(!objectId) {
+      libraryId = this.rootStore.params.libraryId;
+      objectId = this.rootStore.params.objectId;
+    } else if(!libraryId) {
+      libraryId = yield client.ContentObjectLibraryId({objectId});
+    }
 
     this.streamInfo = yield client.ContentObjectMetadata({
       libraryId,
@@ -107,11 +112,16 @@ class LiveStore {
   });
 
   @action.bound
-  StartStream = flow(function * () {
+  StartStream = flow(function * ({libraryId, objectId}={}) {
     const client = this.rootStore.client;
-    const {libraryId, objectId} = this.rootStore.params;
+    if(!objectId) {
+      libraryId = this.rootStore.params.libraryId;
+      objectId = this.rootStore.params.objectId;
+    } else if(!libraryId) {
+      libraryId = yield client.ContentObjectLibraryId({objectId});
+    }
 
-    const streamInfo = yield this.StreamInfo();
+    const streamInfo = yield this.StreamInfo({libraryId, objectId});
     if(streamInfo) {
       // eslint-disable-next-line no-console
       console.error("Stream already started");
@@ -121,14 +131,24 @@ class LiveStore {
     try {
       this.loading = true;
 
-      // Switch to ingress node
-      let {fabricURIs} = yield client.UseRegion({region: this.ingress_region});
-      yield client.SetNodes({fabricURIs: [fabricURIs[0]]});
+      let ingressRegion = this.ingressRegion;
+      if(objectId === this.rootStore.params.objectId) {
+        // Update current settings if operating on stream
+        const {write_token} = yield client.EditContentObject({libraryId, objectId});
+        yield this.SaveLiveParameters({libraryId, objectId, writeToken: write_token});
+        yield client.FinalizeContentObject({libraryId, objectId, writeToken: write_token});
+      } else {
+        // Operating on separate stream object - pull ingress region
+        ingressRegion = yield client.ContentObjectMetadata({
+          libraryId,
+          objectId,
+          metadataSubtree: "ingress_region"
+        });
+      }
 
-      // Update current settings
-      const { write_token } = yield client.EditContentObject({libraryId, objectId});
-      yield this.SaveLiveParameters({writeToken: write_token});
-      yield client.FinalizeContentObject({libraryId, objectId, writeToken: write_token});
+      // Switch to ingress node
+      let {fabricURIs} = yield client.UseRegion({region: ingressRegion});
+      yield client.SetNodes({fabricURIs: [fabricURIs[0]]});
 
       // Create draft for live edge
       const edgeEdit = yield client.EditContentObject({libraryId, objectId});
@@ -138,8 +158,6 @@ class LiveStore {
 
       // Create draft for setting write token
       const tokenEdit = yield client.EditContentObject({libraryId, objectId});
-
-
 
       // Set edge write token and node in metadata for both drafts
       yield client.MergeMetadata({
@@ -217,14 +235,19 @@ class LiveStore {
   });
 
   @action.bound
-  StopStream = flow(function * () {
+  StopStream = flow(function * ({libraryId, objectId}={}) {
     const client = this.rootStore.client;
-    const {libraryId, objectId} = this.rootStore.params;
+    if(!objectId) {
+      libraryId = this.rootStore.params.libraryId;
+      objectId = this.rootStore.params.objectId;
+    } else if(!libraryId) {
+      libraryId = yield client.ContentObjectLibraryId({objectId});
+    }
 
     try {
       this.loading = true;
 
-      const streamInfo = yield this.StreamInfo();
+      const streamInfo = yield this.StreamInfo({libraryId, objectId});
 
       if(!streamInfo) {
         // eslint-disable-next-line no-console
@@ -308,9 +331,14 @@ class LiveStore {
   });
 
   @action.bound
-  SaveLiveParameters = flow(function * ({writeToken}) {
+  SaveLiveParameters = flow(function * ({libraryId, objectId, writeToken}) {
     const client = this.rootStore.client;
-    const {libraryId, objectId} = this.rootStore.params;
+    if(!objectId) {
+      libraryId = this.rootStore.params.libraryId;
+      objectId = this.rootStore.params.objectId;
+    } else if(!libraryId) {
+      libraryId = yield client.ContentObjectLibraryId({objectId});
+    }
 
     try {
       yield client.MergeMetadata({
@@ -323,13 +351,24 @@ class LiveStore {
           ingress_region: this.ingress_region,
           resolution: `${this.resolution_width}x${this.resolution_height}`,
           max_duration_sec: this.max_duration_sec,
-          //udp_port: parseInt(this.udp_port),
           source_timescale: this.source_timescale,
           public: {
-            video_type: "live"
+            asset_metadata: {
+              video_type: "live"
+            }
           }
         }
       });
+
+      if(this.ingest_type === "udp") {
+        yield client.ReplaceMetadata({
+          libraryId,
+          objectId,
+          writeToken,
+          metadataSubtree: "udp_port",
+          metadata: parseInt(this.udp_port)
+        });
+      }
 
       yield client.ReplaceMetadata({
         libraryId,

@@ -18,7 +18,9 @@ class VideoPreview extends React.Component {
   }
 
   componentWillUnmount() {
-    this.player.destroy();
+    if(this.player) {
+      this.player.destroy();
+    }
   }
 
   async InitializeVideo(element) {

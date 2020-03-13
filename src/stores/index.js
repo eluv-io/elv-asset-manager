@@ -4,6 +4,7 @@ import {FrameClient} from "elv-client-js/src/FrameClient";
 import ContentStore from "./Content";
 import FormStore from "./Form";
 import LiveStore from "./Live";
+import ChannelStore from "./Channel";
 
 // Force strict mode so mutations are only allowed within actions.
 configure({
@@ -15,7 +16,7 @@ class RootStore {
   @observable params = {};
   @observable assetMetadata;
   @observable assetName;
-  @observable titleConfiguration;
+  @observable titleConfiguration = {};
 
   @observable linkStatus = {
     updatesAvailable: false,
@@ -29,6 +30,7 @@ class RootStore {
     this.contentStore = new ContentStore(this);
     this.formStore = new FormStore(this);
     this.liveStore = new LiveStore(this);
+    this.channelStore = new ChannelStore(this);
   }
 
   @action.bound
@@ -93,7 +95,13 @@ class RootStore {
 
     yield this.formStore.InitializeFormData();
 
-    yield this.liveStore.Initialize();
+    if(this.formStore.HasControl("live_stream")) {
+      yield this.liveStore.Initialize();
+    }
+
+    if(this.formStore.HasControl("channel")) {
+      yield this.channelStore.Initialize();
+    }
   });
 
   @action.bound
@@ -148,4 +156,5 @@ export const rootStore = new RootStore();
 export const contentStore = rootStore.contentStore;
 export const formStore = rootStore.formStore;
 export const liveStore = rootStore.liveStore;
+export const channelStore = rootStore.channelStore;
 

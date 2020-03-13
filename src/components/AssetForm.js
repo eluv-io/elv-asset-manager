@@ -9,6 +9,7 @@ import Playlists from "./Playlists";
 import Credits from "./Credits";
 import LinkUpdate from "./LinkUpdate";
 import LiveStream from "./LiveStream";
+import Channel from "./Channel";
 
 @inject("rootStore")
 @inject("formStore")
@@ -24,6 +25,11 @@ class AssetForm extends React.Component {
 
   Tabs() {
     let tabs = [];
+
+    if(this.props.formStore.HasControl("channel")) {
+      tabs.push(["Channel", "CHANNEL"]);
+    }
+
     if(this.props.formStore.HasControl("live_stream")) {
       tabs.push(["Live Stream", "LIVE"]);
     }
@@ -62,6 +68,8 @@ class AssetForm extends React.Component {
 
   CurentForm() {
     switch (this.state.form) {
+      case "CHANNEL":
+        return <Channel />;
       case "LIVE":
         return <LiveStream />;
       case "INFO":

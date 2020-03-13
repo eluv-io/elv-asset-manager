@@ -203,7 +203,6 @@ button {
 }
 
 .asset-form {
-  max-width: 75rem;
   padding-top: $elv-spacing-l;
   position: relative;
   width: 100%;
@@ -804,4 +803,53 @@ input {
       }
     }
   }
+}
+
+.channel-stream-info-container {
+  width: 100%;
+
+  .stream-info-header {
+    margin: 0;
+    padding-bottom: $elv-spacing-xs;
+    text-align: left;
+  }
+}
+
+
+.channel-stream-info {
+  display: grid;
+  grid-template-areas: "indicator row" "indicator row" "indicator row" "indicator row";
+  grid-template-columns: 5rem 1fr;
+  grid-template-rows: 1.5rem 1.5rem 1.5rem 3rem;
+  padding: $elv-spacing-m 0;
+
+  div {
+    @include elv-ellipsis;
+  }
+
+  .stream-indicator {
+    grid-area: indicator;
+    margin: $elv-spacing-s auto;
+    position: relative;
+  }
+
+  .toggle-stream-button {
+    position: relative;
+  }
+
+  .stream-actions {
+    align-self: center;
+    display: flex;
+
+    button {
+      margin-right: $elv-spacing-xs;
+      max-width: 100%;
+      width: 10rem;
+    }
+  }
+}
+
+.light {
+  color: $elv-color-text-light;
+  font-size: $elv-font-l;
 }
