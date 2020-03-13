@@ -8,6 +8,7 @@ import Gallery from "./Gallery";
 import Playlists from "./Playlists";
 import Credits from "./Credits";
 import LinkUpdate from "./LinkUpdate";
+import LiveStream from "./LiveStream";
 
 @inject("rootStore")
 @inject("formStore")
@@ -22,10 +23,13 @@ class AssetForm extends React.Component {
   }
 
   Tabs() {
-    let tabs = [
-      ["Info", "INFO"],
-      ["Credits", "CREDITS"]
-    ];
+    let tabs = [];
+    if(this.props.formStore.isLiveStream) {
+      tabs.push(["Live Stream", "LIVE"]);
+    }
+
+    tabs.push(["Info", "INFO"]);
+    tabs.push(["Credits", "CREDITS"]);
 
     // Inject relevant assets
     this.props.formStore.assetTypes.forEach(({label, for_title_types, name}) => {
@@ -49,6 +53,8 @@ class AssetForm extends React.Component {
 
   CurentForm() {
     switch (this.state.form) {
+      case "LIVE":
+        return <LiveStream />;
       case "INFO":
         return <AssetInfo />;
       case "CREDITS":

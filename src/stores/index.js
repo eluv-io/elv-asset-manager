@@ -3,6 +3,7 @@ import {configure, observable, action, flow, runInAction} from "mobx";
 import {FrameClient} from "elv-client-js/src/FrameClient";
 import ContentStore from "./Content";
 import FormStore from "./Form";
+import LiveStore from "./Live";
 
 // Force strict mode so mutations are only allowed within actions.
 configure({
@@ -31,6 +32,7 @@ class RootStore {
   constructor() {
     this.contentStore = new ContentStore(this);
     this.formStore = new FormStore(this);
+    this.liveStore = new LiveStore(this);
   }
 
   @action.bound
@@ -124,6 +126,8 @@ class RootStore {
     }
 
     yield this.formStore.InitializeFormData();
+
+    yield this.liveStore.Initialize();
   });
 
   @action.bound
@@ -177,4 +181,5 @@ class RootStore {
 export const rootStore = new RootStore();
 export const contentStore = rootStore.contentStore;
 export const formStore = rootStore.formStore;
+export const liveStore = rootStore.liveStore;
 

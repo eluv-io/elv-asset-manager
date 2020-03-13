@@ -7,6 +7,8 @@ const Slugify = str =>
   (str || "").toLowerCase().replace(/ /g, "-").replace(/[^a-z0-9\-]/g,"");
 
 class FormStore {
+  @observable isLiveStream = true;
+
   @observable assetInfo = {};
   @observable images = [];
   @observable gallery = [];
@@ -800,6 +802,10 @@ class FormStore {
 
       if(!writeToken) {
         throw Error("Update request denied");
+      }
+
+      if(this.isLiveStream) {
+        yield this.rootStore.liveStore.SaveLiveParameters({writeToken});
       }
 
       // Move fields that belong in the info subtree and remove from main tree

@@ -23,7 +23,7 @@ main {
 }
 
 .app-container {
-  align-items: center;
+  align-items: flex-start;
   margin: $elv-spacing-s;
 }
 
@@ -100,6 +100,7 @@ button {
   max-width: 100%;
 
   video {
+    background-color: $elv-color-black;
     cursor: pointer;
     width: 100%;
   }
@@ -374,6 +375,7 @@ label {
   color: $elv-color-text-light;
 }
 
+input,
 select {
   border: 1px solid $elv-color-mediumgray;
   width: 100%;
@@ -465,6 +467,23 @@ input {
       margin: 0 $elv-spacing-xxs;
       padding: $elv-spacing-xxs;
     }
+  }
+}
+
+.toggle-section {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin: $elv-spacing-s 0;
+
+  .toggle-section-button {
+    max-width: 100%;
+    width: 50%;
+  }
+
+  .toggle-section-content {
+    margin-top: $elv-spacing-s;
+    width: 100%;
   }
 }
 
@@ -652,6 +671,45 @@ input {
         stroke: $elv-color-lightblue;
       }
     }
+  }
+}
+
+.asset-form-live-container {
+  .live-header {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+  }
+
+  .toggle-stream-loading,
+  .toggle-stream-button {
+    position: absolute;
+    right: 0;
+    width: 150px;
+  }
+
+  .stream-indicator {
+    align-items: center;
+    background-color: $elv-color-mediumgray;
+    border-radius: 100%;
+    display: flex;
+    height: $elv-spacing-ml;
+    justify-content: center;
+    left: 0;
+    padding: 0.6rem;
+    position: absolute;
+    width: $elv-spacing-ml;
+
+    svg {
+      fill: $elv-color-white;
+      stroke: $elv-color-white;
+    }
+  }
+
+  .stream-indicator-active {
+    background-color: $elv-color-mediumblue;
   }
 }
 

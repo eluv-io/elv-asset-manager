@@ -1,6 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import {toJS} from "mobx";
-import {IconButton} from "elv-components-js";
+import {Action, IconButton} from "elv-components-js";
 import AddIcon from "../static/icons/plus-square.svg";
 import RemoveIcon from "../static/icons/trash.svg";
 
@@ -11,7 +11,9 @@ const FormatName = (name) => {
     .join(" ");
 };
 
-export const Input = ({type, label, name, value, readonly=false, onChange}) => {
+export const Input = ({type, label, name, value, readonly=false, onChange, hidden=false}) => {
+  if(hidden) { return null; }
+
   return (
     <div className="asset-form-input">
       <label htmlFor={name}>{label || FormatName(name)}</label>
@@ -76,9 +78,16 @@ export const Selection = ({label, name, value, onChange, options}) => {
         value={value}
         onChange={event => onChange(event.target.value)}
       >
-        {options.map(option =>
-          <option value={option} key={`asset-info-${name}-${option}`}>{option}</option>
-        )}
+        {options.map(option => {
+          let name = option;
+          let value = option;
+          if(Array.isArray(option)) {
+            name = option[0];
+            value = option[1];
+          }
+
+          return <option value={value} key={`asset-info-${name}-${value}`}>{name}</option>;
+        })}
       </select>
     </div>
   );
@@ -200,6 +209,24 @@ export const Date = ({label, name, year, month, day, readonly=false, onChange}) 
         readOnly={readonly}
         onChange={event => Update("day", event)}
       />
+    </div>
+  );
+};
+
+export const ToggleSection = ({sectionName, showInitially=false, children}) => {
+  const [show, setShow] = useState(showInitially);
+
+  const toggleButton = (
+    <Action className="toggle-section-button secondary" onClick={() => setShow(!show)}>
+      { show ? `Hide ${sectionName}` : `Show ${sectionName}`}
+    </Action>
+  );
+
+  return (
+    <div className={`toggle-section toggle-section-${show ? "show" : "hide"}`}>
+      { toggleButton }
+
+      { show ? <div className="toggle-section-content">{ children }</div> : null }
     </div>
   );
 };
