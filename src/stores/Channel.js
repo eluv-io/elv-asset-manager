@@ -1,4 +1,5 @@
-import {action, observable, flow} from "mobx";
+import {action, observable, flow, toJS, computed} from "mobx";
+import {DateTime} from "luxon";
 
 class ChannelStore {
   @observable streamLibraryId;
@@ -7,8 +8,34 @@ class ChannelStore {
   @observable streamStatus;
   @observable streamActive = false;
 
+  @observable schedule = [];
+
   constructor(rootStore) {
     this.rootStore = rootStore;
+  }
+
+  @computed get dailySchedule() {
+    let dailySchedule = {};
+    this.schedule.forEach(program => {
+      const startDate = DateTime.fromMillis(program.start_time_epoch).toFormat("yyyyLLdd");
+      const endDate = DateTime.fromMillis(program.end_time_epoch - 1).toFormat("yyyyLLdd");
+
+      if(!dailySchedule[startDate]) {
+        dailySchedule[startDate] = [];
+      }
+
+      if(!dailySchedule[endDate]) {
+        dailySchedule[endDate] = [];
+      }
+
+      dailySchedule[startDate].push(program);
+
+      if(startDate !== endDate) {
+        dailySchedule[endDate].push(program);
+      }
+    });
+
+    return dailySchedule;
   }
 
   @action.bound
@@ -27,6 +54,8 @@ class ChannelStore {
       const streamLibraryId = yield client.ContentObjectLibraryId({objectId: metadata.stream_id});
       yield this.RetrieveStreamInfo({streamLibraryId, streamId: metadata.stream_id});
     }
+
+    yield this.LoadSchedule(metadata.schedule);
   });
 
   @action.bound
@@ -88,6 +117,73 @@ class ChannelStore {
   });
 
   @action.bound
+  LoadSchedule = flow(function * (schedule) {
+    if(!schedule) { return; }
+
+    const newPrograms = (Object.values(schedule.daily_schedules) || {}).flat();
+
+    this.schedule = yield this.FormatSchedule(toJS(this.schedule).concat(newPrograms));
+  });
+
+  FormatSchedule = flow(function * (schedule) {
+    const {libraryId, objectId} = this.rootStore.params;
+    const files = (yield this.rootStore.client.ContentObjectMetadata({
+      libraryId,
+      objectId,
+      resolveLinks: false,
+      metadataSubtree: "files"
+    })) || {};
+
+    schedule = schedule.sort((a, b) => a.start_time_epoch < b.start_time_epoch ? -1 : 1)
+      .map(program => ({
+        ...program,
+        end_time_epoch: program.start_time_epoch + program.duration_sec * 1000
+      }));
+
+    // Detect overlap
+    schedule = schedule.map(program => {
+      const conflicts = schedule.filter(otherProgram => {
+        if(otherProgram === program) { return false; }
+
+        return !(
+          // Ends before program begins
+          otherProgram.end_time_epoch <= program.start_time_epoch ||
+          // Begins after program ends
+          otherProgram.start_time_epoch >= program.end_time_epoch
+        );
+      });
+
+      if(conflicts.length > 0) {
+        program.conflicts = conflicts.map(otherProgram => ({
+          title: otherProgram.title,
+          start_time_epoch: otherProgram.start_time_epoch,
+          end_time_epoch: otherProgram.start_time_epoch,
+          duration_sec: otherProgram.duration_sec
+        }));
+      }
+
+      return program;
+    });
+
+    // Resolve file images
+    schedule = yield Promise.all(
+      schedule.map(async program => {
+        if(program.program_image && files[program.program_image]) {
+          program.imageUrl = await this.rootStore.client.Rep({
+            libraryId,
+            objectId,
+            rep: `thumbnail/files/${program.program_image}`
+          });
+        }
+
+        return program;
+      })
+    );
+
+    return schedule;
+  });
+
+  @action.bound
   UpdateParameter(name, value) {
     this[name] = value;
   }
@@ -107,13 +203,31 @@ class ChannelStore {
     const client = this.rootStore.client;
     const {libraryId, objectId} = this.rootStore.params;
 
+    let schedule = {};
+    Object.keys(this.dailySchedule).map(date => {
+      schedule[date] = this.dailySchedule[date].map(program =>
+        ({
+          title: program.title || "",
+          description: program.description || "",
+          start_time_epoch: program.start_time_epoch,
+          duration_sec: program.duration_sec,
+          program_id: program.program_id,
+          program_image: program.program_image,
+          signature: program.signature
+        })
+      );
+    });
+
     yield client.ReplaceMetadata({
       libraryId,
       objectId,
       writeToken,
       metadataSubtree: "public/asset_metadata/channel_info",
       metadata: {
-        stream_id: this.streamId
+        stream_id: this.streamId,
+        schedule: {
+          daily_schedules: schedule
+        }
       }
     });
   });

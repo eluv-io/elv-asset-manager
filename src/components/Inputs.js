@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {toJS} from "mobx";
-import {Action, IconButton} from "elv-components-js";
+import {Action, BrowseWidget, IconButton} from "elv-components-js";
 import AddIcon from "../static/icons/plus-square.svg";
 import RemoveIcon from "../static/icons/trash.svg";
 
@@ -227,6 +227,33 @@ export const ToggleSection = ({sectionName, showInitially=false, children}) => {
       { toggleButton }
 
       { show ? <div className="toggle-section-content">{ children }</div> : null }
+    </div>
+  );
+};
+
+export const FileBrowser = ({name, header, accept, multiple=false, directories=false, onChange}) => {
+  return (
+    <div className="asset-form-input asset-form-file-browser">
+      <label htmlFor="schedule">Upload schedule from file</label>
+      <BrowseWidget
+        name={name}
+        header={header}
+        accept={accept}
+        multiple={multiple}
+        directories={directories}
+        onChange={onChange}
+      />
+    </div>
+  );
+};
+
+export const LabelledField = ({label, value, hidden=false}) => {
+  if(hidden) { return null; }
+
+  return (
+    <div className="asset-form-input asset-form-labelled-field">
+      <label>{ label }</label>
+      <div title={value}>{ value }</div>
     </div>
   );
 };

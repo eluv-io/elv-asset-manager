@@ -8,8 +8,8 @@ import Gallery from "./Gallery";
 import Playlists from "./Playlists";
 import Credits from "./Credits";
 import LinkUpdate from "./LinkUpdate";
-import LiveStream from "./LiveStream";
-import Channel from "./Channel";
+import LiveStream from "./channels/LiveStream";
+import Channel from "./channels/Channel";
 
 @inject("rootStore")
 @inject("formStore")

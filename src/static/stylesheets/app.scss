@@ -1,6 +1,7 @@
 @import "~elv-components-js/src/stylesheets/defaults";
 @import "~elv-components-js/src/stylesheets/styles";
 @import "./file_browser";
+@import "./channels";
 
 .app-version {
   display: none;
@@ -433,10 +434,15 @@ input {
   }
 }
 
+.asset-form-labelled-field,
 .asset-form-textarea {
   label {
     align-self: baseline;
   }
+}
+
+.asset-form-file-browser {
+  grid-template-columns: 15rem 1fr;
 }
 
 .asset-form-date {
@@ -674,45 +680,6 @@ input {
   }
 }
 
-.asset-form-live-container {
-  .live-header {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    position: relative;
-    width: 100%;
-  }
-
-  .toggle-stream-loading,
-  .toggle-stream-button {
-    position: absolute;
-    right: 0;
-    width: 150px;
-  }
-
-  .stream-indicator {
-    align-items: center;
-    background-color: $elv-color-mediumgray;
-    border-radius: 100%;
-    display: flex;
-    height: $elv-spacing-ml;
-    justify-content: center;
-    left: 0;
-    padding: 0.6rem;
-    position: absolute;
-    width: $elv-spacing-ml;
-
-    svg {
-      fill: $elv-color-white;
-      stroke: $elv-color-white;
-    }
-  }
-
-  .stream-indicator-active {
-    background-color: $elv-color-mediumblue;
-  }
-}
-
 .asset-form-clip-orderable {
   grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 2rem 4rem;
 }
@@ -801,50 +768,6 @@ input {
       &:hover {
         stroke: $elv-color-darkblue;
       }
-    }
-  }
-}
-
-.channel-stream-info-container {
-  width: 100%;
-
-  .stream-info-header {
-    margin: 0;
-    padding-bottom: $elv-spacing-xs;
-    text-align: left;
-  }
-}
-
-
-.channel-stream-info {
-  display: grid;
-  grid-template-areas: "indicator row" "indicator row" "indicator row" "indicator row";
-  grid-template-columns: 5rem 1fr;
-  grid-template-rows: 1.5rem 1.5rem 1.5rem 3rem;
-  padding: $elv-spacing-m 0;
-
-  div {
-    @include elv-ellipsis;
-  }
-
-  .stream-indicator {
-    grid-area: indicator;
-    margin: $elv-spacing-s auto;
-    position: relative;
-  }
-
-  .toggle-stream-button {
-    position: relative;
-  }
-
-  .stream-actions {
-    align-self: center;
-    display: flex;
-
-    button {
-      margin-right: $elv-spacing-xs;
-      max-width: 100%;
-      width: 10rem;
     }
   }
 }

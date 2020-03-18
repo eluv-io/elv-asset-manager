@@ -150,6 +150,18 @@ class RootStore {
       this.updating = false;
     }
   });
+
+  @action.bound
+  OpenObjectLink({libraryId, objectId}) {
+    this.client.SendMessage({
+      options: {
+        operation: "OpenLink",
+        libraryId,
+        objectId
+      },
+      noResponse: true
+    });
+  }
 }
 
 export const rootStore = new RootStore();

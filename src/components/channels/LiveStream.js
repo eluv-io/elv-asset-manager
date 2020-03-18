@@ -1,12 +1,12 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Input, Selection, ToggleSection} from "./Inputs";
+import {Input, Selection, ToggleSection} from "../Inputs";
 
 import {Action, Confirm, ImageIcon, LoadingElement} from "elv-components-js";
 
-import StreamActive from "../static/icons/video.svg";
-import StreamInactive from "../static/icons/video-off.svg";
-import VideoPreview from "./VideoPreview";
+import StreamActive from "../../static/icons/video.svg";
+import StreamInactive from "../../static/icons/video-off.svg";
+import VideoPreview from "../VideoPreview";
 
 @inject("rootStore")
 @inject("liveStore")
