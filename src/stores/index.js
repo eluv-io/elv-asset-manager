@@ -152,12 +152,13 @@ class RootStore {
   });
 
   @action.bound
-  OpenObjectLink({libraryId, objectId}) {
+  OpenObjectLink({libraryId, objectId, versionHash}) {
     this.client.SendMessage({
       options: {
         operation: "OpenLink",
         libraryId,
-        objectId
+        objectId,
+        versionHash
       },
       noResponse: true
     });

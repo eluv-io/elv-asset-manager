@@ -1,5 +1,6 @@
 import {action, observable, flow, toJS, computed} from "mobx";
 import {DateTime} from "luxon";
+import UrlJoin from "url-join";
 
 class ChannelStore {
   @observable streamLibraryId;
@@ -73,6 +74,8 @@ class ChannelStore {
       streamLibraryId: this.streamLibraryId,
       streamId: this.streamId
     });
+
+    yield this.UpdateStreamLink();
   });
 
   @action.bound
@@ -90,6 +93,50 @@ class ChannelStore {
       streamLibraryId: this.streamLibraryId,
       streamId: this.streamId
     });
+
+    yield this.UpdateStreamLink();
+  });
+
+  @action.bound
+  UpdateStreamLink = flow(function * ({writeToken}={}) {
+    if(!this.streamId) { return; }
+
+    const client = this.rootStore.client;
+    const {libraryId, objectId} = this.rootStore.params;
+
+    let finalize = false;
+    if(!writeToken) {
+      finalize = true;
+      writeToken = (yield client.EditContentObject({
+        libraryId,
+        objectId
+      })).write_token;
+    }
+
+    const streamHash = yield client.LatestVersionHash({objectId: this.streamId});
+    yield client.MergeMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "public/asset_metadata",
+      metadata: {
+        sources: {
+          default: this.rootStore.formStore.CreateLink(streamHash, "/meta/public/asset_metadata/sources/default")
+        }
+      }
+    });
+
+    yield client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "public/asset_metadata/channel_info/stream_active",
+      metadata: this.streamActive
+    });
+
+    if(finalize) {
+      yield client.FinalizeContentObject({libraryId, objectId, writeToken});
+    }
   });
 
   @action.bound
@@ -140,6 +187,19 @@ class ChannelStore {
         end_time_epoch: program.start_time_epoch + program.duration_sec * 1000
       }));
 
+    // Remove duplicates
+    schedule = schedule.filter((program, i) => {
+      const matches = schedule.filter((otherProgram, j) =>
+        program !== otherProgram &&
+        i > j &&
+        program.start_time_epoch === otherProgram.start_time_epoch &&
+        program.end_time_epoch === otherProgram.end_time_epoch &&
+        program.program_id === otherProgram.program_id
+      );
+
+      return matches.length === 0;
+    });
+
     // Detect overlap
     schedule = schedule.map(program => {
       const conflicts = schedule.filter(otherProgram => {
@@ -157,7 +217,7 @@ class ChannelStore {
         program.conflicts = conflicts.map(otherProgram => ({
           title: otherProgram.title,
           start_time_epoch: otherProgram.start_time_epoch,
-          end_time_epoch: otherProgram.start_time_epoch,
+          end_time_epoch: otherProgram.end_time_epoch,
           duration_sec: otherProgram.duration_sec
         }));
       }
@@ -168,12 +228,16 @@ class ChannelStore {
     // Resolve file images
     schedule = yield Promise.all(
       schedule.map(async program => {
-        if(program.program_image && files[program.program_image]) {
-          program.imageUrl = await this.rootStore.client.Rep({
-            libraryId,
-            objectId,
-            rep: `thumbnail/files/${program.program_image}`
-          });
+        if(program.program_image) {
+          const image = program.program_image.file || program.program_image;
+
+          if(files[image]) {
+            program.imageUrl = await this.rootStore.client.Rep({
+              libraryId,
+              objectId,
+              rep: `thumbnail/files/${image}`
+            });
+          }
         }
 
         return program;
@@ -205,17 +269,27 @@ class ChannelStore {
 
     let schedule = {};
     Object.keys(this.dailySchedule).map(date => {
-      schedule[date] = this.dailySchedule[date].map(program =>
-        ({
+      schedule[date] = this.dailySchedule[date].map(program => {
+        let image = program.program_image;
+        if(image && typeof image === "string") {
+          // Image is file specifier (loaded from schedule import). Make link
+          image = {
+            file: program.program_image,
+            default: this.rootStore.formStore.CreateLink(null, UrlJoin("files", program.program_image)),
+            thumbnail: this.rootStore.formStore.CreateLink(null, UrlJoin("rep", "thumbnail", "files", program.program_image))
+          };
+        }
+
+        return {
           title: program.title || "",
           description: program.description || "",
           start_time_epoch: program.start_time_epoch,
           duration_sec: program.duration_sec,
           program_id: program.program_id,
-          program_image: program.program_image,
+          program_image: toJS(image),
           signature: program.signature
-        })
-      );
+        };
+      });
     });
 
     yield client.ReplaceMetadata({
@@ -226,10 +300,12 @@ class ChannelStore {
       metadata: {
         stream_id: this.streamId,
         schedule: {
-          daily_schedules: schedule
+          daily_schedules: toJS(schedule)
         }
       }
     });
+
+    yield this.UpdateStreamLink({writeToken});
   });
 }
 

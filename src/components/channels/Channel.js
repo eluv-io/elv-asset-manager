@@ -9,6 +9,7 @@ import ContentBrowser from "../ContentBrowser";
 
 import StreamActive from "../../static/icons/video.svg";
 import StreamInactive from "../../static/icons/video-off.svg";
+import DefaultStreamIcon from "../../static/icons/stream.svg";
 import LinkIcon from "../../static/icons/external-link.svg";
 import ActiveIcon from "../../static/icons/activity.svg";
 import WarningIcon from "../../static/icons/alert-circle.svg";
@@ -37,7 +38,7 @@ const ScheduleEntry = ({program, index}) => {
     <div
       className="schedule-entry-color-icon"
       style={{
-        "background-color": `rgb(${r}, ${g}, ${b})`
+        backgroundColor: `rgb(${r}, ${g}, ${b})`
       }}
     />
   );
@@ -56,10 +57,10 @@ const ScheduleEntry = ({program, index}) => {
     if(expanded) {
       const conflictingPrograms = program.conflicts.map((otherProgram, conflictIndex) => (
         <div className="schedule-entry-conflict" key={`conflict-${index}-${conflictIndex}`}>
-          <LabelledField label="Title" value={program.title}/>
-          <LabelledField label="Start Time" value={DateTime.fromMillis(program.start_time_epoch).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)}/>
-          <LabelledField label="End Time" value={DateTime.fromMillis(program.end_time_epoch).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)}/>
-          <LabelledField label="Duration" value={Duration.fromMillis(program.duration_sec * 1000).toFormat("h 'Hours', m 'Minutes', s 'Seconds'")}/>
+          <LabelledField label="Title" value={otherProgram.title}/>
+          <LabelledField label="Start Time" value={DateTime.fromMillis(otherProgram.start_time_epoch).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)}/>
+          <LabelledField label="End Time" value={DateTime.fromMillis(otherProgram.end_time_epoch).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)}/>
+          <LabelledField label="Duration" value={Duration.fromMillis(otherProgram.duration_sec * 1000).toFormat("h 'Hours', m 'Minutes', s 'Seconds'")}/>
         </div>
       ));
 
@@ -67,7 +68,7 @@ const ScheduleEntry = ({program, index}) => {
         <div className="schedule-entry-conflicts-container">
           <h4>Warning: The following programs have schedules that conflict with this program:</h4>
           <div className="schedule-entry-conflicts">
-            {conflictingPrograms}
+            { conflictingPrograms }
           </div>
         </div>
       );
@@ -122,7 +123,7 @@ const ScheduleEntry = ({program, index}) => {
         { activeIcon }
         { conflictIcon }
       </div>
-      <ImageIcon label={program.title} icon={program.imageUrl || StreamActive} alternateIcon={StreamActive} className="schedule-entry-image" />
+      <ImageIcon label={program.title} icon={program.imageUrl || DefaultStreamIcon} alternateIcon={DefaultStreamIcon} className="schedule-entry-image" />
       { entryInfo }
     </div>
   );
@@ -193,13 +194,13 @@ class Schedule extends React.Component {
             const position = 100 * (Math.max(0, program.start_time_epoch - dayStartTime)) / (60 * 60 * 24 * 1000);
             return (
               <div
-                key={`schedule-timeline-entry-${program.program_id}-${program.start_time_epoch}`}
+                key={`schedule-timeline-entry-${program.program_id}-${dayStartTime}-${program.start_time_epoch}`}
                 className="schedule-timeline-entry"
                 title={`${program.title} - ${ShortDuration(program.start_time_epoch, program.end_time_epoch)}`}
                 style={{
                   width: `${width}%`,
                   left: `${position}%`,
-                  "background-color": `rgb(${r}, ${g}, ${b})`
+                  backgroundColor: `rgb(${r}, ${g}, ${b})`
                 }}
               />
             );
@@ -214,11 +215,15 @@ class Schedule extends React.Component {
       const dateString = DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
 
       return (
-        <div className="schedule-daily-container">
+        <div className="schedule-daily-container" key={`schedule-entries-container-${date}`}>
           <h4>{ dateString }</h4>
           { this.ScheduleTimeline(date, this.props.channelStore.dailySchedule[date]) }
           <div className="schedule-entries-container" key={`schedule-entries-${date}`}>
-            { this.props.channelStore.dailySchedule[date].map((program, i) => <ScheduleEntry program={program} index={i} />) }
+            {
+              this.props.channelStore.dailySchedule[date].map((program, i) =>
+                <ScheduleEntry key={`schedule-entry-${date}-${i}`} program={program} index={i} />
+              )
+            }
           </div>
         </div>
       );
@@ -316,7 +321,14 @@ class StreamInfo extends React.Component {
     );
 
     if(!this.props.channelStore.streamId) {
-      return selectStreamButton;
+      return (
+        <React.Fragment>
+          <h4 className="stream-info-header">Stream Info</h4>
+          <div className="channel-stream-info">
+            { selectStreamButton }
+          </div>
+        </React.Fragment>
+      );
     }
 
     let previewStreamButton;
@@ -350,8 +362,8 @@ class StreamInfo extends React.Component {
               label="Open stream object in new tab"
               onClick={() => this.props.rootStore.OpenObjectLink({
                 libraryId: this.props.channelStore.streamLibraryId,
-                objectId: this.props.channelStore.streamId}
-              )}
+                objectId: this.props.channelStore.streamId
+              })}
             />
           </div>
           <div className="light">{ this.props.channelStore.streamId }</div>

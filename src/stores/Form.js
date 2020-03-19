@@ -66,7 +66,7 @@ class FormStore {
   }
 
   CreateLink(versionHash, linkTarget="/meta/public/asset_metadata", options={}) {
-    if(versionHash === this.rootStore.params.versionHash) {
+    if(!versionHash || versionHash === this.rootStore.params.versionHash) {
       return {
         ...options,
         ".": {"auto_update":{"tag":"latest"}},

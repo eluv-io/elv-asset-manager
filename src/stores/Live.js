@@ -275,8 +275,7 @@ class LiveStore {
         }
       }
 
-      /*
-      yield new Promise(resolve => setTimeout(resolve, 5000));
+      yield new Promise(resolve => setTimeout(resolve, 2000));
 
       try {
         yield client.FinalizeContentObject({
@@ -284,14 +283,14 @@ class LiveStore {
           objectId,
           writeToken: streamInfo.write_token
         });
-      } catch(error) {
+      } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Failed to finalize live edge token", streamInfo.write_token);
+        // eslint-disable-next-line no-console
         console.error(error);
       }
 
       yield new Promise(resolve => setTimeout(resolve, 2000));
-
-       */
 
       const { write_token } = yield client.EditContentObject({libraryId, objectId});
 
