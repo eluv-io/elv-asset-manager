@@ -20,27 +20,24 @@ class ChannelStore {
   @computed get dailySchedule() {
     let dailySchedule = {};
     this.schedule.forEach((program, scheduleIndex) => {
-      const startDate = DateTime.fromMillis(program.start_time_epoch).toFormat("yyyyLLdd");
-      const endDate = DateTime.fromMillis(program.end_time_epoch - 1).toFormat("yyyyLLdd");
-
       program = {
         ...program,
         timeZone: this.referenceTimezone,
         scheduleIndex
       };
 
-      if(!dailySchedule[startDate]) {
-        dailySchedule[startDate] = [];
-      }
+      // Add an entry for each day the program spans
+      let date = DateTime.fromMillis(program.start_time_epoch);
+      let end = DateTime.fromMillis(program.end_time_epoch - 1);
+      while(date.toFormat("yyyyLLdd") <= end.toFormat("yyyyLLdd")) {
+        const dateString = date.toFormat("yyyyLLdd");
+        if(!dailySchedule[dateString]) {
+          dailySchedule[dateString] = [];
+        }
 
-      if(!dailySchedule[endDate]) {
-        dailySchedule[endDate] = [];
-      }
+        dailySchedule[dateString].push(program);
 
-      dailySchedule[startDate].push(program);
-
-      if(startDate !== endDate) {
-        dailySchedule[endDate].push(program);
+        date = date.plus({days: 1});
       }
     });
 
@@ -235,6 +232,8 @@ class ChannelStore {
           end_time_epoch: otherProgram.end_time_epoch,
           duration_sec: otherProgram.duration_sec
         }));
+      } else {
+        program.conflicts = undefined;
       }
 
       return program;
@@ -279,13 +278,18 @@ class ChannelStore {
 
   @action.bound
   // eslint-disable-next-line no-unused-vars
-  EditScheduleEntry({index, title, description, startTime, endTime}) {
+  EditScheduleEntry = flow(function * ({index, title, description, start_time_epoch, end_time_epoch}) {
     this.schedule[index] = {
       ...this.schedule[index],
       title,
-      description
+      description,
+      start_time_epoch,
+      end_time_epoch,
+      duration_sec: (end_time_epoch - start_time_epoch) / 1000
     };
-  }
+
+    this.schedule = yield this.FormatSchedule(toJS(this.schedule));
+  });
 
   @action.bound
   RemoveScheduleEntry(index) {

@@ -1,6 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Input, TextArea, Selection, Date, MultiSelect, Checkbox, LabelledField} from "./Inputs";
+import {Input, TextArea, Selection, MultiSelect, Checkbox, LabelledField, BasicDate} from "./Inputs";
 import {Confirm, IconButton} from "elv-components-js";
 import {toJS} from "mobx";
 
@@ -274,7 +274,7 @@ class AssetInfo extends React.Component {
             onChange={ip_title_id => this.props.formStore.UpdateAssetInfo("ip_title_id", ip_title_id)}
           />
 
-          <Date
+          <BasicDate
             name="release_date"
             year={this.props.formStore.assetInfo.release_date.year}
             month={this.props.formStore.assetInfo.release_date.month}

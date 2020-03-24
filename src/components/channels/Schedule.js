@@ -3,7 +3,7 @@ import {inject, observer} from "mobx-react";
 import {Action, Confirm, ImageIcon, LoadingElement} from "elv-components-js";
 import {DateTime, Duration} from "luxon";
 
-import {FileBrowser, Input, LabelledField, Selection, TextArea} from "../Inputs";
+import {DateSelection, FileBrowser, Input, LabelledField, Selection, TextArea} from "../Inputs";
 
 import DefaultStreamIcon from "../../static/icons/stream.svg";
 import ActiveIcon from "../../static/icons/activity.svg";
@@ -21,10 +21,22 @@ const Color = s => {
   };
 };
 
-const ShortDuration = (start_time_epoch, end_time_epoch) =>
-  DateTime.fromMillis(start_time_epoch).toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET) + " - " +
-  DateTime.fromMillis(end_time_epoch).toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET) + " (" +
-  Duration.fromMillis(end_time_epoch - start_time_epoch).toFormat("h 'Hours', m 'Minutes', s 'Seconds'") + ")";
+const ShortDuration = (start_time_epoch, end_time_epoch) => {
+  let start = DateTime.fromMillis(start_time_epoch);
+  let end = DateTime.fromMillis(end_time_epoch);
+
+  // Show date if start time and end time are on different days
+  let format = DateTime.TIME_WITH_SHORT_OFFSET;
+  if(start.toLocaleString(DateTime.DATE_SHORT) !== end.toLocaleString(DateTime.DATE_SHORT)) {
+    format = DateTime.DATETIME_SHORT;
+  }
+
+  return (
+    start.toLocaleString(format) + " - " +
+    end.toLocaleString(format) + " (" +
+    Duration.fromMillis(end_time_epoch - start_time_epoch).toFormat("h 'Hours', m 'Minutes', s 'Seconds'") + ")"
+  );
+};
 
 const ScheduleEntry = ({
   program,
@@ -144,12 +156,27 @@ const ScheduleEntry = ({
       <div className="schedule-entry-info">
         <Input label="Title" value={newTitle} onChange={title => setNewTitle(title)} />
         <TextArea label="Description" value={newDescription} onChange={description => setNewDescription(description)} />
+        <DateSelection
+          name="start_time_epoch"
+          label="Start Time"
+          value={newStartTime}
+          onChange={setNewStartTime}
+        />
+        <DateSelection
+          name="end_time_epoch"
+          label="End Time"
+          value={newEndTime}
+          onChange={setNewEndTime}
+        />
+        <LabelledField
+          label="Duration"
+          value={Duration.fromMillis(newEndTime - newStartTime).toFormat("h 'Hours', m 'Minutes', s 'Seconds'")}
+        />
 
         <div className="schedule-entry-actions">
           <Action
             className="secondary"
-            onClick={async event => {
-              event.stopPropagation();
+            onClick={() => {
               setEditing(false);
               setNewTitle(program.title);
               setNewDescription(program.description);
@@ -161,8 +188,10 @@ const ScheduleEntry = ({
           </Action>
 
           <Action
-            onClick={event => {
-              event.stopPropagation();
+            className={newStartTime > newEndTime ? "tertiary" : ""}
+            onClick={() => {
+              if(newStartTime > newEndTime) { return; }
+
               EditScheduleEntry({
                 index: program.scheduleIndex,
                 title: newTitle,

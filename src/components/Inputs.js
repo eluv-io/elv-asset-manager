@@ -1,8 +1,13 @@
+import "react-datetime/css/react-datetime.css";
+require("moment-timezone");
+
 import React, {useState} from "react";
 import {toJS} from "mobx";
 import {Action, BrowseWidget, IconButton} from "elv-components-js";
+import {Settings} from "luxon";
 import AddIcon from "../static/icons/plus-square.svg";
 import RemoveIcon from "../static/icons/trash.svg";
+import * as DatePicker from "react-datetime";
 
 const FormatName = (name) => {
   return (name || "")
@@ -153,7 +158,22 @@ export const MultiSelect = ({label, name, values, onChange, options}) => {
   );
 };
 
-export const Date = ({label, name, year, month, day, readonly=false, onChange}) => {
+export const DateSelection = ({label, name, value, onChange}) => {
+  return (
+    <div className="asset-form-input asset-form-date">
+      <label htmlFor={name}>{label || FormatName(name)}</label>
+      <DatePicker
+        value={value}
+        input
+        strictParsing
+        displayTimeZone={Settings.defaultZoneName || ""}
+        onChange={datetime => onChange(datetime.valueOf())}
+      />
+    </div>
+  );
+};
+
+export const BasicDate = ({label, name, year, month, day, readonly=false, onChange}) => {
   const Update = (field, event) => {
     try {
       const value = parseInt(event.target.value) || "";

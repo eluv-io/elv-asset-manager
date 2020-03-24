@@ -3,6 +3,11 @@
 @import "./file_browser";
 @import "./channels";
 
+.rdt {
+  // sass-lint:disable no-important
+  position: unset !important;
+}
+
 .app-version {
   display: none;
 }
