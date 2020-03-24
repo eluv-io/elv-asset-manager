@@ -9,6 +9,7 @@ import OrderButtons from "./OrderButtons";
 import UpdateIcon from "../static/icons/arrow-up-circle.svg";
 import RemoveIcon from "../static/icons/trash.svg";
 import PlayIcon from "../static/icons/play-circle.svg";
+import LinkIcon from "../static/icons/external-link.svg";
 
 const Clip = ({
   index,
@@ -22,13 +23,23 @@ const Clip = ({
   Swap,
   Remove,
   Update,
-  SetDefault
+  SetDefault,
+  OpenObjectLink
 }) => {
   const {versionHash, title, id, slug, assetType, latestVersionHash} = clip;
 
   const [showPreview, setShowPreview] = useState(false);
 
   const preview = showPreview ? <VideoPreview versionHash={versionHash}/> : null;
+
+  const linkButton = (
+    <IconButton
+      className="open-object-link"
+      icon={LinkIcon}
+      label="Open object in new tab"
+      onClick={() => OpenObjectLink({versionHash})}
+    />
+  );
 
   let defaultButton;
   if(defaultable) {
@@ -99,6 +110,7 @@ const Clip = ({
         { orderButtons }
         <div className="asset-form-clip-actions">
           { updateButton }
+          { linkButton }
           <IconButton
             icon={RemoveIcon}
             className="remove-button"
@@ -117,6 +129,7 @@ const Clip = ({
   );
 };
 
+@inject("rootStore")
 @inject("formStore")
 @observer
 class Clips extends React.Component {
@@ -206,6 +219,7 @@ class Clips extends React.Component {
                 playlistIndex: this.props.playlistIndex,
                 index
               })}
+              OpenObjectLink={this.props.rootStore.OpenObjectLink}
             />
           )}
         </div>

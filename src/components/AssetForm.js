@@ -8,6 +8,8 @@ import Gallery from "./Gallery";
 import Playlists from "./Playlists";
 import Credits from "./Credits";
 import LinkUpdate from "./LinkUpdate";
+import LiveStream from "./channels/LiveStream";
+import Channel from "./channels/Channel";
 
 @inject("rootStore")
 @inject("formStore")
@@ -22,13 +24,24 @@ class AssetForm extends React.Component {
   }
 
   Tabs() {
-    let tabs = [
-      ["Info", "INFO"],
-      ["Credits", "CREDITS"]
-    ];
+    let tabs = [];
+
+    if(this.props.formStore.HasControl("channel")) {
+      tabs.push(["Channel", "CHANNEL"]);
+    }
+
+    if(this.props.formStore.HasControl("live_stream")) {
+      tabs.push(["Live Stream", "LIVE"]);
+    }
+
+    tabs.push(["Info", "INFO"]);
+
+    if(this.props.formStore.HasControl("credits")) {
+      tabs.push(["Credits", "CREDITS"]);
+    }
 
     // Inject relevant assets
-    this.props.formStore.assetTypes.forEach(({label, for_title_types, name}) => {
+    this.props.formStore.associatedAssets.forEach(({label, for_title_types, name}) => {
       if(
         for_title_types &&
         for_title_types.length > 0 &&
@@ -40,15 +53,25 @@ class AssetForm extends React.Component {
       tabs.push([label, name]);
     });
 
-    return tabs.concat([
-      ["Images", "IMAGES"],
-      ["Gallery", "GALLERY"],
-      ["Playlists", "PLAYLISTS"]
-    ]);
+    tabs.push(["Images", "IMAGES"]);
+
+    if(this.props.formStore.HasControl("gallery")) {
+      tabs.push(["Gallery", "GALLERY"]);
+    }
+
+    if(this.props.formStore.HasControl("playlists")) {
+      tabs.push(["Playlists", "PLAYLISTS"]);
+    }
+
+    return tabs;
   }
 
   CurentForm() {
     switch (this.state.form) {
+      case "CHANNEL":
+        return <Channel />;
+      case "LIVE":
+        return <LiveStream />;
       case "INFO":
         return <AssetInfo />;
       case "CREDITS":
@@ -61,7 +84,7 @@ class AssetForm extends React.Component {
         return <Playlists />;
     }
 
-    const assetType = this.props.formStore.assetTypes.find(({name}) => name === this.state.form);
+    const assetType = this.props.formStore.associatedAssets.find(({name}) => name === this.state.form);
 
     if(!assetType) {
       // eslint-disable-next-line no-console

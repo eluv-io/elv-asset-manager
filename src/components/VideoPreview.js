@@ -1,7 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
 import PropTypes from "prop-types";
-import AsyncComponent from "./AsyncComponent";
 import HLSPlayer from "hls.js";
 
 @inject("contentStore")
@@ -11,26 +10,38 @@ class VideoPreview extends React.Component {
     super(props);
 
     this.state = {
+      versionHash: "",
       errorMessage: ""
     };
 
-    this.Preview = this.Preview.bind(this);
     this.InitializeVideo = this.InitializeVideo.bind(this);
   }
 
-  InitializeVideo(element) {
+  componentWillUnmount() {
+    if(this.player) {
+      this.player.destroy();
+    }
+  }
+
+  async InitializeVideo(element) {
     if(!element) { return; }
 
     try {
       this.setState({errorMessage: undefined});
-      const playoutMethods = this.props.contentStore.playoutOptions[this.props.versionHash].hls.playoutMethods;
+
+      const versionHash = await this.props.contentStore.LoadPlayoutOptions({
+        objectId: this.props.objectId,
+        versionHash: this.props.versionHash
+      });
+
+      const playoutMethods = this.props.contentStore.playoutOptions[versionHash].hls.playoutMethods;
       // Prefer AES playout
       const playoutUrl = (playoutMethods["aes-128"] || playoutMethods.clear).playoutUrl;
 
-      const player = new HLSPlayer();
+      this.player = new HLSPlayer();
 
-      player.loadSource(playoutUrl);
-      player.attachMedia(element);
+      this.player.loadSource(playoutUrl);
+      this.player.attachMedia(element);
     } catch (error) {
       this.setState({errorMessage: "Error loading video preview"});
       // eslint-disable-next-line no-console
@@ -38,7 +49,7 @@ class VideoPreview extends React.Component {
     }
   }
 
-  Preview() {
+  render() {
     if(this.state.errorMessage) {
       return <div className="error-message">{this.state.errorMessage}</div>;
     }
@@ -55,19 +66,11 @@ class VideoPreview extends React.Component {
       </div>
     );
   }
-
-  render() {
-    return (
-      <AsyncComponent
-        Load={() => this.props.contentStore.LoadPlayoutOptions(this.props.versionHash)}
-        render={this.Preview}
-      />
-    );
-  }
 }
 
 VideoPreview.propTypes = {
-  versionHash: PropTypes.string.isRequired
+  objectId: PropTypes.string,
+  versionHash: PropTypes.string
 };
 
 export default VideoPreview;

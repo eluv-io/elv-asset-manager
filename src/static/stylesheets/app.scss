@@ -1,6 +1,12 @@
 @import "~elv-components-js/src/stylesheets/defaults";
 @import "~elv-components-js/src/stylesheets/styles";
 @import "./file_browser";
+@import "./channels";
+
+.rdt {
+  // sass-lint:disable no-important
+  position: unset !important;
+}
 
 .app-version {
   display: none;
@@ -23,7 +29,7 @@ main {
 }
 
 .app-container {
-  align-items: center;
+  align-items: flex-start;
   margin: $elv-spacing-s;
 }
 
@@ -71,6 +77,14 @@ button {
   }
 }
 
+.even {
+  background-color: $elv-color-lightestgray;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
 .hint {
   color: $elv-color-text-lighter;
 }
@@ -100,6 +114,7 @@ button {
   max-width: 100%;
 
   video {
+    background-color: $elv-color-black;
     cursor: pointer;
     width: 100%;
   }
@@ -202,7 +217,6 @@ button {
 }
 
 .asset-form {
-  max-width: 75rem;
   padding-top: $elv-spacing-l;
   position: relative;
   width: 100%;
@@ -367,6 +381,21 @@ button {
 
 .asset-info-container {
   width: 100%;
+
+  .asset-info-list-field-entry {
+    padding: $elv-spacing-m $elv-spacing-ml $elv-spacing-m $elv-spacing-m;
+    position: relative;
+  }
+
+  .info-list-icon {
+    height: $elv-font-xxl;
+  }
+
+  .info-list-remove-icon {
+    position: absolute;
+    right: $elv-spacing-xs;
+    top: $elv-spacing-xs;
+  }
 }
 
 
@@ -374,7 +403,9 @@ label {
   color: $elv-color-text-light;
 }
 
-select {
+input,
+select,
+textarea {
   border: 1px solid $elv-color-mediumgray;
   width: 100%;
 }
@@ -431,10 +462,15 @@ input {
   }
 }
 
+.asset-form-labelled-field,
 .asset-form-textarea {
   label {
     align-self: baseline;
   }
+}
+
+.asset-form-file-browser {
+  grid-template-columns: 15rem 1fr;
 }
 
 .asset-form-date {
@@ -446,10 +482,16 @@ input {
     align-items: center;
     align-self: baseline;
     display: flex;
+  }
 
-    button {
-      margin-left: $elv-spacing-xxs;
-      padding: $elv-spacing-mxs;
+  button {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+
+    svg {
+      height: $elv-font-xxl;
     }
   }
 
@@ -460,11 +502,23 @@ input {
   .asset-form-multi-select-selections {
     display: grid;
     grid-template-columns: 1fr 2.5rem;
+  }
+}
 
-    button {
-      margin: 0 $elv-spacing-xxs;
-      padding: $elv-spacing-xxs;
-    }
+.toggle-section {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin: $elv-spacing-s 0;
+
+  .toggle-section-button {
+    max-width: 100%;
+    width: 50%;
+  }
+
+  .toggle-section-content {
+    margin-top: $elv-spacing-s;
+    width: 100%;
   }
 }
 
@@ -745,4 +799,9 @@ input {
       }
     }
   }
+}
+
+.light {
+  color: $elv-color-text-light;
+  font-size: $elv-font-l;
 }

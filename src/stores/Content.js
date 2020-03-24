@@ -138,15 +138,21 @@ class ContentStore {
   });
 
   @action.bound
-  LoadPlayoutOptions = flow(function * (versionHash) {
-    if(this.playoutOptions[versionHash]) { return; }
+  LoadPlayoutOptions = flow(function * ({objectId, versionHash}) {
+    if(!versionHash) {
+      versionHash = yield this.rootStore.client.LatestVersionHash({objectId});
+    }
 
-    this.playoutOptions[versionHash] = (yield this.rootStore.client.PlayoutOptions({
-      versionHash,
-      linkPath: "public/asset_metadata/sources/default",
-      protocols: ["hls"],
-      drms: ["aes-128"]
-    }));
+    if(!this.playoutOptions[versionHash]) {
+      this.playoutOptions[versionHash] = (yield this.rootStore.client.PlayoutOptions({
+        versionHash,
+        linkPath: "public/asset_metadata/sources/default",
+        protocols: ["hls"],
+        drms: ["aes-128"]
+      }));
+    }
+
+    return versionHash;
   });
 }
 

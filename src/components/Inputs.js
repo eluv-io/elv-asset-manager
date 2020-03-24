@@ -1,8 +1,13 @@
-import React from "react";
+import "react-datetime/css/react-datetime.css";
+require("moment-timezone");
+
+import React, {useState} from "react";
 import {toJS} from "mobx";
-import {IconButton} from "elv-components-js";
+import {Action, BrowseWidget, IconButton} from "elv-components-js";
+import {Settings} from "luxon";
 import AddIcon from "../static/icons/plus-square.svg";
 import RemoveIcon from "../static/icons/trash.svg";
+import * as DatePicker from "react-datetime";
 
 const FormatName = (name) => {
   return (name || "")
@@ -11,7 +16,9 @@ const FormatName = (name) => {
     .join(" ");
 };
 
-export const Input = ({type, label, name, value, readonly=false, onChange}) => {
+export const Input = ({type, label, name, value, readonly=false, onChange, hidden=false}) => {
+  if(hidden) { return null; }
+
   return (
     <div className="asset-form-input">
       <label htmlFor={name}>{label || FormatName(name)}</label>
@@ -76,9 +83,16 @@ export const Selection = ({label, name, value, onChange, options}) => {
         value={value}
         onChange={event => onChange(event.target.value)}
       >
-        {options.map(option =>
-          <option value={option} key={`asset-info-${name}-${option}`}>{option}</option>
-        )}
+        {options.map(option => {
+          let name = option;
+          let value = option;
+          if(Array.isArray(option)) {
+            name = option[0];
+            value = option[1];
+          }
+
+          return <option value={value} key={`asset-info-${name}-${value}`}>{name}</option>;
+        })}
       </select>
     </div>
   );
@@ -112,16 +126,16 @@ export const MultiSelect = ({label, name, values, onChange, options}) => {
     <div className="asset-form-input asset-form-multi-select">
       <label htmlFor={name}>
         {label || FormatName(name)}
+      </label>
+      <div>
         <IconButton
           icon={AddIcon}
           label={`Add ${name}`}
           onClick={() => Add()}
           className="asset-form-multi-select-add"
         />
-      </label>
-      <div className="asset-form-multi-select-selections">
         { values.map((selected, index) =>
-          <React.Fragment key={`asset-form-multi-select-${name}-${index}`}>
+          <div className="asset-form-multi-select-selections" key={`asset-form-multi-select-${name}-${index}`}>
             <select
               name={name}
               value={selected}
@@ -137,14 +151,35 @@ export const MultiSelect = ({label, name, values, onChange, options}) => {
               label={`Remove ${name}`}
               onClick={() => Remove(index)}
             />
-          </React.Fragment>
+          </div>
         )}
       </div>
     </div>
   );
 };
 
-export const Date = ({label, name, year, month, day, readonly=false, onChange}) => {
+export const DateSelection = ({label, name, value, onChange}) => {
+  let debounceTimeout;
+  return (
+    <div className="asset-form-input asset-form-date">
+      <label htmlFor={name}>{label || FormatName(name)}</label>
+      <DatePicker
+        value={value}
+        input
+        strictParsing
+        displayTimeZone={Settings.defaultZoneName || ""}
+        onChange={datetime => {
+          if(parseInt(datetime.valueOf()) === datetime.valueOf()) {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => onChange(datetime.valueOf()), 1000);
+          }
+        }}
+      />
+    </div>
+  );
+};
+
+export const BasicDate = ({label, name, year, month, day, readonly=false, onChange}) => {
   const Update = (field, event) => {
     try {
       const value = parseInt(event.target.value) || "";
@@ -200,6 +235,51 @@ export const Date = ({label, name, year, month, day, readonly=false, onChange}) 
         readOnly={readonly}
         onChange={event => Update("day", event)}
       />
+    </div>
+  );
+};
+
+export const ToggleSection = ({sectionName, showInitially=false, children}) => {
+  const [show, setShow] = useState(showInitially);
+
+  const toggleButton = (
+    <Action className="toggle-section-button secondary" onClick={() => setShow(!show)}>
+      { show ? `Hide ${sectionName}` : `Show ${sectionName}`}
+    </Action>
+  );
+
+  return (
+    <div className={`toggle-section toggle-section-${show ? "show" : "hide"}`}>
+      { toggleButton }
+
+      { show ? <div className="toggle-section-content">{ children }</div> : null }
+    </div>
+  );
+};
+
+export const FileBrowser = ({name, header, accept, multiple=false, directories=false, onChange}) => {
+  return (
+    <div className="asset-form-input asset-form-file-browser">
+      <label htmlFor="schedule">Upload schedule from file</label>
+      <BrowseWidget
+        name={name}
+        header={header}
+        accept={accept}
+        multiple={multiple}
+        directories={directories}
+        onChange={onChange}
+      />
+    </div>
+  );
+};
+
+export const LabelledField = ({label, value, hidden=false, formatLabel=false}) => {
+  if(hidden) { return null; }
+
+  return (
+    <div className="asset-form-input asset-form-labelled-field">
+      <label>{ formatLabel ? FormatName(label) : label }</label>
+      <div title={value}>{ value }</div>
     </div>
   );
 };

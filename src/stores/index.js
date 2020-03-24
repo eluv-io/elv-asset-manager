@@ -3,6 +3,8 @@ import {configure, observable, action, flow, runInAction} from "mobx";
 import {FrameClient} from "elv-client-js/src/FrameClient";
 import ContentStore from "./Content";
 import FormStore from "./Form";
+import LiveStore from "./Live";
+import ChannelStore from "./Channel";
 
 // Force strict mode so mutations are only allowed within actions.
 configure({
@@ -14,11 +16,7 @@ class RootStore {
   @observable params = {};
   @observable assetMetadata;
   @observable assetName;
-  @observable contentTypeAssetAssetTypes;
-  @observable contentTypeAssetTitleTypes;
-  @observable contentTypeAssetInfoFields;
-  @observable contentTypeAssetTypes;
-  @observable contentTypeAssetImageKeys;
+  @observable titleConfiguration = {};
 
   @observable linkStatus = {
     updatesAvailable: false,
@@ -31,6 +29,8 @@ class RootStore {
   constructor() {
     this.contentStore = new ContentStore(this);
     this.formStore = new FormStore(this);
+    this.liveStore = new LiveStore(this);
+    this.channelStore = new ChannelStore(this);
   }
 
   @action.bound
@@ -39,12 +39,6 @@ class RootStore {
       target: window.parent,
       timeout: 30
     });
-
-    this.balance = parseFloat(
-      yield this.client.GetBalance({
-        address: yield this.client.CurrentAccountAddress()
-      })
-    );
 
     let queryParams = window.location.search.split("?")[1];
     queryParams = queryParams.split("&");
@@ -92,38 +86,22 @@ class RootStore {
       const libraryId = (yield this.client.ContentSpaceId()).replace("ispc", "ilib");
       const objectId = this.client.utils.DecodeVersionHash(typeHash).objectId;
 
-      this.contentTypeAssetAssetTypes = yield this.client.ContentObjectMetadata({
+      this.titleConfiguration = (yield this.client.ContentObjectMetadata({
         libraryId,
         objectId,
-        metadataSubtree: "asset_asset_types"
-      });
-
-      this.contentTypeAssetTitleTypes = yield this.client.ContentObjectMetadata({
-        libraryId,
-        objectId,
-        metadataSubtree: "asset_title_types"
-      });
-
-      this.contentTypeAssetInfoFields = yield this.client.ContentObjectMetadata({
-        libraryId,
-        objectId,
-        metadataSubtree: "asset_info_fields"
-      });
-
-      this.contentTypeAssetTypes = yield this.client.ContentObjectMetadata({
-        libraryId,
-        objectId,
-        metadataSubtree: "asset_types"
-      });
-
-      this.contentTypeAssetImageKeys = yield this.client.ContentObjectMetadata({
-        libraryId,
-        objectId,
-        metadataSubtree: "asset_image_keys"
-      });
+        metadataSubtree: "public/title_configuration"
+      })) || {};
     }
 
     yield this.formStore.InitializeFormData();
+
+    if(this.formStore.HasControl("live_stream")) {
+      yield this.liveStore.Initialize();
+    }
+
+    if(this.formStore.HasControl("channel")) {
+      yield this.channelStore.Initialize();
+    }
   });
 
   @action.bound
@@ -172,9 +150,24 @@ class RootStore {
       this.updating = false;
     }
   });
+
+  @action.bound
+  OpenObjectLink({libraryId, objectId, versionHash}) {
+    this.client.SendMessage({
+      options: {
+        operation: "OpenLink",
+        libraryId,
+        objectId,
+        versionHash
+      },
+      noResponse: true
+    });
+  }
 }
 
 export const rootStore = new RootStore();
 export const contentStore = rootStore.contentStore;
 export const formStore = rootStore.formStore;
+export const liveStore = rootStore.liveStore;
+export const channelStore = rootStore.channelStore;
 

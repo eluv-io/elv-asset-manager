@@ -142,7 +142,16 @@ class ContentBrowser extends React.Component {
             subHeader={library.name}
             list={list}
             Load={async () => await this.props.contentStore.LoadObjects(this.state.libraryId)}
-            Select={objectId => this.setState({objectId})}
+            Select={async objectId => {
+              if(this.props.objectOnly) {
+                await this.props.onComplete({
+                  libraryId: this.state.libraryId,
+                  objectId
+                });
+              } else {
+                this.setState({objectId});
+              }
+            }}
           />
         </React.Fragment>
       );
@@ -175,7 +184,7 @@ class ContentBrowser extends React.Component {
             list={this.props.contentStore.versions[this.state.objectId]}
             hashes={true}
             Load={async () => await this.props.contentStore.LoadVersions(this.state.libraryId, this.state.objectId)}
-            Select={versionHash => this.props.onComplete({
+            Select={async versionHash => await this.props.onComplete({
               libraryId: this.state.libraryId,
               objectId: this.state.objectId,
               versionHash
@@ -199,6 +208,7 @@ ContentBrowser.propTypes = {
   assetTypes: PropTypes.arrayOf(PropTypes.string),
   titleTypes: PropTypes.arrayOf(PropTypes.string),
   playableOnly: PropTypes.bool,
+  objectOnly: PropTypes.bool,
   onComplete: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired
 };

@@ -15,75 +15,34 @@ class FormStore {
 
   @observable assets = {};
 
-  @observable assetAssetTypes = [
-    "primary",
-    "clip",
-    "trailer"
+  @observable controls = [
+    "credits",
+    "gallery",
+    "playlists"
   ];
 
-  @observable assetTitleTypes = [
+  @observable availableAssetTypes = [
+    "primary",
+    "clip"
+  ];
+
+  @observable availableTitleTypes = [
     "collection",
-    "episode",
-    "feature",
-    "franchise",
-    "season",
-    "series",
+    "title",
     "site"
   ];
 
-  @observable assetImageKeys = [
-    "main_slider_background_desktop",
-    "main_slider_background_mobile",
-    "poster",
-    "primary_portrait",
-    "primary_landscape",
-    "screenshot",
-    "thumbnail",
-    "slider_background_desktop",
-    "slider_background_mobile",
-    "title_detail_hero_desktop",
-    "title_detail_hero_mobile",
-    "title_treatment",
-    "title_treatment_wht"
+  @observable defaultImageKeys = [
+    "portrait",
+    "landscape"
   ];
 
-  @observable assetTypes = [
-    {
-      name: "seasons",
-      label: "Seasons",
-      asset_types: ["primary"],
-      title_types: ["season"],
-      for_title_types: ["series"],
-      indexed: true,
-      slugged: true,
-      defaultable: false,
-      orderable: true
-    },
+  @observable associatedAssets = [
     {
       name: "titles",
       label: "Titles",
-      asset_types: ["primary"],
-      title_types: ["episode", "feature", "season", "series"],
       indexed: true,
       slugged: true,
-      defaultable: false,
-      orderable: true
-    },
-    {
-      name: "clips",
-      label: "Clips",
-      asset_types: ["trailer", "clip"],
-      indexed: true,
-      slugged: false,
-      defaultable: true,
-      orderable: true
-    },
-    {
-      name: "trailers",
-      label: "Trailers",
-      asset_types: ["trailer", "clip"],
-      indexed: true,
-      slugged: false,
       defaultable: true,
       orderable: true
     }
@@ -93,18 +52,7 @@ class FormStore {
     {name: "synopsis", type: "textarea"},
     {name: "copyright"},
     {name: "creator"},
-    {name: "mgm_internal_rating", label: "MGM Internal Rating"},
-    {name: "mpaa_rating", label: "MPAA Rating"},
-    {name: "mpaa_rating_reason", label: "MPAA Rating Reason"},
-    {name: "original_broadcaster"},
-    {name: "number_of_episodes"},
-    {name: "number_of_seasons"},
     {name: "runtime", type: "integer"},
-    {name: "sales_synopsis", type: "textarea"},
-    {name: "sales_tagline"},
-    {name: "scripted", type: "checkbox", for_title_types: ["episode", "season", "series"],},
-    {name: "tv_rating", label: "TV Rating"},
-    {name: "tv_rating_reason", label: "TV Rating Reason"},
   ];
 
   constructor(rootStore) {
@@ -113,8 +61,12 @@ class FormStore {
     this.linkHashes = {};
   }
 
+  HasControl(control) {
+    return this.controls.includes(control);
+  }
+
   CreateLink(versionHash, linkTarget="/meta/public/asset_metadata", options={}) {
-    if(versionHash === this.rootStore.params.versionHash) {
+    if(!versionHash || versionHash === this.rootStore.params.versionHash) {
       return {
         ...options,
         ".": {"auto_update":{"tag":"latest"}},
@@ -132,25 +84,14 @@ class FormStore {
   InitializeFormData = flow(function * () {
     const assetMetadata = this.rootStore.assetMetadata || {};
 
-    if(this.rootStore.contentTypeAssetAssetTypes) {
-      this.assetAssetTypes = this.rootStore.contentTypeAssetAssetTypes;
-    }
+    const titleConfiguration = this.rootStore.titleConfiguration;
 
-    if(this.rootStore.contentTypeAssetTitleTypes) {
-      this.assetTitleTypes = this.rootStore.contentTypeAssetTitleTypes;
-    }
-
-    if(this.rootStore.contentTypeAssetInfoFields) {
-      this.infoFields = this.rootStore.contentTypeAssetInfoFields;
-    }
-
-    if(this.rootStore.contentTypeAssetTypes) {
-      this.assetTypes = this.rootStore.contentTypeAssetTypes;
-    }
-
-    if(this.rootStore.contentTypeAssetImageKeys) {
-      this.assetImageKeys = this.rootStore.contentTypeAssetImageKeys;
-    }
+    this.controls = titleConfiguration.controls || this.controls;
+    this.availableAssetTypes = titleConfiguration.asset_types || this.availableAssetTypes;
+    this.availableTitleTypes = titleConfiguration.title_types || this.availableTitleTypes;
+    this.infoFields = titleConfiguration.info_fields || this.infoFields;
+    this.associatedAssets = titleConfiguration.associated_assets || this.associatedAssets;
+    this.defaultImageKeys = titleConfiguration.default_image_keys || this.defaultImageKeys;
 
     this.assetInfo = this.LoadAssetInfo(assetMetadata);
     this.credits = this.LoadCredits((assetMetadata.info || {}).talent);
@@ -159,8 +100,8 @@ class FormStore {
     this.playlists = yield this.LoadPlaylists(assetMetadata.playlists);
 
     // Load all clip types
-    for(let i = 0; i < this.assetTypes.length; i++) {
-      const name = this.assetTypes[i].name;
+    for(let i = 0; i < this.associatedAssets.length; i++) {
+      const name = this.associatedAssets[i].name;
 
       this.assets[name] = yield this.LoadAssets(
         assetMetadata[name],
@@ -439,14 +380,18 @@ class FormStore {
       display_title: metadata.display_title || "",
       slug: metadata.slug || Slugify(metadata.display_title || ""),
       ip_title_id: metadata.ip_title_id || "",
-      title_type: metadata.title_type || this.assetTitleTypes[0],
-      asset_type: metadata.asset_type || this.assetAssetTypes[0],
+      title_type: metadata.title_type || this.availableTitleTypes[0],
+      asset_type: metadata.asset_type || this.availableAssetTypes[0],
       genre: info.genre || [],
       release_date
     };
 
-    this.infoFields.forEach(({name}) => {
-      assetInfo[name] = info[name] || "";
+    this.infoFields.forEach(({name, top_level}) => {
+      if(top_level) {
+        assetInfo[name] = metadata[name] || "";
+      } else {
+        assetInfo[name] = info[name] || "";
+      }
     });
 
     return assetInfo;
@@ -660,7 +605,7 @@ class FormStore {
       });
     }
 
-    this.assetImageKeys.forEach(imageKey => {
+    this.defaultImageKeys.forEach(imageKey => {
       if(images.find(info => info.imageKey === imageKey)) { return; }
 
       images.push({
@@ -802,22 +747,57 @@ class FormStore {
         throw Error("Update request denied");
       }
 
+      if(this.HasControl("live_stream")) {
+        yield this.rootStore.liveStore.SaveLiveParameters({writeToken});
+      }
+
+      if(this.HasControl("channel")) {
+        yield this.rootStore.channelStore.SaveChannelInfo({writeToken});
+      }
+
       // Move fields that belong in the info subtree and remove from main tree
       const assetInfo = toJS(this.assetInfo);
+      let listFields = [];
 
       assetInfo.info = {};
-      this.infoFields.forEach(({name, type, for_title_types}) => {
-        if(!for_title_types || for_title_types.length == 0 || for_title_types.includes(assetInfo.title_type)) {
-          if(type === "integer") {
-            assetInfo.info[name] = parseInt(assetInfo[name]);
-          } else if(type === "number") {
-            assetInfo.info[name] = parseFloat(assetInfo[name]);
-          } else {
-            assetInfo.info[name] = assetInfo[name];
-          }
+      this.infoFields.forEach(({name, type, for_title_types, top_level, fields}) => {
+        let value = assetInfo[name];
+        if(type === "integer") {
+          value = parseInt(assetInfo[name]);
+        } else if(type === "number") {
+          value = parseFloat(assetInfo[name]);
+        } else if(type === "list") {
+          value = value.map(entry => {
+            entry = toJS(entry);
+
+            fields.forEach(field => {
+              if(field.type === "integer") {
+                entry[field.name] = parseInt(entry[field.name]);
+              } else if(field.type === "number") {
+                entry[field.name] = parseFloat(entry[field.name]);
+              }
+            });
+
+            return entry;
+          });
         }
 
-        delete assetInfo[name];
+        if(!for_title_types || for_title_types.length === 0 || for_title_types.includes(assetInfo.title_type)) {
+          if(type === "list") {
+            // List type - Since we're doing a merge on the info metadata, we must do an explicit replace call to modify lists
+            listFields.push({name, value, top_level});
+            delete assetInfo[name];
+          } else if(top_level) {
+            // Top level specified, keep value at root level `public/asset_metadata/
+            assetInfo[name] = value;
+          } else {
+            // Default case - Move field to "info"
+            assetInfo.info[name] = value;
+            delete assetInfo[name];
+          }
+        } else {
+          delete assetInfo[name];
+        }
       });
 
       // Format release date and move into 'info'
@@ -848,6 +828,19 @@ class FormStore {
         metadata: genre
       });
 
+      // List types must be replaced, or else they will be merged
+      yield Promise.all(
+        listFields.map(async ({name, value, top_level}) => {
+          await client.ReplaceMetadata({
+            libraryId,
+            objectId,
+            writeToken,
+            metadataSubtree: top_level ? `public/asset_metadata/${name}` : `public/asset_metadata/info/${name}`,
+            metadata: value
+          });
+        })
+      );
+
       // Credits
       let credits = {};
       toJS(this.credits).map(group => {
@@ -870,8 +863,8 @@ class FormStore {
         metadata: credits
       });
 
-      for(let i = 0; i < this.assetTypes.length; i++) {
-        const assetType = this.assetTypes[i];
+      for(let i = 0; i < this.associatedAssets.length; i++) {
+        const assetType = this.associatedAssets[i];
         const assets = toJS(this.assets[assetType.name]);
 
         // If not slugged or indexed, asset is saved as array

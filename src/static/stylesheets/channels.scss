@@ -1,0 +1,249 @@
+@import "~elv-components-js/src/stylesheets/styles";
+
+.asset-form-live-container {
+  .live-header {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+  }
+
+  .toggle-stream-loading,
+  .toggle-stream-button {
+    position: absolute;
+    right: 0;
+    width: 150px;
+  }
+
+  .stream-indicator {
+    align-items: center;
+    background-color: $elv-color-mediumgray;
+    border-radius: 100%;
+    display: flex;
+    height: $elv-spacing-ml;
+    justify-content: center;
+    left: 0;
+    padding: 0.6rem;
+    position: absolute;
+    width: $elv-spacing-ml;
+
+    svg {
+      fill: $elv-color-white;
+      stroke: $elv-color-white;
+    }
+  }
+
+  .stream-indicator-active {
+    background-color: $elv-color-mediumblue;
+  }
+}
+
+.stream-info-header {
+  font-weight: 500;
+  margin-bottom: $elv-spacing-s;
+}
+
+.channel-stream-info-container {
+  width: 100%;
+
+  .video-preview,
+  video {
+    margin-bottom: $elv-spacing-l;
+    max-height: 50vh;
+  }
+}
+
+.channel-stream-info {
+  display: grid;
+  grid-template-areas: "indicator row" "indicator row" "indicator row" "indicator row";
+  grid-template-columns: 5rem 1fr;
+  grid-template-rows: 1.5rem 1.5rem 1.5rem 3rem;
+  padding: $elv-spacing-xs 0 $elv-spacing-m;
+
+  div {
+    @include elv-ellipsis;
+  }
+
+  .stream-indicator {
+    grid-area: indicator;
+    margin: $elv-spacing-s auto;
+    position: relative;
+  }
+
+  .stream-info-name {
+    align-items: center;
+    display: flex;
+  }
+
+  .open-object-link {
+    height: $elv-font-l;
+    margin-left: $elv-spacing-xxs;
+  }
+
+  .toggle-stream-button {
+    position: relative;
+  }
+
+  .stream-actions {
+    align-self: center;
+    display: flex;
+
+    button {
+      margin-right: $elv-spacing-xs;
+      max-width: 100%;
+      width: 10rem;
+    }
+  }
+}
+
+.stream-schedules-container {
+  width: 100%;
+
+  .asset-form-file-browser,
+  .schedule-loading {
+    height: 3rem;
+  }
+
+  .-elv-browse-widget-files {
+    display: none;
+  }
+
+  .upload-message {
+    font-weight: 500;
+    height: 2rem;
+    text-align: center;
+  }
+
+  .upload-error {
+    color: $elv-color-mediumred;
+  }
+}
+
+.schedule-daily-container {
+  h4 {
+    font-weight: 500;
+    margin-top: $elv-spacing-l;
+  }
+}
+
+.schedule-timeline {
+  height: 1rem;
+  margin: $elv-spacing-s 0;
+  outline: 1px solid $elv-color-mediumgray;
+  padding: 0 $elv-spacing-s;
+  position: relative;
+  width: 100%;
+
+  .schedule-timeline-entry {
+    height: 100%;
+    opacity: 0.7;
+    position: absolute;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &:not(:first-child) {
+      border-left: 1px solid $elv-color-white;
+    }
+  }
+}
+
+.schedule-entry {
+  align-items: start;
+  display: grid;
+  grid-template-columns: 6rem 4fr;
+  height: 5rem;
+  max-height: 10rem;
+  padding: $elv-spacing-xs;
+  position: relative;
+
+  .schedule-entry-color-icon {
+    border-radius: 100%;
+    height: $elv-spacing-s;
+    left: $elv-spacing-xxs;
+    opacity: 0.8;
+    position: absolute;
+    top: $elv-spacing-xxs;
+    width: $elv-spacing-s;
+  }
+
+  span {
+    color: $elv-color-text-light;
+  }
+
+  .schedule-entry-icons {
+    display: flex;
+    position: absolute;
+    right: $elv-spacing-xxs;
+    top: $elv-spacing-xs;
+
+    svg {
+      height: $elv-spacing-m;
+    }
+  }
+
+  .program-active-icon {
+    stroke: $elv-color-mediumblue;
+  }
+
+  .conflict-warning-icon {
+    stroke: $elv-color-mediumred;
+    z-index: 10;
+  }
+
+  .schedule-entry-image {
+    cursor: pointer;
+    fill: $elv-color-darkgray;
+    height: auto;
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: cover;
+    stroke-width: 1px;
+    width: 100%;
+
+    &:hover {
+      outline: 3px solid $elv-color-mediumgray;
+    }
+  }
+
+  &.schedule-entry-expanded {
+    grid-template-columns: 1fr 4fr;
+    height: auto;
+    max-height: unset;
+
+    .schedule-entry-image {
+      object-fit: contain;
+    }
+  }
+
+  .schedule-entry-info {
+    overflow-y: hidden;
+    padding: $elv-spacing-xs 0 0 $elv-spacing-s;
+  }
+
+  .schedule-entry-actions {
+    margin-top: $elv-spacing-s;
+    z-index: 100;
+
+    button {
+      margin-right: $elv-spacing-xs;
+    }
+  }
+
+  .schedule-entry-conflicts-container {
+    h4 {
+      color: $elv-color-mediumred;
+      margin: $elv-spacing-s 0;
+    }
+
+    .schedule-entry-conflicts {
+      margin-left: $elv-spacing-m;
+    }
+
+    .schedule-entry-conflict {
+      margin-bottom: $elv-spacing-m;
+    }
+  }
+}
