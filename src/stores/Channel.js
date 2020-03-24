@@ -278,10 +278,11 @@ class ChannelStore {
 
   @action.bound
   // eslint-disable-next-line no-unused-vars
-  EditScheduleEntry = flow(function * ({index, title, description, start_time_epoch, end_time_epoch}) {
+  EditScheduleEntry = flow(function * ({index, title, program_id, description, start_time_epoch, end_time_epoch}) {
     this.schedule[index] = {
       ...this.schedule[index],
       title,
+      program_id,
       description,
       start_time_epoch,
       end_time_epoch,

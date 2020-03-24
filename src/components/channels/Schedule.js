@@ -48,6 +48,7 @@ const ScheduleEntry = ({
   const [editing, setEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(program.title);
   const [newDescription, setNewDescription] = useState(program.description);
+  const [newProgramId, setNewProgramId] = useState(program.program_id);
   const [newStartTime, setNewStartTime] = useState(program.start_time_epoch);
   const [newEndTime, setNewEndTime] = useState(program.end_time_epoch);
 
@@ -79,6 +80,7 @@ const ScheduleEntry = ({
           <LabelledField label="Start Time" value={DateTime.fromMillis(otherProgram.start_time_epoch).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)}/>
           <LabelledField label="End Time" value={DateTime.fromMillis(otherProgram.end_time_epoch).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)}/>
           <LabelledField label="Duration" value={Duration.fromMillis(otherProgram.duration_sec * 1000).toFormat("h 'Hours', m 'Minutes', s 'Seconds'")}/>
+          <LabelledField label="Program ID" value={otherProgram.program_id} />
         </div>
       ));
 
@@ -123,6 +125,7 @@ const ScheduleEntry = ({
         <LabelledField label="Start Time" value={DateTime.fromMillis(program.start_time_epoch).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)} />
         <LabelledField label="End Time" value={DateTime.fromMillis(program.end_time_epoch).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)} />
         <LabelledField label="Duration" value={Duration.fromMillis(program.duration_sec * 1000).toFormat("h 'Hours', m 'Minutes', s 'Seconds'")} />
+        <LabelledField label="Program ID" value={program.program_id} />
         <LabelledField hidden={!expanded} label="Description" value={program.description} />
 
         <div className="schedule-entry-actions">
@@ -155,7 +158,6 @@ const ScheduleEntry = ({
     entryInfo = (
       <div className="schedule-entry-info">
         <Input label="Title" value={newTitle} onChange={title => setNewTitle(title)} />
-        <TextArea label="Description" value={newDescription} onChange={description => setNewDescription(description)} />
         <DateSelection
           name="start_time_epoch"
           label="Start Time"
@@ -172,6 +174,8 @@ const ScheduleEntry = ({
           label="Duration"
           value={Duration.fromMillis(newEndTime - newStartTime).toFormat("h 'Hours', m 'Minutes', s 'Seconds'")}
         />
+        <Input label="Program ID" value={newProgramId} onChange={programId => setNewProgramId(programId)} />
+        <TextArea label="Description" value={newDescription} onChange={description => setNewDescription(description)} />
 
         <div className="schedule-entry-actions">
           <Action
@@ -179,6 +183,7 @@ const ScheduleEntry = ({
             onClick={() => {
               setEditing(false);
               setNewTitle(program.title);
+              setNewProgramId(program.program_id);
               setNewDescription(program.description);
               setNewStartTime(program.start_time_epoch);
               setNewEndTime(program.end_time_epoch);
@@ -195,6 +200,7 @@ const ScheduleEntry = ({
               EditScheduleEntry({
                 index: program.scheduleIndex,
                 title: newTitle,
+                program_id: newProgramId,
                 description: newDescription,
                 start_time_epoch: newStartTime,
                 end_time_epoch: newEndTime
@@ -226,7 +232,7 @@ const ScheduleEntry = ({
         icon={program.imageUrl || DefaultStreamIcon}
         alternateIcon={DefaultStreamIcon}
         className="schedule-entry-image"
-        onClick={() => setExpanded(!expanded)}
+        onClick={() => { setExpanded(!expanded); setEditing(false); }}
       />
       { entryInfo }
     </div>
