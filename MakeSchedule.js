@@ -1,10 +1,11 @@
 const Luxon = require("luxon");
+const uuidv4 = require("uuid").v4;
 
 const programSpecs = [
   {
     "start_time_epoch": 1570345200,
     "duration_sec": 600,
-    "program_id": "113ef7b8-892c-4350-b47f-edb997f93d1a",
+    "program_id": uuidv4(),
     "title": "World News",
     "description": "News, sport and business reports from around the world as well as the main news stories from the UK.",
     "program_image": "news.jpg",
@@ -12,7 +13,7 @@ const programSpecs = [
   {
     "start_time_epoch": 1570345200,
     "duration_sec": 600,
-    "program_id": "113ef7b8-892c-4350-b47f-edb997f93d1b",
+    "program_id": uuidv4(),
     "title": "Sports",
     "description": "Sports sport sports",
     "program_image": "sports.png",
@@ -20,7 +21,7 @@ const programSpecs = [
   {
     "start_time_epoch": 1570345200,
     "duration_sec": 600,
-    "program_id": "113ef7b8-892c-4350-b47f-edb997f93d1c",
+    "program_id": uuidv4(),
     "title": "Reality Show",
     "description": "Nothing of substance",
     "program_image": "reality.png",
@@ -28,7 +29,7 @@ const programSpecs = [
   {
     "start_time_epoch": 1570345200,
     "duration_sec": 600,
-    "program_id": "113ef7b8-892c-4350-b47f-edb997f93d1d",
+    "program_id": uuidv4(),
     "title": "Lorem Ipsum",
     "description": "\"At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.\"",
     "program_image": "lorem.png",
@@ -36,7 +37,7 @@ const programSpecs = [
   {
     "start_time_epoch": 1570345200,
     "duration_sec": 600,
-    "program_id": "113ef7b8-892c-4350-b47f-edb997f93d1e",
+    "program_id": uuidv4(),
     "title": "Cats Cats Cats",
     "description": "A show about dogs",
     "program_image": "cats.png",
@@ -44,7 +45,7 @@ const programSpecs = [
   {
     "start_time_epoch": 1570345200,
     "duration_sec": 600,
-    "program_id": "113ef7b8-892c-4350-b47f-edb997f93d1f",
+    "program_id": uuidv4(),
     "title": "Rerun",
     "description": "",
     "program_image": "rerun.png",

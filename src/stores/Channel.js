@@ -1,5 +1,5 @@
 import {action, observable, flow, toJS, computed} from "mobx";
-import {DateTime} from "luxon";
+import {Settings, DateTime} from "luxon";
 import UrlJoin from "url-join";
 
 class ChannelStore {
@@ -8,6 +8,8 @@ class ChannelStore {
   @observable streamInfo = {};
   @observable streamStatus;
   @observable streamActive = false;
+  @observable localTimezone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+  @observable referenceTimezone;
 
   @observable schedule = [];
 
@@ -17,9 +19,15 @@ class ChannelStore {
 
   @computed get dailySchedule() {
     let dailySchedule = {};
-    this.schedule.forEach(program => {
+    this.schedule.forEach((program, scheduleIndex) => {
       const startDate = DateTime.fromMillis(program.start_time_epoch).toFormat("yyyyLLdd");
       const endDate = DateTime.fromMillis(program.end_time_epoch - 1).toFormat("yyyyLLdd");
+
+      program = {
+        ...program,
+        timeZone: this.referenceTimezone,
+        scheduleIndex
+      };
 
       if(!dailySchedule[startDate]) {
         dailySchedule[startDate] = [];
@@ -130,8 +138,8 @@ class ChannelStore {
       libraryId,
       objectId,
       writeToken,
-      metadataSubtree: "public/asset_metadata/channel_info/stream_active",
-      metadata: this.streamActive
+      metadataSubtree: "public/asset_metadata/channel_info/stream",
+      metadata: this.rootStore.formStore.CreateLink(streamHash, "/meta/public/asset_metadata/sources/default")
     });
 
     if(finalize) {
@@ -146,6 +154,7 @@ class ChannelStore {
       objectId: streamId,
       metadataSubtree: "public/asset_metadata"
     })) || {};
+
 
     this.streamInfo.originUrl = yield this.rootStore.client.ContentObjectMetadata({
       libraryId: streamLibraryId,
@@ -162,6 +171,12 @@ class ChannelStore {
     this.streamLibraryId = streamLibraryId;
     this.streamId = streamId;
   });
+
+  @action.bound
+  SetReferenceTimezone(zone) {
+    this.referenceTimezone = zone;
+    Settings.defaultZoneName = zone;
+  }
 
   @action.bound
   LoadSchedule = flow(function * (schedule) {
@@ -261,6 +276,21 @@ class ChannelStore {
 
     yield this.RetrieveStreamInfo({streamLibraryId: libraryId, streamId: objectId});
   });
+
+  @action.bound
+  // eslint-disable-next-line no-unused-vars
+  EditScheduleEntry({index, title, description, startTime, endTime}) {
+    this.schedule[index] = {
+      ...this.schedule[index],
+      title,
+      description
+    };
+  }
+
+  @action.bound
+  RemoveScheduleEntry(index) {
+    this.schedule = this.schedule.filter((_, i) => i !== index);
+  }
 
   @action.bound
   SaveChannelInfo = flow(function * ({writeToken}) {

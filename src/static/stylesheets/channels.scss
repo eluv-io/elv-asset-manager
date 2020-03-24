@@ -130,21 +130,28 @@
 .schedule-timeline {
   height: 1rem;
   margin: $elv-spacing-s 0;
+  outline: 1px solid $elv-color-mediumgray;
   padding: 0 $elv-spacing-s;
   position: relative;
   width: 100%;
 
   .schedule-timeline-entry {
-    border: 1px solid $elv-color-white;
     height: 100%;
     opacity: 0.7;
     position: absolute;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &:not(:first-child) {
+      border-left: 1px solid $elv-color-white;
+    }
   }
 }
 
 .schedule-entry {
   align-items: start;
-  cursor: pointer;
   display: grid;
   grid-template-columns: 6rem 4fr;
   height: 5rem;
@@ -187,6 +194,7 @@
   }
 
   .schedule-entry-image {
+    cursor: pointer;
     fill: $elv-color-darkgray;
     height: auto;
     max-height: 100%;
@@ -213,6 +221,15 @@
   .schedule-entry-info {
     overflow-y: hidden;
     padding: $elv-spacing-xs 0 0 $elv-spacing-s;
+  }
+
+  .schedule-entry-actions {
+    margin-top: $elv-spacing-s;
+    z-index: 100;
+
+    button {
+      margin-right: $elv-spacing-xs;
+    }
   }
 
   .schedule-entry-conflicts-container {

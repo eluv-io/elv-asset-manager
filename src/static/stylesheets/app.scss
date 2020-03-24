@@ -72,6 +72,10 @@ button {
   }
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 .hint {
   color: $elv-color-text-lighter;
 }
