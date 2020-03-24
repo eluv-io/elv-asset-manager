@@ -95,7 +95,7 @@ const ListField = ({name, label, values, fields, UpdateAssetInfo}) => {
   };
 
   const fieldInputs =
-    values.map((entry, index) => {
+    (values || []).map((entry, index) => {
       entry = entry || {};
 
       const entryFields = fields.map(field => {
