@@ -159,6 +159,7 @@ export const MultiSelect = ({label, name, values, onChange, options}) => {
 };
 
 export const DateSelection = ({label, name, value, onChange}) => {
+  let debounceTimeout;
   return (
     <div className="asset-form-input asset-form-date">
       <label htmlFor={name}>{label || FormatName(name)}</label>
@@ -167,7 +168,12 @@ export const DateSelection = ({label, name, value, onChange}) => {
         input
         strictParsing
         displayTimeZone={Settings.defaultZoneName || ""}
-        onChange={datetime => onChange(datetime.valueOf())}
+        onChange={datetime => {
+          if(parseInt(datetime.valueOf()) === datetime.valueOf()) {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => onChange(datetime.valueOf()), 1000);
+          }
+        }}
       />
     </div>
   );
