@@ -757,18 +757,37 @@ class FormStore {
 
       // Move fields that belong in the info subtree and remove from main tree
       const assetInfo = toJS(this.assetInfo);
+      let listFields = [];
 
       assetInfo.info = {};
-      this.infoFields.forEach(({name, type, for_title_types, top_level}) => {
+      this.infoFields.forEach(({name, type, for_title_types, top_level, fields}) => {
         let value = assetInfo[name];
         if(type === "integer") {
           value = parseInt(assetInfo[name]);
         } else if(type === "number") {
           value = parseFloat(assetInfo[name]);
+        } else if(type === "list") {
+          value = value.map(entry => {
+            entry = toJS(entry);
+
+            fields.forEach(field => {
+              if(field.type === "integer") {
+                entry[field.name] = parseInt(entry[field.name]);
+              } else if(field.type === "number") {
+                entry[field.name] = parseFloat(entry[field.name]);
+              }
+            });
+
+            return entry;
+          });
         }
 
-        if(!for_title_types || for_title_types.length == 0 || for_title_types.includes(assetInfo.title_type)) {
-          if(top_level) {
+        if(!for_title_types || for_title_types.length === 0 || for_title_types.includes(assetInfo.title_type)) {
+          if(type === "list") {
+            // List type - Since we're doing a merge on the info metadata, we must do an explicit replace call to modify lists
+            listFields.push({name, value, top_level});
+            delete assetInfo[name];
+          } else if(top_level) {
             // Top level specified, keep value at root level `public/asset_metadata/
             assetInfo[name] = value;
           } else {
@@ -808,6 +827,19 @@ class FormStore {
         metadataSubtree: "public/asset_metadata/info/genre",
         metadata: genre
       });
+
+      // List types must be replaced, or else they will be merged
+      yield Promise.all(
+        listFields.map(async ({name, value, top_level}) => {
+          await client.ReplaceMetadata({
+            libraryId,
+            objectId,
+            writeToken,
+            metadataSubtree: top_level ? `public/asset_metadata/${name}` : `public/asset_metadata/info/${name}`,
+            metadata: value
+          });
+        })
+      );
 
       // Credits
       let credits = {};

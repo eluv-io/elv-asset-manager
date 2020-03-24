@@ -1,6 +1,11 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Input, TextArea, Selection, Date, MultiSelect, Checkbox} from "./Inputs";
+import {Input, TextArea, Selection, Date, MultiSelect, Checkbox, LabelledField} from "./Inputs";
+import {Confirm, IconButton} from "elv-components-js";
+import {toJS} from "mobx";
+
+import AddIcon from "../static/icons/plus-square.svg";
+import DeleteIcon from "../static/icons/trash.svg";
 
 const GENRES = [
   "Action / Adventure",
@@ -62,6 +67,110 @@ const GENRES = [
   "Western"
 ];
 
+const ListField = ({name, label, values, fields, UpdateAssetInfo}) => {
+  const Update = (index, fieldName, newValue) => {
+    let newValues = [...toJS(values)];
+    newValues[index][fieldName] = newValue;
+
+    UpdateAssetInfo(name, newValues);
+  };
+
+  const Add = () => {
+    let newValues = [...toJS(values)];
+
+    let newValue = {};
+    fields.forEach(field => newValue[field.name] = "");
+
+    newValues.push(newValue);
+
+    UpdateAssetInfo(name, newValues);
+  };
+
+  const Remove = (index) => {
+    let newValues = [...toJS(values)];
+
+    newValues = newValues.filter((_, i) => i !== index);
+
+    UpdateAssetInfo(name, newValues);
+  };
+
+  const fieldInputs =
+    values.map((entry, index) => {
+      entry = entry || {};
+
+      const entryFields = fields.map(field => {
+        if(field.type === "textarea") {
+          return (
+            <TextArea
+              key={`input-${name}-${field.name}`}
+              name={field.name}
+              label={field.label}
+              value={entry[field.name] || ""}
+              onChange={newValue => Update(index, field.name, newValue)}
+            />
+          );
+        } else if(field.type === "checkbox") {
+          return (
+            <Checkbox
+              key={`input-${name}-${field.name}`}
+              name={field.name}
+              label={field.label}
+              value={entry[field.name] || ""}
+              onChange={newValue => Update(index, field.name, newValue)}
+            />
+          );
+        } else {
+          return (
+            <Input
+              key={`input-${name}-${field.name}`}
+              name={field.name}
+              label={field.label}
+              type={field.type}
+              value={entry[field.name] || ""}
+              onChange={newValue => Update(index, field.name, newValue)}
+            />
+          );
+        }
+      });
+
+      return (
+        <div
+          className={`asset-info-list-field-entry ${index % 2 === 0 ? "even" : "odd"}`}
+          key={`input-container-${name}-${index}`}
+        >
+          <IconButton
+            icon={DeleteIcon}
+            title={`Remove ${label || name}`}
+            onClick={async () => await Confirm({
+              message: `Are you sure you want to remove this entry from ${label || name}?`,
+              onConfirm: () => Remove(index)
+            })}
+            className="info-list-icon info-list-remove-icon"
+          />
+          { entryFields }
+        </div>
+      );
+    });
+
+  return (
+    <LabelledField
+      label={label || name}
+      formatLabel={!label}
+      value={
+        <div className="asset-info-list-field">
+          <IconButton
+            icon={AddIcon}
+            title={`Add ${label || name}`}
+            onClick={Add}
+            className="info-list-icon"
+          />
+          { fieldInputs }
+        </div>
+      }
+    />
+  );
+};
+
 @inject("formStore")
 @observer
 class AssetInfo extends React.Component {
@@ -75,7 +184,7 @@ class AssetInfo extends React.Component {
         for_title_types.includes(this.props.formStore.assetInfo.title_type)
       );
 
-    return fields.map(({name, label, type}) => {
+    return fields.map(({name, label, type, fields}) => {
       if(type === "textarea") {
         return (
           <TextArea
@@ -94,6 +203,16 @@ class AssetInfo extends React.Component {
             label={label}
             value={this.props.formStore.assetInfo[name]}
             onChange={value => this.props.formStore.UpdateAssetInfo(name, value)}
+          />
+        );
+      } else if(type === "list") {
+        return (
+          <ListField
+            key={`input-${name}`}
+            name={name}
+            values={this.props.formStore.assetInfo[name]}
+            fields={fields}
+            UpdateAssetInfo={this.props.formStore.UpdateAssetInfo}
           />
         );
       } else {

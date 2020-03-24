@@ -184,7 +184,7 @@ const ScheduleEntry = ({
 
   return (
     <div
-      className={`schedule-entry ${expanded ? "schedule-entry-expanded" : ""} ${program.scheduleIndex % 2 === 0 ? "schedule-entry-even" : "schedule-entry-odd"}`}
+      className={`schedule-entry ${expanded ? "schedule-entry-expanded" : ""} ${program.scheduleIndex % 2 === 0 ? "even" : "odd"}`}
       key={`schedule-entry-${program.start_time_epoch}-${program.program_id}`}
     >
       { colorIcon }

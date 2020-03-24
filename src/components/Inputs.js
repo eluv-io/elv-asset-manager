@@ -121,16 +121,16 @@ export const MultiSelect = ({label, name, values, onChange, options}) => {
     <div className="asset-form-input asset-form-multi-select">
       <label htmlFor={name}>
         {label || FormatName(name)}
+      </label>
+      <div>
         <IconButton
           icon={AddIcon}
           label={`Add ${name}`}
           onClick={() => Add()}
           className="asset-form-multi-select-add"
         />
-      </label>
-      <div className="asset-form-multi-select-selections">
         { values.map((selected, index) =>
-          <React.Fragment key={`asset-form-multi-select-${name}-${index}`}>
+          <div className="asset-form-multi-select-selections" key={`asset-form-multi-select-${name}-${index}`}>
             <select
               name={name}
               value={selected}
@@ -146,7 +146,7 @@ export const MultiSelect = ({label, name, values, onChange, options}) => {
               label={`Remove ${name}`}
               onClick={() => Remove(index)}
             />
-          </React.Fragment>
+          </div>
         )}
       </div>
     </div>
@@ -247,12 +247,12 @@ export const FileBrowser = ({name, header, accept, multiple=false, directories=f
   );
 };
 
-export const LabelledField = ({label, value, hidden=false}) => {
+export const LabelledField = ({label, value, hidden=false, formatLabel=false}) => {
   if(hidden) { return null; }
 
   return (
     <div className="asset-form-input asset-form-labelled-field">
-      <label>{ label }</label>
+      <label>{ formatLabel ? FormatName(label) : label }</label>
       <div title={value}>{ value }</div>
     </div>
   );

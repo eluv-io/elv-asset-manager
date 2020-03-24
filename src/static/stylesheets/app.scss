@@ -72,6 +72,10 @@ button {
   }
 }
 
+.even {
+  background-color: $elv-color-lightestgray;
+}
+
 .clickable {
   cursor: pointer;
 }
@@ -372,6 +376,21 @@ button {
 
 .asset-info-container {
   width: 100%;
+
+  .asset-info-list-field-entry {
+    padding: $elv-spacing-m $elv-spacing-ml $elv-spacing-m $elv-spacing-m;
+    position: relative;
+  }
+
+  .info-list-icon {
+    height: $elv-font-xxl;
+  }
+
+  .info-list-remove-icon {
+    position: absolute;
+    right: $elv-spacing-xs;
+    top: $elv-spacing-xs;
+  }
 }
 
 
@@ -458,10 +477,16 @@ input {
     align-items: center;
     align-self: baseline;
     display: flex;
+  }
 
-    button {
-      margin-left: $elv-spacing-xxs;
-      padding: $elv-spacing-mxs;
+  button {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+
+    svg {
+      height: $elv-font-xxl;
     }
   }
 
@@ -472,11 +497,6 @@ input {
   .asset-form-multi-select-selections {
     display: grid;
     grid-template-columns: 1fr 2.5rem;
-
-    button {
-      margin: 0 $elv-spacing-xxs;
-      padding: $elv-spacing-xxs;
-    }
   }
 }
 
