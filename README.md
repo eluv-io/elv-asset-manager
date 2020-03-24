@@ -114,13 +114,14 @@ The schema for this configuring fields is an array of the following:
 - `name` (required) - The metadata key of the field
 - `label` - By default, the label for each field shown in the form is `name` with each word (delimited by space or underscore) capitalized. For example, `display_title` becomes `Display Title`. If this is not ideal, `label` can be specified to explicitly define the label in the form.
 - `type` - Possible values: `textarea`|`integer`|`number`|`checkbox` - If not specified, field is presented as a single line text input
+- `top_level` - If specified, the field will be saved in `public/asset_metadata` instead of `public/asset_metadata/info`
 - `for_title_types` - If the field should only be presented for certain title types, those types can be specified as an array.
 
 Example: 
 
 ```json
   "info_fields": [
-    {"name": "synopsis", "type": "textarea"},
+    {"name": "synopsis", "type": "textarea", "top_level": true},
     {"name": "copyright"},
     {"name": "mpaa_rating", "label": "MPAA Rating"},
     {"name": "mpaa_rating_reason", "label": "MPAA Rating Reason"},

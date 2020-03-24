@@ -386,8 +386,12 @@ class FormStore {
       release_date
     };
 
-    this.infoFields.forEach(({name}) => {
-      assetInfo[name] = info[name] || "";
+    this.infoFields.forEach(({name, top_level}) => {
+      if(top_level) {
+        assetInfo[name] = metadata[name] || "";
+      } else {
+        assetInfo[name] = info[name] || "";
+      }
     });
 
     return assetInfo;
@@ -755,18 +759,26 @@ class FormStore {
       const assetInfo = toJS(this.assetInfo);
 
       assetInfo.info = {};
-      this.infoFields.forEach(({name, type, for_title_types}) => {
-        if(!for_title_types || for_title_types.length == 0 || for_title_types.includes(assetInfo.title_type)) {
-          if(type === "integer") {
-            assetInfo.info[name] = parseInt(assetInfo[name]);
-          } else if(type === "number") {
-            assetInfo.info[name] = parseFloat(assetInfo[name]);
-          } else {
-            assetInfo.info[name] = assetInfo[name];
-          }
+      this.infoFields.forEach(({name, type, for_title_types, top_level}) => {
+        let value = assetInfo[name];
+        if(type === "integer") {
+          value = parseInt(assetInfo[name]);
+        } else if(type === "number") {
+          value = parseFloat(assetInfo[name]);
         }
 
-        delete assetInfo[name];
+        if(!for_title_types || for_title_types.length == 0 || for_title_types.includes(assetInfo.title_type)) {
+          if(top_level) {
+            // Top level specified, keep value at root level `public/asset_metadata/
+            assetInfo[name] = value;
+          } else {
+            // Default case - Move field to "info"
+            assetInfo.info[name] = value;
+            delete assetInfo[name];
+          }
+        } else {
+          delete assetInfo[name];
+        }
       });
 
       // Format release date and move into 'info'
