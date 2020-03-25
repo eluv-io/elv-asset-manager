@@ -113,7 +113,7 @@ The schema for this configuring fields is an array of the following:
 
 - `name` (required) - The metadata key of the field
 - `label` - By default, the label for each field shown in the form is `name` with each word (delimited by space or underscore) capitalized. For example, `display_title` becomes `Display Title`. If this is not ideal, `label` can be specified to explicitly define the label in the form.
-- `type` - Possible values: `textarea`|`integer`|`number`|`checkbox`|`list` - If not specified, field is presented as a single line text input. The `fields` key for `list` type specification takes a list of fields with the same schema, limited to `name`, `type` and `label`. Lists may not contain additional `list` types.
+- `type` - Possible values: `textarea`|`integer`|`number`|`checkbox`|`list` - If not specified, field is presented as a single line text input. The `fields` key for `list` type specification takes a list of fields with the same schema, limited to `name`, `type` and `label`.
 - `top_level` - If specified, the field will be saved in `public/asset_metadata` instead of `public/asset_metadata/info`, minus the `top_level` and `for_title_types` specifiers.
 - `for_title_types` - If the field should only be presented for certain title types, those types can be specified as an array.
 

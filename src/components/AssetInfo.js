@@ -119,6 +119,17 @@ const ListField = ({name, label, values, fields, UpdateAssetInfo}) => {
               onChange={newValue => Update(index, field.name, newValue)}
             />
           );
+        } else if(field.type === "list") {
+          return (
+            <ListField
+              key={`input-${name}-${field.name}`}
+              name={field.name}
+              label={field.label}
+              values={entry[field.name] || []}
+              fields={field.fields}
+              UpdateAssetInfo={(name, newValues) => Update(index, field.name, newValues)}
+            />
+          );
         } else {
           return (
             <Input
