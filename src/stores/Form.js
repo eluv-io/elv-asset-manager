@@ -767,7 +767,7 @@ class FormStore {
         } else if(type === "number") {
           value = parseFloat(assetInfo[name]);
         } else if(type === "list") {
-          value = value.map(entry => {
+          value = (value || []).map(entry => {
             entry = toJS(entry);
 
             fields.forEach(field => {
