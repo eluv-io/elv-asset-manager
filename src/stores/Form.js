@@ -55,6 +55,8 @@ class FormStore {
     {name: "runtime", type: "integer"},
   ];
 
+  @observable slugWarning = false;
+
   constructor(rootStore) {
     this.rootStore = rootStore;
     this.targets = {};
@@ -114,8 +116,10 @@ class FormStore {
   UpdateAssetInfo(key, value) {
     this.assetInfo[key] = value;
 
-    if(key === "display_title") {
+    if(key === "display_title" && !this.originalSlug) {
       this.assetInfo.slug = Slugify(value);
+    } else if(key === "slug" && this.originalSlug) {
+      this.slugWarning = this.originalSlug !== value;
     }
   }
 
@@ -385,6 +389,8 @@ class FormStore {
       genre: info.genre || [],
       release_date
     };
+
+    this.originalSlug = assetInfo.slug;
 
     this.infoFields.forEach(({name, top_level}) => {
       if(top_level) {

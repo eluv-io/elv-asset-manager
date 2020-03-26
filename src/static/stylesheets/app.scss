@@ -462,6 +462,12 @@ input {
   }
 }
 
+.asset-form-input-warning {
+  color: $elv-color-mediumred;
+  font-size: $elv-font-m;
+  margin: $elv-spacing-s 0 $elv-spacing-xs;
+}
+
 .asset-form-labelled-field,
 .asset-form-textarea {
   label {

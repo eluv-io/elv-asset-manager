@@ -16,6 +16,15 @@ const FormatName = (name) => {
     .join(" ");
 };
 
+export const Warning = ({message}) => {
+  return (
+    <div className="asset-form-input asset-form-input-warning">
+      <label />
+      <div className="warning">{ message }</div>
+    </div>
+  );
+};
+
 export const Input = ({type, label, name, value, readonly=false, onChange, hidden=false}) => {
   if(hidden) { return null; }
 

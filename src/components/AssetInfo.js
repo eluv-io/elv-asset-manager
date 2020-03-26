@@ -1,6 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Input, TextArea, Selection, MultiSelect, Checkbox, LabelledField, BasicDate} from "./Inputs";
+import {Input, TextArea, Selection, MultiSelect, Checkbox, LabelledField, BasicDate, Warning} from "./Inputs";
 import {Confirm, IconButton} from "elv-components-js";
 import {toJS} from "mobx";
 
@@ -271,6 +271,8 @@ class AssetInfo extends React.Component {
             value={this.props.formStore.assetInfo.display_title}
             onChange={display_title => this.props.formStore.UpdateAssetInfo("display_title", display_title)}
           />
+
+          { this.props.formStore.slugWarning ? <Warning message="Warning: Changing the slug will any links to this object that contain the slug." /> : null }
 
           <Input
             name="slug"
