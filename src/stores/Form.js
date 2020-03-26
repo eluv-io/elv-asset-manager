@@ -1,4 +1,5 @@
 import {observable, action, flow, toJS} from "mobx";
+import {DateTime} from "luxon";
 import UrlJoin from "url-join";
 
 require("elv-components-js/src/utils/LimitedMap");
@@ -366,14 +367,15 @@ class FormStore {
   LoadAssetInfo(metadata) {
     const info = (metadata.info || {});
 
-    let release_date = { year: "", month: "", day: ""};
+    let release_date;
     if(info.release_date) {
-      const date = new Date(info.release_date);
-      release_date = {
-        year: date.getFullYear(),
-        month: date.getMonth() + 1,
-        day: date.getDate() + 1
-      };
+      release_date = DateTime.fromISO(info.release_date);
+    }
+
+    if(!release_date || release_date.invalid) {
+      release_date = DateTime.local().ts;
+    } else {
+      release_date = release_date.ts;
     }
 
     let assetInfo = {
@@ -736,14 +738,6 @@ class FormStore {
     ];
   });
 
-  FormatDate(date) {
-    if(!date.year) { date.year = new Date().getUTCFullYear(); }
-    if(!date.month) { date.month = new Date().getMonth() + 1; }
-    if(!date.day) { date.day = new Date().getDate() + 1; }
-
-    return `${date.year}-${date.month.toString().padStart(2, "0")}-${date.day.toString().padStart(2, "0")}`;
-  }
-
   async FormatAssets({assetType, assets}) {
     // If not slugged or indexed, asset is saved as array
     let formattedAssets = assetType.indexed || assetType.slugged ? {} : [];
@@ -868,7 +862,7 @@ class FormStore {
       });
 
       // Format release date and move into 'info'
-      assetInfo.info.release_date = this.FormatDate(assetInfo.release_date);
+      assetInfo.info.release_date = DateTime.fromMillis(assetInfo.release_date).toFormat("yyyy-LL-dd");
       delete assetInfo.release_date;
 
       // Format genre and remove - will be replaced separately

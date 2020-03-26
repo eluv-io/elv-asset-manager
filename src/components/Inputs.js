@@ -167,7 +167,7 @@ export const MultiSelect = ({label, name, values, onChange, options}) => {
   );
 };
 
-export const DateSelection = ({label, name, value, onChange}) => {
+export const DateSelection = ({label, name, value, dateOnly=false, onChange}) => {
   let debounceTimeout;
   return (
     <div className="asset-form-input asset-form-date">
@@ -176,73 +176,15 @@ export const DateSelection = ({label, name, value, onChange}) => {
         value={value}
         input
         strictParsing
+        timeFormat={dateOnly ? false : undefined}
+        dateFormat="YYYY-MM-DD"
         displayTimeZone={Settings.defaultZoneName || ""}
         onChange={datetime => {
           if(parseInt(datetime.valueOf()) === datetime.valueOf()) {
             clearTimeout(debounceTimeout);
-            debounceTimeout = setTimeout(() => onChange(datetime.valueOf()), 1000);
+            debounceTimeout = setTimeout(() => onChange(datetime.valueOf()), 500);
           }
         }}
-      />
-    </div>
-  );
-};
-
-export const BasicDate = ({label, name, year, month, day, readonly=false, onChange}) => {
-  const Update = (field, event) => {
-    try {
-      const value = parseInt(event.target.value) || "";
-      if(value < 0) { return; }
-
-      switch (field) {
-        case "year":
-          if(value >= 10000) { return; }
-
-          onChange({year: value, month, day});
-
-          break;
-        case "month":
-          if(value > 12) { return; }
-
-          onChange({year, month: value, day});
-          break;
-        case "day":
-          if(value > 31) { return; }
-
-          onChange({year, month, day: value});
-          break;
-      }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Failed to update date:", field);
-      // eslint-disable-next-line no-console
-      console.error(error);
-    }
-  };
-
-  return (
-    <div className="asset-form-input asset-form-date">
-      <label htmlFor={name}>{label || FormatName(name)}</label>
-      <input
-        name={`${name}-year`}
-        placeholder="Year"
-        value={year}
-        readOnly={readonly}
-        onChange={event => Update("year", event)}
-      />
-      <input
-        name={`${name}-month`}
-        placeholder="Month"
-        value={month}
-        readOnly={readonly}
-        onChange={event => Update("month", event)}
-      />
-      <input
-        name={`${name}-day`}
-        placeholder="Day"
-        value={day}
-        readOnly={readonly}
-        onChange={event => Update("day", event)}
       />
     </div>
   );
