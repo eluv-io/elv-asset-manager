@@ -13,12 +13,12 @@ class Playlists extends React.Component {
   Playlist(playlist, index, length) {
     return (
       <div className="asset-form-playlist" key={`playlist-${index}`}>
-        <div className="asset-form-playlist-key">
+        <div className="asset-form-playlist-name">
           <Input
-            name="playlistKey"
-            label="Playlist Key"
-            value={playlist.playlistKey}
-            onChange={playlistKey => this.props.formStore.UpdatePlaylist({index, playlistKey})}
+            name="playlistName"
+            label="Playlist Name"
+            value={playlist.playlistName}
+            onChange={playlistName => this.props.formStore.UpdatePlaylist({index, key: "playlistName", value: playlistName})}
           />
           <OrderButtons
             index={index}
@@ -37,11 +37,20 @@ class Playlists extends React.Component {
           />
         </div>
 
+        <div className="asset-form-playlist-slug">
+          <Input
+            name="playlistSlug"
+            label="Playlist Slug"
+            value={playlist.playlistSlug}
+            onChange={playlistSlug => this.props.formStore.UpdatePlaylist({index, key: "playlistSlug", value: playlistSlug})}
+          />
+        </div>
+
         <Clips
           assetTypes={this.props.formStore.availableAssetTypes}
           titleTypes={this.props.formStore.availableTitleTypes}
           playlistIndex={index}
-          header={`'${playlist.playlistKey}' Clips`}
+          header={`'${playlist.playlistName}' Clips`}
           name="Clip"
           orderable
           defaultable

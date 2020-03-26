@@ -772,15 +772,19 @@ input {
     padding-left: $elv-spacing-xs;
   }
 
-  .asset-form-playlist-key {
+  .asset-form-playlist-name {
     align-items: center;
     display: flex;
-    padding-bottom: $elv-spacing-m;
+    margin-bottom: $elv-spacing-xs;
 
     .asset-form-input {
       flex-grow: 1;
       padding-right: $elv-spacing-s;
     }
+  }
+
+  .asset-form-playlist-slug {
+    margin-bottom: $elv-spacing-m;
   }
 }
 

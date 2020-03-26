@@ -340,17 +340,14 @@ class FormStore {
   @action.bound
   AddPlaylist() {
     this.playlists.push({
-      playlistKey: "New Playlist",
+      playlistSlug: "New Playlist",
       clips: []
     });
   }
 
   @action.bound
-  UpdatePlaylist({index, playlistKey}) {
-    this.playlists[index] = {
-      ...this.playlists[index],
-      playlistKey
-    };
+  UpdatePlaylist({index, key, value}) {
+    this.playlists[index][key] = value;
   }
 
   @action.bound
@@ -497,13 +494,15 @@ class FormStore {
     metadata = toJS(metadata);
 
     // When slugged but not indexed, default choice is duplicated in the 'default' and slug keys.
-    if(metadata.default && metadata.default["."]) {
-      const dupKey = Object.keys(metadata)
-        .find(key => key !== "default" && metadata[key]["."].source === metadata.default["."].source);
-
-      if(dupKey) {
-        delete metadata[dupKey];
+    if(metadata.default) {
+      let defaultMeta = metadata.default;
+      if(!defaultMeta["/"]) {
+        // Indexed + slugged lists are saved like {"default": {"<slug>": <link>}}
+        defaultMeta = defaultMeta[Object.keys(defaultMeta)[0]];
       }
+
+      const defaultSlug = defaultMeta["/"].split("/").pop();
+      delete metadata[defaultSlug];
     }
 
     const keys = Array.isArray(metadata) ?
@@ -699,23 +698,31 @@ class FormStore {
       yield Promise.all(
         Object.keys(metadata).sort().map(async playlistIndex => {
           if(isNaN(parseInt(playlistIndex))) {
-            // Old format - playlistIndex is the playlist key
-            unorderedPlaylists.push({
-              playlistKey: playlistIndex,
+            // New format - [playlistSlug]: { ... }
+            const playlist = {
+              playlistName: metadata[playlistIndex].name || "",
+              playlistSlug: playlistIndex,
               clips: await this.LoadAssets(
-                metadata[playlistIndex],
-                `public/asset_metadata/playlists/${playlistIndex}`
+                metadata[playlistIndex].list,
+                `public/asset_metadata/playlists/${playlistIndex}/list`
               )
-            });
+            };
+
+            if(metadata[playlistIndex].order !== undefined) {
+              playlists[parseInt(metadata[playlistIndex].order)] = playlist;
+            } else {
+              unorderedPlaylists.push(playlist);
+            }
           } else {
-            // Proper format: [index]: { [playlistKey]: ... }
-            const playlistKey = Object.keys(metadata[playlistIndex])[0];
+            // Old format: [index]: { [playlistSlug]: ... }
+            const playlistSlug = Object.keys(metadata[playlistIndex])[0];
 
             playlists[parseInt(playlistIndex)] = {
-              playlistKey,
+              playlistName: playlistSlug || "",
+              playlistSlug,
               clips: await this.LoadAssets(
-                metadata[playlistIndex][playlistKey],
-                `public/asset_metadata/playlists/${playlistIndex}/${playlistKey}`
+                metadata[playlistIndex][playlistSlug],
+                `public/asset_metadata/playlists/${playlistIndex}/${playlistSlug}`
               )
             };
           }
@@ -735,6 +742,60 @@ class FormStore {
     if(!date.day) { date.day = new Date().getDate() + 1; }
 
     return `${date.year}-${date.month.toString().padStart(2, "0")}-${date.day.toString().padStart(2, "0")}`;
+  }
+
+  async FormatAssets({assetType, assets}) {
+    // If not slugged or indexed, asset is saved as array
+    let formattedAssets = assetType.indexed || assetType.slugged ? {} : [];
+    const hasDefault = assets.find(({isDefault}) => isDefault);
+    let index = hasDefault ? 1 : 0;
+
+    await Promise.all(
+      assets.map(async ({displayTitle, versionHash, isDefault}) => {
+        const link = this.CreateLink(versionHash);
+
+        let key;
+        if(isDefault) {
+          key = "default";
+        } else {
+          key = index;
+          index += 1;
+        }
+
+        if(assetType.slugged) {
+          const slug = (await this.rootStore.client.ContentObjectMetadata({
+            versionHash,
+            metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
+          })) || Slugify(displayTitle);
+
+          if(assetType.indexed) {
+            formattedAssets[key] = {
+              [slug]: link
+            };
+          } else {
+            if(key === "default") {
+              formattedAssets.default = this.CreateLink(
+                this.rootStore.params.versionHash,
+                `/meta/public/asset_metadata/${assetType.name}/${slug}`,
+                { order: 0 }
+              );
+              link.order = 0;
+            } else {
+              link.order = key;
+            }
+
+            // If slugged but not indexed, 'default' is link to regular slug
+            formattedAssets[slug] = link;
+          }
+        } else if(assetType.indexed) {
+          formattedAssets[key] = link;
+        } else {
+          formattedAssets.push(link);
+        }
+      })
+    );
+
+    return formattedAssets;
   }
 
   @action.bound
@@ -873,51 +934,7 @@ class FormStore {
         const assetType = this.associatedAssets[i];
         const assets = toJS(this.assets[assetType.name]);
 
-        // If not slugged or indexed, asset is saved as array
-        let formattedAssets = assetType.indexed || assetType.slugged ? {} : [];
-        let index = 0;
-        yield Promise.all(
-          assets.map(async ({displayTitle, versionHash, isDefault}) => {
-            const link = this.CreateLink(versionHash);
-
-            let key;
-            if(isDefault) {
-              key = "default";
-            } else {
-              key = index;
-              index += 1;
-            }
-
-            if(assetType.slugged) {
-              const slug = (await client.ContentObjectMetadata({
-                versionHash,
-                metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
-              })) || Slugify(displayTitle);
-
-              if(assetType.indexed) {
-                formattedAssets[key] = {
-                  [slug]: link
-                };
-              } else {
-                if(isDefault) {
-                  formattedAssets.default = this.CreateLink(
-                    this.rootStore.params.versionHash,
-                    `/meta/public/asset_metadata/${assetType.name}/${slug}`
-                  );
-                } else {
-                  link.order = key;
-                }
-
-                // If slugged but not indexed, 'default' is link to regular slug
-                formattedAssets[slug] = link;
-              }
-            } else if(assetType.indexed) {
-              formattedAssets[key] = link;
-            } else {
-              formattedAssets.push(link);
-            }
-          })
-        );
+        const formattedAssets = yield this.FormatAssets({assetType, assets});
 
         yield client.ReplaceMetadata({
           libraryId,
@@ -977,29 +994,25 @@ class FormStore {
       // Playlists
       let playlists = {};
       yield Promise.all(
-        toJS(this.playlists).map(async ({playlistKey, clips}, index) => {
-          if(!playlistKey) {
+        toJS(this.playlists).map(async ({playlistName, playlistSlug, clips}, index) => {
+          if(!playlistSlug) {
             return;
           }
 
-          let playlistClips = {};
-          await Promise.all(
-            clips.map(async ({isDefault, displayTitle, versionHash}, index) => {
-              if(isDefault) {
-                playlistClips.default = this.CreateLink(versionHash, undefined, {order: index});
-              } else {
-                const slug = (await client.ContentObjectMetadata({
-                  versionHash,
-                  metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
-                })) || Slugify(displayTitle);
+          const list = await this.FormatAssets({
+            assetType: {
+              indexed: false,
+              slugged: true,
+              name: `playlists/${playlistSlug}/list`
+            },
+            assets: clips
+          });
 
-                playlistClips[slug] = this.CreateLink(versionHash, undefined, {order: index});
-              }
-            })
-          );
-
-          playlists[index.toString()] = {
-            [playlistKey]: playlistClips
+          playlists[playlistSlug] = {
+            name: playlistName || playlistSlug,
+            count: clips.length,
+            order: index,
+            list
           };
         })
       );
