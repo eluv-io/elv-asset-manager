@@ -113,9 +113,36 @@ The schema for this configuring fields is an array of the following:
 
 - `name` (required) - The metadata key of the field
 - `label` - By default, the label for each field shown in the form is `name` with each word (delimited by space or underscore) capitalized. For example, `display_title` becomes `Display Title`. If this is not ideal, `label` can be specified to explicitly define the label in the form.
-- `type` - Possible values: `textarea`|`integer`|`number`|`checkbox`|`date`|`datetime`|`list` - If not specified, field is presented as a single line text input. The `fields` key for `list` type specification takes a list of fields with the same schema, limited to `name`, `type` and `label`.
-- `top_level` - If specified, the field will be saved in `public/asset_metadata` instead of `public/asset_metadata/info`, minus the `top_level` and `for_title_types` specifiers.
+- `type` - The type of this field (see below for details). If not specified, field is presented as a single line text input.
+- `top_level` - If specified, the field will be saved in `public/asset_metadata` instead of `public/asset_metadata/info`
 - `for_title_types` - If the field should only be presented for certain title types, those types can be specified as an array.
+
+Possible `type` values:
+```
+(default) - Single line text input
+
+textarea - Multiline text input
+
+integer - Integer number
+
+number - Decimal number
+
+checkbox - True/false value
+
+select - Select from a list of options
+- additional field: 'options' - List of allowable options
+
+multiselect - Select mutliple from a list of options
+- additional field: 'options' - List of allowable options
+
+date - ISO 8601 date (e.g. `2020-03-15`)
+ 
+datetime - ISO 8601 datetime (e.g. `2020-03-15T13:55:47-0400`)
+- additional field: 'zone' - Reference timezone for this datetime
+
+list - A list of fields 
+- additional field: 'fields' - Recursive schema specifying the contents of each list item
+```
 
 `date` and `datetime` will be saved in the object metadata as [ISO 8601](https://www.w3.org/TR/NOTE-datetime) 'Complete date' (e.g. `2020-03-15`) and 'Complete date plus hours, minutes and seconds' (e.g. `2020-03-15T13:55:47-0400`) strings.
 
@@ -134,7 +161,7 @@ Example:
     {"name": "runtime", "type": "integer"},
     {"name": "scripted", "type": "checkbox", "for_title_types": ["episode", "season", "series"]},
     {"name": "tv_rating", "label": "TV Rating"},
-    {"name": "tv_rating_reason", "label": "TV Rating Reason"},
+    {"name": "genre", "type": "multiselect", "options": ["Action", "Adventure", "Comedy", "Romance"]}
     {"name": "premiere_date", "type": "date"},
     {"name": "air_time", "type": "datetime", "zone": "utc"},
     {"name": "air_time_us_east", "label": "Air Time (US East)", "type": "datetime", "zone": "America/New_York"}

@@ -401,8 +401,7 @@ class FormStore {
       slug: metadata.slug || Slugify(metadata.display_title || ""),
       ip_title_id: metadata.ip_title_id || "",
       title_type: metadata.title_type || this.availableTitleTypes[0],
-      asset_type: metadata.asset_type || this.availableAssetTypes[0],
-      genre: info.genre || []
+      asset_type: metadata.asset_type || this.availableAssetTypes[0]
     };
 
     this.originalSlug = assetInfo.slug;
@@ -855,7 +854,7 @@ class FormStore {
       if(!isTopLevel) {
         info[name] = value;
       } else {
-        if(type === "list") {
+        if(type === "list" || type === "multiselect") {
           // List type - Since we're doing a merge on the info metadata, we must do an explicit replace call to modify lists
           listFields.push({name, value, top_level});
         } else if(top_level) {
@@ -908,12 +907,6 @@ class FormStore {
       ["title", "display_title", "ip_title_id", "slug", "title_type", "asset_type"]
         .forEach(attr => topInfo[attr] = assetInfo[attr]);
 
-      // Format genre
-      let genre = assetInfo.genre;
-      genre = genre.filter((a, b) => genre.indexOf(a) === b).sort();
-
-      delete assetInfo.genre;
-
       // Asset Info
       yield client.MergeMetadata({
         libraryId,
@@ -929,15 +922,6 @@ class FormStore {
         writeToken,
         metadataSubtree: "public/asset_metadata",
         metadata: topInfo
-      });
-
-      // Genre must be replaced, or else it will be merged
-      yield client.ReplaceMetadata({
-        libraryId,
-        objectId,
-        writeToken,
-        metadataSubtree: "public/asset_metadata/info/genre",
-        metadata: genre
       });
 
       // List types must be replaced, or else they will be merged

@@ -16,65 +16,85 @@ import {toJS} from "mobx";
 import AddIcon from "../static/icons/plus-square.svg";
 import DeleteIcon from "../static/icons/trash.svg";
 
-const GENRES = [
-  "Action / Adventure",
-  "Action",
-  "Adult",
-  "Adventure",
-  "Animation",
-  "Awards Show",
-  "Beauty Pageant",
-  "Biblical",
-  "Biography",
-  "Black Exploitation (ORION)",
-  "Business",
-  "Childrens",
-  "Classic",
-  "Comedy",
-  "Comedy / Drama",
-  "Comedy / Adventure",
-  "Comic Fantasy",
-  "Coming of Age",
-  "Competition",
-  "Comedy / Romance",
-  "Crime",
-  "Dance",
-  "Documentary",
-  "DocuDrama",
-  "Dramatic Comedy",
-  "Drama",
-  "Erotic",
-  "Espionage",
-  "Family",
-  "Fantasy",
-  "Game Show",
-  "Historical",
-  "Holiday",
-  "Horror",
-  "Instructional",
-  "LGBTQ",
-  "Live Event",
-  "Magazine Format",
-  "Magic Show",
-  "Thriller",
-  "Mystery",
-  "Musical",
-  "Noir",
-  "Performance",
-  "Reality",
-  "Religious",
-  "Romance",
-  "Romantic Comedy",
-  "Romantic Drama",
-  "Sci-Fi/Adventure",
-  "Sci-Fi",
-  "Sci-Fi/Horror",
-  "Sci-Fi/Thriller",
-  "Sports",
-  "Suspense",
-  "War",
-  "Western"
-];
+const InfoField = ({field, entry, Update}) => {
+  if(field.type === "textarea") {
+    return (
+      <TextArea
+        key={`input-${name}-${field.name}`}
+        name={field.name}
+        label={field.label}
+        value={entry[field.name] || ""}
+        onChange={newValue => Update(field.name, newValue)}
+      />
+    );
+  } else if(field.type === "checkbox") {
+    return (
+      <Checkbox
+        key={`input-${name}-${field.name}`}
+        name={field.name}
+        label={field.label}
+        value={entry[field.name] || ""}
+        onChange={newValue => Update(field.name, newValue)}
+      />
+    );
+  } else if(field.type === "date" || field.type === "datetime") {
+    return (
+      <DateSelection
+        key={`input-${name}-${field.name}`}
+        name={field.name}
+        label={field.label}
+        value={entry[field.name]}
+        dateOnly={field.type === "date"}
+        referenceTimezone={field.zone}
+        onChange={newValue => Update(field.name, newValue)}
+      />
+    );
+  } else if(field.type === "select") {
+    return (
+      <Selection
+        key={`input-${name}-${field.name}`}
+        name={field.name}
+        label={field.label}
+        value={entry[field.name]}
+        options={field.options}
+        onChange={newValue => Update(field.name, newValue)}
+      />
+    );
+  } else if(field.type === "multiselect") {
+    return (
+      <MultiSelect
+        key={`input-${name}-${field.name}`}
+        name={field.name}
+        label={field.label}
+        values={entry[field.name]}
+        options={field.options}
+        onChange={newValue => Update(field.name, newValue)}
+      />
+    );
+  } else if(field.type === "list") {
+    return (
+      <ListField
+        key={`input-${name}-${field.name}`}
+        name={field.name}
+        label={field.label}
+        values={entry[field.name] || []}
+        fields={field.fields}
+        UpdateAssetInfo={(name, newValues) => Update(field.name, newValues)}
+      />
+    );
+  } else {
+    return (
+      <Input
+        key={`input-${name}-${field.name}`}
+        name={field.name}
+        label={field.label}
+        type={field.type}
+        value={entry[field.name] || ""}
+        onChange={newValue => Update(field.name, newValue)}
+      />
+    );
+  }
+};
 
 const ListField = ({name, label, values, fields, UpdateAssetInfo}) => {
   const Update = (index, fieldName, newValue) => {
@@ -107,63 +127,13 @@ const ListField = ({name, label, values, fields, UpdateAssetInfo}) => {
     (values || []).map((entry, index) => {
       entry = entry || {};
 
-      const entryFields = fields.map(field => {
-        if(field.type === "textarea") {
-          return (
-            <TextArea
-              key={`input-${name}-${field.name}`}
-              name={field.name}
-              label={field.label}
-              value={entry[field.name] || ""}
-              onChange={newValue => Update(index, field.name, newValue)}
-            />
-          );
-        } else if(field.type === "checkbox") {
-          return (
-            <Checkbox
-              key={`input-${name}-${field.name}`}
-              name={field.name}
-              label={field.label}
-              value={entry[field.name] || ""}
-              onChange={newValue => Update(index, field.name, newValue)}
-            />
-          );
-        } else if(field.type === "date" || field.type === "datetime") {
-          return (
-            <DateSelection
-              key={`input-${name}-${field.name}`}
-              name={field.name}
-              label={field.label}
-              value={entry[field.name]}
-              dateOnly={field.type === "date"}
-              referenceTimezone={field.zone}
-              onChange={newValue => Update(index, field.name, newValue)}
-            />
-          );
-        } else if(field.type === "list") {
-          return (
-            <ListField
-              key={`input-${name}-${field.name}`}
-              name={field.name}
-              label={field.label}
-              values={entry[field.name] || []}
-              fields={field.fields}
-              UpdateAssetInfo={(name, newValues) => Update(index, field.name, newValues)}
-            />
-          );
-        } else {
-          return (
-            <Input
-              key={`input-${name}-${field.name}`}
-              name={field.name}
-              label={field.label}
-              type={field.type}
-              value={entry[field.name] || ""}
-              onChange={newValue => Update(index, field.name, newValue)}
-            />
-          );
-        }
-      });
+      const entryFields = fields.map(field =>
+        InfoField({
+          field,
+          entry,
+          Update: (entryName, newValue) => Update(index, entryName, newValue)
+        })
+      );
 
       return (
         <div
@@ -216,62 +186,13 @@ class AssetInfo extends React.Component {
         for_title_types.includes(this.props.formStore.assetInfo.title_type)
       );
 
-    return fields.map(({name, label, type, zone, fields}) => {
-      if(type === "textarea") {
-        return (
-          <TextArea
-            key={`input-${name}`}
-            name={name}
-            label={label}
-            value={this.props.formStore.assetInfo[name]}
-            onChange={value => this.props.formStore.UpdateAssetInfo(name, value)}
-          />
-        );
-      } else if(type === "checkbox") {
-        return (
-          <Checkbox
-            key={`input-${name}`}
-            name={name}
-            label={label}
-            value={this.props.formStore.assetInfo[name]}
-            useDefaultReferenceTimezone={false}
-            onChange={value => this.props.formStore.UpdateAssetInfo(name, value)}
-          />
-        );
-      } else if(type === "date" || type === "datetime") {
-        return (
-          <DateSelection
-            key={`input-${name}`}
-            name={name}
-            value={this.props.formStore.assetInfo[name]}
-            dateOnly={type === "date"}
-            referenceTimezone={zone}
-            onChange={value => this.props.formStore.UpdateAssetInfo(name, value)}
-          />
-        );
-      } else if(type === "list") {
-        return (
-          <ListField
-            key={`input-${name}`}
-            name={name}
-            values={this.props.formStore.assetInfo[name]}
-            fields={fields}
-            UpdateAssetInfo={this.props.formStore.UpdateAssetInfo}
-          />
-        );
-      } else {
-        return (
-          <Input
-            key={`input-${name}`}
-            name={name}
-            label={label}
-            type={type}
-            value={this.props.formStore.assetInfo[name]}
-            onChange={value => this.props.formStore.UpdateAssetInfo(name, value)}
-          />
-        );
-      }
-    });
+    return fields.map(field =>
+      InfoField({
+        field,
+        entry: this.props.formStore.assetInfo,
+        Update: this.props.formStore.UpdateAssetInfo
+      })
+    );
   }
 
   render() {
@@ -318,13 +239,6 @@ class AssetInfo extends React.Component {
             label="IP Title ID"
             value={this.props.formStore.assetInfo.ip_title_id}
             onChange={ip_title_id => this.props.formStore.UpdateAssetInfo("ip_title_id", ip_title_id)}
-          />
-
-          <MultiSelect
-            name="genre"
-            values={this.props.formStore.assetInfo.genre}
-            onChange={genre => this.props.formStore.UpdateAssetInfo("genre", genre)}
-            options={GENRES}
           />
 
           { this.InfoFields() }
