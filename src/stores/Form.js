@@ -50,6 +50,7 @@ class FormStore {
   ];
 
   @observable infoFields = [
+    {name: "release_date", type: "release_date"},
     {name: "synopsis", type: "textarea"},
     {name: "copyright"},
     {name: "creator"},
@@ -363,20 +364,36 @@ class FormStore {
     this.playlists[i2] = playlist;
   }
 
+  LoadInfoFields({infoFields, values, isTopLevel=false, topLevelValues}) {
+    let info = {};
+    infoFields.forEach(({name, type, top_level, fields}) => {
+      if(isTopLevel && top_level) {
+        info[name] = topLevelValues[name] || "";
+      } else {
+        info[name] = values[name] || "";
+      }
+
+      if((type === "date" || type === "datetime") && info[name]) {
+        const date = DateTime.fromISO(values[name]);
+
+        if(!date || date.invalid) {
+          info[name] = undefined;
+        } else {
+          info[name] = date.ts;
+        }
+      } else if(type === "list" && info[name]) {
+        info[name] = (info[name] || []).map(listValues =>
+          this.LoadInfoFields({infoFields: fields, values: listValues})
+        );
+      }
+    });
+
+    return info;
+  }
+
   // Load methods
   LoadAssetInfo(metadata) {
     const info = (metadata.info || {});
-
-    let release_date;
-    if(info.release_date) {
-      release_date = DateTime.fromISO(info.release_date);
-    }
-
-    if(!release_date || release_date.invalid) {
-      release_date = DateTime.local().ts;
-    } else {
-      release_date = release_date.ts;
-    }
 
     let assetInfo = {
       title: metadata.title || "",
@@ -385,19 +402,22 @@ class FormStore {
       ip_title_id: metadata.ip_title_id || "",
       title_type: metadata.title_type || this.availableTitleTypes[0],
       asset_type: metadata.asset_type || this.availableAssetTypes[0],
-      genre: info.genre || [],
-      release_date
+      genre: info.genre || []
     };
 
     this.originalSlug = assetInfo.slug;
 
-    this.infoFields.forEach(({name, top_level}) => {
-      if(top_level) {
-        assetInfo[name] = metadata[name] || "";
-      } else {
-        assetInfo[name] = info[name] || "";
-      }
+    const loadedInfo = this.LoadInfoFields({
+      infoFields: this.infoFields,
+      values: info,
+      isTopLevel: true,
+      topLevelValues: metadata
     });
+
+    assetInfo = {
+      ...assetInfo,
+      ...loadedInfo
+    };
 
     return assetInfo;
   }
@@ -792,6 +812,65 @@ class FormStore {
     return formattedAssets;
   }
 
+  FormatDate(millis, datetime=false) {
+    try {
+      return datetime ?
+        DateTime.fromMillis(millis).toISO({suppressMilliseconds: true}) :
+        DateTime.fromMillis(millis).toFormat("yyyy-LL-dd");
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to parse time for", name);
+      // eslint-disable-next-line no-console
+      console.error(error);
+    }
+
+    return "";
+  }
+
+  FormatFields({infoFields, values, titleType, isTopLevel=false}) {
+    let topInfo = {};
+    let info = {};
+    let listFields = [];
+
+    infoFields.forEach(({name, type, for_title_types, top_level, fields}) => {
+      if(for_title_types && !for_title_types.includes(titleType)) { return; }
+
+      let value = values[name];
+      if(type === "integer") {
+        value = parseInt(values[name]);
+      } else if(type === "number") {
+        value = parseFloat(values[name]);
+      } else if(type === "date") {
+        value = this.FormatDate(values[name]);
+      } else if(type === "datetime") {
+        value = this.FormatDate(values[name], true);
+      } else if(type === "list") {
+        value = (value || []).map(entry => {
+          entry = toJS(entry);
+
+          return (this.FormatFields({infoFields: fields, values: entry, titleType})).info;
+        });
+      }
+
+      if(!isTopLevel) {
+        info[name] = value;
+      } else {
+        if(type === "list") {
+          // List type - Since we're doing a merge on the info metadata, we must do an explicit replace call to modify lists
+          listFields.push({name, value, top_level});
+        } else if(top_level) {
+          // Top level specified, keep value at root level `public/asset_metadata/
+          topInfo[name] = value;
+        } else {
+          // Default case - field is in info
+          info[name] = value;
+        }
+      }
+    });
+
+    return { info, topInfo, listFields };
+  }
+
   @action.bound
   SaveAsset = flow(function * () {
     try {
@@ -816,56 +895,20 @@ class FormStore {
         yield this.rootStore.channelStore.SaveChannelInfo({writeToken});
       }
 
-      // Move fields that belong in the info subtree and remove from main tree
+      // Format asset info
       const assetInfo = toJS(this.assetInfo);
-      let listFields = [];
-
-      assetInfo.info = {};
-      this.infoFields.forEach(({name, type, for_title_types, top_level, fields}) => {
-        let value = assetInfo[name];
-        if(type === "integer") {
-          value = parseInt(assetInfo[name]);
-        } else if(type === "number") {
-          value = parseFloat(assetInfo[name]);
-        } else if(type === "list") {
-          value = (value || []).map(entry => {
-            entry = toJS(entry);
-
-            fields.forEach(field => {
-              if(field.type === "integer") {
-                entry[field.name] = parseInt(entry[field.name]);
-              } else if(field.type === "number") {
-                entry[field.name] = parseFloat(entry[field.name]);
-              }
-            });
-
-            return entry;
-          });
-        }
-
-        if(!for_title_types || for_title_types.length === 0 || for_title_types.includes(assetInfo.title_type)) {
-          if(type === "list") {
-            // List type - Since we're doing a merge on the info metadata, we must do an explicit replace call to modify lists
-            listFields.push({name, value, top_level});
-            delete assetInfo[name];
-          } else if(top_level) {
-            // Top level specified, keep value at root level `public/asset_metadata/
-            assetInfo[name] = value;
-          } else {
-            // Default case - Move field to "info"
-            assetInfo.info[name] = value;
-            delete assetInfo[name];
-          }
-        } else {
-          delete assetInfo[name];
-        }
+      const {info, topInfo, listFields} = this.FormatFields({
+        infoFields: this.infoFields,
+        values: assetInfo,
+        titleType: assetInfo.title_type,
+        isTopLevel: true
       });
 
-      // Format release date and move into 'info'
-      assetInfo.info.release_date = DateTime.fromMillis(assetInfo.release_date).toFormat("yyyy-LL-dd");
-      delete assetInfo.release_date;
+      // Move built-in fields to top level info
+      ["title", "display_title", "ip_title_id", "slug", "title_type", "asset_type"]
+        .forEach(attr => topInfo[attr] = assetInfo[attr]);
 
-      // Format genre and remove - will be replaced separately
+      // Format genre
       let genre = assetInfo.genre;
       genre = genre.filter((a, b) => genre.indexOf(a) === b).sort();
 
@@ -876,8 +919,16 @@ class FormStore {
         libraryId,
         objectId,
         writeToken,
+        metadataSubtree: "public/asset_metadata/info",
+        metadata: info
+      });
+
+      yield client.MergeMetadata({
+        libraryId,
+        objectId,
+        writeToken,
         metadataSubtree: "public/asset_metadata",
-        metadata: assetInfo
+        metadata: topInfo
       });
 
       // Genre must be replaced, or else it will be merged

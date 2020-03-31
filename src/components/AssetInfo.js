@@ -128,6 +128,18 @@ const ListField = ({name, label, values, fields, UpdateAssetInfo}) => {
               onChange={newValue => Update(index, field.name, newValue)}
             />
           );
+        } else if(field.type === "date" || field.type === "datetime") {
+          return (
+            <DateSelection
+              key={`input-${name}-${field.name}`}
+              name={field.name}
+              label={field.label}
+              value={entry[field.name]}
+              dateOnly={field.type === "date"}
+              referenceTimezone={field.zone}
+              onChange={newValue => Update(index, field.name, newValue)}
+            />
+          );
         } else if(field.type === "list") {
           return (
             <ListField
@@ -204,7 +216,7 @@ class AssetInfo extends React.Component {
         for_title_types.includes(this.props.formStore.assetInfo.title_type)
       );
 
-    return fields.map(({name, label, type, fields}) => {
+    return fields.map(({name, label, type, zone, fields}) => {
       if(type === "textarea") {
         return (
           <TextArea
@@ -222,6 +234,18 @@ class AssetInfo extends React.Component {
             name={name}
             label={label}
             value={this.props.formStore.assetInfo[name]}
+            useDefaultReferenceTimezone={false}
+            onChange={value => this.props.formStore.UpdateAssetInfo(name, value)}
+          />
+        );
+      } else if(type === "date" || type === "datetime") {
+        return (
+          <DateSelection
+            key={`input-${name}`}
+            name={name}
+            value={this.props.formStore.assetInfo[name]}
+            dateOnly={type === "date"}
+            referenceTimezone={zone}
             onChange={value => this.props.formStore.UpdateAssetInfo(name, value)}
           />
         );
@@ -294,13 +318,6 @@ class AssetInfo extends React.Component {
             label="IP Title ID"
             value={this.props.formStore.assetInfo.ip_title_id}
             onChange={ip_title_id => this.props.formStore.UpdateAssetInfo("ip_title_id", ip_title_id)}
-          />
-
-          <DateSelection
-            name="release_date"
-            value={this.props.formStore.assetInfo.release_date}
-            dateOnly={true}
-            onChange={release_date => this.props.formStore.UpdateAssetInfo("release_date", release_date)}
           />
 
           <MultiSelect

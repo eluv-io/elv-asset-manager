@@ -167,7 +167,15 @@ export const MultiSelect = ({label, name, values, onChange, options}) => {
   );
 };
 
-export const DateSelection = ({label, name, value, dateOnly=false, onChange}) => {
+export const DateSelection = ({
+  label,
+  name,
+  value,
+  dateOnly=false,
+  onChange,
+  referenceTimezone,
+  useDefaultReferenceTimezone=true
+}) => {
   let debounceTimeout;
   return (
     <div className="asset-form-input asset-form-date">
@@ -176,9 +184,9 @@ export const DateSelection = ({label, name, value, dateOnly=false, onChange}) =>
         value={value}
         input
         strictParsing
-        timeFormat={dateOnly ? false : undefined}
-        dateFormat="YYYY-MM-DD"
-        displayTimeZone={Settings.defaultZoneName || ""}
+        timeFormat={dateOnly ? false : "HH:mm:ss z (Z)"}
+        dateFormat={"YYYY-MM-DD"}
+        displayTimeZone={referenceTimezone || (useDefaultReferenceTimezone ? Settings.defaultZoneName || "" : "")}
         onChange={datetime => {
           if(parseInt(datetime.valueOf()) === datetime.valueOf()) {
             clearTimeout(debounceTimeout);

@@ -113,9 +113,15 @@ The schema for this configuring fields is an array of the following:
 
 - `name` (required) - The metadata key of the field
 - `label` - By default, the label for each field shown in the form is `name` with each word (delimited by space or underscore) capitalized. For example, `display_title` becomes `Display Title`. If this is not ideal, `label` can be specified to explicitly define the label in the form.
-- `type` - Possible values: `textarea`|`integer`|`number`|`checkbox`|`list` - If not specified, field is presented as a single line text input. The `fields` key for `list` type specification takes a list of fields with the same schema, limited to `name`, `type` and `label`.
+- `type` - Possible values: `textarea`|`integer`|`number`|`checkbox`|`date`|`datetime`|`list` - If not specified, field is presented as a single line text input. The `fields` key for `list` type specification takes a list of fields with the same schema, limited to `name`, `type` and `label`.
 - `top_level` - If specified, the field will be saved in `public/asset_metadata` instead of `public/asset_metadata/info`, minus the `top_level` and `for_title_types` specifiers.
 - `for_title_types` - If the field should only be presented for certain title types, those types can be specified as an array.
+
+`date` and `datetime` will be saved in the object metadata as [ISO 8601](https://www.w3.org/TR/NOTE-datetime) 'Complete date' (e.g. `2020-03-15`) and 'Complete date plus hours, minutes and seconds' (e.g. `2020-03-15T13:55:47-0400`) strings.
+
+Note: Times will be displayed in an easier to read format in the UI (e.g. `2020-03-15 13:55:47 EDT (-04:00)`).
+
+Additionally, `datetime` takes an optional parameter `zone`, specifying the timezone this field should reference. See [Luxon's timezone documentation](https://moment.github.io/luxon/docs/manual/zones.html) for details. By default, the zone used will be the user's local timezone.
 
 Example: 
 
@@ -129,6 +135,9 @@ Example:
     {"name": "scripted", "type": "checkbox", "for_title_types": ["episode", "season", "series"]},
     {"name": "tv_rating", "label": "TV Rating"},
     {"name": "tv_rating_reason", "label": "TV Rating Reason"},
+    {"name": "premiere_date", "type": "date"},
+    {"name": "air_time", "type": "datetime", "zone": "utc"},
+    {"name": "air_time_us_east", "label": "Air Time (US East)", "type": "datetime", "zone": "America/New_York"}
     {
       "name": "quotes", 
       "type": "list",
