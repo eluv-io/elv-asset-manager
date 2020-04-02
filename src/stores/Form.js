@@ -50,7 +50,7 @@ class FormStore {
   ];
 
   @observable infoFields = [
-    {name: "release_date", type: "release_date"},
+    {name: "release_date", type: "date"},
     {name: "synopsis", type: "textarea"},
     {name: "copyright"},
     {name: "creator"},
