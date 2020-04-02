@@ -1,6 +1,6 @@
 import {configure, observable, action, flow, runInAction} from "mobx";
 
-import {FrameClient} from "elv-client-js/src/FrameClient";
+import {FrameClient} from "@eluvio/elv-client-js/src/FrameClient";
 import ContentStore from "./Content";
 import FormStore from "./Form";
 import LiveStore from "./Live";
