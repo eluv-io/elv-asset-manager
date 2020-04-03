@@ -143,7 +143,7 @@ export const MultiSelect = ({label, name, values, onChange, options}) => {
           onClick={() => Add()}
           className="asset-form-multi-select-add"
         />
-        { values.map((selected, index) =>
+        {(values || []).map((selected, index) =>
           <div className="asset-form-multi-select-selections" key={`asset-form-multi-select-${name}-${index}`}>
             <select
               name={name}

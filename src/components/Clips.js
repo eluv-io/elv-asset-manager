@@ -188,7 +188,7 @@ class Clips extends React.Component {
       <div className="asset-form-section-container">
         <h3>{this.props.header}</h3>
         <div className="asset-form-clips-container">
-          {clips.map((clip, index) =>
+          {(clips || []).map((clip, index) =>
             <Clip
               index={index}
               isPlayable={clip.playable}

@@ -764,7 +764,7 @@ class FormStore {
     let index = hasDefault ? 1 : 0;
 
     await Promise.all(
-      assets.map(async ({displayTitle, versionHash, isDefault}) => {
+      (assets || []).map(async ({displayTitle, versionHash, isDefault}) => {
         const link = this.CreateLink(versionHash);
 
         let key;
