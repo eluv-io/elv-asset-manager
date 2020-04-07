@@ -226,7 +226,7 @@ class AssetInfo extends React.Component {
             onChange={display_title => this.props.formStore.UpdateAssetInfo("display_title", display_title)}
           />
 
-          { this.props.formStore.slugWarning ? <Warning message="Warning: Changing the slug will any links to this object that contain the slug." /> : null }
+          { this.props.formStore.slugWarning ? <Warning message="Warning: Changing the slug will break any links to this object that contain the slug." /> : null }
 
           <Input
             name="slug"
