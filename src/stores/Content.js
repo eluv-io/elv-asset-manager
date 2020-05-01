@@ -52,8 +52,8 @@ class ContentStore {
         libraryId,
         filterOptions: {
           select: [
-            "name",
             "public/name",
+            "public/description",
             "public/asset_metadata/title",
             "public/asset_metadata/asset_type",
             "public/asset_metadata/title_type"
@@ -87,6 +87,8 @@ class ContentStore {
           id,
           objectId: id,
           name,
+          objectName: metadata.public.name,
+          objectDescription: metadata.public.description,
           assetType: metadata.public.asset_metadata.asset_type,
           titleType: metadata.public.asset_metadata.title_type,
           sortKey: name.startsWith("iq__") ? `zz${name}` : name

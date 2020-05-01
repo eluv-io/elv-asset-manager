@@ -31,16 +31,17 @@ class BrowserList extends React.Component {
         <ul className={`browser ${this.props.hashes ? "mono" : ""}`}>
           {(this.props.list || [])
             .filter(({name}) => name.toLowerCase().includes(this.state.filter.toLowerCase()))
-            .map(({id, name, assetType}) => {
-              return (
-                <li key={`browse-entry-${id}`}>
-                  <button onClick={() => this.props.Select(id)}>
-                    <div>{name}</div>
-                    {assetType ? <div className="hint">{assetType}</div> : null}
-                  </button>
-                </li>
-              );
-            })}
+            .map(({id, name, objectName, objectDescription, assetType}) => (
+              <li key={`browse-entry-${id}`}>
+                <button
+                  title={objectName ? `${objectName}\n\n${id}${objectDescription ? `\n\n${objectDescription}` : ""}` : id}
+                  onClick={() => this.props.Select(id)}
+                >
+                  <div>{ name }</div>
+                  { assetType ? <div className="hint">{ assetType }</div> : null }
+                </button>
+              </li>
+            ))}
         </ul>
       </div>
     );

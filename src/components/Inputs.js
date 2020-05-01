@@ -232,13 +232,13 @@ export const FileBrowser = ({name, header, accept, multiple=false, directories=f
   );
 };
 
-export const LabelledField = ({label, value, hidden=false, formatLabel=false}) => {
+export const LabelledField = ({label, value, hidden=false, formatLabel=false, children}) => {
   if(hidden) { return null; }
 
   return (
     <div className="asset-form-input asset-form-labelled-field">
       <label>{ formatLabel ? FormatName(label) : label }</label>
-      <div title={value}>{ value }</div>
+      <div title={value}>{ children || value }</div>
     </div>
   );
 };
