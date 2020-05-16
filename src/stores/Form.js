@@ -29,8 +29,11 @@ class FormStore {
 
   @observable availableTitleTypes = [
     "collection",
+    "episode",
+    "season",
+    "series",
+    "site",
     "title",
-    "site"
   ];
 
   @observable defaultImageKeys = [
@@ -45,6 +48,39 @@ class FormStore {
       indexed: true,
       slugged: true,
       defaultable: true,
+      orderable: true
+    },
+    {
+      name: "series",
+      label: "Series",
+      asset_types: ["primary"],
+      title_types: ["series"],
+      for_title_types: ["site", "collection"],
+      indexed: true,
+      slugged: true,
+      defaultable: false,
+      orderable: true
+    },
+    {
+      name: "seasons",
+      label: "Seasons",
+      asset_types: ["primary"],
+      title_types: ["season"],
+      for_title_types: ["series"],
+      indexed: true,
+      slugged: true,
+      defaultable: false,
+      orderable: true
+    },
+    {
+      name: "episodes",
+      label: "Episodes",
+      asset_types: ["primary"],
+      title_types: ["episode"],
+      for_title_types: ["season"],
+      indexed: true,
+      slugged: true,
+      defaultable: false,
       orderable: true
     }
   ];

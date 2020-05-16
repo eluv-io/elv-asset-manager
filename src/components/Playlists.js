@@ -47,11 +47,9 @@ class Playlists extends React.Component {
         </div>
 
         <Clips
-          assetTypes={this.props.formStore.availableAssetTypes}
-          titleTypes={this.props.formStore.availableTitleTypes}
           playlistIndex={index}
           header={`'${playlist.playlistName}' Clips`}
-          name="Clip"
+          name="Item"
           orderable
           defaultable
         />
