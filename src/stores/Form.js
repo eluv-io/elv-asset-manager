@@ -5,7 +5,11 @@ import UrlJoin from "url-join";
 require("elv-components-js/src/utils/LimitedMap");
 
 const Slugify = str =>
-  (str || "").toLowerCase().replace(/ /g, "-").replace(/[^a-z0-9\-]/g,"");
+  (str || "")
+    .toLowerCase()
+    .replace(/ /g, "-")
+    .replace(/[^a-z0-9\-]/g,"")
+    .replace(/-+/g, "-");
 
 class FormStore {
   @observable assetInfo = {};
