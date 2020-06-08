@@ -10,6 +10,7 @@ import Credits from "./Credits";
 import LinkUpdate from "./LinkUpdate";
 import LiveStream from "./channels/LiveStream";
 import Channel from "./channels/Channel";
+import SiteAccessCode from "./SiteAccessCode";
 
 @inject("rootStore")
 @inject("formStore")
@@ -63,6 +64,10 @@ class AssetForm extends React.Component {
       tabs.push(["Playlists", "PLAYLISTS"]);
     }
 
+    if(this.props.formStore.HasControl("site_codes")) {
+      tabs.push(["Access Codes", "SITE_CODES"]);
+    }
+
     return tabs;
   }
 
@@ -82,6 +87,8 @@ class AssetForm extends React.Component {
         return <Gallery />;
       case "PLAYLISTS":
         return <Playlists />;
+      case "SITE_CODES":
+        return <SiteAccessCode />;
     }
 
     const assetType = this.props.formStore.associatedAssets.find(({name}) => name === this.state.form);

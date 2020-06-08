@@ -23,7 +23,8 @@ Here is a full example of asset configuration metadata for a content type:
         "playlists",
         "gallery",
         "live_stream",
-        "channel"
+        "channel",
+        "site_codes"
       ],
       "asset_types":[
         "primary",

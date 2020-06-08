@@ -16,6 +16,10 @@ const FormatName = (name) => {
     .join(" ");
 };
 
+export const Maybe = (value, component) => value ?
+  (typeof component === "function" ? component() : component) :
+  null;
+
 export const Warning = ({message}) => {
   return (
     <div className="asset-form-input asset-form-input-warning">
@@ -25,13 +29,14 @@ export const Warning = ({message}) => {
   );
 };
 
-export const Input = ({type, label, name, value, readonly=false, onChange, hidden=false}) => {
+export const Input = ({type, label, name, value, readonly=false, onChange, hidden=false, required=false}) => {
   if(hidden) { return null; }
 
   return (
     <div className="asset-form-input">
       <label htmlFor={name}>{label || FormatName(name)}</label>
       <input
+        required={required}
         name={name}
         value={value}
         readOnly={readonly}

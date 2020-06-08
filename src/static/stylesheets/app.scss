@@ -229,8 +229,17 @@ button {
     justify-content: center;
   }
 
+  .access-code-error {
+    margin-bottom: $elv-spacing-l;
+  }
+
   .-elv-button {
     min-height: $elv-spacing-l;
+
+    &.wide {
+      max-width: 12rem;
+      width: 12rem;
+    }
   }
 }
 
@@ -378,6 +387,10 @@ button {
     margin-bottom: $elv-spacing-m;
     text-align: center;
   }
+}
+
+.section {
+  margin-bottom: $elv-spacing-l;
 }
 
 .asset-info-container {
@@ -811,4 +824,16 @@ input {
 .light {
   color: $elv-color-text-light;
   font-size: $elv-font-l;
+}
+
+.access-code-results {
+  h3 {
+    margin: $elv-spacing-l 0 0;
+  }
+
+  h4 {
+    color: $elv-color-text-light;
+    margin: 0 0 $elv-spacing-l;
+    text-align: center;
+  }
 }

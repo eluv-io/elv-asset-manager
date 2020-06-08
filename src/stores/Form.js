@@ -1,5 +1,6 @@
 import {observable, action, flow, toJS} from "mobx";
 import {DateTime} from "luxon";
+import {ElvClient} from "@eluvio/elv-client-js";
 import UrlJoin from "url-join";
 
 require("elv-components-js/src/utils/LimitedMap");
@@ -98,6 +99,7 @@ class FormStore {
   ];
 
   @observable slugWarning = false;
+  @observable siteSelectorInfo = {};
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -1112,6 +1114,212 @@ class FormStore {
       // eslint-disable-next-line no-console
       console.error(error);
 
+      throw error;
+    }
+  });
+
+  @action.bound
+  LoadSiteSelectorInfo = flow(function * () {
+    const client = this.rootStore.client;
+    const groupAddresses = yield client.Collection({
+      collectionType: "accessGroups"
+    });
+
+    const existingCodes = (yield client.ContentObjectMetadata({
+      versionHash: this.rootStore.params.versionHash,
+      metadataSubtree: "public/codes"
+    })) || {};
+
+    let existingSites = {};
+    Object.values(existingCodes).forEach(({sites}) => {
+      return (sites || []).forEach(site => {
+        if(!site || sites[site.siteKey]) { return; }
+
+        existingSites[site.siteKey] = site.siteId;
+      });
+    });
+
+    const groups = (yield Promise.all(
+      groupAddresses.map(async address => {
+        const libraryId = (await client.ContentSpaceId()).replace(/^ispc/, "ilib");
+        const objectId = client.utils.AddressToObjectId(address);
+        const name = await client.ContentObjectMetadata({
+          libraryId,
+          objectId,
+          metadataSubtree: "public/name"
+        });
+
+        return [name || address, address, name ? name.toLowerCase() : `zzzz${address}`];
+      })
+    )).sort((a, b) => a[2] < b[2] ? -1 : 1);
+
+    this.siteSelectorInfo = {
+      groups,
+      sites: Object.keys(existingSites).sort((a, b) => a[0].toLowerCase() < b[0].toLowerCase() ? -1 : 1),
+      siteMap: existingSites
+    };
+  });
+
+  Hash = (code) => {
+    const chars = code.split("").map(code => code.charCodeAt(0));
+    return chars.reduce((sum, char, i) => (chars[i + 1] ? (sum * 2) + char * chars[i+1] * (i + 1) : sum + char), 0).toString();
+  };
+
+  @action.bound
+  RemoveSiteAccessCode = flow(function * ({accessCode}) {
+    const {libraryId, objectId} = this.rootStore.params;
+
+    try {
+      const client = this.rootStore.client;
+
+      const codeHash = this.Hash(accessCode);
+      let existingCodeInfo = yield client.ContentObjectMetadata({libraryId, objectId, metadataSubtree: `public/codes/${codeHash}`});
+
+      if(!existingCodeInfo) { throw Error("Unknown access code: " + accessCode); }
+
+      // Update site selector
+      const { write_token } = yield client.EditContentObject({libraryId, objectId});
+
+      yield client.DeleteMetadata({
+        libraryId,
+        objectId,
+        writeToken: write_token,
+        metadataSubtree: `public/codes/${codeHash}`
+      });
+
+      yield client.FinalizeContentObject({libraryId, objectId, writeToken: write_token});
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Error:");
+      // eslint-disable-next-line no-console
+      console.error(error.body ? JSON.stringify(error, null, 2) : error);
+      throw error;
+    }
+  });
+
+  @action.bound
+  CreateSiteAccessCode = flow(function * ({accessCode, accountName, siteKey, siteId, existingGroupAddress, newGroupName}) {
+    const {libraryId, objectId} = this.rootStore.params;
+
+    try {
+      const client = this.rootStore.client;
+
+      // Generate key hash for quick lookup
+      const codeHash = this.Hash(accessCode);
+
+      let existingCodeInfo = yield client.ContentObjectMetadata({libraryId, objectId, metadataSubtree: `public/codes/${codeHash}`});
+      if(existingCodeInfo) {
+        throw Error("Code already exists");
+      }
+
+      // Create client for creating and setting up new account
+      const configUrl = yield client.ConfigUrl();
+      const newClient = yield ElvClient.FromConfigurationUrl({configUrl});
+      const wallet = newClient.GenerateWallet();
+
+      // Create new account
+      const newSigner = wallet.AddAccountFromMnemonic({
+        mnemonic: yield wallet.GenerateMnemonic()
+      });
+
+      // Send funds to new account
+      yield client.SendFunds({
+        recipient: newSigner.address,
+        ether: 2
+      });
+
+      // Create the user wallet for the new account
+      yield newClient.SetSigner({signer: newSigner});
+      yield newClient.userProfileClient.ReplaceUserMetadata({metadataSubtree: "public/name", metadata: accountName});
+
+      // Generate encrypted private key with code
+      const encryptedPrivateKey = yield wallet.GenerateEncryptedPrivateKey({
+        signer: newSigner,
+        password: accessCode,
+        options: {scrypt: {N: 16384}}
+      });
+
+      // Update site selector
+      const { write_token } = yield client.EditContentObject({libraryId, objectId});
+
+      yield client.ReplaceMetadata({
+        libraryId,
+        objectId,
+        writeToken: write_token,
+        metadataSubtree: `public/codes/${codeHash}`,
+        metadata: {
+          ak: client.utils.B64(encryptedPrivateKey),
+          sites: [{
+            siteId,
+            siteKey
+          }]
+        }
+      });
+
+      yield client.FinalizeContentObject({libraryId, objectId, writeToken: write_token});
+
+      // Add user to site group
+      let existingGroupName;
+      if(existingGroupAddress) {
+        yield client.AddAccessGroupMember({contractAddress: existingGroupAddress, memberAddress: newSigner.address});
+        const libraryId = (yield client.ContentSpaceId()).replace(/^ispc/, "ilib");
+        const objectId = client.utils.AddressToObjectId(existingGroupAddress);
+        existingGroupName = yield client.ContentObjectMetadata({
+          libraryId,
+          objectId,
+          metadataSubtree: "public/name"
+        });
+      }
+
+      // Create new group for user
+      let newGroupAddress;
+      if(newGroupName) {
+        newGroupAddress = yield client.CreateAccessGroup({name: newGroupName});
+        yield client.AddAccessGroupMember({contractAddress: newGroupAddress, memberAddress: newSigner.address});
+
+        yield client.AddContentObjectGroupPermission({
+          groupAddress: newGroupAddress,
+          objectId,
+          permission: "see"
+        });
+
+        yield client.AddContentObjectGroupPermission({
+          groupAddress: newGroupAddress,
+          objectId,
+          permission: "access"
+        });
+
+        yield client.AddContentObjectGroupPermission({
+          groupAddress: newGroupAddress,
+          objectId: siteId,
+          permission: "see"
+        });
+
+        yield client.AddContentObjectGroupPermission({
+          groupAddress: newGroupAddress,
+          objectId: siteId,
+          permission: "access"
+        });
+      }
+
+      return {
+        accessCode,
+        address: newSigner.address,
+        privateKey: newSigner.signingKey.privateKey,
+        existingGroup: {
+          existingGroupName,
+          existingGroupAddress,
+        },
+        newGroup: {
+          newGroupName,
+          newGroupAddress
+        }
+      };
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Error:");
+      // eslint-disable-next-line no-console
+      console.error(error.body ? JSON.stringify(error, null, 2) : error);
       throw error;
     }
   });
