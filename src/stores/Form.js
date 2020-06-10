@@ -384,7 +384,8 @@ class FormStore {
   @action.bound
   AddPlaylist() {
     this.playlists.push({
-      playlistSlug: "New Playlist",
+      playlistName: "New Playlist",
+      playlistSlug: "new-playlist",
       clips: []
     });
   }

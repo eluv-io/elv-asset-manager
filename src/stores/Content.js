@@ -6,6 +6,9 @@ class ContentStore {
   @observable objects = {};
   @observable versions = {};
 
+  @observable objectsPerPage = 100;
+  @observable objectPaginationInfo = {};
+
   @observable files = {};
   @observable baseFileUrls = {};
   @observable mimeTypes = {};
@@ -44,27 +47,36 @@ class ContentStore {
   });
 
   @action.bound
-  LoadObjects = flow(function * (libraryId) {
-    if(this.objects[libraryId]) { return; }
+  LoadObjects = flow(function * ({libraryId, page=1, filter=""}) {
+    const limit = this.objectsPerPage;
+    const start = (page - 1) * limit;
 
-    const objectInfo = (
+    const results = (
       yield this.rootStore.client.ContentObjects({
         libraryId,
         filterOptions: {
+          filter: !filter ? undefined : {
+            key: "public/asset_metadata/title",
+            type: "cnt",
+            filter
+          },
           select: [
             "public/name",
             "public/description",
             "public/asset_metadata/title",
+            "public/asset_metadata/display_title",
             "public/asset_metadata/asset_type",
             "public/asset_metadata/title_type"
           ],
-          limit: 10000
+          sort: "public/asset_metadata/title",
+          start,
+          limit
         }
       })
-    ).contents || [];
+    ) || {};
 
     let objects = [];
-    yield objectInfo.limitedMap(
+    yield (results.contents || []).limitedMap(
       5,
       async ({id, versions}) => {
         const metadata = versions[0].meta || {};
@@ -81,7 +93,12 @@ class ContentStore {
           ...metadata.public.asset_metadata
         };
 
-        const name = metadata.public.asset_metadata.title || metadata.public.name || metadata.name || "";
+        const name =
+          metadata.public.asset_metadata.title ||
+          metadata.public.asset_metadata.display_title ||
+          metadata.public.name ||
+          metadata.name ||
+          "";
 
         objects.push({
           id,
@@ -97,6 +114,7 @@ class ContentStore {
     );
 
     this.objects[libraryId] = objects.sort((a, b) => a.sortKey < b.sortKey ? -1 : 1);
+    this.objectPaginationInfo[libraryId] = results.paging;
   });
 
   @action.bound

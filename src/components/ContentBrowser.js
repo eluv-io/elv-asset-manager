@@ -3,6 +3,7 @@ import AsyncComponent from "./AsyncComponent";
 import {inject, observer} from "mobx-react";
 import PropTypes from "prop-types";
 import Action from "elv-components-js/src/components/Action";
+import {Maybe} from "./Inputs";
 
 @observer
 class BrowserList extends React.Component {
@@ -10,49 +11,119 @@ class BrowserList extends React.Component {
     super(props);
 
     this.state = {
-      filter: ""
+      page: 1,
+      filter: "",
+      version: 1
     };
-
-    this.List = this.List.bind(this);
   }
 
-  List() {
+  Pagination() {
+    if(!this.props.paginated) { return null; }
+
+    let pages = 1;
+    if(this.props.paginationInfo) {
+      const {items, limit} = this.props.paginationInfo;
+      pages = Math.ceil(items / limit);
+    }
+
+    const ChangePage = (page) => {
+      clearTimeout(this.pageChangeTimeout);
+
+      this.setState({page});
+      this.pageChangeTimeout = setTimeout(() => {
+        this.setState({version: this.state.version + 1});
+      }, 500);
+    };
+
     return (
-      <div className="browser-container">
-        <h3>{this.props.header}</h3>
-        <h4>{this.props.subHeader}</h4>
-        <input
-          name="filter"
-          placeholder="Filter..."
-          className="browser-filter"
-          onChange={event => this.setState({filter: event.target.value})}
-          value={this.state.filter}
-        />
-        <ul className={`browser ${this.props.hashes ? "mono" : ""}`}>
-          {(this.props.list || [])
-            .filter(({name}) => name.toLowerCase().includes(this.state.filter.toLowerCase()))
-            .map(({id, name, objectName, objectDescription, assetType}) => (
-              <li key={`browse-entry-${id}`}>
-                <button
-                  title={objectName ? `${objectName}\n\n${id}${objectDescription ? `\n\n${objectDescription}` : ""}` : id}
-                  onClick={() => this.props.Select(id)}
-                >
-                  <div>{ name }</div>
-                  { assetType ? <div className="hint">{ assetType }</div> : null }
-                </button>
-              </li>
-            ))}
-        </ul>
+      <div className="browser-pagination">
+        {Maybe(
+          this.state.page > 1,
+          <Action className="secondary prev-button" onClick={() => ChangePage(this.state.page - 1)}>
+            Previous
+          </Action>
+        )}
+        Page {this.state.page} of {pages}
+        {Maybe(
+          this.state.page < pages,
+          <Action className="secondary next-button" onClick={() => ChangePage(this.state.page + 1)}>
+            Next
+          </Action>
+        )}
       </div>
     );
   }
 
-  render() {
+  Filter() {
     return (
-      <AsyncComponent
-        Load={this.props.Load}
-        render={this.List}
+      <input
+        name="filter"
+        placeholder="Filter..."
+        className="browser-filter"
+        onChange={event => {
+          this.setState({filter: event.target.value});
+
+          if(this.props.paginated) {
+            clearTimeout(this.filterTimeout);
+
+            this.filterTimeout = setTimeout(async () => {
+              this.setState({page: 1, version: this.state.version + 1});
+            }, 1000);
+          }
+        }}
+        value={this.state.filter}
       />
+    );
+  }
+
+  render() {
+    let list = this.props.list || [];
+    if(!this.props.paginated) {
+      list = list.filter(({name}) => name.toLowerCase().includes(this.state.filter.toLowerCase()));
+    }
+
+    return (
+      <div className="browser-container">
+        <h3>{this.props.header}</h3>
+        <h4>{this.props.subHeader}</h4>
+        { this.Pagination() }
+        { this.Filter() }
+        <AsyncComponent
+          key={`browser-listing-version-${this.state.version}`}
+          Load={() => this.props.Load({page: this.state.page, filter: this.state.filter})}
+          render={() => (
+            <ul className={`browser ${this.props.hashes ? "mono" : ""}`}>
+              {list.map(({id, name, objectName, objectDescription, assetType, titleType}) => {
+                let disabled =
+                  (this.props.assetTypes && !this.props.assetTypes.includes(assetType)) ||
+                  (this.props.titleTypes && !this.props.titleTypes.includes(titleType));
+
+                let title = objectName ? `${objectName}\n\n${id}${objectDescription ? `\n\n${objectDescription}` : ""}` : id;
+                if(disabled) {
+                  title = title + "\n\nTitle type or asset type not allowed for this list:";
+                  title = title + `\n\tTitle Type: ${titleType || "<not specified>"}`;
+                  title = title + `\n\tAllowed Title Types: ${this.props.titleTypes.join(", ")}`;
+                  title = title + `\n\tAsset Type: ${assetType || "<not specified>"}`;
+                  title = title + `\n\tAllowed Asset Types: ${this.props.assetTypes.join(", ")}`;
+                }
+
+                return (
+                  <li key={`browse-entry-${id}`}>
+                    <button
+                      disabled={disabled}
+                      title={title}
+                      onClick={() => this.props.Select(id)}
+                    >
+                      <div>{name}</div>
+                      {assetType ? <div className="hint">{assetType}</div> : null}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        />
+      </div>
     );
   }
 }
@@ -70,8 +141,12 @@ BrowserList.propTypes = {
     })
   ),
   hashes: PropTypes.bool,
+  assetTypes: PropTypes.arrayOf(PropTypes.string),
+  titleTypes: PropTypes.arrayOf(PropTypes.string),
   Load: PropTypes.func.isRequired,
-  Select: PropTypes.func.isRequired
+  Select: PropTypes.func.isRequired,
+  paginated: PropTypes.bool,
+  paginationInfo: PropTypes.object
 };
 
 @inject("contentStore")
@@ -105,6 +180,7 @@ class ContentBrowser extends React.Component {
             list={this.props.contentStore.libraries}
             Load={this.props.contentStore.LoadLibraries}
             Select={libraryId => this.setState({libraryId})}
+            paginated={false}
           />
         </React.Fragment>
       );
@@ -113,13 +189,6 @@ class ContentBrowser extends React.Component {
         .find(({libraryId}) => libraryId === this.state.libraryId);
 
       let list = this.props.contentStore.objects[this.state.libraryId] || [];
-      if(this.props.assetTypes && this.props.assetTypes.length > 0) {
-        list = list.filter(item => this.props.assetTypes.includes(item.assetType));
-      }
-
-      if(this.props.titleTypes && this.props.titleTypes.length > 0) {
-        list = list.filter(item => this.props.titleTypes.includes(item.titleType));
-      }
 
       content = (
         <React.Fragment>
@@ -139,10 +208,19 @@ class ContentBrowser extends React.Component {
           </div>
           <BrowserList
             key={`browser-list-${this.state.libraryId}`}
-            header="Choose an object"
-            subHeader={library.name}
+            header={library.name}
             list={list}
-            Load={async () => await this.props.contentStore.LoadObjects(this.state.libraryId)}
+            paginated
+            paginationInfo={this.props.contentStore.objectPaginationInfo[this.state.libraryId]}
+            assetTypes={this.props.assetTypes}
+            titleTypes={this.props.titleTypes}
+            Load={async ({page, filter}) => await this.props.contentStore.LoadObjects({
+              libraryId: this.state.libraryId,
+              page,
+              filter,
+              assetTypes: this.props.assetTypes,
+              titleTypes: this.props.titleTypes
+            })}
             Select={async objectId => {
               if(this.props.objectOnly) {
                 await this.props.onComplete({
@@ -190,6 +268,7 @@ class ContentBrowser extends React.Component {
               objectId: this.state.objectId,
               versionHash
             })}
+            paginated={false}
           />
         </React.Fragment>
       );

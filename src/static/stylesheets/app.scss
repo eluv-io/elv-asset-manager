@@ -149,6 +149,24 @@ button {
     width: 100%;
   }
 
+  .browser-pagination {
+    align-items: center;
+    color: $elv-color-text-light;
+    display: flex;
+    justify-content: center;
+    margin-bottom: $elv-spacing-s;
+    position: relative;
+
+    button {
+      position: absolute;
+      right: 0;
+    }
+
+    .prev-button {
+      left: 0;
+    }
+  }
+
   .back {
     margin-bottom: $elv-spacing-s;
   }
@@ -197,12 +215,14 @@ button {
         @include elv-ellipsis;
       }
 
-      &:hover {
-        background: $elv-color-mediumblue;
-        color: $elv-color-text-white;
-
-        div {
+      &:not(:disabled) {
+        &:hover {
+          background: $elv-color-mediumblue;
           color: $elv-color-text-white;
+
+          div {
+            color: $elv-color-text-white;
+          }
         }
       }
     }
