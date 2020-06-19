@@ -1,6 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Input, Selection, ToggleSection} from "../Inputs";
+import {Checkbox, Input, Selection, ToggleSection} from "../Inputs";
 
 import {Action, Confirm, ImageIcon, LoadingElement} from "elv-components-js";
 
@@ -88,6 +88,13 @@ class LiveStream extends React.Component {
           label="Bitrate"
           value={this.props.liveStore.video_bitrate}
           onChange={video_bitrate => this.props.liveStore.UpdateParameter("video_bitrate", video_bitrate)}
+        />
+
+        <Checkbox
+          name="force_equal_frame_duration"
+          label="Force Equal Frame Duration"
+          value={this.props.liveStore.force_equal_frame_duration}
+          onChange={force_equal_frame_duration => this.props.liveStore.UpdateParameter("force_equal_frame_duration", force_equal_frame_duration)}
         />
       </ToggleSection>
     );
@@ -180,7 +187,7 @@ class LiveStream extends React.Component {
             type="integer"
             name="udp_port"
             label="UDP Port"
-            hidden={this.props.liveStore.ingest_type !== "UDP"}
+            hidden={this.props.liveStore.ingest_type !== "udp"}
             onChange={udp_port => this.props.liveStore.UpdateParameter("udp_port", udp_port)}
           />
 
@@ -197,6 +204,14 @@ class LiveStream extends React.Component {
             label="Max Duration (seconds)"
             value={this.props.liveStore.max_duration_sec}
             onChange={max_duration_sec => this.props.liveStore.UpdateParameter("max_duration_sec", max_duration_sec)}
+          />
+
+          <Selection
+            name="abr_profile_id"
+            label="ABR Profile"
+            value={this.props.liveStore.abr_profile_id}
+            options={["base720", "sports720@60"]}
+            onChange={abr_profile_id => this.props.liveStore.UpdateParameter("abr_profile_id", abr_profile_id)}
           />
 
           { this.VideoParameters() }

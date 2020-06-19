@@ -20,6 +20,7 @@ class LiveStore {
   @observable ingress_region = "";
   @observable ingressNode = "";
   @observable max_duration_sec = 28800;
+  @observable abr_profile_id = "base720";
 
   // Video Parameters
   @observable resolution_width = 1280;
@@ -29,6 +30,7 @@ class LiveStore {
   @observable force_keyint = 40;
   @observable video_seg_duration_ts = 2160000;
   @observable video_bitrate = 8000000;
+  @observable force_equal_frame_duration = false;
 
   // Audio Parameters
   @observable audio_bitrate = 128000;
@@ -60,6 +62,7 @@ class LiveStore {
     this.ingressNode = metadata.ingressNode || this.ingressNode;
     this.max_duration_sec = metadata.max_duration_sec || this.max_duration_sec;
     this.source_timescale = metadata.source_timescale || this.source_timescale;
+    this.abr_profile_id = metadata.abr_profile_id || this.abr_profile_id;
 
     // Video Parameters
     if(metadata.video_tx_params) {
@@ -69,6 +72,7 @@ class LiveStore {
       this.force_keyint = metadata.video_tx_params.force_keyint || this.force_keyint;
       this.video_seg_duration_ts = metadata.video_tx_params.seg_duration_ts || this.video_seg_duration_ts;
       this.video_bitrate = metadata.video_tx_params.video_bitrate || this.video_bitrate;
+      this.force_equal_frame_duration = metadata.video_tx_params.force_equal_frame_duration || this.force_equal_frame_duration;
     }
 
     // Audio Parameters
@@ -351,6 +355,7 @@ class LiveStore {
           resolution: `${this.resolution_width}x${this.resolution_height}`,
           max_duration_sec: this.max_duration_sec,
           source_timescale: this.source_timescale,
+          abr_profile_id: this.abr_profile_id,
           public: {
             asset_metadata: {
               video_type: "live"
@@ -380,7 +385,8 @@ class LiveStore {
           enc_height: parseInt(this.resolution_height),
           force_keyint: parseInt(this.force_keyint),
           seg_duration_ts: parseInt(this.video_seg_duration_ts),
-          video_bitrate: parseInt(this.video_bitrate)
+          video_bitrate: parseInt(this.video_bitrate),
+          force_equal_frame_duration: this.force_equal_frame_duration
         }
       });
 
