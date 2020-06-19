@@ -1,9 +1,19 @@
-import {observable, action, flow, toJS} from "mobx";
+import {observable, action, flow, toJS, computed} from "mobx";
 import {DateTime} from "luxon";
 import {ElvClient} from "@eluvio/elv-client-js";
 import UrlJoin from "url-join";
 
 require("elv-components-js/src/utils/LimitedMap");
+
+// Incremental numerical IDs
+
+let __id = 0;
+class Id {
+  static next(){
+    __id++;
+    return __id;
+  }
+}
 
 const Slugify = str =>
   (str || "")
@@ -13,6 +23,8 @@ const Slugify = str =>
     .replace(/-+/g, "-");
 
 class FormStore {
+  @observable editWriteToken;
+
   @observable assetInfo = {};
   @observable images = [];
   @observable gallery = [];
@@ -20,6 +32,18 @@ class FormStore {
   @observable credits = {};
 
   @observable assets = {};
+
+  @observable siteCustomization = {
+    logo: null,
+    colors: {
+      background: "#002957",
+      primary_text: "#ffffff",
+      secondary_text: "#8c8c8c",
+      border: "#2a2a2a",
+      accent: "#1b73e8"
+    },
+    arrangement: []
+  };
 
   @observable controls = [
     "credits",
@@ -101,6 +125,14 @@ class FormStore {
   @observable slugWarning = false;
   @observable siteSelectorInfo = {};
 
+  @computed get relevantAssociatedAssets() {
+    return this.associatedAssets.filter(assetType => (
+      !assetType.for_title_types ||
+      assetType.for_title_types.length === 0 ||
+      assetType.for_title_types.includes(this.assetInfo.title_type)
+    ));
+  }
+
   constructor(rootStore) {
     this.rootStore = rootStore;
     this.targets = {};
@@ -128,8 +160,6 @@ class FormStore {
   }
 
   InitializeFormData = flow(function * () {
-    const assetMetadata = this.rootStore.assetMetadata || {};
-
     const titleConfiguration = this.rootStore.titleConfiguration;
 
     this.controls = titleConfiguration.controls || this.controls;
@@ -138,6 +168,8 @@ class FormStore {
     this.infoFields = titleConfiguration.info_fields || this.infoFields;
     this.associatedAssets = titleConfiguration.associated_assets || this.associatedAssets;
     this.defaultImageKeys = titleConfiguration.default_image_keys || this.defaultImageKeys;
+
+    const assetMetadata = this.rootStore.assetMetadata || {};
 
     this.assetInfo = this.LoadAssetInfo(assetMetadata);
     this.credits = this.LoadCredits((assetMetadata.info || {}).talent);
@@ -153,6 +185,42 @@ class FormStore {
         assetMetadata[name],
         `public/asset_metadata/${name}`
       );
+    }
+
+    if(this.HasControl("site_customization")) {
+      if(!assetMetadata.site_customization) {
+        this.DefaultArrangement();
+      } else {
+        let arrangement = assetMetadata.site_customization.arrangement || [];
+        arrangement = arrangement.map(entry => {
+          if(entry.type !== "playlist") {
+            return entry;
+          }
+
+          const playlist = this.playlists.find(playlist => playlist.playlistSlug === entry.playlist_slug);
+
+          if(!playlist) {
+            return;
+          }
+
+          entry = {
+            ...entry,
+            playlistId: playlist.playlistId,
+            name: `playlist--${playlist.playlistId}`
+          };
+
+          delete entry.playlist_slug;
+
+          return entry;
+        })
+          .filter(entry => entry);
+
+
+        this.siteCustomization = {
+          ...assetMetadata.site_customization,
+          arrangement
+        };
+      }
     }
   });
 
@@ -384,6 +452,7 @@ class FormStore {
   @action.bound
   AddPlaylist() {
     this.playlists.push({
+      playlistId: `playlist-${Id.next()}`,
       playlistName: "New Playlist",
       playlistSlug: "new-playlist",
       clips: []
@@ -764,6 +833,7 @@ class FormStore {
           if(isNaN(parseInt(playlistIndex))) {
             // New format - [playlistSlug]: { ... }
             const playlist = {
+              playlistId: `playlist-${Id.next()}`,
               playlistName: metadata[playlistIndex].name || "",
               playlistSlug: playlistIndex,
               clips: await this.LoadAssets(
@@ -914,16 +984,19 @@ class FormStore {
   }
 
   @action.bound
-  SaveAsset = flow(function * () {
+  SaveAsset = flow(function * (commit=true) {
     try {
       const client = this.rootStore.client;
 
       const {libraryId, objectId} = this.rootStore.params;
 
-      const writeToken = (yield client.EditContentObject({
-        libraryId,
-        objectId
-      })).write_token;
+      let writeToken = this.editWriteToken;
+      if(!writeToken) {
+        writeToken = (yield client.EditContentObject({
+          libraryId,
+          objectId
+        })).write_token;
+      }
 
       if(!writeToken) {
         throw Error("Update request denied");
@@ -1097,6 +1170,35 @@ class FormStore {
         metadata: playlists
       });
 
+      if(this.HasControl("site_customization")) {
+        let siteCustomization = {...toJS(this.siteCustomization)};
+        siteCustomization.arrangement = this.siteCustomization.arrangement.map(entry => {
+          entry = {...toJS(entry)};
+          if(entry.type === "playlist") {
+            const playlist = this.playlists.find(playlist => playlist.playlistId === entry.playlistId);
+            entry.playlist_slug = playlist.playlistSlug;
+            entry.name = "playlist";
+            delete entry.playlistId;
+          }
+
+          return entry;
+        });
+
+
+        yield client.ReplaceMetadata({
+          libraryId,
+          objectId,
+          writeToken,
+          metadataSubtree: "public/asset_metadata/site_customization",
+          metadata: siteCustomization
+        });
+      }
+
+      if(!commit) {
+        this.editWriteToken = writeToken;
+        return;
+      }
+
       yield client.FinalizeContentObject({
         libraryId,
         objectId,
@@ -1118,6 +1220,127 @@ class FormStore {
       throw error;
     }
   });
+
+  // Site Customization
+
+  @action.bound
+  UpdateSiteColor({colorKey, color}) {
+    this.siteCustomization.colors[colorKey] = color;
+  }
+
+  @action.bound
+  UpdateSiteLogo({imagePath, targetHash}) {
+    this.siteCustomization.logo = {
+      imagePath,
+      targetHash
+    };
+  }
+
+  @action.bound
+  DefaultArrangement() {
+    let arrangement = [];
+    if(this.playlists[0]) {
+      arrangement.push({
+        type: "playlist",
+        name: `playlist--${this.playlists[0].playlistId}`,
+        playlistId: this.playlists[0].playlistId,
+        label: this.playlists[0].playlistName,
+        component: "feature",
+        options: {
+          variant: "normal"
+        }
+      });
+    }
+
+    arrangement = arrangement.concat(
+      this.playlists.slice(1).map(playlist => ({
+        type: "playlist",
+        name: `playlist--${playlist.playlistId}`,
+        label: playlist.playlistName,
+        playlistId: playlist.playlistId,
+        component: "carousel",
+        options: {
+          variant: "landscape",
+          width: "medium"
+        }
+      }))
+    );
+
+    arrangement = arrangement.concat(
+      this.relevantAssociatedAssets.map(assetType => ({
+        type: "asset",
+        name: assetType.name,
+        label: assetType.label,
+        playlistId: undefined,
+        component: "carousel",
+        options: {
+          variant: "landscape",
+          width: "medium"
+        }
+      }))
+        .sort((a, b) => a.name < b.name ? -1 : 1)
+    );
+
+    this.siteCustomization.arrangement = arrangement;
+  }
+
+  @action.bound
+  AddArrangementEntry() {
+    let initialEntry;
+    if(this.associatedAssets[0]) {
+      initialEntry = {
+        type: "asset",
+        name: this.associatedAssets[0].name,
+        label: this.associatedAssets[0].label,
+        playlistId: undefined,
+        component: "carousel",
+        options: {
+          width: 4
+        }
+      };
+    } else if(this.playlists[0]) {
+      initialEntry = {
+        type: "playlist",
+        name: "playlist",
+        label: this.playlists[0].label,
+        playlistId: this.playlists[0].playlistId,
+        component: "carousel",
+        options: {
+          width: 4
+        }
+      };
+    } else {
+      initialEntry = {
+        type: "header",
+        playlistId: undefined,
+        options: {
+          text: "New Header"
+        }
+      };
+    }
+
+    this.siteCustomization.arrangement.push(initialEntry);
+  }
+
+  @action.bound
+  UpdateArrangementEntry({index, attrs}) {
+    this.siteCustomization.arrangement[index] = attrs;
+  }
+
+  @action.bound
+  SwapArrangementEntries(i1, i2) {
+    const image = this.siteCustomization.arrangement[i1];
+    this.siteCustomization.arrangement[i1] = this.siteCustomization.arrangement[i2];
+    this.siteCustomization.arrangement[i2] = image;
+  }
+
+  @action.bound
+  RemoveArrangementEntry(index) {
+    this.siteCustomization.arrangement = this.siteCustomization.arrangement.filter((_, i) => i !== index);
+  }
+
+
+  // Site Selector + Access Keys
 
   @action.bound
   LoadSiteSelectorInfo = flow(function * () {

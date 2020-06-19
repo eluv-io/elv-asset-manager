@@ -86,7 +86,6 @@ Here is a full example of asset configuration metadata for a content type:
     }
   }
 }
-
 ```
 
 ### Asset and Title Types

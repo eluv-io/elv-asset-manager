@@ -1,0 +1,147 @@
+@import "~elv-components-js/src/stylesheets/defaults";
+@import "~elv-components-js/src/stylesheets/styles";
+
+input {
+  &[type="color"] {
+    width: $elv-spacing-xxl;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.site-customization {
+  .site-color-selection {
+    flex: 1 1 auto;
+  }
+
+  .site-color-logo {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .site-logo-selection {
+    display: flex;
+    flex-direction: column;
+    width: 40vw;
+
+    .-elv-async-component {
+      flex: 0 1 auto;
+      margin-top: $elv-spacing-s;
+      width: $elv-spacing-l;
+    }
+
+    .file-image-preview {
+      margin: $elv-spacing-s 0;
+      max-height: 15vw;
+      max-width: 15vw;
+      width: 100%;
+
+      img {
+        height: auto;
+        width: 100%;
+      }
+    }
+
+    button {
+      margin-top: $elv-spacing-s;
+    }
+  }
+
+  .site-arrangement-container {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+
+    .actions-container {
+      justify-content: flex-start;
+      margin-top: $elv-spacing-s;
+    }
+  }
+
+  .site-arrangement-entry {
+    border-bottom: 1px solid $elv-color-lightgray;
+    display: flex;
+    padding: $elv-spacing-s 0;
+    width: 100%;
+  }
+
+  .arrangement-option {
+    display: flex;
+    flex-direction: column;
+    margin-right: $elv-spacing-s;
+    width: 12rem;
+
+    &.medium {
+      width: 20rem;
+    }
+
+    &.long {
+      width: 30rem;
+    }
+
+    &.actions-cell {
+      flex: 1 1 auto;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    label {
+      height: $elv-spacing-m;
+    }
+
+    button {
+      height: 1.2rem;
+      margin: auto $elv-spacing-s auto 0;
+      width: 1.2rem;
+    }
+
+    select {
+      width: 100%;
+    }
+  }
+}
+
+.actions-container {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-bottom: $elv-spacing-s;
+  position: relative;
+  width: 100%;
+
+  button {
+    margin-right: $elv-spacing-s;
+  }
+}
+
+.preview-frame-container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: $elv-spacing-s 0;
+  width: 100%;
+
+  .preview-fullscreen-button {
+    position: absolute;
+    right: 0;
+  }
+}
+
+.app-frame-container {
+  display: flex;
+  height: auto;
+  width: 100%;
+}
+
+.site-preview-frame {
+  border: 0;
+  height: 80vh;
+  width: 100%;
+}

@@ -11,6 +11,7 @@ import LinkUpdate from "./LinkUpdate";
 import LiveStream from "./channels/LiveStream";
 import Channel from "./channels/Channel";
 import SiteAccessCode from "./SiteAccessCode";
+import SiteCustomization from "./SiteCustomization";
 
 @inject("rootStore")
 @inject("formStore")
@@ -42,15 +43,7 @@ class AssetForm extends React.Component {
     }
 
     // Inject relevant assets
-    this.props.formStore.associatedAssets.forEach(({label, for_title_types, name}) => {
-      if(
-        for_title_types &&
-        for_title_types.length > 0 &&
-        !for_title_types.includes(this.props.formStore.assetInfo.title_type)
-      ) {
-        return;
-      }
-
+    this.props.formStore.relevantAssociatedAssets.forEach(({label, name}) => {
       tabs.push([label, name]);
     });
 
@@ -62,6 +55,10 @@ class AssetForm extends React.Component {
 
     if(this.props.formStore.HasControl("playlists")) {
       tabs.push(["Playlists", "PLAYLISTS"]);
+    }
+
+    if(this.props.formStore.HasControl("site_customization")) {
+      tabs.push(["Site Customization", "SITE_CUSTOMIZATION"]);
     }
 
     if(this.props.formStore.HasControl("site_codes")) {
@@ -87,6 +84,8 @@ class AssetForm extends React.Component {
         return <Gallery />;
       case "PLAYLISTS":
         return <Playlists />;
+      case "SITE_CUSTOMIZATION":
+        return <SiteCustomization />;
       case "SITE_CODES":
         return <SiteAccessCode />;
     }

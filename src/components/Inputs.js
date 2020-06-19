@@ -9,7 +9,7 @@ import AddIcon from "../static/icons/plus-square.svg";
 import RemoveIcon from "../static/icons/trash.svg";
 import * as DatePicker from "react-datetime";
 
-const FormatName = (name) => {
+export const FormatName = (name) => {
   return (name || "")
     .split(/[_, \s]/)
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -51,6 +51,23 @@ export const Input = ({type, label, name, value, readonly=false, onChange, hidde
 
           onChange(input);
         }}
+      />
+    </div>
+  );
+};
+
+export const ColorSelection = ({label, name, value, readonly=false, onChange, hidden=false}) => {
+  if(hidden) { return null; }
+
+  return (
+    <div className="asset-form-input">
+      <label htmlFor={name}>{label || FormatName(name)}</label>
+      <input
+        name={name}
+        value={value}
+        readOnly={readonly}
+        type="color"
+        onChange={event => onChange(event.target.value)}
       />
     </div>
   );
