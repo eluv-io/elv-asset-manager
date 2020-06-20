@@ -27,14 +27,18 @@ class StreamInfo extends React.Component {
     this.ActivateModal = this.ActivateModal.bind(this);
   }
 
+  componentDidMount() {
+    this.props.channelStore.StreamInfo();
+  }
+
   StreamPreview() {
-    if(!this.props.channelStore.streamActive || !this.state.previewStream) { return null; }
+    if(!this.props.channelStore.streamStatus.active || !this.state.previewStream) { return null; }
 
     return <VideoPreview objectId={this.props.channelStore.streamId} />;
   }
 
   ToggleStream() {
-    const active = this.props.channelStore.streamActive;
+    const active = this.props.channelStore.streamStatus.active;
 
     return (
       <Action
@@ -98,7 +102,7 @@ class StreamInfo extends React.Component {
     }
 
     let previewStreamButton;
-    if(this.props.channelStore.streamActive) {
+    if(this.props.channelStore.streamStatus.active) {
       previewStreamButton = (
         <Action className="secondary" onClick={() => this.setState({previewStream: !this.state.previewStream})}>
           {this.state.previewStream ? "Hide" : "Show"} Preview
@@ -113,10 +117,13 @@ class StreamInfo extends React.Component {
       <React.Fragment>
         <h4 className="stream-info-header">Stream Info</h4>
         <div className="channel-stream-info">
-          <div className={`stream-indicator ${this.props.channelStore.streamActive ? "stream-indicator-active" : "stream-indicator-inactive"}`}>
+          <div
+            onClick={this.props.channelStore.StreamInfo}
+            className={`stream-indicator ${this.props.channelStore.streamStatus.active ? "stream-indicator-active" : "stream-indicator-inactive"}`}
+          >
             <ImageIcon
-              icon={this.props.channelStore.streamActive ? StreamActive : StreamInactive}
-              title={this.props.channelStore.streamActive ? "Stream Active" : "Stream Inactive"}
+              icon={this.props.channelStore.streamStatus.active ? StreamActive : StreamInactive}
+              title={this.props.channelStore.streamStatus.active ? "Stream Active" : "Stream Inactive"}
             />
           </div>
 
@@ -132,6 +139,7 @@ class StreamInfo extends React.Component {
               })}
             />
           </div>
+          <div className="light">{ this.props.channelStore.streamStatus.status }</div>
           <div className="light">{ this.props.channelStore.streamId }</div>
           <div className="light">{ info.originUrl }</div>
           <div className="stream-actions">

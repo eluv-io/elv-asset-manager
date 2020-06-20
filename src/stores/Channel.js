@@ -6,7 +6,6 @@ class ChannelStore {
   @observable streamLibraryId;
   @observable streamId;
   @observable streamInfo = {};
-  @observable streamStatus;
   @observable streamActive = false;
   @observable localTimezone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
   @observable referenceTimezone;
@@ -15,6 +14,10 @@ class ChannelStore {
 
   constructor(rootStore) {
     this.rootStore = rootStore;
+  }
+
+  @computed get streamStatus() {
+    return this.rootStore.liveStore.streamStatus[this.streamId] || { active: false, status: "Off" };
   }
 
   @computed get dailySchedule() {
@@ -62,6 +65,16 @@ class ChannelStore {
     }
 
     yield this.LoadSchedule(metadata.schedule);
+  });
+
+  @action.bound
+  StreamInfo = flow(function * () {
+    if(!this.streamId) { return; }
+
+    yield this.rootStore.liveStore.StreamInfo({
+      libraryId: this.streamLibraryId,
+      objectId: this.streamId
+    });
   });
 
   @action.bound
@@ -159,14 +172,10 @@ class ChannelStore {
       metadataSubtree: "origin_url"
     });
 
-    this.streamStatus = yield this.rootStore.liveStore.StreamInfo({
-      libraryId: streamLibraryId,
-      objectId: streamId
-    });
-
-    this.streamActive = !!this.streamStatus;
     this.streamLibraryId = streamLibraryId;
     this.streamId = streamId;
+
+    yield this.StreamInfo();
   });
 
   @action.bound
@@ -271,7 +280,6 @@ class ChannelStore {
     this.streamLibraryId = undefined;
     this.streamId = undefined;
     this.streamInfo = undefined;
-    this.streamActive = false;
 
     yield this.RetrieveStreamInfo({streamLibraryId: libraryId, streamId: objectId});
   });

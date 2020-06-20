@@ -7,8 +7,6 @@ node_modules/
 dist/*
 !*/.keep
 
-/configuration.js
-
 deploy.sh
 
 scratch/

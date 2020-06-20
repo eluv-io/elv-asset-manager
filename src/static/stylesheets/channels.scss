@@ -20,6 +20,7 @@
     align-items: center;
     background-color: $elv-color-mediumgray;
     border-radius: 100%;
+    cursor: pointer;
     display: flex;
     height: $elv-spacing-ml;
     justify-content: center;
@@ -37,6 +38,13 @@
   .stream-indicator-active {
     background-color: $elv-color-mediumblue;
   }
+
+  .stream-status {
+    color: $elv-color-text-light;
+    font-size: $elv-font-xl;
+    left: 3rem;
+    position: absolute;
+  }
 }
 
 .stream-info-header {
@@ -44,9 +52,17 @@
   margin-bottom: $elv-spacing-s;
 }
 
+.preview-frame {
+  border: 0;
+  height: 80vh;
+  outline: 1px solid $elv-color-lightgray;
+  width: 100%;
+}
+
 .channel-stream-info-container {
   width: 100%;
 
+  .preview-frame,
   .video-preview,
   video {
     margin-bottom: $elv-spacing-l;
@@ -56,9 +72,9 @@
 
 .channel-stream-info {
   display: grid;
-  grid-template-areas: "indicator row" "indicator row" "indicator row" "indicator row";
+  grid-template-areas: "indicator row" "indicator row" "indicator row" "indicator row" "indicator row";
   grid-template-columns: 5rem 1fr;
-  grid-template-rows: 1.5rem 1.5rem 1.5rem 3rem;
+  grid-template-rows: 2.2rem 1.3rem 1.5rem 1.5rem 3rem;
   padding: $elv-spacing-xs 0 $elv-spacing-m;
 
   div {
@@ -74,6 +90,7 @@
   .stream-info-name {
     align-items: center;
     display: flex;
+    font-size: $elv-font-xl;
   }
 
   .open-object-link {

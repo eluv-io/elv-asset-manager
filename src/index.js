@@ -9,6 +9,10 @@ import * as Stores from "./stores";
 import AssetForm from "./components/AssetForm";
 import AsyncComponent from "./components/AsyncComponent";
 
+if(typeof EluvioConfiguration === "undefined") {
+  global.EluvioConfiguration = {};
+}
+
 @inject("rootStore")
 @observer
 class App extends React.Component {

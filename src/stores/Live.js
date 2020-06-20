@@ -1,4 +1,4 @@
-import {action, observable, flow} from "mobx";
+import {action, observable, flow, toJS} from "mobx";
 
 class LiveStore {
   @observable regions = [
@@ -11,8 +11,8 @@ class LiveStore {
   ];
 
   @observable loading = false;
-  @observable streamInfo;
-  @observable active = false;
+
+  @observable streamStatus = {};
 
   @observable origin_url = "";
   @observable ingest_type = "hls";
@@ -104,15 +104,94 @@ class LiveStore {
       libraryId = yield client.ContentObjectLibraryId({objectId});
     }
 
-    this.streamInfo = yield client.ContentObjectMetadata({
+    const edgeWriteToken = yield client.ContentObjectMetadata({
       libraryId,
       objectId,
-      metadataSubtree: "public/live_stream_info"
+      metadataSubtree: "edge_write_token"
     });
 
-    this.active = !!this.streamInfo;
+    const ingressNode = yield client.ContentObjectMetadata({
+      libraryId,
+      objectId,
+      metadataSubtree: "ingress_node_api"
+    });
 
-    return this.streamInfo;
+    if(!edgeWriteToken || !ingressNode) {
+      this.streamStatus[objectId] = {
+        active: false,
+        status: "Off"
+      };
+
+      return this.streamStatus[objectId];
+    }
+
+    let streamStatus = this.streamStatus[objectId] || {};
+
+    try {
+      yield client.SetNodes({fabricURIs: [ingressNode]});
+
+      if(!streamStatus.liveHandle || !streamStatus.edgeWriteToken) {
+        const liveMeta = yield client.CallBitcodeMethod({
+          libraryId,
+          versionHash: yield client.LatestVersionHash({objectId}),
+          method: "live/meta",
+          constant: false
+        });
+
+        streamStatus.edgeWriteToken = liveMeta.live_recording_parameters.edge_write_token;
+        streamStatus.liveHandle = liveMeta.live_recording_handle;
+        streamStatus.node = ingressNode;
+      }
+
+      streamStatus.lroStatus = yield client.CallBitcodeMethod({
+        libraryId,
+        objectId,
+        writeToken: streamStatus.edgeWriteToken,
+        method: `live/status/${streamStatus.liveHandle}`,
+        constant: false
+      });
+
+      // eslint-disable-next-line no-console
+      console.log("LRO Status:");
+      // eslint-disable-next-line no-console
+      console.log(toJS(streamStatus.lroStatus));
+
+      if(streamStatus.lroStatus.state === "running") {
+        streamStatus.active = true;
+
+        if(!streamStatus.lroStatus.custom.start_time || new Date(streamStatus.lroStatus.custom.start_time) < new Date("2020-01-01T00:00:00.000Z")) {
+          streamStatus.status = "Active (Waiting for Media)";
+        } else if(new Date(streamStatus.lroStatus.custom.current_time) - new Date(streamStatus.lroStatus.custom.last_update_time) > 60 * 1000){
+          streamStatus.status = "Active (Stalled)";
+        } else {
+          streamStatus.status = "Active";
+        }
+      } else {
+        streamStatus.active = false;
+
+        if(!streamStatus.lroStatus.custom.end_time || new Date(streamStatus.lroStatus.custom.end_time) < new Date("2020-01-01T00:00:00.000Z")) {
+          streamStatus.status = "Off (Terminated)";
+        } else {
+          streamStatus.status = "Off (Stopped)";
+        }
+      }
+
+      this.streamStatus[objectId] = streamStatus;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("LRO Status error:");
+      // eslint-disable-next-line no-console
+      console.error(error);
+
+      this.streamStatus[objectId] = {
+        active: false,
+        status: "Off (Terminated)"
+      };
+    } finally {
+      yield client.ResetRegion();
+    }
+
+    return this.streamStatus[objectId];
   });
 
   @action.bound
@@ -126,7 +205,7 @@ class LiveStore {
     }
 
     const streamInfo = yield this.StreamInfo({libraryId, objectId});
-    if(streamInfo) {
+    if(streamInfo && streamInfo.active) {
       // eslint-disable-next-line no-console
       console.error("Stream already started");
       return;
@@ -135,7 +214,7 @@ class LiveStore {
     try {
       this.loading = true;
 
-      let ingressRegion = this.ingressRegion;
+      let ingressRegion = this.ingress_region;
       if(objectId === this.rootStore.params.objectId) {
         // Update current settings if operating on stream
         const {write_token} = yield client.EditContentObject({libraryId, objectId});
@@ -152,13 +231,11 @@ class LiveStore {
 
       // Switch to ingress node
       let {fabricURIs} = yield client.UseRegion({region: ingressRegion});
+
       yield client.SetNodes({fabricURIs: [fabricURIs[0]]});
 
       // Create draft for live edge
       const edgeEdit = yield client.EditContentObject({libraryId, objectId});
-
-      // Create draft for live management info
-      const infoEdit = yield client.EditContentObject({libraryId, objectId});
 
       // Create draft for setting write token
       const tokenEdit = yield client.EditContentObject({libraryId, objectId});
@@ -174,65 +251,23 @@ class LiveStore {
         }
       });
 
-      yield client.MergeMetadata({
-        libraryId,
-        objectId,
-        writeToken: infoEdit.write_token,
-        metadata: {
-          edge_write_token: edgeEdit.write_token,
-          ingress_node_api: fabricURIs[0]
-        }
-      });
-
       yield client.FinalizeContentObject({libraryId, objectId, writeToken: tokenEdit.write_token});
 
-      const { handle } = yield client.CallBitcodeMethod({
+      yield client.CallBitcodeMethod({
         libraryId,
         objectId,
         writeToken: edgeEdit.write_token,
         method: "live/start",
         constant: false
       });
-
-      /* TODO: Check status before updating
-
-      const liveMeta = yield client.CallBitcodeMethod({
-        libraryId,
-        objectId,
-        method: "live/meta",
-        constant: false
-      });
-
-      console.log(liveMeta);
-
-       */
-
-
-      yield client.ReplaceMetadata({
-        libraryId,
-        objectId,
-        writeToken: infoEdit.write_token,
-        metadataSubtree: "public/live_stream_info",
-        metadata: {
-          node: fabricURIs[0],
-          write_token: edgeEdit.write_token,
-          handle
-        }
-      });
-
-      yield client.FinalizeContentObject({
-        libraryId,
-        objectId,
-        writeToken: infoEdit.write_token
-      });
-
-      this.active = true;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Failed to start stream:");
       // eslint-disable-next-line no-console
       console.error(error);
     } finally {
+      yield this.StreamInfo({libraryId, objectId});
+
       yield client.ResetRegion();
       this.loading = false;
     }
@@ -265,45 +300,24 @@ class LiveStore {
         yield client.CallBitcodeMethod({
           libraryId,
           objectId,
-          writeToken: streamInfo.write_token,
-          method: `live/stop/${streamInfo.handle}`,
+          writeToken: streamInfo.edgeWriteToken,
+          method: `live/stop/${streamInfo.liveHandle}`,
           constant: false,
           format: "text"
         });
+
+        this.liveHandle = "";
       } catch (error) {
         if(error.body.errors[0].cause.kind !== "item does not exist") {
           throw error;
         } else {
           // eslint-disable-next-line no-console
           console.error("Handle does not exist - removing stream info from metadata");
+          this.liveHandle = "";
         }
       }
 
-      yield new Promise(resolve => setTimeout(resolve, 2000));
-
-      try {
-        yield client.FinalizeContentObject({
-          libraryId,
-          objectId,
-          writeToken: streamInfo.write_token
-        });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Failed to finalize live edge token", streamInfo.write_token);
-        // eslint-disable-next-line no-console
-        console.error(error);
-      }
-
-      yield new Promise(resolve => setTimeout(resolve, 2000));
-
       const { write_token } = yield client.EditContentObject({libraryId, objectId});
-
-      yield client.DeleteMetadata({
-        libraryId,
-        objectId,
-        writeToken: write_token,
-        metadataSubtree: "public/live_stream_info"
-      });
 
       yield client.DeleteMetadata({
         libraryId,
@@ -320,8 +334,6 @@ class LiveStore {
       });
 
       yield client.FinalizeContentObject({libraryId, objectId, writeToken: write_token});
-
-      this.active = false;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Failed to stop stream:");
@@ -329,6 +341,7 @@ class LiveStore {
       console.error(error);
     } finally {
       yield client.ResetRegion();
+      yield this.StreamInfo({libraryId, objectId});
       this.loading = false;
     }
   });

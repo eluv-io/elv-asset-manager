@@ -7,13 +7,24 @@ import {Action, Confirm, ImageIcon, LoadingElement} from "elv-components-js";
 import StreamActive from "../../static/icons/video.svg";
 import StreamInactive from "../../static/icons/video-off.svg";
 import VideoPreview from "../VideoPreview";
+import AppFrame from "../AppFrame";
+
+import UrlJoin from "url-join";
 
 @inject("rootStore")
 @inject("liveStore")
 @observer
 class LiveStream extends React.Component {
+  componentDidMount() {
+    this.props.liveStore.StreamInfo();
+  }
+
+  Status() {
+    return this.props.liveStore.streamStatus[this.props.rootStore.params.objectId] || {};
+  }
+
   ToggleStream() {
-    const active = this.props.liveStore.active;
+    const active = this.Status().active;
 
     return (
       <Action
@@ -31,10 +42,25 @@ class LiveStream extends React.Component {
   }
 
   StreamPreview() {
-    if(!this.props.liveStore.active) { return null; }
+    if(!this.Status().active) { return null; }
+
+    const streamSampleUrl = EluvioConfiguration.apps && (EluvioConfiguration.apps["Stream Sample"] || EluvioConfiguration.apps["stream-sample"]);
+
+    if(!streamSampleUrl) {
+      return (
+        <ToggleSection sectionName="Stream Preview">
+          <VideoPreview objectId={this.props.rootStore.params.objectId}/>
+        </ToggleSection>
+      );
+    }
+
     return (
       <ToggleSection sectionName="Stream Preview">
-        <VideoPreview objectId={this.props.rootStore.params.objectId} />
+        <AppFrame
+          appUrl={UrlJoin(streamSampleUrl, "/#/", this.props.rootStore.params.objectId)}
+          queryParams={{action: "display"}}
+          className="preview-frame"
+        />
       </ToggleSection>
     );
   }
@@ -149,15 +175,21 @@ class LiveStream extends React.Component {
   }
 
   render() {
+    const status = this.Status();
+
     return (
       <div className="asset-form-section-container asset-form-live-container">
         <h3 className="live-header">
-          <div className={`stream-indicator ${this.props.liveStore.active ? "stream-indicator-active" : "stream-indicator-inactive"}`}>
+          <div
+            onClick={this.props.liveStore.StreamInfo}
+            className={`stream-indicator ${status.active ? "stream-indicator-active" : "stream-indicator-inactive"}`}
+          >
             <ImageIcon
-              icon={this.props.liveStore.active ? StreamActive : StreamInactive}
-              title={this.props.liveStore.active ? "Stream Active" : "Stream Inactive"}
+              icon={status.active ? StreamActive : StreamInactive}
+              title={status.active ? "Stream Active" : "Stream Inactive"}
             />
           </div>
+          <div className="stream-status">{ status.status }</div>
 
           Live Stream Management
 
