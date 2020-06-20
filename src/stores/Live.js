@@ -30,6 +30,7 @@ class LiveStore {
   @observable force_keyint = 40;
   @observable video_seg_duration_ts = 2160000;
   @observable video_bitrate = 8000000;
+  @observable video_stream_id = -1;
   @observable force_equal_frame_duration = false;
 
   // Audio Parameters
@@ -39,6 +40,7 @@ class LiveStore {
   @observable audio_duration_ts = 1152000;
   @observable sample_rate = 48000;
   @observable audio_seg_duration_ts = 1440000;
+  @observable audio_stream_id = -1;
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -72,6 +74,7 @@ class LiveStore {
       this.force_keyint = metadata.video_tx_params.force_keyint || this.force_keyint;
       this.video_seg_duration_ts = metadata.video_tx_params.seg_duration_ts || this.video_seg_duration_ts;
       this.video_bitrate = metadata.video_tx_params.video_bitrate || this.video_bitrate;
+      this.video_stream_id = metadata.video_tx_params.stream_id || this.video_stream_id;
       this.force_equal_frame_duration = metadata.video_tx_params.force_equal_frame_duration || this.force_equal_frame_duration;
     }
 
@@ -82,6 +85,7 @@ class LiveStore {
       this.dcodec = metadata.audio_tx_params.dcodec || this.dcodec;
       this.audio_duration_ts = metadata.audio_tx_params.duration_ts || this.audio_duration_ts;
       this.sample_rate = metadata.audio_tx_params.sample_rate || this.sample_rate;
+      this.audio_stream_id = metadata.audio_tx_params.stream_id || this.audio_stream_id;
       this.audio_seg_duration_ts = metadata.audio_tx_params.seg_duration_ts || this.audio_seg_duration_ts;
     }
 
@@ -387,7 +391,7 @@ class LiveStore {
         });
       }
 
-      yield client.ReplaceMetadata({
+      yield client.MergeMetadata({
         libraryId,
         objectId,
         writeToken,
@@ -399,6 +403,7 @@ class LiveStore {
           force_keyint: parseInt(this.force_keyint),
           seg_duration_ts: parseInt(this.video_seg_duration_ts),
           video_bitrate: parseInt(this.video_bitrate),
+          stream_id: parseInt(this.video_stream_id),
           force_equal_frame_duration: this.force_equal_frame_duration
         }
       });
@@ -414,7 +419,8 @@ class LiveStore {
           dcodec: this.dcodec,
           duration_ts: parseInt(this.audio_duration_ts),
           sample_rate: parseInt(this.sample_rate),
-          seg_duration_ts: parseInt(this.audio_seg_duration_ts)
+          seg_duration_ts: parseInt(this.audio_seg_duration_ts),
+          stream_id: parseInt(this.audio_stream_id)
         }
       });
 

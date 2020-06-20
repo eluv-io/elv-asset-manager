@@ -116,6 +116,12 @@ class LiveStream extends React.Component {
           onChange={video_bitrate => this.props.liveStore.UpdateParameter("video_bitrate", video_bitrate)}
         />
 
+        <Input
+          name="video_stream_id"
+          value={this.props.liveStore.video_stream_id}
+          onChange={video_stream_id => this.props.liveStore.UpdateParameter("video_stream_id", video_stream_id)}
+        />
+
         <Checkbox
           name="force_equal_frame_duration"
           label="Force Equal Frame Duration"
@@ -169,6 +175,12 @@ class LiveStream extends React.Component {
           label="Segment Duration Timescale"
           value={this.props.liveStore.audio_seg_duration_ts}
           onChange={audio_seg_duration_ts => this.props.liveStore.UpdateParameter("audio_seg_duration_ts", audio_seg_duration_ts)}
+        />
+
+        <Input
+          name="audio_stream_id"
+          value={this.props.liveStore.audio_stream_id}
+          onChange={audio_stream_id => this.props.liveStore.UpdateParameter("audio_stream_id", audio_stream_id)}
         />
       </ToggleSection>
     );
