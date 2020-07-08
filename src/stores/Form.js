@@ -34,7 +34,7 @@ class FormStore {
   @observable assets = {};
 
   @observable siteCustomization = {
-    logo: null,
+    logo: {},
     colors: {
       background: "#002957",
       primary_text: "#ffffff",
@@ -220,6 +220,29 @@ class FormStore {
           ...assetMetadata.site_customization,
           arrangement
         };
+      }
+
+      if(this.HasControl("premiere")) {
+        if(this.siteCustomization.premiere && this.siteCustomization.premiere.title) {
+          try {
+            const target = yield this.rootStore.client.LinkTarget({
+              versionHash: this.rootStore.params.versionHash,
+              linkPath: "public/asset_metadata/site_customization/premiere/title"
+            });
+
+            yield this.RetrieveAsset(target);
+            this.siteCustomization.premiere.title = this.targets[target];
+            this.siteCustomization.premiere.premieresAt = DateTime.fromISO(this.siteCustomization.premiere.premieresAt);
+            this.siteCustomization.premiere.enabled = true;
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error("Failed to load premiere title");
+            // eslint-disable-next-line no-console
+            console.error(error);
+          }
+        } else {
+          delete this.siteCustomization.premiere;
+        }
       }
     }
   });
@@ -613,6 +636,7 @@ class FormStore {
       displayTitle: assetMetadata.display_title || assetMetadata.title,
       slug: assetMetadata.slug,
       playable: !!(assetMetadata.sources || {}).default,
+      versionHash,
       latestVersionHash
     };
   });
@@ -1184,6 +1208,15 @@ class FormStore {
           return entry;
         });
 
+        if(this.HasControl("premiere")) {
+          if(!siteCustomization.premiere || !siteCustomization.premiere.enabled || !siteCustomization.premiere.title) {
+            delete siteCustomization.premiere;
+          } else {
+            delete siteCustomization.premiere.enabled;
+            siteCustomization.premiere.title = this.CreateLink(siteCustomization.premiere.title.versionHash);
+            siteCustomization.premiere.premieresAt = this.FormatDate(siteCustomization.premiere.premieresAt || Date.now(), true);
+          }
+        }
 
         yield client.ReplaceMetadata({
           libraryId,
@@ -1338,6 +1371,18 @@ class FormStore {
   RemoveArrangementEntry(index) {
     this.siteCustomization.arrangement = this.siteCustomization.arrangement.filter((_, i) => i !== index);
   }
+
+  @action.bound
+  UpdatePremiere(premiere) {
+    this.siteCustomization.premiere = premiere;
+  }
+
+  @action.bound
+  SetPremiereTitle = flow(function * (versionHash) {
+    yield this.RetrieveAsset(versionHash);
+
+    this.siteCustomization.premiere.title = this.targets[versionHash];
+  });
 
 
   // Site Selector + Access Keys

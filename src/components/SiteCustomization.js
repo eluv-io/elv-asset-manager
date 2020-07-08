@@ -11,6 +11,7 @@ import AsyncComponent from "./AsyncComponent";
 import DeleteIcon from "../static/icons/trash.svg";
 import MaximizeIcon from "../static/icons/maximize.svg";
 import OrderButtons from "./OrderButtons";
+import Premiere from "./Premiere";
 
 const siteComponents = {
   feature: {
@@ -349,7 +350,7 @@ class SiteCustomization extends React.Component {
   }
 
   Logo() {
-    const logoLink = this.props.formStore.siteCustomization.logo;
+    const logoLink = this.props.formStore.siteCustomization.logo || {};
 
     return (
       <div className="site-logo-selection">
@@ -398,6 +399,7 @@ class SiteCustomization extends React.Component {
           { this.Logo() }
           { this.Colors() }
         </div>
+        <Premiere />
         <div className="asset-form-section-container site-arrangement-container">
           <h4>Arrangement</h4>
           { this.props.formStore.siteCustomization.arrangement.map((_, i) => <SiteArrangementEntry key={`site-entry-${i}`} index={i} />)}

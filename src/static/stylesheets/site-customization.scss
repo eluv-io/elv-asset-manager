@@ -105,6 +105,15 @@ input {
       width: 100%;
     }
   }
+
+  .site-premiere-selection {
+    align-items: flex-start;
+    width: 100%;
+
+    .rdt {
+      width: 20rem;
+    }
+  }
 }
 
 .actions-container {
