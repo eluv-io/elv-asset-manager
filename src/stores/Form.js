@@ -230,9 +230,13 @@ class FormStore {
               linkPath: "public/asset_metadata/site_customization/premiere/title"
             });
 
+            let price = parseFloat(this.siteCustomization.premiere.price);
+            price = isNaN(price) ? "0.00" : price.toFixed(2);
+
             yield this.RetrieveAsset(target);
             this.siteCustomization.premiere.title = this.targets[target];
             this.siteCustomization.premiere.premieresAt = DateTime.fromISO(this.siteCustomization.premiere.premieresAt);
+            this.siteCustomization.premiere.price = price;
             this.siteCustomization.premiere.enabled = true;
           } catch (error) {
             // eslint-disable-next-line no-console
@@ -1213,8 +1217,13 @@ class FormStore {
             delete siteCustomization.premiere;
           } else {
             delete siteCustomization.premiere.enabled;
+
+            let price = parseFloat(this.siteCustomization.premiere.price);
+            price = isNaN(price) ? "0.00" : price.toFixed(2);
+
             siteCustomization.premiere.title = this.CreateLink(siteCustomization.premiere.title.versionHash);
             siteCustomization.premiere.premieresAt = this.FormatDate(siteCustomization.premiere.premieresAt || Date.now(), true);
+            siteCustomization.premiere.price = price;
           }
         }
 
@@ -1280,7 +1289,7 @@ class FormStore {
         label: this.playlists[0].playlistName,
         component: "feature",
         options: {
-          variant: "normal"
+          variant: "hero"
         }
       });
     }

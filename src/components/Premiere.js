@@ -1,6 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Checkbox, DateSelection} from "./Inputs";
+import {Checkbox, DateSelection, Input} from "./Inputs";
 import {Action, Modal} from "elv-components-js";
 import ContentBrowser from "./ContentBrowser";
 import {Clip} from "./Clips";
@@ -77,6 +77,11 @@ class Premiere extends React.Component {
             label="Premiere Date"
             value={premiereInfo.premieresAt}
             onChange={premieresAt => this.props.formStore.UpdatePremiere({...premiereInfo, premieresAt})}
+          />
+          <Input
+            value={premiereInfo.price}
+            label="Price"
+            onChange={price => this.props.formStore.UpdatePremiere({...premiereInfo, price})}
           />
           { this.PremiereTitle() }
           <Action onClick={this.ActivateModal}>

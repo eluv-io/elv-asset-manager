@@ -4,7 +4,7 @@ const EluvioConfiguration = {
   "apps": {
     "Eluvio Fabric Browser": "https://browse.demov3.contentfabric.io",
     "Video Editor": "https://video-editor.demov3.contentfabric.io",
-    "Site Sample": "https://site-sample.demov3.contentfabric.io",
+    "Site Sample": "http://localhost:8086",
     "Stream Sample": "https://stream-sample.demov3.contentfabric.io"
   },
   "version": "elv-core-js@9f357815914ef4a1e79279a040182ae44a8c48b2"

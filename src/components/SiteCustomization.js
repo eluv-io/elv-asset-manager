@@ -18,7 +18,7 @@ const siteComponents = {
     options: {
       variant: {
         label: "Variant",
-        values: ["normal", "full_screen"]
+        values: ["hero", "box", "video"]
       }
     }
   },
@@ -335,7 +335,7 @@ class SiteCustomization extends React.Component {
               <AppFrame
                 appUrl={
                   UrlJoin(
-                    EluvioConfiguration["siteSampleUrl"],
+                    EluvioConfiguration.apps["Site Sample"],
                     "/#/preview",
                     this.props.rootStore.params.objectId,
                     this.props.formStore.editWriteToken || ""
