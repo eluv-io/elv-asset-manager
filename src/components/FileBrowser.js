@@ -5,7 +5,7 @@ import PrettyBytes from "pretty-bytes";
 import UrlJoin from "url-join";
 import URI from "urijs";
 import Path from "path";
-import {IconButton, ImageIcon, Modal} from "elv-components-js";
+import {Action, IconButton, ImageIcon, Modal} from "elv-components-js";
 import AsyncComponent from "./AsyncComponent";
 import PreviewIcon from "./PreviewIcon";
 
@@ -283,6 +283,17 @@ class FileSelection extends React.Component {
   }
 
   Selection() {
+    if(this.props.useButton) {
+      return (
+        <div className="file-selection">
+          <Action onClick={this.ActivateModal} title="Select a file">
+            { this.props.buttonText || "Select a File"}
+          </Action>
+          { this.state.modal() }
+        </div>
+      );
+    }
+
     return (
       <div className="file-selection">
         <IconButton
@@ -309,6 +320,8 @@ FileSelection.propTypes = {
   header: PropTypes.string,
   extensions: PropTypes.arrayOf(PropTypes.string),
   versionHash: PropTypes.string.isRequired,
+  useButton: PropTypes.bool,
+  buttonText: PropTypes.string,
   Select: PropTypes.func.isRequired
 };
 

@@ -1,7 +1,8 @@
 @import "~elv-components-js/src/stylesheets/defaults";
 @import "~elv-components-js/src/stylesheets/styles";
-@import "./file_browser";
 @import "./channels";
+@import "./file_browser";
+@import "./site-customization";
 
 .rdt {
   // sass-lint:disable no-important

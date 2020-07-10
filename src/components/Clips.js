@@ -11,7 +11,7 @@ import RemoveIcon from "../static/icons/trash.svg";
 import PlayIcon from "../static/icons/play-circle.svg";
 import LinkIcon from "../static/icons/external-link.svg";
 
-const Clip = ({
+export const Clip = ({
   index,
   isDefault,
   isPlayable,

@@ -5,6 +5,26 @@ import React from "react";
 import {inject, observer} from "mobx-react";
 import Image from "../static/icons/image.svg";
 
+export const PreviewImage =
+  inject("contentStore")(
+    observer(
+      ({contentStore, imagePath, targetHash}) => {
+        if(!imagePath || !contentStore.baseFileUrls[targetHash]) { return <div className="preview-icon" />; }
+
+        const uri = URI(contentStore.baseFileUrls[targetHash]);
+        uri.path(UrlJoin(uri.path(), imagePath).replace("//", "/"));
+
+        return (
+          <CroppedIcon
+            icon={uri.toString()}
+            title={imagePath}
+            className="file-image-preview"
+          />
+        );
+      }
+    )
+  );
+
 const PreviewIcon =
   inject("contentStore")(
     observer(
