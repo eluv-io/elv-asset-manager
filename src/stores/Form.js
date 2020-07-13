@@ -22,6 +22,26 @@ const Slugify = str =>
     .replace(/[^a-z0-9\-]/g,"")
     .replace(/-+/g, "-");
 
+const AssetMetadataFields =(level) => {
+  return [
+    "ip_title_id",
+    "asset_type",
+    "title",
+    "display_title",
+    "slug",
+    "sources",
+    "."
+  ]
+    .map(key =>
+      level === undefined ?
+        [`*/${key}`, `*/*/${key}`] :
+        `${"*/".repeat(level)}${key}`
+    )
+    .flat()
+    .sort();
+};
+
+
 class FormStore {
   @observable editWriteToken;
 
@@ -179,7 +199,8 @@ class FormStore {
 
     // Load all clip types
     for(let i = 0; i < this.associatedAssets.length; i++) {
-      const name = this.associatedAssets[i].name;
+      const assetSpec = this.associatedAssets[i];
+      const name = assetSpec.name;
 
       this.assets[name] = yield this.LoadAssets(
         assetMetadata[name],
@@ -348,14 +369,17 @@ class FormStore {
       clip = this.assets[key][index];
     }
 
-    if(clip.versionHash !== clip.latestVersionHash) {
-      yield this.RetrieveAsset(clip.latestVersionHash);
+    const latestVersionHash = yield this.rootStore.client.LatestVersionHash({versionHash: clip.versionHash});
+
+    if(clip.versionHash !== latestVersionHash) {
+      yield this.RetrieveAsset(latestVersionHash);
     }
 
     const updatedClip = {
       ...clip,
-      versionHash: clip.latestVersionHash,
-      ...this.targets[clip.latestVersionHash]
+      versionHash: latestVersionHash,
+      ...this.targets[latestVersionHash],
+      latestVersionHash
     };
 
     if(playlistIndex !== undefined) {
@@ -603,14 +627,16 @@ class FormStore {
     return credits;
   }
 
-  RetrieveAssetFromLink = flow(function * (linkPath) {
+  RetrieveAssetFromLink = flow(function * (linkPath, metadata) {
     if(!this.linkHashes[linkPath]) {
-      const metadata = yield (yield this.rootStore.client.ContentObjectMetadata({
-        versionHash: this.rootStore.params.versionHash,
-        metadataSubtree: linkPath,
-        resolveLinks: true,
-        resolveIncludeSource: true
-      })) || {};
+      if(!metadata) {
+        metadata = yield (yield this.rootStore.client.ContentObjectMetadata({
+          versionHash: this.rootStore.params.versionHash,
+          metadataSubtree: linkPath,
+          resolveLinks: true,
+          resolveIncludeSource: true
+        })) || {};
+      }
 
       this.linkHashes[linkPath] = metadata["."].source;
 
@@ -628,11 +654,11 @@ class FormStore {
     if(!assetMetadata) {
       assetMetadata = (yield this.rootStore.client.ContentObjectMetadata({
         versionHash,
-        metadataSubtree: "public/asset_metadata"
+        metadataSubtree: "public/asset_metadata",
+        select: AssetMetadataFields(0)
       })) || {};
     }
 
-    const latestVersionHash = yield this.rootStore.client.LatestVersionHash({versionHash});
     this.targets[versionHash] = {
       id: assetMetadata.ip_title_id,
       assetType: assetMetadata.asset_type,
@@ -640,12 +666,11 @@ class FormStore {
       displayTitle: assetMetadata.display_title || assetMetadata.title,
       slug: assetMetadata.slug,
       playable: !!(assetMetadata.sources || {}).default,
-      versionHash,
-      latestVersionHash
+      versionHash
     };
   });
 
-  LoadAssets = flow(function * (metadata, linkPath) {
+  LoadAssets = flow(function * (metadata, linkPath, level) {
     if(!metadata) { return []; }
 
     let assets = [];
@@ -653,6 +678,16 @@ class FormStore {
     let defaultAsset;
 
     metadata = toJS(metadata);
+
+    // Provided metadata is unresolved. Retrieve full resolved metadata.
+    const resolvedMetadata = (yield this.rootStore.client.ContentObjectMetadata({
+      versionHash: this.rootStore.params.versionHash,
+      metadataSubtree: linkPath,
+      select: AssetMetadataFields(level),
+      resolveLinks: true,
+      resolveIncludeSource: true,
+      resolveIgnoreErrors: true
+    })) || {};
 
     // When slugged but not indexed, default choice is duplicated in the 'default' and slug keys.
     if(metadata.default) {
@@ -679,7 +714,12 @@ class FormStore {
           const hasSlug = !metadata[key]["/"];
           const slug = hasSlug ? Object.keys(metadata[key])[0] : undefined;
 
-          const targetHash = await this.RetrieveAssetFromLink(UrlJoin(linkPath, key.toString(), slug || ""));
+          let fullMetadata = resolvedMetadata[key.toString()] || {};
+          if(hasSlug && slug) {
+            fullMetadata = fullMetadata[slug];
+          }
+
+          const targetHash = await this.RetrieveAssetFromLink(UrlJoin(linkPath, key.toString(), slug || ""), fullMetadata);
 
           // Order might be saved in the link
           let order = ((hasSlug ? metadata[key][slug] : metadata[key]) || {}).order;
@@ -866,7 +906,8 @@ class FormStore {
               playlistSlug: playlistIndex,
               clips: await this.LoadAssets(
                 metadata[playlistIndex].list,
-                `public/asset_metadata/playlists/${playlistIndex}/list`
+                `public/asset_metadata/playlists/${playlistIndex}/list`,
+                1
               )
             };
 
@@ -905,7 +946,7 @@ class FormStore {
     let index = hasDefault ? 1 : 0;
 
     await Promise.all(
-      (assets || []).map(async ({displayTitle, versionHash, isDefault}) => {
+      (assets || []).map(async ({displayTitle, versionHash, isDefault, slug}) => {
         const link = this.CreateLink(versionHash);
 
         let key;
@@ -917,10 +958,12 @@ class FormStore {
         }
 
         if(assetType.slugged) {
-          const slug = (await this.rootStore.client.ContentObjectMetadata({
-            versionHash,
-            metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
-          })) || Slugify(displayTitle);
+          if(!slug) {
+            slug = (await this.rootStore.client.ContentObjectMetadata({
+              versionHash,
+              metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
+            })) || Slugify(displayTitle);
+          }
 
           if(assetType.indexed) {
             formattedAssets[key] = {
