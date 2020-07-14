@@ -350,20 +350,20 @@ class SiteCustomization extends React.Component {
   }
 
   Logo() {
-    const logoLink = this.props.formStore.siteCustomization.logo || {};
+    const logoLink = this.props.formStore.siteCustomization.logo;
 
     return (
       <div className="site-logo-selection">
         <h4>Logo</h4>
         {Maybe(
-          logoLink.imagePath,
+          logoLink,
           () => <PreviewImage imagePath={logoLink.imagePath} targetHash={logoLink.targetHash} />
         )}
         <FileSelection
           header="Select a Logo"
           useButton={true}
           buttonText="Select a Logo"
-          versionHash={logoLink["."] && logoLink["."].source || this.props.rootStore.params.versionHash}
+          versionHash={(logoLink && logoLink["."] && logoLink["."].source) || this.props.rootStore.params.versionHash}
           Select={({imagePath, targetHash}) => this.props.formStore.UpdateSiteLogo({
             imagePath,
             targetHash

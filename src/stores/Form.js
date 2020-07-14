@@ -54,7 +54,7 @@ class FormStore {
   @observable assets = {};
 
   @observable siteCustomization = {
-    logo: {},
+    logo: undefined,
     colors: {
       background: "#002957",
       primary_text: "#ffffff",
@@ -241,6 +241,10 @@ class FormStore {
           ...assetMetadata.site_customization,
           arrangement
         };
+      }
+
+      if(this.siteCustomization.logo) {
+        this.siteCustomization.logo = this.LinkComponents(this.siteCustomization.logo);
       }
 
       if(this.HasControl("premiere")) {
@@ -772,6 +776,21 @@ class FormStore {
     return assets;
   });
 
+  LinkComponents(link) {
+    if(!link || !link["/"]) {
+      return;
+    }
+
+    let targetHash = this.rootStore.params.versionHash;
+    let imagePath = link["/"].replace(/^\.\/files\//, "");
+    if(link["/"].startsWith("/qfab/")) {
+      targetHash = link["/"].split("/")[2];
+      imagePath = link["/"].split("/").slice(4).join("/");
+    }
+
+    return {targetHash, imagePath};
+  }
+
   LoadImages = flow(function * (metadata) {
     let images = [];
     let imageTargets = [];
@@ -784,12 +803,7 @@ class FormStore {
             return;
           }
 
-          let targetHash = this.rootStore.params.versionHash;
-          let imagePath = link["/"].replace(/^\.\/files\//, "");
-          if(link["/"].startsWith("/qfab/")) {
-            targetHash = link["/"].split("/")[2];
-            imagePath = link["/"].split("/").slice(4).join("/");
-          }
+          const {targetHash, imagePath} = this.LinkComponents(link);
 
           if(!imageTargets.includes(targetHash)) {
             imageTargets.push(targetHash);
@@ -850,12 +864,7 @@ class FormStore {
 
         if(!link || !link["/"]) { return; }
 
-        let targetHash = this.rootStore.params.versionHash;
-        let imagePath = link["/"].replace(/^\.\/files\//, "");
-        if(link["/"].startsWith("/qfab/")) {
-          targetHash = link["/"].split("/")[2];
-          imagePath = link["/"].split("/").slice(4).join("/");
-        }
+        const {targetHash, imagePath} = this.LinkComponents(link);
 
         if(!imageTargets.includes(targetHash)) {
           imageTargets.push(targetHash);
@@ -1255,6 +1264,10 @@ class FormStore {
           return entry;
         });
 
+        if(siteCustomization.logo) {
+          siteCustomization.logo = this.CreateLink(siteCustomization.logo.targetHash, UrlJoin("files", siteCustomization.logo.imagePath));
+        }
+
         if(this.HasControl("premiere")) {
           if(!siteCustomization.premiere || !siteCustomization.premiere.enabled || !siteCustomization.premiere.title) {
             delete siteCustomization.premiere;
@@ -1315,10 +1328,7 @@ class FormStore {
 
   @action.bound
   UpdateSiteLogo({imagePath, targetHash}) {
-    this.siteCustomization.logo = {
-      imagePath,
-      targetHash
-    };
+    this.siteCustomization.logo = {imagePath, targetHash};
   }
 
   @action.bound
