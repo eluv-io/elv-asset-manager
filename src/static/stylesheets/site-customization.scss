@@ -62,10 +62,16 @@ input {
   }
 
   .site-arrangement-entry {
-    border-bottom: 1px solid $elv-color-lightgray;
+    border-top: 1px solid $elv-color-lightgray;
     display: flex;
     padding: $elv-spacing-s 0;
     width: 100%;
+  }
+
+  .asset-form-clips-container {
+    &:not(:empty) {
+      padding-bottom: $elv-spacing-l;
+    }
   }
 
   .arrangement-option {
@@ -75,7 +81,7 @@ input {
     width: 12rem;
 
     &.medium {
-      width: 20rem;
+      width: 17rem;
     }
 
     &.long {
@@ -86,8 +92,13 @@ input {
       flex: 1 1 auto;
     }
 
+    &.color-option {
+      width: 3.5rem;
+    }
+
     .actions {
       display: flex;
+      height: 100%;
       justify-content: flex-end;
     }
 
@@ -103,6 +114,14 @@ input {
 
     select {
       width: 100%;
+    }
+
+    input {
+      &[type="color"] {
+        margin: 0;
+        padding: 0;
+        width: 3rem;
+      }
     }
   }
 

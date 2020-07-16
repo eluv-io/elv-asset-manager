@@ -2,7 +2,7 @@ import React from "react";
 import {inject, observer} from "mobx-react";
 import AppFrame from "./AppFrame";
 import UrlJoin from "url-join";
-import {Action, Confirm, IconButton} from "elv-components-js";
+import {Action, Confirm, IconButton, Modal} from "elv-components-js";
 import {ColorSelection, FormatName, Maybe} from "./Inputs";
 import FileSelection from "./FileBrowser";
 import {PreviewImage} from "./PreviewIcon";
@@ -12,22 +12,38 @@ import DeleteIcon from "../static/icons/trash.svg";
 import MaximizeIcon from "../static/icons/maximize.svg";
 import OrderButtons from "./OrderButtons";
 import Premiere from "./Premiere";
+import ContentBrowser from "./ContentBrowser";
+import {Clip} from "./Clips";
 
 const siteComponents = {
+  hero: {
+    firstOnly: true,
+    noLabel: true
+  },
   feature: {
+    singleTitle: true,
+    noLabel: true,
+    initialOptions: {
+      variant: "box",
+      color: "#ffffff"
+    },
     options: {
       variant: {
         label: "Variant",
-        values: ["hero", "box", "video"]
+        values: ["box", "video"]
+      },
+      color: {
+        label: "Color",
+        type: "color",
+        forVariant: "box",
       }
     }
   },
   carousel: {
+    initialOptions: {
+      variant: "landscape"
+    },
     options: {
-      width: {
-        label: "Icon Width",
-        values: ["small", "medium", "large"]
-      },
       variant: {
         label: "Variant",
         values: ["landscape", "portrait"]
@@ -35,11 +51,10 @@ const siteComponents = {
     }
   },
   grid: {
+    initialOptions: {
+      variant: "landscape"
+    },
     options: {
-      width: {
-        label: "Icon Width",
-        values: ["small", "medium", "large"]
-      },
       variant: {
         label: "Variant",
         values: ["landscape", "portrait"]
@@ -47,23 +62,81 @@ const siteComponents = {
     }
   },
   header: {
-    for: ["header"],
+    noTitles: "true",
+    noLabel: true,
     className: "long",
+    initialOptions: {
+      text: ""
+    },
     options: {
       text: {
-        label: "Text"
+        label: "Text",
+        type: "text"
       }
     }
   }
 };
 
 @inject("formStore")
+@inject("rootStore")
 @observer
 class SiteArrangementEntry extends React.Component {
-  // source type, component, variant, options (e.g. carousel/grid width)
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      modal: false
+    };
+
+    this.CloseModal = this.CloseModal.bind(this);
+    this.ActivateModal = this.ActivateModal.bind(this);
+  }
 
   Entry() {
     return this.props.formStore.siteCustomization.arrangement[this.props.index];
+  }
+
+  ActivateModal() {
+    this.setState({
+      modal: (
+        <Modal
+          className="asset-form-modal"
+          closable={true}
+          OnClickOutside={this.CloseModal}
+        >
+          <ContentBrowser
+            header="Premiere Selection"
+            onComplete={async ({versionHash}) => {
+              await this.props.formStore.SetArrangementEntryTitle(this.props.index, versionHash);
+              this.CloseModal();
+            }}
+            onCancel={this.CloseModal}
+          />
+        </Modal>
+      )
+    });
+  }
+
+  CloseModal() {
+    this.setState({modal: null});
+  }
+
+  SingleTitle() {
+    const title = this.Entry().title;
+
+    if(!title) { return null; }
+
+    return (
+      <div className="asset-form-clips-container">
+        <Clip
+          index={0}
+          isPlayable={title.playable}
+          clip={title}
+          Remove={() => this.props.formStore.UpdateArrangementEntry({index: this.props.index, attrs: {...this.Entry(), title: undefined}})}
+          OpenObjectLink={this.props.rootStore.OpenObjectLink}
+        />
+      </div>
+    );
   }
 
   Update(attrs) {
@@ -77,21 +150,43 @@ class SiteArrangementEntry extends React.Component {
   }
 
   Actions() {
-    return (
-      <div className="arrangement-option actions-cell">
-        <label />
-        <div className="actions">
-          <OrderButtons
-            index={this.props.index}
-            length={this.props.formStore.siteCustomization.arrangement.length}
-            Swap={this.props.formStore.SwapArrangementEntries}
-          />
-          <IconButton
-            icon={DeleteIcon}
-            onClick={() => this.props.formStore.RemoveArrangementEntry(this.props.index)}
-          />
+    let orderButtons;
+    if(!siteComponents[this.Entry().component].firstOnly) {
+      orderButtons = (
+        <OrderButtons
+          index={this.props.index}
+          length={this.props.formStore.siteCustomization.arrangement.length}
+          Swap={this.props.formStore.SwapArrangementEntries}
+        />
+      );
+    }
+
+    let titleButton;
+    if(siteComponents[this.Entry().component].singleTitle) {
+      titleButton = (
+        <div className="arrangement-option actions-cell">
+          <label />
+          <Action onClick={this.ActivateModal}>
+            Choose Title
+          </Action>
         </div>
-      </div>
+      );
+    }
+
+    return (
+      <React.Fragment>
+        { titleButton }
+        <div className="arrangement-option actions-cell">
+          <label />
+          <div className="actions">
+            { orderButtons }
+            <IconButton
+              icon={DeleteIcon}
+              onClick={() => this.props.formStore.RemoveArrangementEntry(this.props.index)}
+            />
+          </div>
+        </div>
+      </React.Fragment>
     );
   }
 
@@ -103,6 +198,10 @@ class SiteArrangementEntry extends React.Component {
 
     return Object.keys(options).map(key => {
       const config = options[key];
+
+      if(config.forVariant && entry.options.variant !== config.forVariant) {
+        return null;
+      }
 
       let input;
       if(config.values) {
@@ -119,25 +218,34 @@ class SiteArrangementEntry extends React.Component {
           </select>
         );
       } else {
-        input = <input value={entry.options[key]} onChange={event => this.Update({options: {...entry.options, [key]: event.target.value}})} />;
+        input = (
+          <input
+            type={config.type}
+            value={entry.options[key]}
+            onChange={event => this.Update({options: {...entry.options, [key]: event.target.value}})}
+          />
+        );
       }
 
       return (
-        <div className={`arrangement-option ${component.className || ""}`} key={`arrangement-option-${key}`}>
+        <div className={`arrangement-option ${component.className || ""} ${config.type === "color" ? "color-option" : ""}`} key={`arrangement-option-${key}`}>
           <label>{ config.label }</label>
           { input }
         </div>
       );
-    });
+    }).filter(option => option);
   }
 
   Label() {
-    if(!["asset", "playlist"].includes(this.Entry().type)) {
+    if(
+      !["asset", "playlist"].includes(this.Entry().type) ||
+      siteComponents[this.Entry().component].noLabel
+    ) {
       return null;
     }
 
     return (
-      <div className="arrangement-option">
+      <div className="arrangement-option medium">
         <label>Label</label>
         <input
           value={this.Entry().label}
@@ -147,29 +255,9 @@ class SiteArrangementEntry extends React.Component {
     );
   }
 
-  Components() {
-    if(!["asset", "playlist"].includes(this.Entry().type)) {
-      return null;
-    }
-
-    return (
-      <div className="arrangement-option">
-        <label>Component</label>
-        <select
-          value={this.Entry().component}
-          onChange={event => this.Update({component: event.target.value})}
-        >
-          {
-            Object.keys(siteComponents).map(component =>
-              component === "header" ? null : <option key={`component-${component}`} value={component}>{ FormatName(component) }</option>
-            )
-          }
-        </select>
-      </div>
-    );
-  }
-
   Sources() {
+    if(siteComponents[this.Entry().component].noTitles || siteComponents[this.Entry().component].singleTitle) { return null; }
+
     let assets = this.props.formStore.relevantAssociatedAssets.map(assetType => [assetType.label, assetType.name]);
 
     if(this.props.formStore.controls.includes("playlists") && this.props.formStore.playlists.length > 0) {
@@ -180,8 +268,6 @@ class SiteArrangementEntry extends React.Component {
 
     let labelMap = {};
     assets.forEach(([label, name]) => labelMap[name] = label.replace(/ \(Playlist\)$/, ""));
-
-    assets.push(["Header", "header"]);
 
     return (
       <div className="arrangement-option medium">
@@ -197,17 +283,6 @@ class SiteArrangementEntry extends React.Component {
                 name: source,
                 label,
                 playlistId: source.split("playlist--")[1]
-              });
-            } else if(source === "header") {
-              this.Update({
-                type: "header",
-                name: "header",
-                component: "header",
-                playlistId: undefined,
-                options: {
-                  ...(this.Entry().options),
-                  text: ""
-                }
               });
             } else {
               this.Update({
@@ -225,15 +300,50 @@ class SiteArrangementEntry extends React.Component {
     );
   }
 
+  Components() {
+    return (
+      <div className="arrangement-option">
+        <label>Component</label>
+        <select
+          value={this.Entry().component}
+          onChange={event => {
+            const componentSpec = siteComponents[event.target.value];
+            this.Update({
+              component: event.target.value,
+              label: componentSpec.noLabel ? "" : this.Entry().label,
+              name: componentSpec.singleTitle || componentSpec.noTitle ? "" : this.Entry().name,
+              title: componentSpec.singleTitle ? this.Entry().title : undefined,
+              options: componentSpec.initialOptions
+            });
+          }}
+        >
+          {
+            Object.keys(siteComponents).map(component => {
+              if(siteComponents[component].firstOnly && this.props.index !== 0) {
+                return null;
+              }
+
+              return <option key={`component-${component}`} value={component}>{ FormatName(component) }</option>;
+            })
+          }
+        </select>
+      </div>
+    );
+  }
+
   render() {
     return (
-      <div className="site-arrangement-entry">
-        { this.Sources() }
-        { this.Label() }
-        { this.Components() }
-        { this.Options() }
-        { this.Actions() }
-      </div>
+      <React.Fragment>
+        <div className="site-arrangement-entry">
+          { this.Components() }
+          { this.Sources() }
+          { this.Label() }
+          { this.Options() }
+          { this.Actions() }
+        </div>
+        { this.SingleTitle() }
+        { this.state.modal }
+      </React.Fragment>
     );
   }
 }
@@ -391,6 +501,36 @@ class SiteCustomization extends React.Component {
     );
   }
 
+  Arrangement() {
+    const premiereInfo = this.props.formStore.siteCustomization.premiere || {};
+
+    if(premiereInfo && premiereInfo.enabled) {
+      // Hide arrangement if premiere is enabled
+      return null;
+    }
+
+    return (
+      <div className="asset-form-section-container site-arrangement-container">
+        <h4>Arrangement</h4>
+        { this.props.formStore.siteCustomization.arrangement.map((_, i) => <SiteArrangementEntry key={`site-entry-${i}`} index={i} />)}
+        <div className="actions-container">
+          <Action
+            className="secondary"
+            onClick={async () =>
+              await Confirm({
+                message: "Are you sure you want to use the default arrangement?",
+                onConfirm: this.props.formStore.DefaultArrangement
+              })
+            }
+          >
+            Default
+          </Action>
+          <Action onClick={this.props.formStore.AddArrangementEntry}>Add</Action>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     return (
       <div className="asset-form-container site-customization">
@@ -399,25 +539,11 @@ class SiteCustomization extends React.Component {
           { this.Logo() }
           { this.Colors() }
         </div>
+
         <Premiere />
-        <div className="asset-form-section-container site-arrangement-container">
-          <h4>Arrangement</h4>
-          { this.props.formStore.siteCustomization.arrangement.map((_, i) => <SiteArrangementEntry key={`site-entry-${i}`} index={i} />)}
-          <div className="actions-container">
-            <Action
-              className="secondary"
-              onClick={async () =>
-                await Confirm({
-                  message: "Are you sure you want to use the default arrangement?",
-                  onConfirm: this.props.formStore.DefaultArrangement
-                })
-              }
-            >
-              Default
-            </Action>
-            <Action onClick={this.props.formStore.AddArrangementEntry}>Add</Action>
-          </div>
-        </div>
+
+        { this.Arrangement() }
+
         { this.Preview() }
       </div>
     );

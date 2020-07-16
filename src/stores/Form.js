@@ -58,9 +58,7 @@ class FormStore {
     colors: {
       background: "#002957",
       primary_text: "#ffffff",
-      secondary_text: "#8c8c8c",
-      border: "#2a2a2a",
-      accent: "#1b73e8"
+      secondary_text: "#8c8c8c"
     },
     arrangement: []
   };
@@ -209,70 +207,7 @@ class FormStore {
     }
 
     if(this.HasControl("site_customization")) {
-      if(!assetMetadata.site_customization) {
-        this.DefaultArrangement();
-      } else {
-        let arrangement = assetMetadata.site_customization.arrangement || [];
-        arrangement = arrangement.map(entry => {
-          if(entry.type !== "playlist") {
-            return entry;
-          }
-
-          const playlist = this.playlists.find(playlist => playlist.playlistSlug === entry.playlist_slug);
-
-          if(!playlist) {
-            return;
-          }
-
-          entry = {
-            ...entry,
-            playlistId: playlist.playlistId,
-            name: `playlist--${playlist.playlistId}`
-          };
-
-          delete entry.playlist_slug;
-
-          return entry;
-        })
-          .filter(entry => entry);
-
-
-        this.siteCustomization = {
-          ...assetMetadata.site_customization,
-          arrangement
-        };
-      }
-
-      if(this.siteCustomization.logo) {
-        this.siteCustomization.logo = this.LinkComponents(this.siteCustomization.logo);
-      }
-
-      if(this.HasControl("premiere")) {
-        if(this.siteCustomization.premiere && this.siteCustomization.premiere.title) {
-          try {
-            const target = yield this.rootStore.client.LinkTarget({
-              versionHash: this.rootStore.params.versionHash,
-              linkPath: "public/asset_metadata/site_customization/premiere/title"
-            });
-
-            let price = parseFloat(this.siteCustomization.premiere.price);
-            price = isNaN(price) ? "0.00" : price.toFixed(2);
-
-            yield this.RetrieveAsset(target);
-            this.siteCustomization.premiere.title = this.targets[target];
-            this.siteCustomization.premiere.premieresAt = DateTime.fromISO(this.siteCustomization.premiere.premieresAt);
-            this.siteCustomization.premiere.price = price;
-            this.siteCustomization.premiere.enabled = true;
-          } catch (error) {
-            // eslint-disable-next-line no-console
-            console.error("Failed to load premiere title");
-            // eslint-disable-next-line no-console
-            console.error(error);
-          }
-        } else {
-          delete this.siteCustomization.premiere;
-        }
-      }
+      yield this.LoadSiteCustomization(assetMetadata.site_customization);
     }
   });
 
@@ -948,6 +883,95 @@ class FormStore {
     ];
   });
 
+  LoadSiteCustomization = flow(function * (metadata) {
+    if(!metadata) { return; }
+
+    if(metadata.logo) {
+      this.siteCustomization.logo = this.LinkComponents(metadata.logo);
+    }
+
+    if(metadata.colors) {
+      this.siteCustomization.colors = {
+        ...this.siteCustomization.colors,
+        ...metadata.colors
+      };
+    }
+
+    // Site arrangement
+    if(!metadata) {
+      this.DefaultArrangement();
+    } else {
+      let arrangement = toJS(metadata.arrangement || []);
+      arrangement = (yield Promise.all(
+        arrangement.map(async (entry, index) => {
+          if(entry.title) {
+            const target = await this.rootStore.client.LinkTarget({
+              versionHash: this.rootStore.params.versionHash,
+              linkPath: `public/asset_metadata/site_customization/arrangement/${index}/title`
+            });
+
+            await this.RetrieveAsset(target);
+
+            entry.title = this.targets[target];
+          }
+
+          if(entry.type !== "playlist") {
+            return entry;
+          }
+
+          const playlist = this.playlists.find(playlist => playlist.playlistSlug === entry.playlist_slug);
+
+          if(!playlist) {
+            return;
+          }
+
+          entry = {
+            ...entry,
+            playlistId: playlist.playlistId,
+            name: `playlist--${playlist.playlistId}`
+          };
+
+          delete entry.playlist_slug;
+
+          return entry;
+        })
+      ))
+        .filter(entry => entry);
+
+
+      this.siteCustomization.arrangement = arrangement;
+    }
+
+    if(this.HasControl("premiere")) {
+      if(metadata.premiere && metadata.premiere.title) {
+        try {
+          const target = yield this.rootStore.client.LinkTarget({
+            versionHash: this.rootStore.params.versionHash,
+            linkPath: "public/asset_metadata/site_customization/premiere/title"
+          });
+
+          let price = parseFloat(metadata.premiere.price);
+          price = isNaN(price) ? "0.00" : price.toFixed(2);
+
+          yield this.RetrieveAsset(target);
+          this.siteCustomization.premiere = {
+            title: this.targets[target],
+            premieresAt:  DateTime.fromISO(metadata.premiere.premieresAt),
+            price: price,
+            enabled: true
+          };
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error("Failed to load premiere title");
+          // eslint-disable-next-line no-console
+          console.error(error);
+        }
+      } else {
+        delete this.siteCustomization.premiere;
+      }
+    }
+  });
+
   async FormatAssets({assetType, assets}) {
     // If not slugged or indexed, asset is saved as array
     let formattedAssets = assetType.indexed || assetType.slugged ? {} : [];
@@ -1252,6 +1276,11 @@ class FormStore {
 
       if(this.HasControl("site_customization")) {
         let siteCustomization = {...toJS(this.siteCustomization)};
+
+        if(siteCustomization.logo && siteCustomization.logo.targetHash && siteCustomization.logo.imagePath) {
+          siteCustomization.logo = this.CreateLink(siteCustomization.logo.targetHash, UrlJoin("files", siteCustomization.logo.imagePath));
+        }
+
         siteCustomization.arrangement = this.siteCustomization.arrangement.map(entry => {
           entry = {...toJS(entry)};
           if(entry.type === "playlist") {
@@ -1259,14 +1288,12 @@ class FormStore {
             entry.playlist_slug = playlist.playlistSlug;
             entry.name = "playlist";
             delete entry.playlistId;
+          } else if(entry.title) {
+            entry.title = this.CreateLink(entry.title.versionHash);
           }
 
           return entry;
         });
-
-        if(siteCustomization.logo) {
-          siteCustomization.logo = this.CreateLink(siteCustomization.logo.targetHash, UrlJoin("files", siteCustomization.logo.imagePath));
-        }
 
         if(this.HasControl("premiere")) {
           if(!siteCustomization.premiere || !siteCustomization.premiere.enabled || !siteCustomization.premiere.title) {
@@ -1334,29 +1361,16 @@ class FormStore {
   @action.bound
   DefaultArrangement() {
     let arrangement = [];
-    if(this.playlists[0]) {
-      arrangement.push({
-        type: "playlist",
-        name: `playlist--${this.playlists[0].playlistId}`,
-        playlistId: this.playlists[0].playlistId,
-        label: this.playlists[0].playlistName,
-        component: "feature",
-        options: {
-          variant: "hero"
-        }
-      });
-    }
 
     arrangement = arrangement.concat(
-      this.playlists.slice(1).map(playlist => ({
+      this.playlists.map(playlist => ({
         type: "playlist",
         name: `playlist--${playlist.playlistId}`,
         label: playlist.playlistName,
         playlistId: playlist.playlistId,
         component: "carousel",
         options: {
-          variant: "landscape",
-          width: "medium"
+          variant: "landscape"
         }
       }))
     );
@@ -1369,8 +1383,7 @@ class FormStore {
         playlistId: undefined,
         component: "carousel",
         options: {
-          variant: "landscape",
-          width: "medium"
+          variant: "landscape"
         }
       }))
         .sort((a, b) => a.name < b.name ? -1 : 1)
@@ -1433,6 +1446,13 @@ class FormStore {
   RemoveArrangementEntry(index) {
     this.siteCustomization.arrangement = this.siteCustomization.arrangement.filter((_, i) => i !== index);
   }
+
+  @action.bound
+  SetArrangementEntryTitle = flow(function * (index, versionHash) {
+    yield this.RetrieveAsset(versionHash);
+
+    this.siteCustomization.arrangement[index].title = this.targets[versionHash];
+  });
 
   @action.bound
   UpdatePremiere(premiere) {
