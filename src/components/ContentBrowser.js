@@ -102,9 +102,9 @@ class BrowserList extends React.Component {
                 if(disabled) {
                   title = title + "\n\nTitle type or asset type not allowed for this list:";
                   title = title + `\n\tTitle Type: ${titleType || "<not specified>"}`;
-                  title = title + `\n\tAllowed Title Types: ${this.props.titleTypes.join(", ")}`;
+                  title = title + `\n\tAllowed Title Types: ${(this.props.titleTypes || []).join(", ")}`;
                   title = title + `\n\tAsset Type: ${assetType || "<not specified>"}`;
-                  title = title + `\n\tAllowed Asset Types: ${this.props.assetTypes.join(", ")}`;
+                  title = title + `\n\tAllowed Asset Types: ${(this.props.assetTypes || []).join(", ")}`;
                 }
 
                 return (
