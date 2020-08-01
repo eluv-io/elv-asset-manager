@@ -3,7 +3,7 @@ import {inject, observer} from "mobx-react";
 import {Action, Confirm, ImageIcon, LoadingElement} from "elv-components-js";
 import {DateTime, Duration} from "luxon";
 
-import {DateSelection, FileBrowser, Input, LabelledField, Selection, TextArea} from "../Inputs";
+import {DateSelection, FileBrowser, Input, LabelledField, Selection, TextArea} from "elv-components-js";
 
 import DefaultStreamIcon from "../../static/icons/stream.svg";
 import ActiveIcon from "../../static/icons/activity.svg";

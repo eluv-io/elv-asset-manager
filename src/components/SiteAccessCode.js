@@ -1,7 +1,6 @@
 import {inject, observer} from "mobx-react";
 import React from "react";
-import {Action, Confirm} from "elv-components-js";
-import {Checkbox, Input, LabelledField, Maybe, Selection} from "./Inputs";
+import {Action, Confirm, Checkbox, Input, LabelledField, Maybe, Selection} from "elv-components-js";
 import AsyncComponent from "./AsyncComponent";
 
 @inject("rootStore")

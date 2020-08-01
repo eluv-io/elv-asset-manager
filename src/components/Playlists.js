@@ -1,10 +1,9 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Action, Confirm, IconButton} from "elv-components-js";
+import {Action, Confirm, IconButton, Input} from "elv-components-js";
 import Clips from "./Clips";
 
 import DeleteIcon from "../static/icons/trash.svg";
-import {Input} from "./Inputs";
 import OrderButtons from "./OrderButtons";
 
 @inject("formStore")

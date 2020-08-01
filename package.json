@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@eluvio/elv-client-js": "^3.0.0",
-    "elv-components-js": "git+https://github.com/eluv-io/elv-components-js.git#645165da87ec42845a908a9ce0817db202523866",
+    "elv-components-js": "git+https://github.com/eluv-io/elv-components-js.git#master",
     "hls.js": "^0.12.4",
     "luxon": "^1.22.0",
     "mobx": "^5.13.0",

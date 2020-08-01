@@ -1,9 +1,10 @@
+import "../static/stylesheets/content-browser.scss";
+
 import React from "react";
 import AsyncComponent from "./AsyncComponent";
 import {inject, observer} from "mobx-react";
 import PropTypes from "prop-types";
-import Action from "elv-components-js/src/components/Action";
-import {Maybe} from "./Inputs";
+import {Action, Maybe} from "elv-components-js";
 
 @observer
 class BrowserList extends React.Component {

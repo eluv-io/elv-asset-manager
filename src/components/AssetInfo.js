@@ -9,7 +9,7 @@ import {
   LabelledField,
   Warning,
   DateSelection
-} from "./Inputs";
+} from "elv-components-js";
 import {Confirm, IconButton} from "elv-components-js";
 import {toJS} from "mobx";
 

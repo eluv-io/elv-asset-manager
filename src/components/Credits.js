@@ -1,8 +1,7 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Action, IconButton, Confirm} from "elv-components-js";
+import {Action, IconButton, Confirm, Input} from "elv-components-js";
 import OrderButtons from "./OrderButtons";
-import {Input} from "./Inputs";
 
 import DeleteIcon from "../static/icons/trash.svg";
 import AddUserIcon from "../static/icons/user-plus.svg";

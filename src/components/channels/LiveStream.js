@@ -1,6 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Checkbox, Input, Selection, ToggleSection} from "../Inputs";
+import {Checkbox, Input, Selection, ToggleSection} from "elv-components-js";
 
 import {Action, Confirm, ImageIcon, LoadingElement} from "elv-components-js";
 

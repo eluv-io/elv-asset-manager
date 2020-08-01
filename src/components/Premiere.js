@@ -1,7 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Checkbox, DateSelection, Input} from "./Inputs";
-import {Action, Modal} from "elv-components-js";
+import {Action, Modal, Checkbox, DateSelection, Input} from "elv-components-js";
 import ContentBrowser from "./ContentBrowser";
 import {Clip} from "./Clips";
 

@@ -636,8 +636,10 @@ class FormStore {
         defaultMeta = defaultMeta[Object.keys(defaultMeta)[0]];
       }
 
-      const defaultSlug = defaultMeta["/"].split("/").pop();
-      delete metadata[defaultSlug];
+      if(defaultMeta["/"]) {
+        const defaultSlug = defaultMeta["/"].split("/").pop();
+        delete metadata[defaultSlug];
+      }
     }
 
     const keys = Array.isArray(metadata) ?
