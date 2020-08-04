@@ -55,6 +55,7 @@ class FormStore {
 
   @observable siteCustomization = {
     logo: undefined,
+    background_image: undefined,
     colors: {
       background: "#002957",
       primary_text: "#ffffff",
@@ -892,6 +893,10 @@ class FormStore {
       this.siteCustomization.logo = this.LinkComponents(metadata.logo);
     }
 
+    if(metadata.background_image) {
+      this.siteCustomization.background_image = this.LinkComponents(metadata.background_image);
+    }
+
     if(metadata.colors) {
       this.siteCustomization.colors = {
         ...this.siteCustomization.colors,
@@ -1283,6 +1288,10 @@ class FormStore {
           siteCustomization.logo = this.CreateLink(siteCustomization.logo.targetHash, UrlJoin("files", siteCustomization.logo.imagePath));
         }
 
+        if(siteCustomization.background_image && siteCustomization.background_image.targetHash && siteCustomization.background_image.imagePath) {
+          siteCustomization.background_image = this.CreateLink(siteCustomization.background_image.targetHash, UrlJoin("files", siteCustomization.background_image.imagePath));
+        }
+
         siteCustomization.arrangement = this.siteCustomization.arrangement.map(entry => {
           entry = {...toJS(entry)};
           if(entry.type === "playlist") {
@@ -1358,6 +1367,11 @@ class FormStore {
   @action.bound
   UpdateSiteLogo({imagePath, targetHash}) {
     this.siteCustomization.logo = {imagePath, targetHash};
+  }
+
+  @action.bound
+  UpdateSiteBackgroundImage({imagePath, targetHash}) {
+    this.siteCustomization.background_image = {imagePath, targetHash};
   }
 
   @action.bound

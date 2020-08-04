@@ -482,6 +482,30 @@ class SiteCustomization extends React.Component {
     );
   }
 
+  BackgroundImage() {
+    const backgroundImageLink = this.props.formStore.siteCustomization.background_image;
+
+    return (
+      <div className="site-logo-selection">
+        <h4>Background Image</h4>
+        {Maybe(
+          backgroundImageLink,
+          () => <PreviewImage imagePath={backgroundImageLink.imagePath} targetHash={backgroundImageLink.targetHash} />
+        )}
+        <FileSelection
+          header="Select a Background Image"
+          useButton={true}
+          buttonText="Select an Image"
+          versionHash={(backgroundImageLink && backgroundImageLink["."] && backgroundImageLink["."].source) || this.props.rootStore.params.versionHash}
+          Select={({imagePath, targetHash}) => this.props.formStore.UpdateSiteBackgroundImage({
+            imagePath,
+            targetHash
+          })}
+        />
+      </div>
+    );
+  }
+
   Colors() {
     const colors = this.props.formStore.siteCustomization.colors;
 
@@ -536,6 +560,7 @@ class SiteCustomization extends React.Component {
         <h3>Customize Site</h3>
         <div className="asset-form-section-container site-color-logo">
           { this.Logo() }
+          { this.BackgroundImage() }
           { this.Colors() }
         </div>
 

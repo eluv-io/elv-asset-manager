@@ -11,7 +11,8 @@ input {
 }
 
 .site-customization {
-  .site-color-selection {
+  .site-color-logo,
+  .site-logo-selection {
     flex: 1 1 auto;
   }
 
@@ -24,7 +25,6 @@ input {
   .site-logo-selection {
     display: flex;
     flex-direction: column;
-    width: 40vw;
 
     .-elv-async-component {
       flex: 0 1 auto;
@@ -34,8 +34,8 @@ input {
 
     .file-image-preview {
       margin: $elv-spacing-s 0;
-      max-height: 15vw;
-      max-width: 15vw;
+      max-height: 28vw;
+      max-width: 28vw;
       width: 100%;
 
       img {
