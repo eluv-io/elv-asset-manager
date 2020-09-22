@@ -1565,10 +1565,12 @@ class FormStore {
   });
 
   @action.bound
-  CreateSiteAccessCode = flow(function * ({accessCode, accountName, siteKey, siteId, existingGroupAddress, newGroupName}) {
+  CreateSiteAccessCode = flow(function * ({accessCode, accountName, accountInfo, siteKey, siteId, existingGroupAddress, newGroupName}) {
     const {libraryId, objectId} = this.rootStore.params;
 
     try {
+      accountInfo = accountInfo ? JSON.parse(accountInfo) : {};
+      
       const client = this.rootStore.client;
 
       // Generate key hash for quick lookup
@@ -1615,6 +1617,7 @@ class FormStore {
         writeToken: write_token,
         metadataSubtree: `public/codes/${codeHash}`,
         metadata: {
+          info: accountInfo,
           ak: client.utils.B64(encryptedPrivateKey),
           sites: [{
             siteId,

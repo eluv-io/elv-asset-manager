@@ -1,6 +1,6 @@
 import {inject, observer} from "mobx-react";
 import React from "react";
-import {Action, Confirm, Checkbox, Input, LabelledField, Maybe, Selection} from "elv-components-js";
+import {Action, Confirm, Checkbox, Input, TextArea, LabelledField, Maybe, Selection} from "elv-components-js";
 import AsyncComponent from "./AsyncComponent";
 
 @inject("rootStore")
@@ -17,6 +17,7 @@ class SiteAccessCode extends React.Component {
       siteId: "",
       newSiteKey: "",
       newSiteId: "",
+      accountInfo: "{}",
       addToGroup: false,
       existingGroupAddress: "",
       createNewGroup: false,
@@ -43,6 +44,7 @@ class SiteAccessCode extends React.Component {
             result: await this.props.formStore.CreateSiteAccessCode({
               accessCode: this.state.accessCode,
               accountName: this.state.accountName,
+              accountInfo: this.state.accountInfo,
               siteKey: this.state.siteKey || this.state.newSiteKey,
               siteId: this.state.siteId || this.state.newSiteId,
               existingGroupAddress: this.state.addToGroup ? this.state.existingGroupAddress : undefined,
@@ -171,6 +173,13 @@ class SiteAccessCode extends React.Component {
               label="Account Name"
               value={this.state.accountName}
               onChange={accountName => this.setState({accountName})}
+            />
+            <TextArea
+              value={this.state.accountInfo}
+              label="Account Info"
+              onChange={accountInfo => this.setState({accountInfo})}
+              name="accountInfo"
+              json
             />
             <Selection
               name="siteKey"
