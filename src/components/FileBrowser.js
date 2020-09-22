@@ -8,13 +8,14 @@ import Path from "path";
 import {Action, IconButton, ImageIcon, Modal} from "elv-components-js";
 import AsyncComponent from "./AsyncComponent";
 import PreviewIcon from "./PreviewIcon";
+import ContentBrowser from "./ContentBrowser";
 
 import ObjectIcon from "../static/icons/box.svg";
 import AddFileIcon from "../static/icons/file-plus.svg";
 import DirectoryIcon from "../static/icons/directory.svg";
 import FileIcon from "../static/icons/file.svg";
+import EncryptedFileIcon from "../static/icons/encrypted-file.svg";
 import BackIcon from "../static/icons/directory_back.svg";
-import ContentBrowser from "./ContentBrowser";
 
 class FileBrowser extends React.Component {
   constructor(props) {
@@ -59,14 +60,17 @@ class FileBrowser extends React.Component {
     return uri.toString();
   }
 
-  FileIcon(name) {
+  FileIcon(name, info) {
+    const encrypted = info.encryption && info.encryption.scheme === "cgck";
     const extension = name.split(".").pop();
     const mimeType = (this.props.mimeTypes || {})[extension] || "";
     const isImage =
       mimeType.startsWith("image") ||
       ["apng", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
 
-    if(!isImage) {
+    if(encrypted) {
+      return <ImageIcon icon={EncryptedFileIcon} label="Encrypted File"/>;
+    } else if(!isImage) {
       return <ImageIcon icon={FileIcon} label="File"/>;
     }
 
@@ -95,7 +99,7 @@ class FileBrowser extends React.Component {
         onClick={() => this.props.Select(UrlJoin(this.state.path, name).replace(/^\.\//, ""))}
       >
         <td className="item-icon">
-          { this.FileIcon(name) }
+          { this.FileIcon(name, info) }
         </td>
         <td title={name}>{ name }</td>
         <td title={size} className="info-cell">{ size }</td>
