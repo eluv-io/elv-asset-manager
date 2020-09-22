@@ -31,6 +31,8 @@ class RootStore {
     this.formStore = new FormStore(this);
     this.liveStore = new LiveStore(this);
     this.channelStore = new ChannelStore(this);
+
+    window.rootStore = this;
   }
 
   @action.bound

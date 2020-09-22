@@ -429,9 +429,9 @@ input {
   font-size: $elv-font-s;
 }
 
+.asset-form-list,
 .asset-form-clip,
 .asset-form-image-entry,
-.asset-form-gallery-image-entry,
 .asset-form-playlist,
 .asset-form-credit {
   align-items: center;
@@ -586,9 +586,14 @@ input {
   grid-template-columns: 2rem 1fr 2fr 1.5rem 2rem;
 }
 
-.asset-form-gallery-image-entry {
+.asset-form-configurable-file-control-entry {
+  grid-template-columns: 2rem 1fr 1fr 1rem 1rem 1.5rem;
+}
+
+.asset-form-configurable-file-control-entry-with-description {
   grid-template-columns: 2rem 2fr 3fr 2fr 1rem 1rem 1.5rem;
 }
+
 
 .asset-form-modal {
   .-elv-modal-content {

@@ -4,7 +4,6 @@ import {Action, Confirm, Tabs} from "elv-components-js";
 import Clips from "./Clips";
 import Images from "./Images";
 import AssetInfo from "./AssetInfo";
-import Gallery from "./Gallery";
 import Playlists from "./Playlists";
 import Credits from "./Credits";
 import LinkUpdate from "./LinkUpdate";
@@ -12,6 +11,7 @@ import LiveStream from "./channels/LiveStream";
 import Channel from "./channels/Channel";
 import SiteAccessCode from "./SiteAccessCode";
 import SiteCustomization from "./SiteCustomization";
+import FileControl from "./FileControl";
 
 @inject("rootStore")
 @inject("formStore")
@@ -49,10 +49,6 @@ class AssetForm extends React.Component {
 
     tabs.push(["Images", "IMAGES"]);
 
-    if(this.props.formStore.HasControl("gallery")) {
-      tabs.push(["Gallery", "GALLERY"]);
-    }
-
     if(this.props.formStore.HasControl("playlists")) {
       tabs.push(["Playlists", "PLAYLISTS"]);
     }
@@ -64,6 +60,8 @@ class AssetForm extends React.Component {
     if(this.props.formStore.HasControl("site_codes")) {
       tabs.push(["Access Codes", "SITE_CODES"]);
     }
+
+    this.props.formStore.fileControls.forEach(control => tabs.push([control.name, control.name]));
 
     return tabs;
   }
@@ -80,14 +78,18 @@ class AssetForm extends React.Component {
         return <Credits />;
       case "IMAGES":
         return <Images />;
-      case "GALLERY":
-        return <Gallery />;
       case "PLAYLISTS":
         return <Playlists />;
       case "SITE_CUSTOMIZATION":
         return <SiteCustomization />;
       case "SITE_CODES":
         return <SiteAccessCode />;
+      default:
+        const control = this.props.formStore.fileControls.find(control => control.name === this.state.form);
+
+        if(control) {
+          return <FileControl control={control} />;
+        }
     }
 
     const assetType = this.props.formStore.associatedAssets.find(({name}) => name === this.state.form);

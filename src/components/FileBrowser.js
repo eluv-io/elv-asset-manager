@@ -64,7 +64,7 @@ class FileBrowser extends React.Component {
     const mimeType = (this.props.mimeTypes || {})[extension] || "";
     const isImage =
       mimeType.startsWith("image") ||
-      ["apng", "gif", "jpg", "jpeg", "png", "svg", "tif", "tiff", "webp"].includes(extension);
+      ["apng", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
 
     if(!isImage) {
       return <ImageIcon icon={FileIcon} label="File"/>;
@@ -212,8 +212,8 @@ class FileSelection extends React.Component {
     this.ObjectSelection = this.ObjectSelection.bind(this);
   }
 
-  SelectFile(imagePath) {
-    this.props.Select({imagePath, targetHash: this.state.versionHash});
+  SelectFile(path) {
+    this.props.Select({path, imagePath: path, targetHash: this.state.versionHash});
     this.CloseModal();
   }
 

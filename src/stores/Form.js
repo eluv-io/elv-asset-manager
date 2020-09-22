@@ -47,7 +47,6 @@ class FormStore {
 
   @observable assetInfo = {};
   @observable images = [];
-  @observable gallery = [];
   @observable playlists = [];
   @observable credits = {};
 
@@ -66,9 +65,11 @@ class FormStore {
 
   @observable controls = [
     "credits",
-    "gallery",
     "playlists"
   ];
+
+  @observable fileControls = [];
+  @observable fileControlItems = {};
 
   @observable availableAssetTypes = [
     "primary",
@@ -159,7 +160,7 @@ class FormStore {
   }
 
   HasControl(control) {
-    return this.controls.includes(control);
+    return !!this.controls.find(c => typeof c === "string" ? control === c : c.type === control);
   }
 
   CreateLink(versionHash, linkTarget="/meta/public/asset_metadata", options={}) {
@@ -182,6 +183,9 @@ class FormStore {
     const titleConfiguration = this.rootStore.titleConfiguration;
 
     this.controls = titleConfiguration.controls || this.controls;
+
+    this.fileControls = this.controls.filter(control => typeof control === "object");
+
     this.availableAssetTypes = titleConfiguration.asset_types || this.availableAssetTypes;
     this.availableTitleTypes = titleConfiguration.title_types || this.availableTitleTypes;
     this.infoFields = titleConfiguration.info_fields || this.infoFields;
@@ -193,8 +197,12 @@ class FormStore {
     this.assetInfo = this.LoadAssetInfo(assetMetadata);
     this.credits = this.LoadCredits((assetMetadata.info || {}).talent);
     this.images = yield this.LoadImages(assetMetadata.images, true);
-    this.gallery = yield this.LoadGallery(assetMetadata.gallery);
     this.playlists = yield this.LoadPlaylists(assetMetadata.playlists);
+
+    for(let i = 0; i < this.fileControls.length; i++) {
+      const control = this.fileControls[i];
+      this.fileControlItems[control.name] = yield this.LoadFileControl(control);
+    }
 
     // Load all clip types
     for(let i = 0; i < this.associatedAssets.length; i++) {
@@ -406,37 +414,37 @@ class FormStore {
     this.images = this.images.filter((_, i) => i !== index);
   }
 
-  // Gallery images
+  // Configurable File Items
   @action.bound
-  UpdateGalleryImage({index, title, description, imagePath, targetHash}) {
-    this.gallery[index] = {
+  UpdateFileControlItem({index, controlName, title, description, path, targetHash}) {
+    this.fileControlItems[controlName][index] = {
       title,
       description,
-      imagePath,
+      path,
       targetHash
     };
   }
 
   @action.bound
-  AddGalleryImage() {
-    this.gallery.push({
+  AddFileControlItem({controlName}) {
+    this.fileControlItems[controlName].push({
       title: "",
       description: "",
-      imagePath: undefined,
+      path: undefined,
       targetHash: this.rootStore.params.versionHash
     });
   }
 
   @action.bound
-  RemoveGalleryImage(index) {
-    this.gallery = this.gallery.filter((_, i) => i !== index);
+  RemoveFileControlItem({controlName, index}) {
+    this.fileControlItems[controlName] = this.fileControlItems[controlName].filter((_, i) => i !== index);
   }
 
   @action.bound
-  SwapGalleryImage(i1, i2) {
-    const image = this.gallery[i1];
-    this.gallery[i1] = this.gallery[i2];
-    this.gallery[i2] = image;
+  SwapFileControlItem(controlName, i1, i2) {
+    const image = this.fileControlItems[controlName][i1];
+    this.fileControlItems[controlName][i1] = this.fileControlItems[controlName][i2];
+    this.fileControlItems[controlName][i2] = image;
   }
 
   // Playlists
@@ -720,13 +728,13 @@ class FormStore {
     }
 
     let targetHash = this.rootStore.params.versionHash;
-    let imagePath = link["/"].replace(/^\.\/files\//, "");
+    let path = link["/"].replace(/^\.\/files\//, "");
     if(link["/"].startsWith("/qfab/")) {
       targetHash = link["/"].split("/")[2];
-      imagePath = link["/"].split("/").slice(4).join("/");
+      path = link["/"].split("/").slice(4).join("/");
     }
 
-    return {targetHash, imagePath};
+    return {targetHash, path, imagePath: path};
   }
 
   LoadImages = flow(function * (metadata) {
@@ -785,38 +793,45 @@ class FormStore {
     return images;
   });
 
-  LoadGallery = flow(function * (metadata) {
-    if(!metadata) { return []; }
+  LoadFileControl = flow(function * (control) {
+    const metadata = (yield this.rootStore.client.ContentObjectMetadata({
+      versionHash: this.rootStore.params.versionHash,
+      metadataSubtree: control.target
+    })) || [];
 
-    let images = [];
-    let imageTargets = [];
+    let items = [];
+    let itemTargets = [];
 
-    Object.keys(metadata).forEach(async imageIndex => {
+    Object.keys(metadata).forEach(async index => {
       try {
-        const index = parseInt(imageIndex);
+        index = parseInt(index);
 
         if(isNaN(index)) { return; }
 
-        const imageInfo = metadata[imageIndex];
-        const link = imageInfo.image && imageInfo.image.default;
+        const info = metadata[index];
+
+        let link = info[control.linkKey || "file"];
+        if(link && link.default) {
+          link = link.default;
+        }
 
         if(!link || !link["/"]) { return; }
 
-        const {targetHash, imagePath} = this.LinkComponents(link);
+        const {targetHash, path} = this.LinkComponents(link);
 
-        if(!imageTargets.includes(targetHash)) {
-          imageTargets.push(targetHash);
+        if(!itemTargets.includes(targetHash)) {
+          itemTargets.push(targetHash);
         }
 
-        images[index] = {
-          title: imageInfo.title || "",
-          description: imageInfo.description || "",
-          imagePath,
+        items[index] = {
+          title: info.title || "",
+          description: info.description || "",
+          path,
           targetHash
         };
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error(`Failed to load gallery '${imageIndex}':`);
+        console.error(`Failed to load custom file control item ${control.name} '${index}':`);
         // eslint-disable-next-line no-console
         console.error(toJS(metadata));
         // eslint-disable-next-line no-console
@@ -825,16 +840,16 @@ class FormStore {
     });
 
     // Remove any missing entries
-    images = images.filter(image => image);
+    items = items.filter(item => item);
 
-    // Ensure all base URLs are set for previews
+    // Ensure all base URLs are set
     yield Promise.all(
-      imageTargets.map(async versionHash =>
+      itemTargets.map(async versionHash =>
         await this.rootStore.contentStore.LoadBaseFileUrl(versionHash)
       )
     );
 
-    return images;
+    return items;
   });
 
   LoadPlaylists = flow(function * (metadata) {
@@ -1043,8 +1058,6 @@ class FormStore {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Failed to parse time for", name);
-      // eslint-disable-next-line no-console
-      console.error(error);
     }
 
     return "";
@@ -1222,30 +1235,41 @@ class FormStore {
         metadata: images
       });
 
-      // Gallery
-      let gallery = {};
-      toJS(this.gallery).forEach(({title, description, imagePath, targetHash}, index) => {
-        if(!imagePath) {
-          return;
-        }
+      // Configurable Controls
+      for(let i = 0; i < this.fileControls.length; i++) {
+        const control = this.fileControls[i];
 
-        gallery[index.toString()] = {
-          title,
-          description,
-          image: {
-            default: this.CreateLink(targetHash, UrlJoin("files", imagePath)),
-            thumbnail: this.CreateLink(targetHash, UrlJoin("rep", "thumbnail", "files", imagePath))
+        let items = {};
+        toJS(this.fileControlItems[control.name]).forEach(({title, description, path, targetHash}, index) => {
+          if(!path) {
+            return;
           }
-        };
-      });
 
-      yield client.ReplaceMetadata({
-        libraryId,
-        objectId,
-        writeToken,
-        metadataSubtree: "public/asset_metadata/gallery",
-        metadata: gallery
-      });
+          let file;
+          if(control.thumbnail) {
+            file = {
+              default: this.CreateLink(targetHash, UrlJoin("files", path)),
+              thumbnail: this.CreateLink(targetHash, UrlJoin("rep", "thumbnail", "files", path))
+            };
+          } else {
+            file = this.CreateLink(targetHash, UrlJoin("files", path));
+          }
+
+          items[index.toString()] = {
+            title,
+            description,
+            [control.linkKey || "file"]: file
+          };
+        });
+
+        yield client.ReplaceMetadata({
+          libraryId,
+          objectId,
+          writeToken,
+          metadataSubtree: control.target,
+          metadata: items
+        });
+      }
 
       // Playlists
       let playlists = {};
@@ -1570,7 +1594,7 @@ class FormStore {
 
     try {
       accountInfo = accountInfo ? JSON.parse(accountInfo) : {};
-      
+
       const client = this.rootStore.client;
 
       // Generate key hash for quick lookup
