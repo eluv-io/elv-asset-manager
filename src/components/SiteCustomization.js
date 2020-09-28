@@ -1,8 +1,17 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import {inject, observer} from "mobx-react";
 import AppFrame from "./AppFrame";
 import UrlJoin from "url-join";
-import {Action, Confirm, IconButton, Modal, ColorSelection, FormatName, Maybe} from "elv-components-js";
+import {
+  Action,
+  Confirm,
+  IconButton,
+  Modal,
+  ColorSelection,
+  FormatName,
+  Maybe,
+  DateSelection, ToggleSection
+} from "elv-components-js";
 import FileSelection from "./FileBrowser";
 import {PreviewImage} from "./PreviewIcon";
 import AsyncComponent from "./AsyncComponent";
@@ -24,7 +33,7 @@ const siteComponents = {
     noLabel: true,
     initialOptions: {
       variant: "box",
-      color: "#ffffff"
+      color: "#6bb7ff"
     },
     options: {
       variant: {
@@ -60,6 +69,51 @@ const siteComponents = {
       }
     }
   },
+  event: {
+    singleTitle: true,
+    noLabel: true,
+    initialOptions: {
+      title: "",
+      description: "",
+      date: undefined,
+      price: "",
+      featureImage: undefined,
+      eventImage: undefined,
+    },
+    options: {
+      title: {
+        label: "Title",
+        fullLine: true,
+        type: "text"
+      },
+      description: {
+        label: "Description",
+        fullLine: true,
+        type: "textarea"
+      },
+      date: {
+        label: "Date",
+        fullLine: true,
+        type: "datetime"
+      },
+      price: {
+        label: "Price",
+        fullLine: true,
+        type: "text",
+        characterRegex: /[^0-9.]/g
+      },
+      featureImage: {
+        label: "Feature Image",
+        fullLine: true,
+        type: "image"
+      },
+      eventImage: {
+        label: "Event Image",
+        fullLine: true,
+        type: "image"
+      }
+    }
+  },
   header: {
     noTitles: "true",
     noLabel: true,
@@ -76,48 +130,68 @@ const siteComponents = {
   }
 };
 
+const ImageSelection = inject("rootStore")(observer(
+  ({link, header, selectionHeader, Update, className="", rootStore}) => {
+    useEffect(() => {
+      if(link) { rootStore.contentStore.LoadBaseFileUrl(link.targetHash); }
+    });
+
+    return (
+      <div className={`image-selection ${className}`}>
+        {header ? <h4>{header}</h4> : null }
+        {Maybe(
+          link,
+          () => <PreviewImage imagePath={link.imagePath} targetHash={link.targetHash}/>
+        )}
+        <FileSelection
+          header={selectionHeader}
+          useButton={true}
+          buttonText={selectionHeader}
+          versionHash={(link && link["."] && link["."].source) || rootStore.params.versionHash}
+          Select={Update}
+        />
+      </div>
+    );
+  }
+));
+
+const TitleSelection = ({buttonText="Select a Title", selectionText="Select a Title", Update, className=""}) => {
+  const [modal, setModal] = useState(null);
+
+  const Browse = () => setModal(
+    <Modal
+      className="asset-form-modal"
+      closable
+      OnClickOutside={() => setModal(null)}
+    >
+      <ContentBrowser
+        header={selectionText}
+        onComplete={async args => {
+          await Update(args);
+          setModal(null);
+        }}
+        onCancel={() => setModal(null)}
+      />
+    </Modal>
+  );
+
+  return (
+    <div className={`title-selection ${className}`}>
+      <label />
+      <Action onClick={Browse}>
+        { buttonText }
+      </Action>
+      { modal }
+    </div>
+  );
+};
+
 @inject("formStore")
 @inject("rootStore")
 @observer
 class SiteArrangementEntry extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      modal: false
-    };
-
-    this.CloseModal = this.CloseModal.bind(this);
-    this.ActivateModal = this.ActivateModal.bind(this);
-  }
-
   Entry() {
     return this.props.formStore.siteCustomization.arrangement[this.props.index];
-  }
-
-  ActivateModal() {
-    this.setState({
-      modal: (
-        <Modal
-          className="asset-form-modal"
-          closable={true}
-          OnClickOutside={this.CloseModal}
-        >
-          <ContentBrowser
-            header="Premiere Selection"
-            onComplete={async ({versionHash}) => {
-              await this.props.formStore.SetArrangementEntryTitle(this.props.index, versionHash);
-              this.CloseModal();
-            }}
-            onCancel={this.CloseModal}
-          />
-        </Modal>
-      )
-    });
-  }
-
-  CloseModal() {
-    this.setState({modal: null});
   }
 
   SingleTitle() {
@@ -160,21 +234,21 @@ class SiteArrangementEntry extends React.Component {
       );
     }
 
-    let titleButton;
+    let titleSelection;
     if(siteComponents[this.Entry().component].singleTitle) {
-      titleButton = (
-        <div className="arrangement-option actions-cell">
-          <label />
-          <Action onClick={this.ActivateModal}>
-            Choose Title
-          </Action>
-        </div>
+      titleSelection = (
+        <TitleSelection
+          buttonText="Select a Title"
+          selectionHeader="Select a Title"
+          className="arrangement-option actions-cell"
+          Update={({versionHash}) => this.props.formStore.SetArrangementEntryTitle(this.props.index, versionHash)}
+        />
       );
     }
 
     return (
       <React.Fragment>
-        { titleButton }
+        { titleSelection }
         <div className="arrangement-option actions-cell">
           <label />
           <div className="actions">
@@ -189,50 +263,102 @@ class SiteArrangementEntry extends React.Component {
     );
   }
 
-  Options() {
+  Options(inline) {
     const entry = this.Entry();
 
     const component = siteComponents[entry.component] || {};
-    const options = component.options || {};
+    let options = component.options || {};
 
-    return Object.keys(options).map(key => {
-      const config = options[key];
+    return Object.keys(options)
+      .filter(key => inline ? !options[key].fullLine : options[key].fullLine)
+      .map(key => {
+        const config = options[key];
 
-      if(config.forVariant && entry.options.variant !== config.forVariant) {
-        return null;
-      }
+        if(config.forVariant && entry.options.variant !== config.forVariant) {
+          return null;
+        }
 
-      let input;
-      if(config.values) {
-        input = (
-          <select
-            value={entry.options[key]}
-            onChange={event => this.Update({options: {...entry.options, [key]: event.target.value}})}
-          >
-            {
-              config.values.map(value =>
-                <option key={`option-value-${value}`} value={value}>{ FormatName(value) }</option>
-              )
-            }
-          </select>
+        let input;
+        if(config.values) {
+          input = (
+            <select
+              value={entry.options[key]}
+              onChange={event => this.Update({options: {...entry.options, [key]: event.target.value}})}
+            >
+              {
+                config.values.map(value =>
+                  <option key={`option-value-${value}`} value={value}>{FormatName(value)}</option>
+                )
+              }
+            </select>
+          );
+        } else if(config.type === "image") {
+          input = (
+            <div className="arrangement-option-image">
+              <ImageSelection
+                link={entry.options[key]}
+                selectionHeader="Select an Image"
+                Update={({targetHash, path, imagePath}) => {
+                  this.Update({
+                    options: {
+                      ...entry.options,
+                      [key]: {
+                        targetHash,
+                        imagePath,
+                        path,
+                        ...(
+                          this.props.formStore.CreateLink(
+                            targetHash,
+                            UrlJoin("files", imagePath)
+                          )
+                        )
+                      }
+                    }
+                  });
+                }}
+              />
+            </div>
+          );
+        } else if(config.type === "date" || config.type === "datetime") {
+          input = (
+            <DateSelection
+              noLabel
+              value={entry.options[key]}
+              dateOnly={config.type === "date"}
+              onChange={date => this.Update({options: {...entry.options, [key]: date}})}
+            />
+          );
+        } else if(config.type === "textarea") {
+          input = (
+            <textarea
+              value={entry.options[key]}
+              onChange={event => this.Update({options: {...entry.options, [key]: event.target.value}})}
+            />
+          );
+        } else {
+          input = (
+            <input
+              type={config.type}
+              value={entry.options[key]}
+              onChange={event => {
+                let value = event.target.value;
+
+                if(config.characterRegex) { value = value.replace(config.characterRegex, ""); }
+
+                this.Update({options: {...entry.options, [key]: value}});
+              }}
+            />
+          );
+        }
+
+        return (
+          <div className={`arrangement-option ${component.className || ""} ${config.type === "color" ? "color-option" : ""}`} key={`arrangement-option-${key}`}>
+            <label>{ config.label }</label>
+            { input }
+          </div>
         );
-      } else {
-        input = (
-          <input
-            type={config.type}
-            value={entry.options[key]}
-            onChange={event => this.Update({options: {...entry.options, [key]: event.target.value}})}
-          />
-        );
-      }
-
-      return (
-        <div className={`arrangement-option ${component.className || ""} ${config.type === "color" ? "color-option" : ""}`} key={`arrangement-option-${key}`}>
-          <label>{ config.label }</label>
-          { input }
-        </div>
-      );
-    }).filter(option => option);
+      })
+      .filter(option => option);
   }
 
   Label() {
@@ -330,6 +456,20 @@ class SiteArrangementEntry extends React.Component {
     );
   }
 
+  Details() {
+    const options = this.Options(false);
+
+    if(!options || options.length === 0) { return null; }
+
+    return (
+      <ToggleSection sectionName="Details" showInitially>
+        <div className="site-arrangement-full-line-entries">
+          { options }
+        </div>
+      </ToggleSection>
+    );
+  }
+
   render() {
     return (
       <React.Fragment>
@@ -337,11 +477,11 @@ class SiteArrangementEntry extends React.Component {
           { this.Components() }
           { this.Sources() }
           { this.Label() }
-          { this.Options() }
+          { this.Options(true) }
           { this.Actions() }
         </div>
         { this.SingleTitle() }
-        { this.state.modal }
+        { this.Details() }
       </React.Fragment>
     );
   }
@@ -459,50 +599,24 @@ class SiteCustomization extends React.Component {
   }
 
   Logo() {
-    const logoLink = this.props.formStore.siteCustomization.logo;
-
     return (
-      <div className="site-logo-selection">
-        <h4>Logo</h4>
-        {Maybe(
-          logoLink,
-          () => <PreviewImage imagePath={logoLink.imagePath} targetHash={logoLink.targetHash} />
-        )}
-        <FileSelection
-          header="Select a Logo"
-          useButton={true}
-          buttonText="Select a Logo"
-          versionHash={(logoLink && logoLink["."] && logoLink["."].source) || this.props.rootStore.params.versionHash}
-          Select={({imagePath, targetHash}) => this.props.formStore.UpdateSiteLogo({
-            imagePath,
-            targetHash
-          })}
-        />
-      </div>
+      <ImageSelection
+        link={this.props.formStore.siteCustomization.logo}
+        header="Logo"
+        selectionHeader="Select a Logo"
+        Update={this.props.formStore.UpdateSiteLogo}
+      />
     );
   }
 
   BackgroundImage() {
-    const backgroundImageLink = this.props.formStore.siteCustomization.background_image;
-
     return (
-      <div className="site-logo-selection">
-        <h4>Background Image</h4>
-        {Maybe(
-          backgroundImageLink,
-          () => <PreviewImage imagePath={backgroundImageLink.imagePath} targetHash={backgroundImageLink.targetHash} />
-        )}
-        <FileSelection
-          header="Select a Background Image"
-          useButton={true}
-          buttonText="Select an Image"
-          versionHash={(backgroundImageLink && backgroundImageLink["."] && backgroundImageLink["."].source) || this.props.rootStore.params.versionHash}
-          Select={({imagePath, targetHash}) => this.props.formStore.UpdateSiteBackgroundImage({
-            imagePath,
-            targetHash
-          })}
-        />
-      </div>
+      <ImageSelection
+        link={this.props.formStore.siteCustomization.background_image}
+        header="Background Image"
+        selectionHeader="Select an Image"
+        Update={this.props.formStore.UpdateSiteBackgroundImage}
+      />
     );
   }
 

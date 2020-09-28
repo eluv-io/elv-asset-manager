@@ -64,7 +64,6 @@ class FormStore {
   };
 
   @observable controls = [
-    "credits",
     "playlists"
   ];
 
@@ -1368,7 +1367,7 @@ class FormStore {
       yield client.SendMessage({
         options: {
           operation: "Complete",
-          message: "Successfully updated asset"
+          message: "Successfully Updated Asset"
         }
       });
     } catch (error) {
