@@ -11,7 +11,7 @@ import PreviewIcon from "./PreviewIcon";
 @observer
 class FileControl extends React.Component {
   FileIcon(item) {
-    const extension = (item.path || "").split(".").pop();
+    const extension = ((item.path || "").split(".").pop() || "").toLowerCase();
     const isImage = ["apng", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
 
     if(!isImage) {

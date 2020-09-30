@@ -62,7 +62,7 @@ class FileBrowser extends React.Component {
 
   FileIcon(name, info) {
     const encrypted = info.encryption && info.encryption.scheme === "cgck";
-    const extension = name.split(".").pop();
+    const extension = (name.split(".").pop() || "").toLowerCase();
     const mimeType = (this.props.mimeTypes || {})[extension] || "";
     const isImage =
       mimeType.startsWith("image") ||
