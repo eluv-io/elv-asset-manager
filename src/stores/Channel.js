@@ -153,7 +153,7 @@ class ChannelStore {
     });
 
     if(finalize) {
-      yield client.FinalizeContentObject({libraryId, objectId, writeToken});
+      yield client.FinalizeContentObject({libraryId, objectId, writeToken, commitMessage: "Update channel stream link"});
     }
   });
 

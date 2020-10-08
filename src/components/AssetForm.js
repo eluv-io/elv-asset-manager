@@ -21,7 +21,8 @@ class AssetForm extends React.Component {
     super(props);
 
     this.state = {
-      form: "INFO"
+      form: "INFO",
+      commitMessage: ""
     };
   }
 
@@ -125,7 +126,15 @@ class AssetForm extends React.Component {
             onClick={async () => {
               await Confirm({
                 message: "Are you sure you want to save your changes?",
-                onConfirm: this.props.formStore.SaveAsset
+                additionalInputs: [{
+                  label: "Commit Message (optional)",
+                  name: "commitMessage",
+                  onChange: commitMessage => this.setState({commitMessage})
+                }],
+                onConfirm: async () => {
+                  await this.props.formStore.SaveAsset(true, this.state.commitMessage);
+                  this.setState({commitMessage: ""});
+                }
               });
             }}
           >

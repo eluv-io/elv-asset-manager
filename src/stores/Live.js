@@ -223,7 +223,7 @@ class LiveStore {
         // Update current settings if operating on stream
         const {write_token} = yield client.EditContentObject({libraryId, objectId});
         yield this.SaveLiveParameters({libraryId, objectId, writeToken: write_token});
-        yield client.FinalizeContentObject({libraryId, objectId, writeToken: write_token});
+        yield client.FinalizeContentObject({libraryId, objectId, writeToken: write_token, commitMessage: "Start stream - save parameters"});
       } else {
         // Operating on separate stream object - pull ingress region
         ingressRegion = yield client.ContentObjectMetadata({
@@ -255,7 +255,7 @@ class LiveStore {
         }
       });
 
-      yield client.FinalizeContentObject({libraryId, objectId, writeToken: tokenEdit.write_token});
+      yield client.FinalizeContentObject({libraryId, objectId, writeToken: tokenEdit.write_token, commitMessage: "Start stream - save live edge info"});
 
       yield client.CallBitcodeMethod({
         libraryId,
@@ -337,7 +337,7 @@ class LiveStore {
         metadataSubtree: "ingress_node_api"
       });
 
-      yield client.FinalizeContentObject({libraryId, objectId, writeToken: write_token});
+      yield client.FinalizeContentObject({libraryId, objectId, writeToken: write_token, commitMessage: "Stop stream"});
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Failed to stop stream:");

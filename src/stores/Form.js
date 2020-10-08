@@ -1107,7 +1107,7 @@ class FormStore {
   }
 
   @action.bound
-  SaveAsset = flow(function * (commit=true) {
+  SaveAsset = flow(function * (commit=true, commitMessage="") {
     try {
       const client = this.rootStore.client;
 
@@ -1361,7 +1361,8 @@ class FormStore {
       yield client.FinalizeContentObject({
         libraryId,
         objectId,
-        writeToken
+        writeToken,
+        commitMessage: commitMessage || "Asset Manager"
       });
 
       yield client.SendMessage({
@@ -1577,7 +1578,7 @@ class FormStore {
         metadataSubtree: `public/codes/${codeHash}`
       });
 
-      yield client.FinalizeContentObject({libraryId, objectId, writeToken: write_token});
+      yield client.FinalizeContentObject({libraryId, objectId, writeToken: write_token, commitMessage: "Remove site access code"});
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Error:");
@@ -1649,7 +1650,7 @@ class FormStore {
         }
       });
 
-      yield client.FinalizeContentObject({libraryId, objectId, writeToken: write_token});
+      yield client.FinalizeContentObject({libraryId, objectId, writeToken: write_token, commitMessage: "Create site access code"});
 
       // Add user to site group
       let existingGroupName;
