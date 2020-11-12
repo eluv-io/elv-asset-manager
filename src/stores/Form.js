@@ -46,6 +46,7 @@ class FormStore {
   @observable editWriteToken;
 
   @observable assetInfo = {};
+  @observable localizedAssetInfo = {};
   @observable images = [];
   @observable playlists = [];
   @observable credits = {};
@@ -53,7 +54,10 @@ class FormStore {
   @observable assets = {};
 
   @observable siteCustomization = {
+    header: "",
+    subheader: "",
     logo: undefined,
+    dark_logo: undefined,
     background_image: undefined,
     colors: {
       background: "#002957",
@@ -88,6 +92,8 @@ class FormStore {
     "portrait",
     "landscape"
   ];
+
+  @observable localization;
 
   @observable associatedAssets = [
     {
@@ -190,6 +196,8 @@ class FormStore {
     this.infoFields = titleConfiguration.info_fields || this.infoFields;
     this.associatedAssets = titleConfiguration.associated_assets || this.associatedAssets;
     this.defaultImageKeys = titleConfiguration.default_image_keys || this.defaultImageKeys;
+
+    this.localization = titleConfiguration.localization;
 
     const assetMetadata = this.rootStore.assetMetadata || {};
 
@@ -903,8 +911,15 @@ class FormStore {
   LoadSiteCustomization = flow(function * (metadata) {
     if(!metadata) { return; }
 
+    this.siteCustomization.header = metadata.header || "";
+    this.siteCustomization.subheader = metadata.subheader || "";
+
     if(metadata.logo) {
       this.siteCustomization.logo = this.LinkComponents(metadata.logo);
+    }
+
+    if(metadata.dark_logo) {
+      this.siteCustomization.dark_logo = this.LinkComponents(metadata.dark_logo);
     }
 
     if(metadata.background_image) {
@@ -1311,6 +1326,10 @@ class FormStore {
           siteCustomization.logo = this.CreateLink(siteCustomization.logo.targetHash, UrlJoin("files", siteCustomization.logo.imagePath));
         }
 
+        if(siteCustomization.dark_logo && siteCustomization.dark_logo.targetHash && siteCustomization.dark_logo.imagePath) {
+          siteCustomization.dark_logo = this.CreateLink(siteCustomization.dark_logo.targetHash, UrlJoin("files", siteCustomization.dark_logo.imagePath));
+        }
+
         if(siteCustomization.background_image && siteCustomization.background_image.targetHash && siteCustomization.background_image.imagePath) {
           siteCustomization.background_image = this.CreateLink(siteCustomization.background_image.targetHash, UrlJoin("files", siteCustomization.background_image.imagePath));
         }
@@ -1384,13 +1403,22 @@ class FormStore {
   // Site Customization
 
   @action.bound
+  UpdateSiteCustomization({key, value}) {
+    this.siteCustomization[key] = value;
+  }
+
+  @action.bound
   UpdateSiteColor({colorKey, color}) {
     this.siteCustomization.colors[colorKey] = color;
   }
 
   @action.bound
-  UpdateSiteLogo({imagePath, targetHash}) {
-    this.siteCustomization.logo = {imagePath, targetHash};
+  UpdateSiteLogo({variant="light", imagePath, targetHash}) {
+    if(variant === "dark") {
+      this.siteCustomization.dark_logo = {imagePath, targetHash};
+    } else {
+      this.siteCustomization.logo = {imagePath, targetHash};
+    }
   }
 
   @action.bound

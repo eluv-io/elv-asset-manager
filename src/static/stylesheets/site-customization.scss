@@ -23,6 +23,7 @@ input {
   }
 
   .toggle-section {
+    margin-bottom: 3rem;
     margin-top: 0;
     width: 100%;
   }
@@ -70,6 +71,15 @@ input {
     display: flex;
     padding: $elv-spacing-s 0;
     width: 100%;
+
+    &.column {
+      flex-direction: column;
+
+      .arrangement-option {
+        margin-bottom: $elv-spacing-s;
+        width: 100%;
+      }
+    }
   }
 
   .site-arrangement-full-line-entries {
@@ -144,6 +154,12 @@ input {
         padding: 0;
         width: 3rem;
       }
+    }
+
+    input,
+    select,
+    button {
+      height: 2.3rem;
     }
   }
 

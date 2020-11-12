@@ -72,6 +72,7 @@ const siteComponents = {
   event: {
     singleTitle: true,
     noLabel: true,
+    className: "long",
     initialOptions: {
       title: "",
       description: "",
@@ -83,7 +84,6 @@ const siteComponents = {
     options: {
       title: {
         label: "Title",
-        fullLine: true,
         type: "text"
       },
       description: {
@@ -462,7 +462,7 @@ class SiteArrangementEntry extends React.Component {
     if(!options || options.length === 0) { return null; }
 
     return (
-      <ToggleSection sectionName="Details" showInitially>
+      <ToggleSection sectionName="Details">
         <div className="site-arrangement-full-line-entries">
           { options }
         </div>
@@ -598,14 +598,22 @@ class SiteCustomization extends React.Component {
     );
   }
 
-  Logo() {
+  Logos() {
     return (
-      <ImageSelection
-        link={this.props.formStore.siteCustomization.logo}
-        header="Logo"
-        selectionHeader="Select a Logo"
-        Update={this.props.formStore.UpdateSiteLogo}
-      />
+      <React.Fragment>
+        <ImageSelection
+          link={this.props.formStore.siteCustomization.logo}
+          header="Light Logo"
+          selectionHeader="Select a Logo"
+          Update={args => this.props.formStore.UpdateSiteLogo({variant: "light", ...args})}
+        />
+        <ImageSelection
+          link={this.props.formStore.siteCustomization.dark_logo}
+          header="Dark Logo"
+          selectionHeader="Select a Logo"
+          Update={args => this.props.formStore.UpdateSiteLogo({variant: "dark", ...args})}
+        />
+      </React.Fragment>
     );
   }
 
@@ -638,6 +646,29 @@ class SiteCustomization extends React.Component {
     );
   }
 
+  Headers() {
+    return (
+      <div className="site-arrangement-entry column">
+        <div className="arrangement-option long">
+          <label htmlFor="header">Header</label>
+          <input
+            name="header"
+            value={this.props.formStore.siteCustomization.header}
+            onChange={event => this.props.formStore.UpdateSiteCustomization({key: "header", value: event.target.value})}
+          />
+        </div>
+        <div className="arrangement-option long">
+          <label htmlFor="subheader">Subheader</label>
+          <input
+            name="subheader"
+            value={this.props.formStore.siteCustomization.subheader}
+            onChange={event => this.props.formStore.UpdateSiteCustomization({key: "subheader", value: event.target.value})}
+          />
+        </div>
+      </div>
+    );
+  }
+
   Arrangement() {
     const premiereInfo = this.props.formStore.siteCustomization.premiere || {};
 
@@ -649,6 +680,8 @@ class SiteCustomization extends React.Component {
     return (
       <div className="asset-form-section-container site-arrangement-container">
         <h4>Arrangement</h4>
+        { this.Headers() }
+
         { this.props.formStore.siteCustomization.arrangement.map((_, i) => <SiteArrangementEntry key={`site-entry-${i}`} index={i} />)}
         <div className="actions-container">
           <Action
@@ -673,8 +706,7 @@ class SiteCustomization extends React.Component {
       <div className="asset-form-container site-customization">
         <h3>Customize Site</h3>
         <div className="asset-form-section-container site-color-logo">
-          { this.Logo() }
-          { this.BackgroundImage() }
+          { this.Logos() }
           { this.Colors() }
         </div>
 
