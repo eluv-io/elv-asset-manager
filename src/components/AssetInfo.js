@@ -8,7 +8,8 @@ import {
   Checkbox,
   LabelledField,
   Warning,
-  DateSelection
+  DateSelection,
+  Maybe
 } from "elv-components-js";
 import {Confirm, IconButton} from "elv-components-js";
 import {toJS} from "mobx";
@@ -16,7 +17,7 @@ import {toJS} from "mobx";
 import AddIcon from "../static/icons/plus-square.svg";
 import DeleteIcon from "../static/icons/trash.svg";
 
-const InfoField = ({field, entry, Update}) => {
+const InfoField = ({field, entry, Update, localization={}}) => {
   if(field.type === "textarea") {
     return (
       <TextArea
@@ -56,7 +57,7 @@ const InfoField = ({field, entry, Update}) => {
         name={field.name}
         label={field.label}
         value={entry[field.name]}
-        options={field.options}
+        options={localization.options || field.options}
         onChange={newValue => Update(field.name, newValue)}
       />
     );
@@ -67,7 +68,7 @@ const InfoField = ({field, entry, Update}) => {
         name={field.name}
         label={field.label}
         values={entry[field.name]}
-        options={field.options}
+        options={localization.options || field.options}
         onChange={newValue => Update(field.name, newValue)}
       />
     );
@@ -177,7 +178,7 @@ const ListField = ({name, label, values, fields, UpdateAssetInfo}) => {
 @observer
 class AssetInfo extends React.Component {
   // Generate list of inputs as defined in infoFields
-  InfoFields() {
+  InfoFields(assetInfo) {
     // Filter fields not applicable to current title type
     const fields = this.props.formStore.infoFields
       .filter(({for_title_types}) =>
@@ -186,62 +187,102 @@ class AssetInfo extends React.Component {
         for_title_types.includes(this.props.formStore.assetInfo.title_type)
       );
 
-    return fields.map(field =>
-      InfoField({
-        field,
-        entry: this.props.formStore.assetInfo,
-        Update: this.props.formStore.UpdateAssetInfo
-      })
-    );
+    return fields
+      // Remove non-localized fields if localization is active
+      .filter(field => !("localize" in field && !field.localize && this.props.formStore.localizationActive))
+      .map(field =>
+        InfoField({
+          field,
+          entry: assetInfo,
+          Update: this.props.formStore.UpdateAssetInfo,
+          localization: this.props.formStore.InfoFieldLocalization(field.name)
+        })
+      );
   }
 
   render() {
+    let assetInfo = this.props.formStore.assetInfo;
+    if(this.props.formStore.localizationActive) {
+      const [l0, l1, l2] = this.props.formStore.currentLocalization;
+
+      assetInfo = this.props.formStore.localizedAssetInfo[l0][l1];
+
+      if(l2) {
+        assetInfo = assetInfo[l2];
+      }
+    }
+
     return (
       <div className="asset-form-section-container">
         <h3>Asset Info</h3>
         <div className="asset-info-container">
-          <Selection
-            name="title_type"
-            value={this.props.formStore.assetInfo.title_type}
-            onChange={title_type => this.props.formStore.UpdateAssetInfo("title_type", title_type)}
-            options={this.props.formStore.availableTitleTypes}
-          />
+          {
+            Maybe(
+              !this.props.formStore.localizationActive,
+              <Selection
+                name="title_type"
+                value={assetInfo.title_type}
+                onChange={title_type => this.props.formStore.UpdateAssetInfo("title_type", title_type)}
+                options={this.props.formStore.availableTitleTypes}
+              />
+            )
+          }
 
-          <Selection
-            name="asset_type"
-            value={this.props.formStore.assetInfo.asset_type}
-            onChange={asset_type => this.props.formStore.UpdateAssetInfo("asset_type", asset_type)}
-            options={this.props.formStore.availableAssetTypes}
-          />
+          {
+            Maybe(
+              !this.props.formStore.localizationActive,
+              <Selection
+                name="asset_type"
+                value={assetInfo.asset_type}
+                onChange={asset_type => this.props.formStore.UpdateAssetInfo("asset_type", asset_type)}
+                options={this.props.formStore.availableAssetTypes}
+              />
+            )
+          }
 
           <Input
             name="title"
-            value={this.props.formStore.assetInfo.title}
+            value={assetInfo.title}
             onChange={title => this.props.formStore.UpdateAssetInfo("title", title)}
           />
 
           <Input
             name="display_title"
-            value={this.props.formStore.assetInfo.display_title}
+            value={assetInfo.display_title}
             onChange={display_title => this.props.formStore.UpdateAssetInfo("display_title", display_title)}
           />
 
-          { this.props.formStore.slugWarning ? <Warning message="Warning: Changing the slug will break any links to this object that contain the slug." /> : null }
+          {
+            Maybe(
+              !this.props.formStore.localizationActive && this.props.formStore.slugWarning,
+              <Warning message="Warning: Changing the slug will break any links to this object that contain the slug." />
+            )
+          }
 
-          <Input
-            name="slug"
-            value={this.props.formStore.assetInfo.slug}
-            onChange={slug => this.props.formStore.UpdateAssetInfo("slug", slug)}
-          />
+          {
+            Maybe(
+              !this.props.formStore.localizationActive,
+              <Input
+                name="slug"
+                value={this.props.formStore.assetInfo.slug}
+                onChange={slug => this.props.formStore.UpdateAssetInfo("slug", slug)}
+              />
+            )
+          }
 
-          <Input
-            name="ip_title_id"
-            label="IP Title ID"
-            value={this.props.formStore.assetInfo.ip_title_id}
-            onChange={ip_title_id => this.props.formStore.UpdateAssetInfo("ip_title_id", ip_title_id)}
-          />
+          {
+            Maybe(
+              !this.props.formStore.localizationActive,
+              <Input
+                name="ip_title_id"
+                label="IP Title ID"
+                value={this.props.formStore.assetInfo.ip_title_id}
+                onChange={ip_title_id => this.props.formStore.UpdateAssetInfo("ip_title_id", ip_title_id)}
+              />
+            )
+          }
 
-          { this.InfoFields() }
+          { this.InfoFields(assetInfo) }
         </div>
       </div>
     );

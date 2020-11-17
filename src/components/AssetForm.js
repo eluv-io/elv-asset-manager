@@ -1,6 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Action, Confirm, Tabs} from "elv-components-js";
+import {Action, Confirm, IconButton, Maybe, Tabs} from "elv-components-js";
 import Clips from "./Clips";
 import Images from "./Images";
 import AssetInfo from "./AssetInfo";
@@ -13,6 +13,118 @@ import SiteAccessCode from "./SiteAccessCode";
 import SiteCustomization from "./SiteCustomization";
 import FileControl from "./FileControl";
 
+import LocalizationIcon from "../static/icons/world.svg";
+import CloseIcon from "../static/icons/x-circle.svg";
+
+@inject("rootStore")
+@inject("formStore")
+@observer
+class LocalizationSelection extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    if(!this.props.formStore.localization) { return null; }
+
+    let firstSelection, secondSelection, thirdSelection;
+
+    firstSelection = (
+      <select
+        value={this.props.formStore.currentLocalization[0]}
+        onChange={event => {
+          const options = this.props.formStore.localization[event.target.value];
+          const secondOption = options ? (Array.isArray(options) ? options[0] : Object.keys(options)[0]) : undefined;
+          const thirdOption = secondOption && !Array.isArray(options) ? options[secondOption][0] : undefined;
+          this.props.formStore.SetCurrentLocalization([
+            event.target.value,
+            secondOption,
+            thirdOption
+          ]);
+        }}
+      >
+        {
+          [
+            <option value="" key="localization-selection-none">None</option>,
+            ...(Object.keys(this.props.formStore.localization).map(key =>
+              <option key={`localization-selection-${key}`} value={key}>{ key }</option>
+            ))
+          ]
+        }
+      </select>
+    );
+
+    if(this.props.formStore.currentLocalization[0]) {
+      const options = this.props.formStore.localization[this.props.formStore.currentLocalization[0]];
+      secondSelection = (
+        <select
+          value={this.props.formStore.currentLocalization[1]}
+          onChange={event => {
+            const thirdOption = Array.isArray(options) ? undefined : options[event.target.value][0];
+            this.props.formStore.SetCurrentLocalization([
+              this.props.formStore.currentLocalization[0],
+              event.target.value,
+              thirdOption
+            ]);
+          }}
+        >
+          {
+            (Array.isArray(options) ? options : Object.keys(options)).map(key =>
+              <option key={`localization-selection-${key}`} value={key}>{ key }</option>
+            )
+          }
+        </select>
+      );
+    }
+
+    if(this.props.formStore.currentLocalization[1] && this.props.formStore.currentLocalization[2]) {
+      thirdSelection = (
+        <select
+          value={this.props.formStore.currentLocalization[2]}
+          onChange={event => this.props.formStore.SetCurrentLocalization([this.props.formStore.currentLocalization[0], this.props.formStore.currentLocalization[1], event.target.value])}
+        >
+          {
+            this.props.formStore.localization[this.props.formStore.currentLocalization[0]][this.props.formStore.currentLocalization[1]].map(key =>
+              <option key={`localization-selection-${key}`} value={key}>{ key }</option>
+            )
+          }
+        </select>
+      );
+    }
+
+    return (
+      <div className="sticky localization-selection-container">
+        <IconButton
+          className={`localization-icon ${this.props.formStore.localizationActive ? "active" : ""}`}
+          icon={LocalizationIcon}
+          onClick={this.props.Close}
+        />
+        <label>Select Localization to Manage:</label>
+        { firstSelection }
+        { secondSelection }
+        { thirdSelection }
+        {
+          Maybe(
+            this.props.formStore.localizationActive,
+            <Action
+              className="secondary clear-localization"
+              onClick={() => this.props.formStore.SetCurrentLocalization([""])}
+            >
+              Clear
+            </Action>
+          )
+        }
+        <IconButton
+          title="Close localization selection"
+          icon={CloseIcon}
+          className="close-icon"
+          onClick={this.props.Close}
+        />
+      </div>
+    );
+  }
+}
+
 @inject("rootStore")
 @inject("formStore")
 @observer
@@ -22,7 +134,8 @@ class AssetForm extends React.Component {
 
     this.state = {
       form: "INFO",
-      commitMessage: ""
+      commitMessage: "",
+      showLocalizationOptions: false
     };
   }
 
@@ -117,10 +230,27 @@ class AssetForm extends React.Component {
   render() {
     return (
       <div className="asset-form">
-        <div className="sticky">
+        <div className="sticky app-header">
+          {
+            Maybe(
+              this.props.formStore.localization,
+              <IconButton
+                className={`localization-icon ${this.props.formStore.localizationActive ? "active" : ""}`}
+                icon={LocalizationIcon}
+                onClick={() => this.setState({showLocalizationOptions: !this.state.showLocalizationOptions})}
+              />
+            )
+          }
           <LinkUpdate />
-
-          <h1>Managing '{this.props.formStore.assetInfo.title || this.props.rootStore.assetName}'</h1>
+          <h1>
+            Managing '{this.props.formStore.assetInfo.title || this.props.rootStore.assetName}'
+            {
+              Maybe(
+                this.props.formStore.currentLocalization[1],
+                <div className="localization-hint">{this.props.formStore.currentLocalization.filter(l => l).join("/")}</div>
+              )
+            }
+          </h1>
           <Action
             className="asset-form-save-button"
             onClick={async () => {
@@ -141,6 +271,12 @@ class AssetForm extends React.Component {
             Save
           </Action>
         </div>
+        {
+          Maybe(
+            this.state.showLocalizationOptions,
+            <LocalizationSelection Close={() => this.setState({showLocalizationOptions: false})} />
+          )
+        }
         <Tabs
           className="asset-form-page-selection"
           selected={this.state.form}

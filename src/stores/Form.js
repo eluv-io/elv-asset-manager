@@ -94,6 +94,7 @@ class FormStore {
   ];
 
   @observable localization;
+  @observable currentLocalization = [""];
 
   @observable associatedAssets = [
     {
@@ -147,6 +148,8 @@ class FormStore {
     {name: "runtime", type: "integer"},
   ];
 
+  @observable infoFieldLocalizations;
+
   @observable slugWarning = false;
   @observable siteSelectorInfo = {};
 
@@ -156,6 +159,31 @@ class FormStore {
       assetType.for_title_types.length === 0 ||
       assetType.for_title_types.includes(this.assetInfo.title_type)
     ));
+  }
+
+  @computed get localizationActive() {
+    return this.currentLocalization[0] && this.currentLocalization[1];
+  }
+
+  InfoFieldLocalization(name) {
+    if(!this.localizationActive) { return; }
+
+    if(this.currentLocalization[2]) {
+      return this.rootStore.client.utils.SafeTraverse(
+        this.infoFieldLocalizations,
+        this.currentLocalization[0],
+        this.currentLocalization[1],
+        this.currentLocalization[2],
+        name
+      );
+    } else {
+      return this.rootStore.client.utils.SafeTraverse(
+        this.infoFieldLocalizations,
+        this.currentLocalization[0],
+        this.currentLocalization[1],
+        name
+      );
+    }
   }
 
   constructor(rootStore) {
@@ -184,6 +212,33 @@ class FormStore {
     }
   }
 
+  @action.bound
+  SetCurrentLocalization(options) {
+    this.currentLocalization = options;
+    const [l0, l1, l2] = options;
+
+    this.localizedAssetInfo[l0] = this.localizedAssetInfo[l0] || {};
+    this.localizedAssetInfo[l0][l1] = this.localizedAssetInfo[l0][l1] || {};
+
+    if(l2) {
+      this.localizedAssetInfo[l0][l1][l2] = this.localizedAssetInfo[l0][l1][l2] || {};
+
+      if(!this.localizedAssetInfo[l0][l1][l2]._loaded) {
+        this.localizedAssetInfo[l0][l1][l2] =
+          this.LoadAssetInfo(this.rootStore.client.utils.SafeTraverse(this.rootStore.assetMetadata, l0, l1, l2));
+      }
+
+      this.localizedAssetInfo[l0][l1][l2]._loaded = true;
+    } else {
+      if(!this.localizedAssetInfo[l0][l1]._loaded) {
+        this.localizedAssetInfo[l0][l1] =
+          this.LoadAssetInfo(this.rootStore.client.utils.SafeTraverse(this.rootStore.assetMetadata, l0, l1));
+      }
+
+      this.localizedAssetInfo[l0][l1]._loaded = true;
+    }
+  }
+
   InitializeFormData = flow(function * () {
     const titleConfiguration = this.rootStore.titleConfiguration;
 
@@ -194,6 +249,7 @@ class FormStore {
     this.availableAssetTypes = titleConfiguration.asset_types || this.availableAssetTypes;
     this.availableTitleTypes = titleConfiguration.title_types || this.availableTitleTypes;
     this.infoFields = titleConfiguration.info_fields || this.infoFields;
+    this.infoFieldLocalizations = titleConfiguration.info_field_localizations;
     this.associatedAssets = titleConfiguration.associated_assets || this.associatedAssets;
     this.defaultImageKeys = titleConfiguration.default_image_keys || this.defaultImageKeys;
 
@@ -229,12 +285,25 @@ class FormStore {
 
   @action.bound
   UpdateAssetInfo(key, value) {
-    this.assetInfo[key] = value;
+    if(this.localizationActive) {
+      // Localized asset metadata
+      const [l0, l1, l2] = this.currentLocalization;
 
-    if(key === "display_title" && !this.originalSlug) {
-      this.assetInfo.slug = Slugify(value);
-    } else if(key === "slug" && this.originalSlug) {
-      this.slugWarning = this.originalSlug !== value;
+      if(l2) {
+        this.localizedAssetInfo[l0][l1][l2][key] = value;
+      } else {
+        this.localizedAssetInfo[l0][l1][key] = value;
+      }
+
+    } else {
+      // Normal asset metadata
+      this.assetInfo[key] = value;
+
+      if(key === "display_title" && !this.originalSlug) {
+        this.assetInfo.slug = Slugify(value);
+      } else if(key === "slug" && this.originalSlug) {
+        this.slugWarning = this.originalSlug !== value;
+      }
     }
   }
 
@@ -511,6 +580,8 @@ class FormStore {
 
   // Load methods
   LoadAssetInfo(metadata) {
+    metadata = metadata || {};
+
     const info = (metadata.info || {});
 
     let assetInfo = {
@@ -1065,6 +1136,8 @@ class FormStore {
   }
 
   FormatDate(millis, datetime=false) {
+    if(!millis) { return ""; }
+
     try {
       return datetime ?
         DateTime.fromMillis(millis).toISO({suppressMilliseconds: true}) :
@@ -1077,7 +1150,7 @@ class FormStore {
     return "";
   }
 
-  FormatFields({infoFields, values, titleType, isTopLevel=false}) {
+  FormatFields({infoFields, values, titleType, isTopLevel=false, splitListFields=true}) {
     let topInfo = {};
     let info = {};
     let listFields = [];
@@ -1102,10 +1175,12 @@ class FormStore {
         });
       }
 
+      value = toJS(value);
+
       if(!isTopLevel) {
         info[name] = value;
       } else {
-        if(type === "list" || type === "multiselect") {
+        if(splitListFields && (type === "list" || type === "multiselect")) {
           // List type - Since we're doing a merge on the info metadata, we must do an explicit replace call to modify lists
           listFields.push({name, value, top_level});
         } else if(top_level) {
@@ -1119,6 +1194,40 @@ class FormStore {
     });
 
     return { info, topInfo, listFields };
+  }
+
+  FormatLocalizedFields(localizedAssetInfo) {
+    const {info, topInfo} = this.FormatFields({
+      infoFields: this.infoFields,
+      values: localizedAssetInfo,
+      titleType: this.assetInfo.title_type,
+      isTopLevel: true,
+      splitListFields: false
+    });
+
+    // Move built-in fields to top level info
+    ["title", "display_title", "ip_title_id", "slug", "title_type", "asset_type"]
+      .forEach(attr => topInfo[attr] = localizedAssetInfo[attr]);
+
+    delete topInfo.title_type;
+    delete topInfo.asset_type;
+
+    for(let key of Object.keys(topInfo)) {
+      if(!topInfo[key]) {
+        delete topInfo[key];
+      }
+    }
+
+    for(let key of Object.keys(info)) {
+      if(!info[key]) {
+        delete info[key];
+      }
+    }
+
+    return {
+      info,
+      topInfo
+    };
   }
 
   @action.bound
@@ -1190,6 +1299,41 @@ class FormStore {
           });
         })
       );
+
+      // Localized asset info
+      for(let l0 of Object.keys(this.localizedAssetInfo)) {
+        for(let l1 of Object.keys(this.localizedAssetInfo[l0])) {
+          if(this.localizedAssetInfo[l0][l1]._loaded) {
+            const {info, topInfo} = this.FormatLocalizedFields(this.localizedAssetInfo[l0][l1]);
+
+            yield client.ReplaceMetadata({
+              libraryId,
+              objectId,
+              writeToken,
+              metadataSubtree: UrlJoin("public", "asset_metadata", l0, l1),
+              metadata: {
+                ...topInfo,
+                info
+              }
+            });
+          } else {
+            for(let l2 of Object.keys(this.localizedAssetInfo[l0][l1])) {
+              const {info, topInfo} = this.FormatLocalizedFields(this.localizedAssetInfo[l0][l1][l2]);
+
+              yield client.ReplaceMetadata({
+                libraryId,
+                objectId,
+                writeToken,
+                metadataSubtree: UrlJoin("public", "asset_metadata", l0, l1, l2),
+                metadata: {
+                  ...topInfo,
+                  info
+                }
+              });
+            }
+          }
+        }
+      }
 
       // Credits
       let credits = {};

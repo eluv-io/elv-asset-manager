@@ -18,6 +18,22 @@ Here is a full example of asset configuration metadata for a content type:
 {
   "public":{
     "title_configuration":{
+      "localization": {
+        "info_locals": [
+          "DE",
+          "EN",
+          "ES",
+          "FR",
+          "IT",
+          "JP"
+        ],
+        "info_territories": [
+          {"France": ["FR"]},
+          {"Germany": ["DE"]},
+          {"Switzerland": ["DE", "FR", "IT"]},
+          {"United States": ["EN"]}
+        ]
+      },
       "controls":[
         "credits",
         "playlists",
