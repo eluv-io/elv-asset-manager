@@ -28,18 +28,25 @@ class ContentStore {
     yield libraryIds.limitedMap(
       5,
       async libraryId => {
-        const metadata = await this.rootStore.client.ContentObjectMetadata({
-          libraryId,
-          objectId: libraryId.replace("ilib", "iq__")
-        });
+        try {
+          const metadata = await this.rootStore.client.ContentObjectMetadata({
+            libraryId,
+            objectId: libraryId.replace("ilib", "iq__")
+          });
 
-        const name = (metadata.public ? metadata.public.name : metadata.name) || metadata.name || libraryId || "";
-        libraries.push({
-          id: libraryId,
-          libraryId,
-          name,
-          sortKey: name.startsWith("ilib") ? `zz${name.toLowerCase()}` : name.toLowerCase()
-        });
+          const name = (metadata.public ? metadata.public.name : metadata.name) || metadata.name || libraryId || "";
+          libraries.push({
+            id: libraryId,
+            libraryId,
+            name,
+            sortKey: name.startsWith("ilib") ? `zz${name.toLowerCase()}` : name.toLowerCase()
+          });
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error("Failed to load library " + libraryId);
+          // eslint-disable-next-line no-console
+          console.error(error);
+        }
       }
     );
 

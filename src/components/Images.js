@@ -54,7 +54,7 @@ class Images extends React.Component {
       <div className="asset-form-section-container">
         <h3>Images</h3>
         <div className="asset-form-images-container">
-          {this.props.formStore.images.map((image, i) => this.Image(image, i))}
+          {this.props.formStore.currentLocalizedData.images.map((image, i) => this.Image(image, i))}
         </div>
         <Action onClick={this.props.formStore.AddImage}>Add Image</Action>
       </div>

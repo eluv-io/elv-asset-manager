@@ -167,7 +167,7 @@ class Credits extends React.Component {
       <div className="asset-form-section-container">
         <h3>Credits</h3>
         <div className="asset-form-credits-container">
-          {this.props.formStore.credits.map((group, index) =>
+          {this.props.formStore.currentLocalizedData.credits.map((group, index) =>
             <CreditsGroup
               key={`credits-group-${index}`}
               group={group}

@@ -181,8 +181,8 @@ class Clips extends React.Component {
 
   render() {
     const clips = this.props.playlistIndex !== undefined ?
-      this.props.formStore.playlists[this.props.playlistIndex].clips :
-      this.props.formStore.assets[this.props.storeKey];
+      this.props.formStore.currentLocalizedData.playlists[this.props.playlistIndex].clips :
+      this.props.formStore.currentLocalizedData.assets[this.props.storeKey];
 
     return (
       <div className="asset-form-section-container">

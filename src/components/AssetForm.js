@@ -39,7 +39,7 @@ class LocalizationSelection extends React.Component {
           this.props.formStore.SetCurrentLocalization([
             event.target.value,
             secondOption,
-            thirdOption
+            thirdOption || ""
           ]);
         }}
       >
@@ -64,7 +64,7 @@ class LocalizationSelection extends React.Component {
             this.props.formStore.SetCurrentLocalization([
               this.props.formStore.currentLocalization[0],
               event.target.value,
-              thirdOption
+              thirdOption || ""
             ]);
           }}
         >
@@ -108,7 +108,7 @@ class LocalizationSelection extends React.Component {
             this.props.formStore.localizationActive,
             <Action
               className="secondary clear-localization"
-              onClick={() => this.props.formStore.SetCurrentLocalization([""])}
+              onClick={() => this.props.formStore.ClearCurrentLocalization()}
             >
               Clear
             </Action>
@@ -175,7 +175,11 @@ class AssetForm extends React.Component {
       tabs.push(["Access Codes", "SITE_CODES"]);
     }
 
-    this.props.formStore.fileControls.forEach(control => tabs.push([control.name, control.name]));
+    if(this.props.formStore.localizationActive) {
+      this.props.formStore.localizableFileControls.forEach(control => tabs.push([control.name, control.name]));
+    } else {
+      this.props.formStore.fileControls.forEach(control => tabs.push([control.name, control.name]));
+    }
 
     return tabs;
   }
@@ -199,9 +203,20 @@ class AssetForm extends React.Component {
       case "SITE_CODES":
         return <SiteAccessCode />;
       default:
-        const control = this.props.formStore.fileControls.find(control => control.name === this.state.form);
+        const control = this.props.formStore.fileControls
+          .find(control => control.name === this.state.form);
 
         if(control) {
+          // If localization is active and currently on non-localizable file control tab, return asset info
+          if(this.props.formStore.localizationActive) {
+            const localizedControl = this.props.formStore.localizableFileControls
+              .find(control => control.name === this.state.form);
+
+            if(!localizedControl) {
+              return <AssetInfo />;
+            }
+          }
+
           return <FileControl control={control} />;
         }
     }

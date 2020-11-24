@@ -45,11 +45,18 @@ const AssetMetadataFields =(level) => {
 class FormStore {
   @observable editWriteToken;
 
+  @observable localizedData = {};
+
   @observable assetInfo = {};
-  @observable localizedAssetInfo = {};
+
   @observable images = [];
+  @observable localizedImages = {};
+
   @observable playlists = [];
+  @observable localizedPlaylists = {};
+
   @observable credits = {};
+  @observable localizedCredits = {};
 
   @observable assets = {};
 
@@ -94,7 +101,7 @@ class FormStore {
   ];
 
   @observable localization;
-  @observable currentLocalization = [""];
+  @observable currentLocalization = ["", "", ""];
 
   @observable associatedAssets = [
     {
@@ -165,6 +172,26 @@ class FormStore {
     return this.currentLocalization[0] && this.currentLocalization[1];
   }
 
+  @computed get currentLocalizedData() {
+    if(!this.localizationActive) {
+      return this;
+    }
+
+    const [l0, l1, l2] = this.currentLocalization;
+
+    if(l2) {
+      return this.localizedData[l0][l1][l2];
+    }
+
+    return this.localizedData[l0][l1];
+  }
+
+  @computed get localizableFileControls() {
+    return this.fileControls.filter(control =>
+      control.target.startsWith("public/asset_metadata") || control.target.startsWith("/public/asset_metadata")
+    );
+  }
+
   InfoFieldLocalization(name) {
     if(!this.localizationActive) { return; }
 
@@ -213,30 +240,63 @@ class FormStore {
   }
 
   @action.bound
-  SetCurrentLocalization(options) {
-    this.currentLocalization = options;
+  SetCurrentLocalization = flow(function * (options) {
     const [l0, l1, l2] = options;
 
-    this.localizedAssetInfo[l0] = this.localizedAssetInfo[l0] || {};
-    this.localizedAssetInfo[l0][l1] = this.localizedAssetInfo[l0][l1] || {};
+    this.localizedData[l0] = this.localizedData[l0] || {};
+    this.localizedData[l0][l1] = this.localizedData[l0][l1] || {};
 
+    let target = this.localizedData[l0][l1];
+
+    let assetMetadata = this.rootStore.client.utils.SafeTraverse(this.rootStore.assetMetadata, l0, l1);
     if(l2) {
-      this.localizedAssetInfo[l0][l1][l2] = this.localizedAssetInfo[l0][l1][l2] || {};
+      this.localizedData[l0][l1][l2] = this.localizedData[l0][l1][l2] || {};
 
-      if(!this.localizedAssetInfo[l0][l1][l2]._loaded) {
-        this.localizedAssetInfo[l0][l1][l2] =
-          this.LoadAssetInfo(this.rootStore.client.utils.SafeTraverse(this.rootStore.assetMetadata, l0, l1, l2));
-      }
-
-      this.localizedAssetInfo[l0][l1][l2]._loaded = true;
-    } else {
-      if(!this.localizedAssetInfo[l0][l1]._loaded) {
-        this.localizedAssetInfo[l0][l1] =
-          this.LoadAssetInfo(this.rootStore.client.utils.SafeTraverse(this.rootStore.assetMetadata, l0, l1));
-      }
-
-      this.localizedAssetInfo[l0][l1]._loaded = true;
+      target = this.localizedData[l0][l1][l2];
+      assetMetadata = this.rootStore.client.utils.SafeTraverse(this.rootStore.assetMetadata, l0, l1, l2);
     }
+
+    if(!target._loaded) {
+      target.assetInfo = this.LoadAssetInfo(assetMetadata);
+      target.credits = this.LoadCredits((assetMetadata.info || {}).talent);
+
+      target.images = [];
+      target.playlists = [];
+      target.fileControlItems = {};
+      this.localizableFileControls.forEach(control => target.fileControlItems[control.name] = []);
+
+      target.assets = target.assets || {};
+
+      // Set localization immediately, async controls may be filled in later
+      this.currentLocalization = options;
+
+      target.images = yield this.LoadImages(assetMetadata.images, true);
+      target.playlists = yield this.LoadPlaylists(assetMetadata.playlists);
+
+      for(let i = 0; i < this.localizableFileControls.length; i++) {
+        const control = this.localizableFileControls[i];
+        target.fileControlItems[control.name] = yield this.LoadFileControl(control);
+      }
+
+      for(let i = 0; i < this.associatedAssets.length; i++) {
+        const assetSpec = this.associatedAssets[i];
+        const name = assetSpec.name;
+
+        target.assets[name] = yield this.LoadAssets(
+          assetMetadata[name],
+          UrlJoin("public", "asset_metadata", l0, l1, l2, name)
+        );
+      }
+
+      target._loaded = true;
+    }
+
+    this.currentLocalization = options;
+  });
+
+  @action.bound
+  ClearCurrentLocalization() {
+    this.currentLocalization = ["", "", ""];
   }
 
   InitializeFormData = flow(function * () {
@@ -286,15 +346,7 @@ class FormStore {
   @action.bound
   UpdateAssetInfo(key, value) {
     if(this.localizationActive) {
-      // Localized asset metadata
-      const [l0, l1, l2] = this.currentLocalization;
-
-      if(l2) {
-        this.localizedAssetInfo[l0][l1][l2][key] = value;
-      } else {
-        this.localizedAssetInfo[l0][l1][key] = value;
-      }
-
+      this.currentLocalizedData.assetInfo[key] = value;
     } else {
       // Normal asset metadata
       this.assetInfo[key] = value;
@@ -311,7 +363,7 @@ class FormStore {
 
   @action.bound
   AddCreditGroup() {
-    this.credits.push({
+    this.currentLocalizedData.credits.push({
       group: "",
       talentType: "",
       credits: []
@@ -320,18 +372,18 @@ class FormStore {
 
   @action.bound
   RemoveCreditGroup({groupIndex}) {
-    this.credits =
-      this.credits.filter((_, i) => i !== groupIndex);
+    this.currentLocalizedData.credits =
+      this.currentLocalizedData.credits.filter((_, i) => i !== groupIndex);
   }
 
   @action.bound
   UpdateCreditGroup({groupIndex, key, value}) {
-    this.credits[groupIndex][key] = value;
+    this.currentLocalizedData.credits[groupIndex][key] = value;
   }
 
   @action.bound
   AddCredit({groupIndex}) {
-    this.credits[groupIndex].credits.push({
+    this.currentLocalizedData.credits[groupIndex].credits.push({
       character_name: "",
       talent_first_name: "",
       talent_last_name: ""
@@ -340,20 +392,20 @@ class FormStore {
 
   @action.bound
   UpdateCredit({groupIndex, creditIndex, key, value}) {
-    this.credits[groupIndex].credits[creditIndex][key] = value;
+    this.currentLocalizedData.credits[groupIndex].credits[creditIndex][key] = value;
   }
 
   @action.bound
   SwapCredit({groupIndex, i1, i2}) {
-    const credit = this.credits[groupIndex].credits[i1];
-    this.credits[groupIndex].credits[i1] = this.credits[groupIndex].credits[i2];
-    this.credits[groupIndex].credits[i2] = credit;
+    const credit = this.currentLocalizedData.credits[groupIndex].credits[i1];
+    this.currentLocalizedData.credits[groupIndex].credits[i1] = this.currentLocalizedData.credits[groupIndex].credits[i2];
+    this.currentLocalizedData.credits[groupIndex].credits[i2] = credit;
   }
 
   @action.bound
   RemoveCredit({groupIndex, creditIndex}) {
-    this.credits[groupIndex].credits =
-      this.credits[groupIndex].credits.filter((_, i) => i !== creditIndex);
+    this.currentLocalizedData.credits[groupIndex].credits =
+      this.currentLocalizedData.credits[groupIndex].credits.filter((_, i) => i !== creditIndex);
   }
 
   // Clips/trailers
@@ -363,21 +415,21 @@ class FormStore {
 
     if(playlistIndex !== undefined) {
       // Prevent duplicates
-      if(this.playlists[playlistIndex].clips.find(clip => clip.versionHash === versionHash)) {
+      if(this.currentLocalizedData.playlists[playlistIndex].clips.find(clip => clip.versionHash === versionHash)) {
         return;
       }
 
-      this.playlists[playlistIndex].clips.push({
+      this.currentLocalizedData.playlists[playlistIndex].clips.push({
         versionHash,
         ...this.targets[versionHash]
       });
     } else {
       // Prevent duplicates
-      if(this.assets[key].find(clip => clip.versionHash === versionHash)) {
+      if(this.currentLocalizedData.assets[key].find(clip => clip.versionHash === versionHash)) {
         return;
       }
 
-      this.assets[key].push({
+      this.currentLocalizedData.assets[key].push({
         versionHash,
         ...this.targets[versionHash]
       });
@@ -388,9 +440,9 @@ class FormStore {
   UpdateClip = flow(function * ({key, playlistIndex, index}) {
     let clip;
     if(playlistIndex !== undefined) {
-      clip = this.playlists[playlistIndex].clips[index];
+      clip = this.currentLocalizedData.playlists[playlistIndex].clips[index];
     } else {
-      clip = this.assets[key][index];
+      clip = this.currentLocalizedData.assets[key][index];
     }
 
     const latestVersionHash = yield this.rootStore.client.LatestVersionHash({versionHash: clip.versionHash});
@@ -407,40 +459,40 @@ class FormStore {
     };
 
     if(playlistIndex !== undefined) {
-      this.playlists[playlistIndex].clips[index] = updatedClip;
+      this.currentLocalizedData.playlists[playlistIndex].clips[index] = updatedClip;
     } else {
-      this.assets[key][index] = updatedClip;
+      this.currentLocalizedData.assets[key][index] = updatedClip;
     }
   });
 
   @action.bound
   RemoveClip({key, playlistIndex, index}) {
     if(playlistIndex !== undefined) {
-      this.playlists[playlistIndex].clips =
-        this.playlists[playlistIndex].clips.filter((_, i) => i !== index);
+      this.currentLocalizedData.playlists[playlistIndex].clips =
+        this.currentLocalizedData.playlists[playlistIndex].clips.filter((_, i) => i !== index);
     } else {
-      this.assets[key] = this.assets[key].filter((_, i) => i !== index);
+      this.currentLocalizedData.assets[key] = this.currentLocalizedData.assets[key].filter((_, i) => i !== index);
     }
   }
 
   @action.bound
   SwapClip({key, playlistIndex, i1, i2}) {
     if(playlistIndex !== undefined) {
-      const clip = this.playlists[playlistIndex].clips[i1];
-      this.playlists[playlistIndex].clips[i1] = this.playlists[playlistIndex].clips[i2];
-      this.playlists[playlistIndex].clips[i2] = clip;
+      const clip = this.currentLocalizedData.playlists[playlistIndex].clips[i1];
+      this.currentLocalizedData.playlists[playlistIndex].clips[i1] = this.currentLocalizedData.playlists[playlistIndex].clips[i2];
+      this.currentLocalizedData.playlists[playlistIndex].clips[i2] = clip;
     } else {
-      const clip = this.assets[key][i1];
-      this.assets[key][i1] = this.assets[key][i2];
-      this.assets[key][i2] = clip;
+      const clip = this.currentLocalizedData.assets[key][i1];
+      this.currentLocalizedData.assets[key][i1] = this.currentLocalizedData.assets[key][i2];
+      this.currentLocalizedData.assets[key][i2] = clip;
     }
   }
 
   @action.bound
   SetDefaultClip({key, playlistIndex, index}) {
     const clips = playlistIndex !== undefined ?
-      this.playlists[playlistIndex].clips :
-      this.assets[key];
+      this.currentLocalizedData.playlists[playlistIndex].clips :
+      this.currentLocalizedData.assets[key];
 
     let toUnset;
     if(clips[index].isDefault) {
@@ -454,22 +506,22 @@ class FormStore {
 
     if(toUnset >= 0) {
       playlistIndex !== undefined ?
-        this.playlists[playlistIndex].clips[toUnset].isDefault = false :
-        this.assets[key][toUnset].isDefault = false;
+        this.currentLocalizedData.playlists[playlistIndex].clips[toUnset].isDefault = false :
+        this.currentLocalizedData.assets[key][toUnset].isDefault = false;
     }
 
     // Set new default
     if(toUnset !== index) {
       playlistIndex !== undefined ?
-        this.playlists[playlistIndex].clips[index].isDefault = true :
-        this.assets[key][index].isDefault = true;
+        this.currentLocalizedData.playlists[playlistIndex].clips[index].isDefault = true :
+        this.currentLocalizedData.assets[key][index].isDefault = true;
     }
   }
 
   // Images
   @action.bound
   UpdateImage({index, imageKey, imagePath, targetHash}) {
-    this.images[index] = {
+    this.currentLocalizedData.images[index] = {
       imageKey,
       imagePath,
       targetHash
@@ -478,7 +530,7 @@ class FormStore {
 
   @action.bound
   AddImage() {
-    this.images.push({
+    this.currentLocalizedData.images.push({
       imageKey: "",
       imagePath: undefined,
       targetHash: this.rootStore.params.versionHash
@@ -487,13 +539,13 @@ class FormStore {
 
   @action.bound
   RemoveImage(index) {
-    this.images = this.images.filter((_, i) => i !== index);
+    this.currentLocalizedData.images = this.currentLocalizedData.images.filter((_, i) => i !== index);
   }
 
   // Configurable File Items
   @action.bound
   UpdateFileControlItem({index, controlName, title, description, path, targetHash}) {
-    this.fileControlItems[controlName][index] = {
+    this.currentLocalizedData.fileControlItems[controlName][index] = {
       title,
       description,
       path,
@@ -503,7 +555,7 @@ class FormStore {
 
   @action.bound
   AddFileControlItem({controlName}) {
-    this.fileControlItems[controlName].push({
+    this.currentLocalizedData.fileControlItems[controlName].push({
       title: "",
       description: "",
       path: undefined,
@@ -513,20 +565,20 @@ class FormStore {
 
   @action.bound
   RemoveFileControlItem({controlName, index}) {
-    this.fileControlItems[controlName] = this.fileControlItems[controlName].filter((_, i) => i !== index);
+    this.currentLocalizedData.fileControlItems[controlName] = this.currentLocalizedData.fileControlItems[controlName].filter((_, i) => i !== index);
   }
 
   @action.bound
   SwapFileControlItem(controlName, i1, i2) {
-    const image = this.fileControlItems[controlName][i1];
-    this.fileControlItems[controlName][i1] = this.fileControlItems[controlName][i2];
-    this.fileControlItems[controlName][i2] = image;
+    const item = this.currentLocalizedData.fileControlItems[controlName][i1];
+    this.currentLocalizedData.fileControlItems[controlName][i1] = this.currentLocalizedData.fileControlItems[controlName][i2];
+    this.currentLocalizedData.fileControlItems[controlName][i2] = item;
   }
 
   // Playlists
   @action.bound
   AddPlaylist() {
-    this.playlists.push({
+    this.currentLocalizedData.playlists.push({
       playlistId: `playlist-${Id.next()}`,
       playlistName: "New Playlist",
       playlistSlug: "new-playlist",
@@ -536,19 +588,19 @@ class FormStore {
 
   @action.bound
   UpdatePlaylist({index, key, value}) {
-    this.playlists[index][key] = value;
+    this.currentLocalizedData.playlists[index][key] = value;
   }
 
   @action.bound
   RemovePlaylist(index) {
-    this.playlists = this.playlists.filter((_, i) => i !== index);
+    this.currentLocalizedData.playlists = this.currentLocalizedData.playlists.filter((_, i) => i !== index);
   }
 
   @action.bound
   SwapPlaylist(i1, i2) {
-    const playlist = this.playlists[i1];
-    this.playlists[i1] = this.playlists[i2];
-    this.playlists[i2] = playlist;
+    const playlist = this.currentLocalizedData.playlists[i1];
+    this.currentLocalizedData.playlists[i1] = this.currentLocalizedData.playlists[i2];
+    this.currentLocalizedData.playlists[i2] = playlist;
   }
 
   LoadInfoFields({infoFields, values, isTopLevel=false, topLevelValues}) {
@@ -872,9 +924,15 @@ class FormStore {
   });
 
   LoadFileControl = flow(function * (control) {
+    const [l0, l1, l2] = this.currentLocalization;
+    let metadataPath = control.target;
+    if(l1) {
+      metadataPath = UrlJoin("public", "asset_metadata", l0, l1, l2, metadataPath.replace(/^\/?public\/asset_metadata\//, ""));
+    }
+
     const metadata = (yield this.rootStore.client.ContentObjectMetadata({
       versionHash: this.rootStore.params.versionHash,
-      metadataSubtree: control.target
+      metadataSubtree: metadataPath
     })) || [];
 
     let items = [];
@@ -939,6 +997,9 @@ class FormStore {
       yield Promise.all(
         Object.keys(metadata).sort().map(async playlistIndex => {
           if(isNaN(parseInt(playlistIndex))) {
+            const [l0, l1, l2] = this.currentLocalization;
+            const metadataPath = UrlJoin("public", "asset_metadata", l0, l1, l2, "playlists", playlistIndex.toString(), "list");
+
             // New format - [playlistSlug]: { ... }
             const playlist = {
               playlistId: `playlist-${Id.next()}`,
@@ -946,7 +1007,7 @@ class FormStore {
               playlistSlug: playlistIndex,
               clips: await this.LoadAssets(
                 metadata[playlistIndex].list,
-                `public/asset_metadata/playlists/${playlistIndex}/list`,
+                metadataPath,
                 1
               )
             };
@@ -960,12 +1021,15 @@ class FormStore {
             // Old format: [index]: { [playlistSlug]: ... }
             const playlistSlug = Object.keys(metadata[playlistIndex])[0];
 
+            const [l0, l1, l2] = this.currentLocalization;
+            const metadataPath = UrlJoin("public", "asset_metadata", l0, l1, l2, "playlists", playlistIndex.toString(), playlistSlug);
+
             playlists[parseInt(playlistIndex)] = {
               playlistName: playlistSlug || "",
               playlistSlug,
               clips: await this.LoadAssets(
                 metadata[playlistIndex][playlistSlug],
-                `public/asset_metadata/playlists/${playlistIndex}/${playlistSlug}`
+                metadataPath
               )
             };
           }
@@ -1257,211 +1321,178 @@ class FormStore {
         yield this.rootStore.channelStore.SaveChannelInfo({writeToken});
       }
 
-      // Format asset info
-      const assetInfo = toJS(this.assetInfo);
-      const {info, topInfo, listFields} = this.FormatFields({
-        infoFields: this.infoFields,
-        values: assetInfo,
-        titleType: assetInfo.title_type,
-        isTopLevel: true
-      });
 
-      // Move built-in fields to top level info
-      ["title", "display_title", "ip_title_id", "slug", "title_type", "asset_type"]
-        .forEach(attr => topInfo[attr] = assetInfo[attr]);
+      // Localizable data
+      let localizationKeys = [["", "", ""]];
+      for(let l0 of Object.keys(this.localizedData)) {
+        for(let l1 of Object.keys(this.localizedData[l0])) {
+          if(this.localizedData[l0][l1]._loaded) {
+            localizationKeys.push([l0, l1, ""]);
+          } else {
+            Object.keys(this.localizedData[l0][l1]).forEach(l2 =>
+              localizationKeys.push([l0, l1, l2])
+            );
+          }
+        }
+      }
 
-      // Asset Info
-      yield client.MergeMetadata({
-        libraryId,
-        objectId,
-        writeToken,
-        metadataSubtree: "public/asset_metadata/info",
-        metadata: info
-      });
+      for(let [l0, l1, l2] of localizationKeys) {
+        let localizedData = this;
+        if(l2) {
+          localizedData = this.localizedData[l0][l1][l2];
+        } else if(l1) {
+          localizedData = this.localizedData[l0][l1];
+        }
 
-      yield client.MergeMetadata({
-        libraryId,
-        objectId,
-        writeToken,
-        metadataSubtree: "public/asset_metadata",
-        metadata: topInfo
-      });
+        const {info, topInfo} = this.FormatLocalizedFields(localizedData.assetInfo);
 
-      // List types must be replaced, or else they will be merged
-      yield Promise.all(
-        listFields.map(async ({name, value, top_level}) => {
-          await client.ReplaceMetadata({
+        // Move built-in fields to top level info
+        ["title", "display_title", "ip_title_id", "slug", "title_type", "asset_type"]
+          .forEach(attr => {
+            if(localizedData.assetInfo[attr]) {
+              topInfo[attr] = localizedData.assetInfo[attr];
+            }
+          });
+
+        // Credits
+        let credits = {};
+        toJS(localizedData.credits).map(group => {
+          credits[group.group] =
+            group.credits.map((credit, index) => ({
+              ...credit,
+              talent_type: group.talentType,
+              talent_note_seq_id: (index + 1).toString().padStart(2, "0"),
+              sales_display_order: credit.sales_display_order ?
+                credit.sales_display_order.padStart(2, "0") : ""
+            }));
+        });
+
+        // Images
+        let images = {};
+        toJS(localizedData.images).forEach(({imageKey, imagePath, targetHash}) => {
+          if(!imageKey || !imagePath) {
+            return;
+          }
+
+          images[imageKey] = {
+            default: this.CreateLink(targetHash, UrlJoin("files", imagePath)),
+            thumbnail: this.CreateLink(targetHash, UrlJoin("rep", "thumbnail", "files", imagePath))
+          };
+        });
+
+        // Associated assets
+        let assetData = {};
+        for(let i = 0; i < this.associatedAssets.length; i++) {
+          const assetType = this.associatedAssets[i];
+          const assets = toJS(localizedData.assets[assetType.name]);
+
+          const formattedAssets = yield this.FormatAssets({assetType, assets});
+
+          assetData[assetType.name] = formattedAssets;
+        }
+
+        // Playlists
+        let playlists = {};
+        yield Promise.all(
+          toJS(localizedData.playlists).map(async ({playlistName, playlistSlug, clips}, index) => {
+            if(!playlistSlug) {
+              return;
+            }
+
+            const list = await this.FormatAssets({
+              assetType: {
+                indexed: false,
+                slugged: true,
+                name: `playlists/${playlistSlug}/list`
+              },
+              assets: clips
+            });
+
+            playlists[playlistSlug] = {
+              name: playlistName || playlistSlug,
+              count: clips.length,
+              order: index,
+              list
+            };
+          })
+        );
+
+        // Merge non-localized asset metadata with existing metadata
+        let existingMetadata = { info: {} };
+        if(!l0) {
+          existingMetadata = (yield client.ContentObjectMetadata({
+            libraryId,
+            objectId,
+            metadataSubtree: UrlJoin("public", "asset_metadata")
+          })) || {};
+        }
+
+        yield client.ReplaceMetadata({
+          libraryId,
+          objectId,
+          writeToken,
+          metadataSubtree: UrlJoin("public", "asset_metadata", l0, l1, l2),
+          metadata: {
+            ...existingMetadata,
+            ...topInfo,
+            ...assetData,
+            images,
+            playlists,
+            info: {
+              ...(existingMetadata.info || {}),
+              ...info,
+              talent: credits
+            }
+          }
+        });
+
+        // Configurable Controls
+        for(let i = 0; i < this.fileControls.length; i++) {
+          const control = this.fileControls[i];
+
+          // Skip non-localizable controls for localized data
+          if(l1 && !(control.target.startsWith("public/asset_metadata") || control.target.startsWith("/public/asset_metadata"))) {
+            continue;
+          }
+
+          let items = {};
+          toJS(localizedData.fileControlItems[control.name]).forEach(({title, description, path, targetHash}, index) => {
+            if(!path) {
+              return;
+            }
+
+            let file;
+            if(control.thumbnail) {
+              file = {
+                default: this.CreateLink(targetHash, UrlJoin("files", path)),
+                thumbnail: this.CreateLink(targetHash, UrlJoin("rep", "thumbnail", "files", path))
+              };
+            } else {
+              file = this.CreateLink(targetHash, UrlJoin("files", path));
+            }
+
+            items[index.toString()] = {
+              title,
+              description,
+              [control.linkKey || "file"]: file
+            };
+          });
+
+          let metadataPath = control.target;
+          if(l1) {
+            metadataPath = UrlJoin("public", "asset_metadata", l0, l1, l2, metadataPath.replace(/^\/?public\/asset_metadata\//, ""));
+          }
+
+          yield client.ReplaceMetadata({
             libraryId,
             objectId,
             writeToken,
-            metadataSubtree: top_level ? `public/asset_metadata/${name}` : `public/asset_metadata/info/${name}`,
-            metadata: value
+            metadataSubtree: metadataPath,
+            metadata: items
           });
-        })
-      );
-
-      // Localized asset info
-      for(let l0 of Object.keys(this.localizedAssetInfo)) {
-        for(let l1 of Object.keys(this.localizedAssetInfo[l0])) {
-          if(this.localizedAssetInfo[l0][l1]._loaded) {
-            const {info, topInfo} = this.FormatLocalizedFields(this.localizedAssetInfo[l0][l1]);
-
-            yield client.ReplaceMetadata({
-              libraryId,
-              objectId,
-              writeToken,
-              metadataSubtree: UrlJoin("public", "asset_metadata", l0, l1),
-              metadata: {
-                ...topInfo,
-                info
-              }
-            });
-          } else {
-            for(let l2 of Object.keys(this.localizedAssetInfo[l0][l1])) {
-              const {info, topInfo} = this.FormatLocalizedFields(this.localizedAssetInfo[l0][l1][l2]);
-
-              yield client.ReplaceMetadata({
-                libraryId,
-                objectId,
-                writeToken,
-                metadataSubtree: UrlJoin("public", "asset_metadata", l0, l1, l2),
-                metadata: {
-                  ...topInfo,
-                  info
-                }
-              });
-            }
-          }
         }
       }
 
-      // Credits
-      let credits = {};
-      toJS(this.credits).map(group => {
-        credits[group.group] =
-          group.credits.map((credit, index) => ({
-            ...credit,
-            talent_type: group.talentType,
-            talent_note_seq_id: (index + 1).toString().padStart(2, "0"),
-            sales_display_order: credit.sales_display_order ?
-              credit.sales_display_order.padStart(2, "0") : ""
-          }));
-      });
-
-      // Asset Info
-      yield client.ReplaceMetadata({
-        libraryId,
-        objectId,
-        writeToken,
-        metadataSubtree: "public/asset_metadata/info/talent",
-        metadata: credits
-      });
-
-      for(let i = 0; i < this.associatedAssets.length; i++) {
-        const assetType = this.associatedAssets[i];
-        const assets = toJS(this.assets[assetType.name]);
-
-        const formattedAssets = yield this.FormatAssets({assetType, assets});
-
-        yield client.ReplaceMetadata({
-          libraryId,
-          objectId,
-          writeToken,
-          metadataSubtree: `public/asset_metadata/${assetType.name}`,
-          metadata: formattedAssets
-        });
-      }
-
-      // Images
-      let images = {};
-      toJS(this.images).forEach(({imageKey, imagePath, targetHash}) => {
-        if(!imageKey || !imagePath) {
-          return;
-        }
-
-        images[imageKey] = {
-          default: this.CreateLink(targetHash, UrlJoin("files", imagePath)),
-          thumbnail: this.CreateLink(targetHash, UrlJoin("rep", "thumbnail", "files", imagePath))
-        };
-      });
-
-      yield client.ReplaceMetadata({
-        libraryId,
-        objectId,
-        writeToken,
-        metadataSubtree: "public/asset_metadata/images",
-        metadata: images
-      });
-
-      // Configurable Controls
-      for(let i = 0; i < this.fileControls.length; i++) {
-        const control = this.fileControls[i];
-
-        let items = {};
-        toJS(this.fileControlItems[control.name]).forEach(({title, description, path, targetHash}, index) => {
-          if(!path) {
-            return;
-          }
-
-          let file;
-          if(control.thumbnail) {
-            file = {
-              default: this.CreateLink(targetHash, UrlJoin("files", path)),
-              thumbnail: this.CreateLink(targetHash, UrlJoin("rep", "thumbnail", "files", path))
-            };
-          } else {
-            file = this.CreateLink(targetHash, UrlJoin("files", path));
-          }
-
-          items[index.toString()] = {
-            title,
-            description,
-            [control.linkKey || "file"]: file
-          };
-        });
-
-        yield client.ReplaceMetadata({
-          libraryId,
-          objectId,
-          writeToken,
-          metadataSubtree: control.target,
-          metadata: items
-        });
-      }
-
-      // Playlists
-      let playlists = {};
-      yield Promise.all(
-        toJS(this.playlists).map(async ({playlistName, playlistSlug, clips}, index) => {
-          if(!playlistSlug) {
-            return;
-          }
-
-          const list = await this.FormatAssets({
-            assetType: {
-              indexed: false,
-              slugged: true,
-              name: `playlists/${playlistSlug}/list`
-            },
-            assets: clips
-          });
-
-          playlists[playlistSlug] = {
-            name: playlistName || playlistSlug,
-            count: clips.length,
-            order: index,
-            list
-          };
-        })
-      );
-
-      yield client.ReplaceMetadata({
-        libraryId,
-        objectId,
-        writeToken,
-        metadataSubtree: "public/asset_metadata/playlists",
-        metadata: playlists
-      });
 
       if(this.HasControl("site_customization")) {
         let siteCustomization = {...toJS(this.siteCustomization)};
@@ -1531,7 +1562,7 @@ class FormStore {
       yield client.SendMessage({
         options: {
           operation: "Complete",
-          message: "Successfully Updated Asset"
+          message: "Successfully updated asset"
         }
       });
     } catch (error) {

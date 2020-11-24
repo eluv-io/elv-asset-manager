@@ -65,7 +65,7 @@ class FileControl extends React.Component {
         <div className="image-path" title={info.path}>{info.path}</div>
         <OrderButtons
           index={index}
-          length={this.props.formStore.fileControlItems[this.props.control.name].length}
+          length={this.props.formStore.currentLocalizedData.fileControlItems[this.props.control.name].length}
           Swap={(i1, i2) => this.props.formStore.SwapFileControlItem(control.name, i1, i2)}
         />
         <FileSelection
@@ -100,7 +100,7 @@ class FileControl extends React.Component {
         <h3>{ this.props.control.name }</h3>
         <div className="asset-form-images-container">
           {
-            this.props.formStore.fileControlItems[this.props.control.name].map((item, i) =>
+            this.props.formStore.currentLocalizedData.fileControlItems[this.props.control.name].map((item, i) =>
               this.Item(item, i)
             )
           }

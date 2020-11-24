@@ -201,17 +201,7 @@ class AssetInfo extends React.Component {
   }
 
   render() {
-    let assetInfo = this.props.formStore.assetInfo;
-    if(this.props.formStore.localizationActive) {
-      const [l0, l1, l2] = this.props.formStore.currentLocalization;
-
-      assetInfo = this.props.formStore.localizedAssetInfo[l0][l1];
-
-      if(l2) {
-        assetInfo = assetInfo[l2];
-      }
-    }
-
+    const assetInfo = this.props.formStore.currentLocalizedData.assetInfo;
     return (
       <div className="asset-form-section-container">
         <h3>Asset Info</h3>

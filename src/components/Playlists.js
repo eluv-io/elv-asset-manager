@@ -61,8 +61,8 @@ class Playlists extends React.Component {
       <div className="asset-form-section-container">
         <h3>Playlists</h3>
         <div className="asset-form-playlists-container">
-          {this.props.formStore.playlists.map((playlist, index) =>
-            this.Playlist(playlist, index, this.props.formStore.playlists.length)
+          {this.props.formStore.currentLocalizedData.playlists.map((playlist, index) =>
+            this.Playlist(playlist, index, this.props.formStore.currentLocalizedData.playlists.length)
           )}
         </div>
         <Action onClick={this.props.formStore.AddPlaylist}>Add Playlist</Action>
