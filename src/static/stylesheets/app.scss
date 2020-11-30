@@ -3,6 +3,7 @@
 @import "./channels";
 @import "./file-browser";
 @import "./site-customization";
+@import "./spec";
 
 .rdt {
   // sass-lint:disable no-important
@@ -158,12 +159,29 @@ button {
   display: flex;
 }
 
+.settings-icon,
 .localization-icon {
-  margin-right: $elv-spacing-s;
+  margin-right: $elv-spacing-xs;
+
+  svg {
+    &.-elv-icon {
+      height: 1.75rem;
+      width: 1.75rem;
+    }
+  }
 
   &.active {
     svg {
       stroke: $elv-color-mediumblue;
+    }
+  }
+}
+
+.settings-icon {
+  svg {
+    &.-elv-icon {
+      height: 1.65rem;
+      width: 1.65rem;
     }
   }
 }
@@ -362,18 +380,51 @@ button {
   width: 100%;
 
   .asset-info-list-field-entry {
-    padding: $elv-spacing-m $elv-spacing-ml $elv-spacing-m $elv-spacing-m;
+    padding: $elv-spacing-m $elv-spacing-xl $elv-spacing-m $elv-spacing-m;
     position: relative;
+
+    label {
+      align-items: center;
+      display: flex;
+      height: 100%;
+    }
+
+    .-elv-select,
+    .-elv-multi-select {
+      label {
+        align-items: flex-start;
+        margin-top: $elv-spacing-xxs;
+      }
+    }
+
+    .actions {
+      display: flex;
+      position: absolute;
+      right: $elv-spacing-xs;
+      top: $elv-spacing-xs;
+    }
+  }
+
+  .array-list {
+    .asset-info-list-field-entry {
+      align-items: center;
+      background-color: inherit;
+      display: flex;
+      max-width: 30rem;
+      padding: $elv-spacing-xs $elv-spacing-xl $elv-spacing-xs 0;
+    }
+
+    .actions {
+      align-items: center;
+    }
   }
 
   .info-list-icon {
     height: $elv-font-xxl;
   }
 
-  .info-list-remove-icon {
-    position: absolute;
-    right: $elv-spacing-xs;
-    top: $elv-spacing-xs;
+  .info-list-add-icon {
+    margin: $elv-spacing-xs 0;
   }
 }
 

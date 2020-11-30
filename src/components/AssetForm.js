@@ -15,6 +15,7 @@ import FileControl from "./FileControl";
 
 import LocalizationIcon from "../static/icons/world.svg";
 import CloseIcon from "../static/icons/x-circle.svg";
+import SettingsIcon from "../static/icons/settings.svg";
 
 @inject("rootStore")
 @inject("formStore")
@@ -246,11 +247,19 @@ class AssetForm extends React.Component {
     return (
       <div className="asset-form">
         <div className="sticky app-header">
+          <IconButton
+            title={`Configure app settings ${!this.props.rootStore.canEditType ? "(you do not have permission to edit the content type)" : ""}`}
+            disabled={!this.props.rootStore.canEditType}
+            className="settings-icon"
+            icon={SettingsIcon}
+            onClick={() => this.props.rootStore.SetEditingConfiguration(true)}
+          />
           {
             Maybe(
               this.props.formStore.localization,
               <IconButton
                 className={`localization-icon ${this.props.formStore.localizationActive ? "active" : ""}`}
+                title="Select localization"
                 icon={LocalizationIcon}
                 onClick={() => this.setState({showLocalizationOptions: !this.state.showLocalizationOptions})}
               />

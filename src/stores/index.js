@@ -5,6 +5,7 @@ import ContentStore from "./Content";
 import FormStore from "./Form";
 import LiveStore from "./Live";
 import ChannelStore from "./Channel";
+import SpecStore from "./Spec";
 
 // Force strict mode so mutations are only allowed within actions.
 configure({
@@ -12,10 +13,18 @@ configure({
 });
 
 class RootStore {
+  @observable editingConfiguration = true;
+
   @observable balance = 0;
   @observable params = {};
   @observable assetMetadata;
   @observable assetName;
+
+  @observable typeId = "";
+  @observable typeHash = "";
+  @observable typeName = "";
+  @observable canEditType = false;
+
   @observable titleConfiguration = {};
 
   @observable linkStatus = {
@@ -27,10 +36,11 @@ class RootStore {
   @observable updateStatus;
 
   constructor() {
+    this.channelStore = new ChannelStore(this);
     this.contentStore = new ContentStore(this);
     this.formStore = new FormStore(this);
     this.liveStore = new LiveStore(this);
-    this.channelStore = new ChannelStore(this);
+    this.specStore = new SpecStore(this);
 
     window.rootStore = this;
   }
@@ -80,21 +90,34 @@ class RootStore {
         metadataSubtree: "public/asset_metadata"
       })) || {};
 
-    const typeHash = (yield this.client.ContentObject({
+    this.typeHash = (yield this.client.ContentObject({
       versionHash: this.params.versionHash
     })).type;
 
-    if(typeHash) {
+    if(this.typeHash) {
+      this.typeId = this.client.utils.DecodeVersionHash(this.typeHash).objectId;
       const libraryId = (yield this.client.ContentSpaceId()).replace("ispc", "ilib");
-      const objectId = this.client.utils.DecodeVersionHash(typeHash).objectId;
 
-      this.titleConfiguration = (yield this.client.ContentObjectMetadata({
+      const {name, title_configuration} = (yield this.client.ContentObjectMetadata({
         libraryId,
-        objectId,
-        metadataSubtree: "public/title_configuration"
+        objectId: this.typeId,
+        metadataSubtree: "public",
+        select: [
+          "name",
+          "title_configuration"
+        ]
       })) || {};
+
+      this.titleConfiguration = title_configuration || {};
+      this.typeName = name || this.typeId;
+
+      this.canEditType = yield this.client.CallContractMethod({
+        contractAddress: this.client.utils.HashToAddress(this.typeId),
+        methodName: "canEdit"
+      });
     }
 
+    this.specStore.InitializeSpec();
     yield this.formStore.InitializeFormData();
 
     if(this.formStore.HasControl("live_stream")) {
@@ -154,6 +177,15 @@ class RootStore {
   });
 
   @action.bound
+  SetEditingConfiguration(editing) {
+    this.editingConfiguration = editing;
+
+    if(editing) {
+      this.specStore.InitializeSpec();
+    }
+  }
+
+  @action.bound
   OpenObjectLink({libraryId, objectId, versionHash}) {
     this.client.SendMessage({
       options: {
@@ -172,4 +204,5 @@ export const contentStore = rootStore.contentStore;
 export const formStore = rootStore.formStore;
 export const liveStore = rootStore.liveStore;
 export const channelStore = rootStore.channelStore;
+export const specStore = rootStore.specStore;
 

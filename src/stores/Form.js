@@ -74,88 +74,18 @@ class FormStore {
     arrangement: []
   };
 
-  @observable controls = [
-    "playlists"
-  ];
-
+  @observable controls = [];
   @observable fileControls = [];
   @observable fileControlItems = {};
-
-  @observable availableAssetTypes = [
-    "primary",
-    "clip"
-  ];
-
-  @observable availableTitleTypes = [
-    "collection",
-    "episode",
-    "season",
-    "series",
-    "site",
-    "title",
-  ];
-
-  @observable defaultImageKeys = [
-    "portrait",
-    "landscape"
-  ];
+  @observable availableAssetTypes = [];
+  @observable availableTitleTypes = [];
+  @observable defaultImageKeys = [];
+  @observable associatedAssets = [];
+  @observable infoFields = [];
+  @observable infoFieldLocalizations = {};
 
   @observable localization;
   @observable currentLocalization = ["", "", ""];
-
-  @observable associatedAssets = [
-    {
-      name: "titles",
-      label: "Titles",
-      indexed: true,
-      slugged: true,
-      defaultable: true,
-      orderable: true
-    },
-    {
-      name: "series",
-      label: "Series",
-      asset_types: ["primary"],
-      title_types: ["series"],
-      for_title_types: ["site", "collection"],
-      indexed: true,
-      slugged: true,
-      defaultable: false,
-      orderable: true
-    },
-    {
-      name: "seasons",
-      label: "Seasons",
-      asset_types: ["primary"],
-      title_types: ["season"],
-      for_title_types: ["series"],
-      indexed: true,
-      slugged: true,
-      defaultable: false,
-      orderable: true
-    },
-    {
-      name: "episodes",
-      label: "Episodes",
-      asset_types: ["primary"],
-      title_types: ["episode"],
-      for_title_types: ["season"],
-      indexed: true,
-      slugged: true,
-      defaultable: false,
-      orderable: true
-    }
-  ];
-
-  @observable infoFields = [
-    {name: "release_date", type: "date"},
-    {name: "synopsis", type: "textarea"},
-    {name: "copyright"},
-    {name: "creator"},
-    {name: "runtime", type: "integer"},
-  ];
-
-  @observable infoFieldLocalizations;
 
   @observable slugWarning = false;
   @observable siteSelectorInfo = {};
@@ -299,21 +229,31 @@ class FormStore {
     this.currentLocalization = ["", "", ""];
   }
 
+  InitializeSpec() {
+    const config = this.rootStore.titleConfiguration;
+    const defaults = this.rootStore.specStore.defaultSpec;
+
+    const controls = config.controls || defaults.controls;
+    this.fileControls = controls
+      .filter(control => typeof control === "object")
+      .map(control => {
+        control.link_key = control.link_key || control.linkKey;
+        return control;
+      });
+    this.controls = controls;
+
+    this.availableAssetTypes = config.asset_types || defaults.availableAssetTypes;
+    this.availableTitleTypes = config.title_types || defaults.availableTitleTypes;
+    this.infoFields = config.info_fields || defaults.infoFields;
+    this.infoFieldLocalizations = config.info_field_localizations;
+    this.associatedAssets = config.associated_assets || defaults.associatedAssets;
+    this.defaultImageKeys = config.default_image_keys || defaults.defaultImageKeys;
+
+    this.localization = config.localization;
+  }
+
   InitializeFormData = flow(function * () {
-    const titleConfiguration = this.rootStore.titleConfiguration;
-
-    this.controls = titleConfiguration.controls || this.controls;
-
-    this.fileControls = this.controls.filter(control => typeof control === "object");
-
-    this.availableAssetTypes = titleConfiguration.asset_types || this.availableAssetTypes;
-    this.availableTitleTypes = titleConfiguration.title_types || this.availableTitleTypes;
-    this.infoFields = titleConfiguration.info_fields || this.infoFields;
-    this.infoFieldLocalizations = titleConfiguration.info_field_localizations;
-    this.associatedAssets = titleConfiguration.associated_assets || this.associatedAssets;
-    this.defaultImageKeys = titleConfiguration.default_image_keys || this.defaultImageKeys;
-
-    this.localization = titleConfiguration.localization;
+    this.InitializeSpec();
 
     const assetMetadata = this.rootStore.assetMetadata || {};
 
@@ -946,7 +886,7 @@ class FormStore {
 
         const info = metadata[index];
 
-        let link = info[control.linkKey || "file"];
+        let link = info[control.linkKey || control.link_key || "file"];
         if(link && link.default) {
           link = link.default;
         }
@@ -1257,41 +1197,8 @@ class FormStore {
       }
     });
 
+
     return { info, topInfo, listFields };
-  }
-
-  FormatLocalizedFields(localizedAssetInfo) {
-    const {info, topInfo} = this.FormatFields({
-      infoFields: this.infoFields,
-      values: localizedAssetInfo,
-      titleType: this.assetInfo.title_type,
-      isTopLevel: true,
-      splitListFields: false
-    });
-
-    // Move built-in fields to top level info
-    ["title", "display_title", "ip_title_id", "slug", "title_type", "asset_type"]
-      .forEach(attr => topInfo[attr] = localizedAssetInfo[attr]);
-
-    delete topInfo.title_type;
-    delete topInfo.asset_type;
-
-    for(let key of Object.keys(topInfo)) {
-      if(!topInfo[key]) {
-        delete topInfo[key];
-      }
-    }
-
-    for(let key of Object.keys(info)) {
-      if(!info[key]) {
-        delete info[key];
-      }
-    }
-
-    return {
-      info,
-      topInfo
-    };
   }
 
   @action.bound
@@ -1344,7 +1251,13 @@ class FormStore {
           localizedData = this.localizedData[l0][l1];
         }
 
-        const {info, topInfo} = this.FormatLocalizedFields(localizedData.assetInfo);
+        const {info, topInfo} = this.FormatFields({
+          infoFields: this.infoFields,
+          values: localizedData.assetInfo,
+          titleType: this.assetInfo.title_type,
+          isTopLevel: true,
+          splitListFields: false
+        });
 
         // Move built-in fields to top level info
         ["title", "display_title", "ip_title_id", "slug", "title_type", "asset_type"]
@@ -1353,6 +1266,24 @@ class FormStore {
               topInfo[attr] = localizedData.assetInfo[attr];
             }
           });
+
+        // For localized info, only include data that is present
+        if(l0) {
+          delete topInfo.title_type;
+          delete topInfo.asset_type;
+
+          for(let key of Object.keys(topInfo)) {
+            if(!topInfo[key]) {
+              delete topInfo[key];
+            }
+          }
+
+          for(let key of Object.keys(info)) {
+            if(!info[key]) {
+              delete info[key];
+            }
+          }
+        }
 
         // Credits
         let credits = {};
@@ -1474,7 +1405,7 @@ class FormStore {
             items[index.toString()] = {
               title,
               description,
-              [control.linkKey || "file"]: file
+              [control.linkKey || control.link_key || "file"]: file
             };
           });
 
