@@ -52,6 +52,13 @@ list - A list of fields
 ```
  */
 
+const hints = {
+  info: <>A configurable list of fields for assets of this type. These fields will be stored in <code>public/asset_metadata/info</code> in the asset metadata.</>,
+  fields: "Attributes for each element in this list",
+  for_title_types: "If specified, this field will only apply to assets with these title types",
+  top_level: <>If specified, this field will be stored in <code>public/asset_metadata</code> instead of <code>public/asset_metadata/info</code></>
+};
+
 @inject("specStore")
 @observer
 class Info extends React.Component {
@@ -82,10 +89,12 @@ class Info extends React.Component {
         name={name}
         values={values}
         orderable
+        hint={toplevel ? hints.info : hints.fields}
         fields={[
           {name: "label"},
           {name: "name", label: "Metadata Key"},
-          {name: "for_title_types", type: "multiselect", options: this.props.specStore.availableTitleTypes, only: () => toplevel},
+          {name: "top_level", type: "checkbox", hint: hints.top_level, only: () => toplevel},
+          {name: "for_title_types", type: "multiselect", hint: hints.for_title_types, options: this.props.specStore.availableTitleTypes, only: () => toplevel},
           {name: "type", type: "select", options: types, default: types[0]},
           {name: "options", type: "list", only: entry => ["select", "multiselect"].includes(entry.type)},
           {

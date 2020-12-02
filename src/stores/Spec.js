@@ -37,7 +37,12 @@ class SpecStore {
       {name: "creator"},
       {name: "runtime", type: "integer"},
     ],
-    infoFieldLocalizations: {},
+    localization: {
+      info_locals: [],
+      info_territories: {
+        example: []
+      }
+    },
     fileControls: [],
     fileControlItems: {},
     associatedAssets: [
@@ -93,6 +98,7 @@ class SpecStore {
   @observable associatedAssets = [];
   @observable infoFields = [];
   @observable infoFieldLocalizations = {};
+  @observable localizations;
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -120,11 +126,38 @@ class SpecStore {
     this.availableAssetTypes = config.asset_types || defaults.availableAssetTypes;
     this.availableTitleTypes = config.title_types || defaults.availableTitleTypes;
     this.infoFields = config.info_fields || defaults.infoFields;
-    this.infoFieldLocalizations = config.info_field_localizations;
     this.associatedAssets = config.associated_assets || defaults.associatedAssets;
     this.defaultImageKeys = config.default_image_keys || defaults.defaultImageKeys;
 
-    this.localization = config.localization;
+    this.localizations = this.FormatLocalizations(config.localization || defaults.localization);
+  }
+
+  FormatLocalizations(localizations) {
+    let formattedLocales = [];
+    Object.keys(localizations).forEach(key => {
+      if(Array.isArray(localizations[key])) {
+        // 2 level
+        formattedLocales.push({
+          key,
+          depth: 2,
+          options: localizations[key]
+        });
+      } else {
+        // 3 level
+        formattedLocales.push({
+          key,
+          depth: 3,
+          options: Object.keys(localizations[key]).map(territory =>
+            ({
+              key: territory,
+              options: localizations[key][territory]
+            })
+          )
+        });
+      }
+    });
+
+    return formattedLocales;
   }
 
   FormatInfoFields(fields, topLevel=false) {
@@ -144,6 +177,10 @@ class SpecStore {
 
       if(topLevel && field.for_title_types) {
         formattedField.for_title_types = field.for_title_types;
+      }
+
+      if(topLevel && field.top_level) {
+        formattedField.top_level = field.top_level;
       }
 
       if(field.type === "list") {
@@ -296,6 +333,30 @@ class SpecStore {
   @action.bound
   UpdateTitleTypes(types) {
     this.availableTitleTypes = types;
+  }
+
+  @action.bound
+  UpdateLocalizations(localizations, operation) {
+    if(operation !== "update") {
+      this.localizations = localizations;
+      return;
+    }
+
+    // If depth was changed, need to reconfigure options
+    this.localizations = localizations.map((localization, index) => {
+      const oldLocalization = this.localizations[index] || {};
+      if((oldLocalization.depth || "").toString() !== (localization.depth || "").toString()) {
+        localization[`oldLocalization${oldLocalization.depth}Options`] = oldLocalization.options;
+
+        if(localization[`oldLocalization${localization.depth}Options`]) {
+          localization.options = localization[`oldLocalization${localization.depth}Options`];
+        } else {
+          localization.options = [];
+        }
+      }
+
+      return localization;
+    });
   }
 }
 

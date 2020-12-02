@@ -11,19 +11,27 @@ import {
   LabelledField,
   DateSelection,
   Maybe,
+  ToolTip,
+  ImageIcon,
+  FormatName
 } from "elv-components-js";
+import OrderButtons from "./OrderButtons";
 
 import AddIcon from "../static/icons/plus-square.svg";
 import DeleteIcon from "../static/icons/trash.svg";
-import OrderButtons from "./OrderButtons";
+import HintIcon from "../static/icons/help-circle.svg";
 
 export const InfoField = ({field, entry, Update, localization={}}) => {
+  if(field.hint) {
+    field.hintLabel = HintLabel({label: field.label, name: field.name, hint: field.hint});
+  }
+
   if(field.type === "textarea") {
     return (
       <TextArea
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.label}
+        label={field.hintLabel || field.label}
         value={entry[field.name] || ""}
         onChange={newValue => Update(field.name, newValue)}
       />
@@ -33,7 +41,7 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
       <Checkbox
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.label}
+        label={field.hintLabel || field.label}
         value={entry[field.name] || ""}
         onChange={newValue => Update(field.name, newValue)}
       />
@@ -43,7 +51,7 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
       <DateSelection
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.label}
+        label={field.hintLabel || field.label}
         value={entry[field.name]}
         dateOnly={field.type === "date"}
         referenceTimezone={field.zone}
@@ -55,7 +63,7 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
       <Selection
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.label}
+        label={field.hintLabel || field.label}
         value={entry[field.name]}
         options={localization.options || field.options}
         onChange={newValue => Update(field.name, newValue)}
@@ -66,7 +74,7 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
       <MultiSelect
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.label}
+        label={field.hintLabel || field.label}
         values={entry[field.name] || []}
         options={localization.options || field.options}
         onChange={newValue => Update(field.name, newValue)}
@@ -77,7 +85,7 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
       <ListField
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.label}
+        label={field.hintLabel || field.label}
         values={entry[field.name] || []}
         fields={field.fields}
         Update={(name, newValues) => Update(field.name, newValues)}
@@ -88,7 +96,7 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
       <Input
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.label}
+        label={field.hintLabel || field.label}
         type={field.type}
         value={entry[field.name] || ""}
         onChange={newValue => Update(field.name, newValue)}
@@ -97,14 +105,40 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
   }
 };
 
-export const ListField = ({name, label, values, fields, Update, orderable=false, prepend=false}) => {
+const HintLabel = ({label, name, hint}) => {
+  label = label || FormatName(name);
+
+  return (
+    <div className="hint-label">
+      { label }
+      <ToolTip className="hint-tooltip" content={<pre className="hint-content">{ hint }</pre>}>
+        <ImageIcon
+          className="hint-icon"
+          icon={HintIcon}
+        />
+      </ToolTip>
+    </div>
+  );
+};
+
+export const ListField = ({
+  name,
+  label,
+  values,
+  fields,
+  defaultValue,
+  hint,
+  Update,
+  orderable=false,
+  prepend=false
+}) => {
   values = values || [];
 
   const UpdateIndex = (index, newValue) => {
     let newValues = [...toJS(values)];
     newValues[index] = newValue;
 
-    Update(name, newValues);
+    Update(name, newValues, "update");
   };
 
   const UpdateField = (index, fieldName, newValue) => {
@@ -112,16 +146,16 @@ export const ListField = ({name, label, values, fields, Update, orderable=false,
     newValues[index] = toJS(newValues[index]);
     newValues[index][fieldName] = newValue;
 
-    Update(name, newValues);
+    Update(name, newValues, "update");
   };
 
   const Add = () => {
     let newValues = [...toJS(values)];
 
     if(fields) {
-      let newValue = {};
+      let newValue = defaultValue || {};
       fields.forEach(field => {
-        newValue[field.name] = field.default || "";
+        newValue[field.name] = field.default || newValue[field.name] || "";
       });
 
       prepend ? newValues.unshift(newValue) : newValues.push(newValue);
@@ -129,7 +163,7 @@ export const ListField = ({name, label, values, fields, Update, orderable=false,
       prepend ? newValues.unshift("") : newValues.push("");
     }
 
-    Update(name, newValues);
+    Update(name, newValues, "add");
   };
 
   const Remove = (index) => {
@@ -137,7 +171,7 @@ export const ListField = ({name, label, values, fields, Update, orderable=false,
 
     newValues = newValues.filter((_, i) => i !== index);
 
-    Update(name, newValues);
+    Update(name, newValues, "remove");
   };
 
   const Swap = (i1, i2) => {
@@ -146,7 +180,7 @@ export const ListField = ({name, label, values, fields, Update, orderable=false,
     newValues[i1] = newValues[i2];
     newValues[i2] = temp;
 
-    Update(name, newValues);
+    Update(name, newValues, "swap");
   };
 
   const fieldInputs =
@@ -176,16 +210,16 @@ export const ListField = ({name, label, values, fields, Update, orderable=false,
 
       return (
         <div
-          className={`asset-info-list-field-entry ${index % 2 === 0 ? "even" : "odd"}`}
+          className={`list-field-entry ${index % 2 === 0 ? "even" : "odd"}`}
           key={`input-container-${name}-${index}`}
         >
           <div className="actions">
             {Maybe(orderable, <OrderButtons index={index} length={values.length} Swap={Swap} />)}
             <IconButton
               icon={DeleteIcon}
-              title={`Remove ${label || name}`}
+              title="Remove Item"
               onClick={async () => await Confirm({
-                message: `Are you sure you want to remove this entry from ${label || name}?`,
+                message: "Are you sure you want to remove this item?",
                 onConfirm: () => Remove(index)
               })}
               className="info-list-icon info-list-remove-icon"
@@ -198,11 +232,11 @@ export const ListField = ({name, label, values, fields, Update, orderable=false,
 
   return (
     <LabelledField
-      className="list-field"
-      label={label || name}
-      formatLabel={!label}
+      className="list-field-container"
+      label={hint ? HintLabel({label, name, hint}) : label || FormatName(name)}
+      formatLabel={false}
       value={
-        <div className={`asset-info-list-field ${!fields ? "array-list" : ""}`}>
+        <div className={`list-field ${!fields ? "array-list" : ""}`}>
           { fieldInputs }
           <IconButton
             icon={AddIcon}

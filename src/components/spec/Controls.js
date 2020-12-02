@@ -3,16 +3,23 @@ import {Checkbox} from "elv-components-js";
 import {inject, observer} from "mobx-react";
 import {ListField} from "../Inputs";
 
+const hints = {
+  default_image_keys: "These image keys will be populated by default for all assets.",
+  link_key: "What the link to the file will be called in the metadata. Default: 'file'",
+  target: (
+    <React.Fragment>
+      The location in the metadata to store the file information. Default: <code>public/asset_metadata/files</code>
+      <br /> <br />
+      Note: File controls with metadata targets outside of public/asset_metadata cannot be localized.
+    </React.Fragment>
+  ),
+  thumbnail: "If these files may be images, enabling this will allow previewing selected images in the selector",
+  extensions: "Allowed file extensions (e.g. jpg, png, txt, pdf). If none are specified, all file types will be allowed"
+};
+
 @inject("specStore")
 @observer
 class Controls extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-    };
-  }
-
   /*
     {
     "_id": 1,
@@ -48,13 +55,14 @@ class Controls extends React.Component {
         fields={[
           { name: "name" },
           { name: "description", type: "checkbox", default: false },
-          { name: "link_key", label: "Link Key", default: "file" },
-          { name: "target", label: "Link Target", default: "/public/asset_metadata/files" },
-          { name: "thumbnail", type: "checkbox", label: "Thumbnail Links", default: false },
+          { name: "link_key", label: "Link Key", default: "file", hint: hints.link_key },
+          { name: "target", label: "Link Target", default: "/public/asset_metadata/files", hint: hints.target },
+          { name: "thumbnail", type: "checkbox", label: "Thumbnail Links", default: false, hint: hints.thumbnail },
           {
             name: "extensions",
             label: "File Extensions",
-            type: "list"
+            type: "list",
+            hint: hints.extensions
           }
         ]}
         Update={(_, newValues) => this.props.specStore.UpdateFileControls(newValues)}
@@ -79,6 +87,7 @@ class Controls extends React.Component {
         <div className="indented image-keys-list">
           <ListField
             orderable
+            hint={hints.default_image_keys}
             name="Default Image Keys"
             label={"Default Image Keys"}
             values={this.props.specStore.defaultImageKeys}
