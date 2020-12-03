@@ -576,7 +576,6 @@ input {
 }
 
 .asset-form-credits-group {
-  align-items: center;
   display: flex;
   flex-direction: column;
   margin: $elv-spacing-l 0 $elv-spacing-xl;
@@ -593,7 +592,6 @@ input {
 
 .asset-form-credits-group-header {
   display: flex;
-  justify-content: center;
   width: 100%;
 
   .remove-credit-group-button {
@@ -750,14 +748,30 @@ input {
   }
 }
 
+.-elv-input {
+  &.-elv-input {
+    grid-template-columns: 12rem 1fr;
+  }
+
+  label {
+    align-items: center;
+    display: flex;
+  }
+
+  &.-elv-multi-select,
+  &.-elv-textarea {
+    label {
+      align-items: flex-start;
+      margin-top: $elv-spacing-xs;
+    }
+  }
+}
+
 .list-field-container {
   min-width: 30rem;
 
-  &.list-field-container {
-    grid-template-columns: 15rem 1fr;
-  }
-
   & > label {
+    align-items: flex-start;
     margin-top: $elv-spacing-xs;
     width: 100%;
 
@@ -781,18 +795,7 @@ input {
     position: relative;
 
     label {
-      align-items: center;
-      display: flex;
       height: 100%;
-    }
-
-    .-elv-select,
-    .-elv-multi-select,
-    .list-field-container {
-      label {
-        align-items: flex-start;
-        margin-top: $elv-spacing-xxs;
-      }
     }
 
     .actions {
@@ -852,7 +855,6 @@ input {
     background-color: transparent;
     border: 0;
     font-family: $elv-font-default;
-    //width: 100%;
     font-size: $elv-font-m;
     text-align: left;
   }
@@ -861,5 +863,3 @@ input {
     display: inline-block;
   }
 }
-
-

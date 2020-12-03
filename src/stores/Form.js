@@ -561,9 +561,13 @@ class FormStore {
           info[name] = date.ts;
         }
       } else if(type === "list" && info[name]) {
-        info[name] = (info[name] || []).map(listValues =>
-          this.LoadInfoFields({infoFields: fields, values: listValues})
-        );
+        info[name] = (info[name] || []).map(listValues => {
+          if(!fields || fields.length === 0) {
+            return listValues;
+          }
+
+          return this.LoadInfoFields({infoFields: fields, values: listValues});
+        });
       }
     });
 
@@ -1174,6 +1178,10 @@ class FormStore {
       } else if(type === "list") {
         value = (value || []).map(entry => {
           entry = toJS(entry);
+
+          if(!fields || fields.length === 0) {
+            return entry;
+          }
 
           return (this.FormatFields({infoFields: fields, values: entry, titleType})).info;
         });

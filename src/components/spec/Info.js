@@ -54,7 +54,7 @@ list - A list of fields
 
 const hints = {
   info: <>A configurable list of fields for assets of this type. These fields will be stored in <code>public/asset_metadata/info</code> in the asset metadata.</>,
-  fields: "Attributes for each element in this list",
+  fields: "Attributes for each element in this list. If no fields are specified, this field will be a list of text strings.",
   for_title_types: "If specified, this field will only apply to assets with these title types",
   top_level: <>If specified, this field will be stored in <code>public/asset_metadata</code> instead of <code>public/asset_metadata/info</code></>
 };
@@ -92,7 +92,7 @@ class Info extends React.Component {
         hint={toplevel ? hints.info : hints.fields}
         fields={[
           {name: "label"},
-          {name: "name", label: "Metadata Key"},
+          {name: "name", label: "Metadata Key", required: true},
           {name: "top_level", type: "checkbox", hint: hints.top_level, only: () => toplevel},
           {name: "for_title_types", type: "multiselect", hint: hints.for_title_types, options: this.props.specStore.availableTitleTypes, only: () => toplevel},
           {name: "type", type: "select", options: types, default: types[0]},
@@ -118,13 +118,13 @@ class Info extends React.Component {
             name="Asset Types"
             orderable
             values={this.props.specStore.availableAssetTypes}
-            Update={(_, types) => this.props.specStore.UpdateAssetTypes(types)}
+            Update={(_, types, operation) => this.props.specStore.UpdateAssetTypes(types, operation)}
           />
           <ListField
             name="Title Types"
             orderable
             values={this.props.specStore.availableTitleTypes}
-            Update={(_, types) => this.props.specStore.UpdateTitleTypes(types)}
+            Update={(_, types, operation) => this.props.specStore.UpdateTitleTypes(types, operation)}
           />
           { this.InfoListField("Asset Info Fields", this.props.specStore.infoFields, this.props.specStore.UpdateAssetInfoFields, true) }
         </div>

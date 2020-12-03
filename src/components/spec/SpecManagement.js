@@ -45,7 +45,7 @@ class SpecManagement extends React.Component {
       <div className="asset-form">
         <div className="sticky app-header">
           <IconButton
-            className="settings-icon"
+            className="settings-icon active"
             title="Cancel app configuration"
             icon={SettingsIcon}
             onClick={() => this.props.rootStore.SetEditingConfiguration(false)}

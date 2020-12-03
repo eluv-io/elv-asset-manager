@@ -20,6 +20,7 @@ const hints = {
   associated_assets: "Here you can configure controls to allow associating other assets, such as titles, clips or trailers, with assets of this type",
   asset_types: "If specified, only assets with the specified asset type(s) may be added this list",
   title_types: "If specified, only assets with the specified title type(s) may be added to this list",
+  name: <React.Fragment>These associated assets will be store stored in <code>public/asset_metadata/{"<Metadata Key>"}</code></React.Fragment>,
   for_title_types: "If specified, only assets of the specified title type(s) will have this list",
   indexed: (
     <React.Fragment>
@@ -136,16 +137,15 @@ class AssociatedAssets extends React.Component {
             values={this.props.specStore.associatedAssets}
             hint={hints.associated_assets}
             orderable
-            prepend
             fields={[
               {name: "label"},
-              {name: "name", label: "Metadata Key"},
+              {name: "name", label: "Metadata Key", hint: hints.name, required: true},
               {name: "asset_types", type: "multiselect", options: this.props.specStore.availableAssetTypes, hint: hints.asset_types},
               {name: "title_types", type: "multiselect", options: this.props.specStore.availableTitleTypes, hint: hints.title_types},
               {name: "for_title_types", type: "multiselect", options: this.props.specStore.availableTitleTypes, hint: hints.for_title_types},
               {name: "indexed", type: "checkbox", hint: hints.indexed},
               {name: "slugged", type: "checkbox", hint: hints.slugged},
-              {name: "defaultable", type: "checkbox", hint: hints.defaultable},
+              {name: "defaultable", type: "checkbox", hint: hints.defaultable, only: associatedAsset => associatedAsset.indexed || associatedAsset.slugged},
               {name: "orderable", type: "checkbox", hint: hints.orderable, only: associatedAsset => associatedAsset.indexed}
             ]}
             Update={(_, newValues) => this.props.specStore.UpdateAssociatedAssets(newValues)}

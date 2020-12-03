@@ -13,7 +13,7 @@ configure({
 });
 
 class RootStore {
-  @observable editingConfiguration = true;
+  @observable editingConfiguration = false;
 
   @observable balance = 0;
   @observable params = {};

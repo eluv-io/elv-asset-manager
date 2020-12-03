@@ -23,7 +23,7 @@ import HintIcon from "../static/icons/help-circle.svg";
 
 export const InfoField = ({field, entry, Update, localization={}}) => {
   if(field.hint) {
-    field.hintLabel = HintLabel({label: field.label, name: field.name, hint: field.hint});
+    field.hintLabel = HintLabel({label: field.label, name: field.name, hint: field.hint, required: field.required});
   }
 
   if(field.type === "textarea") {
@@ -83,6 +83,7 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
   } else if(field.type === "list") {
     return (
       <ListField
+        orderable
         key={`input-${name}-${field.name}`}
         name={field.name}
         label={field.hintLabel || field.label}
@@ -96,21 +97,22 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
       <Input
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.hintLabel || field.label}
+        label={field.hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
         type={field.type}
         value={entry[field.name] || ""}
+        required={field.required}
         onChange={newValue => Update(field.name, newValue)}
       />
     );
   }
 };
 
-const HintLabel = ({label, name, hint}) => {
+const HintLabel = ({label, name, hint, required}) => {
   label = label || FormatName(name);
 
   return (
     <div className="hint-label">
-      { label }
+      { label } { required ? "*" : "" }
       <ToolTip className="hint-tooltip" content={<pre className="hint-content">{ hint }</pre>}>
         <ImageIcon
           className="hint-icon"
@@ -132,6 +134,10 @@ export const ListField = ({
   orderable=false,
   prepend=false
 }) => {
+  if(fields && fields.length === 0) {
+    fields = undefined;
+  }
+
   values = values || [];
 
   const UpdateIndex = (index, newValue) => {
@@ -199,7 +205,8 @@ export const ListField = ({
           return (
             <InfoField
               key={`entry-field-${index}-${field.name}`}
-              field={field} entry={entry || {}}
+              field={field}
+              entry={entry || {}}
               Update={(entryName, newValue) => UpdateField(index, entryName, newValue)}
             />
           );

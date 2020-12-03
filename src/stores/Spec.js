@@ -1,5 +1,6 @@
 import {observable, action, flow, toJS} from "mobx";
 
+// Incrementing unique IDs
 let __id = 0;
 class Id {
   static next(){
@@ -7,6 +8,22 @@ class Id {
     return __id.toString();
   }
 }
+
+//
+const FormatOptions = (options, sort=false) => {
+  options = options
+    .filter((value, index, self) => value && self.indexOf(value) === index)
+    .map(option => option.trim());
+
+  if(sort) { options = options.sort(); }
+
+  return options;
+};
+
+const Duplicates = (values) =>
+  values
+    .filter(value => value)
+    .filter((value, index, self) => value && self.indexOf(value) !== index);
 
 class SpecStore {
   @observable defaultSpec = {
@@ -37,12 +54,7 @@ class SpecStore {
       {name: "creator"},
       {name: "runtime", type: "integer"},
     ],
-    localization: {
-      info_locals: [],
-      info_territories: {
-        example: []
-      }
-    },
+    localizations: {},
     fileControls: [],
     fileControlItems: {},
     associatedAssets: [
@@ -100,6 +112,8 @@ class SpecStore {
   @observable infoFieldLocalizations = {};
   @observable localizations;
 
+  @observable errors = [];
+
   constructor(rootStore) {
     this.rootStore = rootStore;
   }
@@ -133,6 +147,8 @@ class SpecStore {
   }
 
   FormatLocalizations(localizations) {
+    if(!localizations) { return; }
+
     let formattedLocales = [];
     Object.keys(localizations).forEach(key => {
       if(Array.isArray(localizations[key])) {
@@ -161,18 +177,23 @@ class SpecStore {
   }
 
   FormatInfoFields(fields, topLevel=false) {
-    return fields.map(field => {
+    let infoFieldErrors = [];
+    const formattedInfoFields = (fields || []).map(field => {
       let formattedField = {
         name: field.name,
         type: field.type || "text"
       };
+
+      if(!field.name) {
+        infoFieldErrors.push(`Info field ${field.label ? `'${field.label}' ` : ""}missing metadata key`);
+      }
 
       if(field.label) {
         formattedField.label = field.label;
       }
 
       if(["select", "multiselect"].includes(field.type)) {
-        formattedField.options = field.options;
+        formattedField.options = FormatOptions(field.options);
       }
 
       if(topLevel && field.for_title_types) {
@@ -184,66 +205,121 @@ class SpecStore {
       }
 
       if(field.type === "list") {
-        formattedField.fields = this.FormatInfoFields(field.fields);
+        const { infoFields, errors } = this.FormatInfoFields(field.fields);
+        formattedField.fields = infoFields;
+
+        infoFieldErrors = infoFieldErrors.concat(errors);
       }
 
       return formattedField;
     });
+
+    Duplicates(formattedInfoFields.map(field => field.name))
+      .forEach(duplicateName => infoFieldErrors.push(`Duplicate info field: ${duplicateName}`));
+
+    return { infoFields: formattedInfoFields, errors: infoFieldErrors };
   }
 
   @action.bound
   SaveSpec = flow(function * ({commitMessage}) {
+    let specErrors = [];
     try {
       const client = this.rootStore.client;
 
-      const infoFields = this.FormatInfoFields(toJS(this.infoFields), true);
+      const { infoFields, errors } = this.FormatInfoFields(toJS(this.infoFields), true);
+
+      specErrors = errors;
 
       let titleConfiguration = {
         ...toJS(this.rootStore.titleConfiguration || {}),
-        asset_types: toJS(this.availableAssetTypes),
-        title_types: toJS(this.availableTitleTypes),
+        asset_types: toJS(FormatOptions(this.availableAssetTypes)),
+        title_types: toJS(FormatOptions(this.availableTitleTypes)),
         associated_assets: toJS(this.associatedAssets),
         info_fields: toJS(infoFields),
-        default_image_keys: toJS(this.defaultImageKeys)
+        default_image_keys: toJS(FormatOptions(this.defaultImageKeys))
       };
 
-      /*
-    {
-        "description": true,
-        "extensions": [
-          "apng",
-          "gif",
-          "jpg",
-          "jpeg",
-          "png",
-          "svg",
-          "tif",
-          "tiff",
-          "webp"
-        ],
-        "linkKey": "image",
-        "name": "Gallery",
-        "target": "/public/asset_metadata/gallery",
-        "thumbnail": true,
-        "type": "files"
-      }
- */
+      // Validation
+      titleConfiguration.associated_assets.forEach(asset => {
+        if(!asset.name) {
+          specErrors.push(`Associated asset ${asset.label ? `'${asset.label}' ` : ""}missing metadata key`);
+        }
+      });
 
+      Duplicates(titleConfiguration.associated_assets.map(field => field.name))
+        .forEach(duplicateName => specErrors.push(`Duplicate associated asset: ${duplicateName}`));
+
+      // Controls
       titleConfiguration.controls = Object.values(this.controls).map(control => {
         if(control.simple) {
           return control.name;
         }
 
+        if(!control.name) {
+          specErrors.push("File control missing name");
+        }
+
+        if(!control.link_key) {
+          specErrors.push(`File control ${control.name ? `'${control.name}' ` : ""}missing link key`);
+        }
+
+        if(!control.target) {
+          specErrors.push(`File control ${control.name ? `'${control.name}' ` : ""}missing link target`);
+        }
+
         return {
           name: control.name,
           description: control.description || false,
-          extensions: toJS(control.extensions),
+          extensions: toJS(FormatOptions(control.extensions || [])),
           link_key: control.link_key,
           target: control.target,
           thumbnail: control.thumbnail || false,
           type: "files"
         };
       });
+
+      Duplicates(titleConfiguration.controls.map(field => field.name))
+        .forEach(duplicateName => specErrors.push(`Duplicate file control: ${duplicateName}`));
+      Duplicates(titleConfiguration.controls.map(field => field.target))
+        .forEach(duplicateName => specErrors.push(`Duplicate file control metadata target: ${duplicateName}`));
+
+      // Localization
+      titleConfiguration.localization = {};
+      this.localizations.forEach(({key, depth, options}) => {
+        key = key.trim();
+
+        if(!key) {
+          specErrors.push("Localization option missing metadata key");
+        }
+
+        let formattedOptions = {};
+        if(depth === 2) {
+          formattedOptions = FormatOptions(options, true);
+        } else {
+          formattedOptions = {};
+          options.forEach(option => {
+            const optionKey = option.key.trim();
+
+            if(!optionKey) {
+              specErrors.push(`Localization option ${key ? `in '${key}' ` : ""}missing metadata key`);
+            }
+
+            formattedOptions[optionKey] = FormatOptions(option.options, true);
+          });
+
+          Duplicates(options.map(field => field.key))
+            .forEach(duplicateName => specErrors.push(`Duplicate localization field for ${key}: ${duplicateName}`));
+        }
+
+        titleConfiguration.localization[key] = formattedOptions;
+      });
+
+      Duplicates(this.localizations.map(field => field.key))
+        .forEach(duplicateName => specErrors.push(`Duplicate localization field: ${duplicateName}`));
+
+      if(specErrors.length > 0) {
+        throw Error(specErrors);
+      }
 
       yield client.EditAndFinalizeContentObject({
         libraryId: (yield client.ContentSpaceId()).replace(/^ispc/, "ilib"),
@@ -264,7 +340,12 @@ class SpecStore {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log(error);
-      throw Error("Failed to update app configuration");
+
+      if(specErrors) {
+        throw Error(FormatOptions(specErrors).join("\n"));
+      } else {
+        throw Error("Failed to update app configuration");
+      }
     }
   });
 
@@ -326,12 +407,42 @@ class SpecStore {
   }
 
   @action.bound
-  UpdateAssetTypes(types) {
+  UpdateAssetTypes(types, operation) {
+    if(operation === "remove") {
+      // Remove deleted asset type from associated assets
+      const removedType = this.availableAssetTypes.find(type => !types.includes(type));
+
+      this.associatedAssets = this.associatedAssets.map(asset => {
+        asset.asset_types = (asset.asset_types || []).filter(type => type !== removedType);
+
+        return asset;
+      });
+    }
+
     this.availableAssetTypes = types;
   }
 
   @action.bound
-  UpdateTitleTypes(types) {
+  UpdateTitleTypes(types, operation) {
+    if(operation === "remove") {
+      // Remove deleted title type from associated assets
+      const removedType = this.availableTitleTypes.find(type => !types.includes(type));
+
+      this.associatedAssets = this.associatedAssets.map(asset => {
+        asset.title_types = (asset.title_types || []).filter(type => type !== removedType);
+        asset.for_title_types = (asset.for_title_types || []).filter(type => type !== removedType);
+
+        return asset;
+      });
+
+      // Remove deleted title types from all 'for_title_types' directives
+      this.infoFields = this.infoFields.map(infoField => {
+        infoField.for_title_types = (infoField.for_title_types || []).filter(type => type !== removedType);
+
+        return infoField;
+      });
+    }
+
     this.availableTitleTypes = types;
   }
 
@@ -346,6 +457,7 @@ class SpecStore {
     this.localizations = localizations.map((localization, index) => {
       const oldLocalization = this.localizations[index] || {};
       if((oldLocalization.depth || "").toString() !== (localization.depth || "").toString()) {
+        // Save options for current depth and try and load options for new depth
         localization[`oldLocalization${oldLocalization.depth}Options`] = oldLocalization.options;
 
         if(localization[`oldLocalization${localization.depth}Options`]) {
