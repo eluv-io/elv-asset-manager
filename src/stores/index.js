@@ -111,10 +111,16 @@ class RootStore {
       this.titleConfiguration = title_configuration || {};
       this.typeName = name || this.typeId;
 
-      this.canEditType = yield this.client.CallContractMethod({
-        contractAddress: this.client.utils.HashToAddress(this.typeId),
-        methodName: "canEdit"
-      });
+      try {
+        this.canEditType = yield this.client.CallContractMethod({
+          contractAddress: this.client.utils.HashToAddress(this.typeId),
+          methodName: "canEdit"
+        });
+      } catch (error) {
+        const owner = yield this.client.ContentObjectOwner({objectId: this.typeId});
+        
+        this.canEditType = this.client.utils.EqualAddress(owner, yield this.client.CurrentAccountAddress());
+      }
     }
 
     this.specStore.InitializeSpec();
