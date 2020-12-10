@@ -54,7 +54,7 @@ class SpecStore {
       {name: "creator"},
       {name: "runtime", type: "integer"},
     ],
-    localizations: {},
+    localizations: [],
     fileControls: [],
     fileControlItems: {},
     associatedAssets: [
@@ -109,8 +109,8 @@ class SpecStore {
   @observable defaultImageKeys = [];
   @observable associatedAssets = [];
   @observable infoFields = [];
-  @observable infoFieldLocalizations = {};
-  @observable localizations;
+  @observable infoFieldLocalizations = [];
+  @observable localizations = [];
 
   @observable errors = [];
 
@@ -147,7 +147,7 @@ class SpecStore {
   }
 
   FormatLocalizations(localizations) {
-    if(!localizations) { return; }
+    if(!localizations) { return []; }
 
     let formattedLocales = [];
     Object.keys(localizations).forEach(key => {
@@ -285,7 +285,7 @@ class SpecStore {
 
       // Localization
       titleConfiguration.localization = {};
-      this.localizations.forEach(({key, depth, options}) => {
+      (this.localizations || []).forEach(({key, depth, options}) => {
         key = key.trim();
 
         if(!key) {
@@ -314,7 +314,7 @@ class SpecStore {
         titleConfiguration.localization[key] = formattedOptions;
       });
 
-      Duplicates(this.localizations.map(field => field.key))
+      Duplicates((this.localizations || []).map(field => field.key))
         .forEach(duplicateName => specErrors.push(`Duplicate localization field: ${duplicateName}`));
 
       if(specErrors.length > 0) {
@@ -455,7 +455,7 @@ class SpecStore {
 
     // If depth was changed, need to reconfigure options
     this.localizations = localizations.map((localization, index) => {
-      const oldLocalization = this.localizations[index] || {};
+      const oldLocalization = (this.localizations || [])[index] || {};
       if((oldLocalization.depth || "").toString() !== (localization.depth || "").toString()) {
         // Save options for current depth and try and load options for new depth
         localization[`oldLocalization${oldLocalization.depth}Options`] = oldLocalization.options;

@@ -256,7 +256,7 @@ class AssetForm extends React.Component {
           />
           {
             Maybe(
-              this.props.formStore.localization,
+              this.props.formStore.localization && Object.keys(this.props.formStore.localization).length > 0,
               <IconButton
                 className={`localization-icon ${this.props.formStore.localizationActive ? "active" : ""}`}
                 title="Select localization"
