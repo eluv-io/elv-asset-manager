@@ -118,7 +118,7 @@ class RootStore {
         });
       } catch (error) {
         const owner = yield this.client.ContentObjectOwner({objectId: this.typeId});
-        
+
         this.canEditType = this.client.utils.EqualAddress(owner, yield this.client.CurrentAccountAddress());
       }
     }

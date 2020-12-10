@@ -127,12 +127,12 @@ class Controls extends React.Component {
     );
   }
 
-  SimpleControl(name) {
+  SimpleControl(name, label) {
     const enabled = this.props.specStore.controls[name];
 
     return (
       <div className="control simple-control">
-        <Checkbox name={name} value={enabled} onChange={() => this.props.specStore.ToggleSimpleControl(name)} />
+        <Checkbox label={label} name={name} value={enabled} onChange={() => this.props.specStore.ToggleSimpleControl(name)} />
       </div>
     );
   }
@@ -165,6 +165,7 @@ class Controls extends React.Component {
           { this.SimpleControl("credits") }
           { this.SimpleControl("channel") }
           { this.SimpleControl("live_stream") }
+          { this.SimpleControl("site_codes", "Access Codes") }
         </div>
 
         <h3>Additional File Controls</h3>
