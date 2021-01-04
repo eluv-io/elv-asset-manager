@@ -10,7 +10,7 @@ class Id {
 }
 
 const FormatOptions = (options, sort=false) => {
-  options = options
+  options = (options || [])
     .filter((value, index, self) => value && self.indexOf(value) === index)
     .map(option => option.trim());
 
