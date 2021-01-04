@@ -44,6 +44,8 @@ multiselect - Select mutliple from a list of options
 
 date - ISO 8601 date (e.g. `2020-03-15`)
 
+file - Link to file
+
 datetime - ISO 8601 datetime (e.g. `2020-03-15T13:55:47-0400`)
 - additional field: 'zone' - Reference timezone for this datetime
 
@@ -71,6 +73,7 @@ class Info extends React.Component {
       "checkbox",
       "select",
       "multiselect",
+      "file",
       "date",
       "datetime",
       "list"
@@ -97,6 +100,7 @@ class Info extends React.Component {
           {name: "for_title_types", type: "multiselect", hint: hints.for_title_types, options: this.props.specStore.availableTitleTypes, only: () => toplevel},
           {name: "type", type: "select", options: types, default: types[0]},
           {name: "options", type: "list", only: entry => ["select", "multiselect"].includes(entry.type)},
+          {name: "extensions", type: "list", only: entry => entry.type === "file"},
           {
             name: "fields",
             type: "list",

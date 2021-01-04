@@ -16,10 +16,13 @@ import {
   FormatName
 } from "elv-components-js";
 import OrderButtons from "./OrderButtons";
+import FileSelection from "./FileBrowser";
+import PreviewIcon from "./PreviewIcon";
 
 import AddIcon from "../static/icons/plus-square.svg";
 import DeleteIcon from "../static/icons/trash.svg";
 import HintIcon from "../static/icons/help-circle.svg";
+import FileIcon from "../static/icons/file.svg";
 
 export const InfoField = ({field, entry, Update, localization={}}) => {
   if(field.hint) {
@@ -91,6 +94,50 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
         fields={field.fields}
         Update={(name, newValues) => Update(field.name, newValues)}
       />
+    );
+  } else if(field.type === "file") {
+    const path = entry[field.name].path || "";
+    const extension = ((path || "").split(".").pop() || "").toLowerCase();
+    const isImage = ["apng", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
+
+    return (
+      <LabelledField key={`input-${name}-${field.name}`} label={field.label || FormatName(field.name)}>
+        <div className="file-input">
+          {
+            Maybe(
+              path,
+              <React.Fragment>
+                {
+                  isImage ?
+                    <PreviewIcon className="file-icon" imagePath={path} targetHash={entry[field.name].targetHash}/> :
+                    <ImageIcon className="file-icon" icon={FileIcon}/>
+                }
+                <div className="file-path">{ path }</div>
+              </React.Fragment>
+            )
+          }
+          <FileSelection
+            header={`Select an item for '${field.label || field.name}'`}
+            versionHash={entry[field.name].targetHash}
+            extensions={field.extensions}
+            Select={({path, targetHash}) => Update(field.name, { path, targetHash })}
+          />
+          {
+            Maybe(
+              path,
+              <IconButton
+                icon={DeleteIcon}
+                onClick={() =>
+                  Confirm({
+                    message: "Are you sure you want to remove this file?",
+                    onConfirm: async () => await Update(field.name, {...entry[field.name], path: ""})
+                  })
+                }
+              />
+            )
+          }
+        </div>
+      </LabelledField>
     );
   } else {
     return (

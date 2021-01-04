@@ -61,7 +61,6 @@ class FileControl extends React.Component {
               })}
             /> : null
         }
-
         <div className="image-path" title={info.path}>{info.path}</div>
         <OrderButtons
           index={index}

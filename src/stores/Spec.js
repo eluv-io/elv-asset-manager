@@ -9,7 +9,6 @@ class Id {
   }
 }
 
-//
 const FormatOptions = (options, sort=false) => {
   options = options
     .filter((value, index, self) => value && self.indexOf(value) === index)
@@ -194,6 +193,10 @@ class SpecStore {
 
       if(["select", "multiselect"].includes(field.type)) {
         formattedField.options = FormatOptions(field.options);
+      }
+
+      if(field.type === "file") {
+        formattedField.extensions = FormatOptions(field.extensions);
       }
 
       if(topLevel && field.for_title_types) {

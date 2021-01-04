@@ -428,6 +428,35 @@ input {
   }
 }
 
+.file-input {
+  align-items: center;
+  border: 1px solid $elv-color-lightgray;
+  display: flex;
+  height: 3rem;
+  padding: $elv-spacing-xs;
+
+  & > .file-path {
+    flex-grow: 1;
+    padding: 0 $elv-spacing-xs;
+  }
+
+  & > button,
+  & > svg {
+    height: $elv-spacing-l;
+    padding: $elv-spacing-xxs;
+    width: $elv-spacing-l;
+  }
+
+  .file-selection {
+    margin-right: $elv-spacing-xs;
+
+    & > button {
+      height: $elv-spacing-m;
+      width: $elv-spacing-m;
+    }
+  }
+}
+
 .toggle-section {
   align-items: center;
   display: flex;

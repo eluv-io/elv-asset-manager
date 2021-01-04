@@ -560,6 +560,14 @@ class FormStore {
         } else {
           info[name] = date.ts;
         }
+      } else if(type === "file") {
+        let linkInfo = this.LinkComponents(info[name]);
+
+        if(!linkInfo) {
+          linkInfo = { targetHash: this.rootStore.params.versionHash };
+        }
+
+        info[name] = linkInfo;
       } else if(type === "list" && info[name]) {
         info[name] = (info[name] || []).map(listValues => {
           if(!fields || fields.length === 0) {
@@ -1175,6 +1183,8 @@ class FormStore {
         value = this.FormatDate(values[name]);
       } else if(type === "datetime") {
         value = this.FormatDate(values[name], true);
+      } else if(type === "file") {
+        value = this.CreateLink(values[name].targetHash, UrlJoin("files", values[name].path));
       } else if(type === "list") {
         value = (value || []).map(entry => {
           entry = toJS(entry);
