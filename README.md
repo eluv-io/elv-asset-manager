@@ -156,6 +156,8 @@ date - ISO 8601 date (e.g. `2020-03-15`)
 datetime - ISO 8601 datetime (e.g. `2020-03-15T13:55:47-0400`)
 - additional field: 'zone' - Reference timezone for this datetime
 
+subsection - A collection of fields stored within a key
+
 list - A list of fields 
 - additional field: 'fields' - Recursive schema specifying the contents of each list item
 ```
@@ -181,6 +183,15 @@ Example:
     {"name": "premiere_date", "type": "date"},
     {"name": "air_time", "type": "datetime", "zone": "utc"},
     {"name": "air_time_us_east", "label": "Air Time (US East)", "type": "datetime", "zone": "America/New_York"}
+    {
+      "name": "director_info",
+      "type": "subsection",
+      "key": "director_info",
+      "fields": [
+        {"name": "name"},
+        {"name": "description", "type": "textarea"}
+      ]
+    },
     {
       "name": "quotes", 
       "type": "list",

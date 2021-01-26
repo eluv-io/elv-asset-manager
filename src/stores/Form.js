@@ -564,11 +564,13 @@ class FormStore {
         let linkInfo = this.LinkComponents(info[name]);
 
         if(!linkInfo) {
-          linkInfo = { targetHash: this.rootStore.params.versionHash };
+          linkInfo = {targetHash: this.rootStore.params.versionHash};
         }
 
         info[name] = linkInfo;
-      } else if(type === "list" && info[name]) {
+      } else if(type === "subsection") {
+        info[name] = this.LoadInfoFields({infoFields: fields, values: info[name]});
+      } else if(type === "list") {
         info[name] = (info[name] || []).map(listValues => {
           if(!fields || fields.length === 0) {
             return listValues;
@@ -1184,7 +1186,11 @@ class FormStore {
       } else if(type === "datetime") {
         value = this.FormatDate(values[name], true);
       } else if(type === "file") {
-        value = this.CreateLink(values[name].targetHash, UrlJoin("files", values[name].path));
+        if(values[name].path) {
+          value = this.CreateLink(values[name].targetHash, UrlJoin("files", values[name].path));
+        }
+      } else if(type === "subsection") {
+        value = this.FormatFields({infoFields: fields, values: values[name], titleType}).info;
       } else if(type === "list") {
         value = (value || []).map(entry => {
           entry = toJS(entry);

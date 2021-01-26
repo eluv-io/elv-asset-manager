@@ -76,6 +76,7 @@ class Info extends React.Component {
       "file",
       "date",
       "datetime",
+      "subsection",
       "list"
     ];
 
@@ -104,7 +105,7 @@ class Info extends React.Component {
           {
             name: "fields",
             type: "list",
-            only: entry => entry.type === "list",
+            only: entry => entry.type === "list" || entry.type === "subsection",
             render: index => this.InfoListField("Fields", values[index].fields, newValues => UpdateFields(index, newValues))
           }
         ]}

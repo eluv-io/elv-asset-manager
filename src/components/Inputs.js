@@ -83,6 +83,32 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
         onChange={newValue => Update(field.name, newValue)}
       />
     );
+  } else if(field.type === "subsection") {
+    return (
+      <LabelledField
+        className="list-field-container"
+        label={field.hintLabel || field.label || FormatName(field.name)}
+        key={`input-${name}-${field.name}`}
+      >
+        <div className="list-field subsection-field list-field-entry even">
+          {
+            field.fields.map((subField, index) => (
+              <InfoField
+                key={`input-${name}-${field.name}-${subField.name}-${index}`}
+                field={subField}
+                entry={entry[field.name]}
+                Update={(_, newValue) => {
+                  let newValues = toJS(entry[field.name]);
+                  newValues[subField.name] = newValue;
+
+                  Update(field.name, newValues);
+                }}
+              />
+            ))
+          }
+        </div>
+      </LabelledField>
+    );
   } else if(field.type === "list") {
     return (
       <ListField
