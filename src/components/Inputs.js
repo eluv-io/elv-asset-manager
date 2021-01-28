@@ -196,6 +196,36 @@ const HintLabel = ({label, name, hint, required}) => {
   );
 };
 
+const InitializeField = ({fields, defaultValue}) => {
+  let newValue = defaultValue || {};
+
+  fields.forEach(field => {
+    let value = "";
+    switch (field.type) {
+      case "subsection":
+        value = InitializeField({fields: field.fields});
+        break;
+      case "list":
+      case "multiselect":
+        value = [];
+        break;
+      case "number":
+      case "integer":
+        value = 0;
+        break;
+      case "checkbox":
+        value = false;
+        break;
+      case "select":
+        value = field.options[0];
+    }
+
+    newValue[field.name] = field.default || newValue[field.name] || value;
+  });
+
+  return newValue;
+};
+
 export const ListField = ({
   name,
   label,
@@ -232,10 +262,7 @@ export const ListField = ({
     let newValues = [...toJS(values)];
 
     if(fields) {
-      let newValue = defaultValue || {};
-      fields.forEach(field => {
-        newValue[field.name] = field.default || newValue[field.name] || "";
-      });
+      const newValue = InitializeField({fields, defaultValue});
 
       prepend ? newValues.unshift(newValue) : newValues.push(newValue);
     } else {

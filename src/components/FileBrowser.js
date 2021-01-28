@@ -197,6 +197,7 @@ FileBrowser.propTypes = {
 };
 
 @inject("contentStore")
+@inject("rootStore")
 @observer
 class FileSelection extends React.Component {
   constructor(props) {
@@ -204,7 +205,7 @@ class FileSelection extends React.Component {
 
     this.state = {
       modal: () => null,
-      versionHash: props.versionHash,
+      versionHash: props.versionHash || this.props.rootStore.params.versionHash,
       selectingObject: false
     };
 
@@ -260,8 +261,8 @@ class FileSelection extends React.Component {
         Select={this.SelectFile}
         files={this.props.contentStore.files[this.state.versionHash]}
         versionHash={this.state.versionHash}
-        baseFileUrl={this.props.contentStore.baseFileUrls[this.props.versionHash]}
-        mimeTypes={this.props.contentStore.mimeTypes[this.props.versionHash]}
+        baseFileUrl={this.props.contentStore.baseFileUrls[this.state.versionHash]}
+        mimeTypes={this.props.contentStore.mimeTypes[this.state.versionHash]}
         extensions={this.props.extensions}
       />
     );
@@ -313,7 +314,7 @@ class FileSelection extends React.Component {
   render() {
     return (
       <AsyncComponent
-        Load={() => this.props.contentStore.LoadFiles(this.props.versionHash)}
+        Load={() => this.props.contentStore.LoadFiles(this.props.versionHash || this.props.rootStore.params.versionHash)}
         render={this.Selection}
       />
     );
@@ -323,7 +324,7 @@ class FileSelection extends React.Component {
 FileSelection.propTypes = {
   header: PropTypes.string,
   extensions: PropTypes.arrayOf(PropTypes.string),
-  versionHash: PropTypes.string.isRequired,
+  versionHash: PropTypes.string,
   useButton: PropTypes.bool,
   buttonText: PropTypes.string,
   Select: PropTypes.func.isRequired

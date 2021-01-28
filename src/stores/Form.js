@@ -1174,7 +1174,7 @@ class FormStore {
     let listFields = [];
 
     infoFields.forEach(({name, type, for_title_types, top_level, fields}) => {
-      if(for_title_types && !for_title_types.includes(titleType)) { return; }
+      if(for_title_types && for_title_types.length > 0 && !for_title_types.includes(titleType)) { return; }
 
       let value = values[name];
       if(type === "integer") {
