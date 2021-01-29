@@ -13,7 +13,8 @@ import {
   Maybe,
   ToolTip,
   ImageIcon,
-  FormatName
+  FormatName,
+  Action
 } from "elv-components-js";
 import OrderButtons from "./OrderButtons";
 import FileSelection from "./FileBrowser";
@@ -24,7 +25,7 @@ import DeleteIcon from "../static/icons/trash.svg";
 import HintIcon from "../static/icons/help-circle.svg";
 import FileIcon from "../static/icons/file.svg";
 
-export const InfoField = ({field, entry, Update, localization={}}) => {
+export const InfoField = ({field, entry, Update, localization={}, textAddButton=false}) => {
   if(field.hint) {
     field.hintLabel = HintLabel({label: field.label, name: field.name, hint: field.hint, required: field.required});
   }
@@ -103,6 +104,7 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
 
                   Update(field.name, newValues);
                 }}
+                textAddButton={textAddButton}
               />
             ))
           }
@@ -119,6 +121,7 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
         values={entry[field.name] || []}
         fields={field.fields}
         Update={(name, newValues) => Update(field.name, newValues)}
+        textAddButton={textAddButton}
       />
     );
   } else if(field.type === "file") {
@@ -138,7 +141,7 @@ export const InfoField = ({field, entry, Update, localization={}}) => {
                     <PreviewIcon className="file-icon" imagePath={path} targetHash={entry[field.name].targetHash}/> :
                     <ImageIcon className="file-icon" icon={FileIcon}/>
                 }
-                <div className="file-path">{ path }</div>
+                <div className="file-path" title={path}>{ path }</div>
               </React.Fragment>
             )
           }
@@ -235,7 +238,8 @@ export const ListField = ({
   hint,
   Update,
   orderable=false,
-  prepend=false
+  prepend=false,
+  textAddButton=false
 }) => {
   if(fields && fields.length === 0) {
     fields = undefined;
@@ -308,6 +312,7 @@ export const ListField = ({
               field={field}
               entry={entry || {}}
               Update={(entryName, newValue) => UpdateField(index, entryName, newValue)}
+              textAddButton={textAddButton}
             />
           );
         });
@@ -337,6 +342,27 @@ export const ListField = ({
       );
     });
 
+  let addButton = (
+    <IconButton
+      icon={AddIcon}
+      title={`Add ${label || name}`}
+      onClick={Add}
+      className="info-list-icon info-list-add-icon secondary"
+    />
+  );
+
+  if(textAddButton) {
+    addButton = (
+      <Action
+        title={`Add ${label || name}`}
+        onClick={Add}
+        className="info-list-icon info-list-add-icon secondary"
+      >
+        Add { label || FormatName(name) }
+      </Action>
+    );
+  }
+
   return (
     <LabelledField
       className="list-field-container"
@@ -345,12 +371,7 @@ export const ListField = ({
       value={
         <div className={`list-field ${!fields ? "array-list" : ""}`}>
           { fieldInputs }
-          <IconButton
-            icon={AddIcon}
-            title={`Add ${label || name}`}
-            onClick={Add}
-            className="info-list-icon info-list-add-icon"
-          />
+          { addButton }
         </div>
       }
     />

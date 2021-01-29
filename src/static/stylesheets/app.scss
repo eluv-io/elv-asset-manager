@@ -88,7 +88,16 @@ button {
 
 .even {
   background-color: $elv-color-bg-white;
+}
+
+.even,
+.odd {
   border: 1px solid $elv-color-gray;
+
+  & + .even,
+  & + .odd {
+    border-top: 0;
+  }
 }
 
 .clickable {
@@ -433,6 +442,7 @@ input {
   border: 1px solid $elv-color-lightgray;
   display: flex;
   height: 3rem;
+  max-width: 40rem;
   padding: $elv-spacing-xs;
 
   & > .file-path {
@@ -779,7 +789,18 @@ input {
 
 .-elv-input {
   &.-elv-input {
-    grid-template-columns: 12rem 1fr;
+    font-size: 1rem;
+    grid-template-columns: 8rem 1fr;
+    margin-bottom: $elv-spacing-xxs;
+
+    /*
+    input,
+    select,
+    textarea {
+      //max-width: 40rem;
+      font-size: $elv-font-l;
+    }
+     */
   }
 
   label {
@@ -797,8 +818,6 @@ input {
 }
 
 .list-field-container {
-  min-width: 30rem;
-
   & > label {
     align-items: flex-start;
     margin-top: $elv-spacing-xs;
@@ -816,7 +835,7 @@ input {
   input,
   select,
   textarea {
-    max-width: 25rem;
+    //max-width: 30rem;
   }
 
   .list-field-entry {

@@ -30,7 +30,8 @@ class AssetInfo extends React.Component {
           field,
           entry: assetInfo,
           Update: this.props.formStore.UpdateAssetInfo,
-          localization: this.props.formStore.InfoFieldLocalization(field.name)
+          localization: this.props.formStore.InfoFieldLocalization(field.name),
+          textAddButton: true
         })
       );
   }
@@ -38,7 +39,7 @@ class AssetInfo extends React.Component {
   render() {
     const assetInfo = this.props.formStore.currentLocalizedData.assetInfo;
     return (
-      <div className="asset-form-section-container">
+      <div className="asset-form-section-container asset-info-section-container">
         <h3>Asset Info</h3>
         <div className="asset-info-container">
           {
