@@ -290,24 +290,25 @@ class FileSelection extends React.Component {
   Selection() {
     if(this.props.useButton) {
       return (
-        <div className="file-selection">
-          <Action onClick={this.ActivateModal} title="Select a file">
+        <>
+          <Action className="file-selection" onClick={this.ActivateModal} title="Select a file">
             { this.props.buttonText || "Select a File"}
           </Action>
           { this.state.modal() }
-        </div>
+        </>
       );
     }
 
     return (
-      <div className="file-selection">
+      <>
         <IconButton
+          className="file-selection"
           onClick={this.ActivateModal}
           title="Select a file"
           icon={AddFileIcon}
         />
         { this.state.modal() }
-      </div>
+      </>
     );
   }
 

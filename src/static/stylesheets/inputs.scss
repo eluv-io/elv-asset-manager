@@ -1,0 +1,213 @@
+.odd {
+  background-color: $elv-color-bg-light-dark;
+
+  & > .actions {
+    background-color: $elv-color-bg-white;
+  }
+}
+
+.even {
+  background-color: $elv-color-bg-white;
+  border-left: 1px solid $elv-color-lightgray;
+
+  & > .actions {
+    background-color: $elv-color-bg-light-dark;
+  }
+}
+
+.-elv-input {
+  &.-elv-input {
+    font-size: 1rem;
+    grid-template-columns: 8rem 1fr;
+    margin-bottom: $elv-spacing-xxs;
+
+    input,
+    select,
+    textarea {
+      border: 1px solid $elv-color-gray;
+      max-width: 35rem;
+      min-width: 35rem;
+    }
+
+    &.-elv-multi-select {
+      max-width: 35rem;
+      min-width: 35rem;
+    }
+  }
+
+  label {
+    align-items: center;
+    display: flex;
+    //color: $elv-color-text-black;
+    text-rendering: optimizeLegibility;
+  }
+
+  &.-elv-multi-select,
+  &.-elv-textarea {
+    label {
+      align-items: flex-start;
+      margin-top: $elv-spacing-xs;
+    }
+  }
+
+  .checkbox-container {
+    input {
+      min-width: 0;
+    }
+  }
+}
+
+.file-input {
+  align-items: center;
+  border: 1px solid $elv-color-lightgray;
+  display: flex;
+  height: 3rem;
+  max-width: 35rem;
+  min-width: 35rem;
+  padding: $elv-spacing-xs;
+  position: relative;
+
+  & > .file-path {
+    flex-grow: 1;
+    padding: 0 $elv-spacing-xs;
+
+    &.empty {
+      color: $elv-color-text-light;
+      font-size: $elv-font-m;
+    }
+  }
+
+  & > button,
+  & > svg {
+    height: $elv-spacing-l;
+    padding: $elv-spacing-xxs;
+    width: $elv-spacing-l;
+  }
+
+  .file-selection {
+    & > button {
+      height: $elv-spacing-m;
+      width: $elv-spacing-m;
+    }
+  }
+}
+
+
+.list-field-container {
+  width: max-content;
+
+  & > label {
+    align-items: flex-start;
+    margin-top: $elv-spacing-l;
+    width: 100%;
+  }
+
+  // Add margin top top of add button for empty list
+  &.field-list-container {
+    & > div > .list-field {
+      & > button {
+        &:first-child {
+          margin-top: $elv-spacing-m;
+        }
+      }
+    }
+  }
+
+  .list-field-entry {
+    margin: $elv-spacing-ss 0;
+    padding: $elv-spacing-ss $elv-spacing-xl $elv-spacing-ss $elv-spacing-m;
+    position: relative;
+    width: max-content;
+
+    &.subsection-field {
+      padding-right: $elv-spacing-s;
+    }
+
+    &:not(.subsection-field) {
+      &.even {
+        border: 1px solid $elv-color-lightgray;
+      }
+    }
+
+    label {
+      height: 100%;
+    }
+
+    .actions {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      padding: $elv-spacing-xxs;
+      position: absolute;
+      right: 0;
+      top: 0;
+      //border-radius: $elv-spacing-xxs;
+    }
+  }
+
+  .info-list-icon {
+    height: $elv-font-xxl;
+  }
+
+  .info-list-add-icon {
+    margin: $elv-spacing-xs 0;
+  }
+}
+
+.array-list-container {
+  label {
+    margin-top: $elv-spacing-xs;
+  }
+
+  .list-field-entry {
+    align-items: center;
+    background-color: inherit;
+    border: 0;
+    display: flex;
+    margin: 0;
+    padding: $elv-spacing-xxs $elv-spacing-xl $elv-spacing-xxs 0;
+
+    &.even {
+      &.even {
+        border: 0;
+      }
+    }
+  }
+
+  .actions {
+    background-color: inherit;
+  }
+}
+
+.hint-label {
+  align-items: center;
+  display: flex;
+  width: 100%;
+
+  svg {
+    cursor: pointer;
+    height: $elv-spacing-s;
+    margin-left: $elv-spacing-xs;
+    stroke: $elv-color-mediumgray;
+    width: $elv-spacing-s;
+  }
+}
+
+.hint-tooltip {
+  &.hint-tooltip {
+    max-width: unset;
+    min-width: 0;
+  }
+
+  pre {
+    background-color: transparent;
+    border: 0;
+    font-family: $elv-font-default;
+    font-size: $elv-font-m;
+    text-align: left;
+  }
+
+  code {
+    display: inline-block;
+  }
+}

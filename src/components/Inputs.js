@@ -1,5 +1,6 @@
 import React from "react";
-import {toJS} from "mobx";
+import {runInAction, toJS} from "mobx";
+import {observer} from "mobx-react";
 import {
   Confirm,
   IconButton,
@@ -25,17 +26,15 @@ import DeleteIcon from "../static/icons/trash.svg";
 import HintIcon from "../static/icons/help-circle.svg";
 import FileIcon from "../static/icons/file.svg";
 
-export const InfoField = ({field, entry, Update, localization={}, textAddButton=false}) => {
-  if(field.hint) {
-    field.hintLabel = HintLabel({label: field.label, name: field.name, hint: field.hint, required: field.required});
-  }
+let InfoField = ({field, entry, Update, localization={}, textAddButton=false}) => {
+  const hintLabel = field.hint ? HintLabel({label: field.label, name: field.name, hint: field.hint, required: field.required}) : null;
 
   if(field.type === "textarea") {
     return (
       <TextArea
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.hintLabel || field.label}
+        label={hintLabel || field.label}
         value={entry[field.name] || ""}
         onChange={newValue => Update(field.name, newValue)}
       />
@@ -45,7 +44,7 @@ export const InfoField = ({field, entry, Update, localization={}, textAddButton=
       <Checkbox
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.hintLabel || field.label}
+        label={hintLabel || field.label}
         value={entry[field.name] || ""}
         onChange={newValue => Update(field.name, newValue)}
       />
@@ -55,7 +54,7 @@ export const InfoField = ({field, entry, Update, localization={}, textAddButton=
       <DateSelection
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.hintLabel || field.label}
+        label={hintLabel || field.label}
         value={entry[field.name]}
         dateOnly={field.type === "date"}
         referenceTimezone={field.zone}
@@ -67,7 +66,7 @@ export const InfoField = ({field, entry, Update, localization={}, textAddButton=
       <Selection
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.hintLabel || field.label}
+        label={hintLabel || field.label}
         value={entry[field.name]}
         options={localization.options || field.options}
         onChange={newValue => Update(field.name, newValue)}
@@ -78,7 +77,7 @@ export const InfoField = ({field, entry, Update, localization={}, textAddButton=
       <MultiSelect
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.hintLabel || field.label}
+        label={hintLabel || field.label}
         values={entry[field.name] || []}
         options={localization.options || field.options}
         onChange={newValue => Update(field.name, newValue)}
@@ -87,11 +86,11 @@ export const InfoField = ({field, entry, Update, localization={}, textAddButton=
   } else if(field.type === "subsection") {
     return (
       <LabelledField
-        className="list-field-container"
-        label={field.hintLabel || field.label || FormatName(field.name)}
+        className="list-field-container subsection-field-container"
+        label={hintLabel || field.label || FormatName(field.name)}
         key={`input-${name}-${field.name}`}
       >
-        <div className="list-field subsection-field list-field-entry even">
+        <div className="list-field subsection-field list-field-entry even" title={field.label || FormatName(field.name)}>
           {
             field.fields.map((subField, index) => (
               <InfoField
@@ -117,7 +116,7 @@ export const InfoField = ({field, entry, Update, localization={}, textAddButton=
         orderable
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.hintLabel || field.label}
+        label={hintLabel || field.label}
         values={entry[field.name] || []}
         fields={field.fields}
         Update={(name, newValues) => Update(field.name, newValues)}
@@ -131,7 +130,7 @@ export const InfoField = ({field, entry, Update, localization={}, textAddButton=
 
     return (
       <LabelledField key={`input-${name}-${field.name}`} label={field.label || FormatName(field.name)}>
-        <div className="file-input">
+        <div className={`file-input ${path ? "" : "empty"}`}>
           {
             Maybe(
               path,
@@ -143,6 +142,12 @@ export const InfoField = ({field, entry, Update, localization={}, textAddButton=
                 }
                 <div className="file-path" title={path}>{ path }</div>
               </React.Fragment>
+            )
+          }
+          {
+            Maybe(
+              !path,
+              <div className="file-path empty">{ "<No File Selected>" }</div>
             )
           }
           <FileSelection
@@ -173,7 +178,7 @@ export const InfoField = ({field, entry, Update, localization={}, textAddButton=
       <Input
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={field.hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
+        label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
         type={field.type}
         value={entry[field.name] || ""}
         required={field.required}
@@ -188,7 +193,9 @@ const HintLabel = ({label, name, hint, required}) => {
 
   return (
     <div className="hint-label">
-      { label } { required ? "*" : "" }
+      <div className="hint-label-text">
+        { label } { required ? "*" : "" }
+      </div>
       <ToolTip className="hint-tooltip" content={<pre className="hint-content">{ hint }</pre>}>
         <ImageIcon
           className="hint-icon"
@@ -229,7 +236,7 @@ const InitializeField = ({fields, defaultValue}) => {
   return newValue;
 };
 
-export const ListField = ({
+let ListField = ({
   name,
   label,
   values,
@@ -248,18 +255,12 @@ export const ListField = ({
   values = values || [];
 
   const UpdateIndex = (index, newValue) => {
-    let newValues = [...toJS(values)];
-    newValues[index] = newValue;
-
-    Update(name, newValues, "update");
+    // Allow list fields to directly modify observed values for efficiency
+    runInAction(() => values[index] = newValue);
   };
 
   const UpdateField = (index, fieldName, newValue) => {
-    let newValues = [...toJS(values)];
-    newValues[index] = toJS(newValues[index]);
-    newValues[index][fieldName] = newValue;
-
-    Update(name, newValues, "update");
+    runInAction(() => values[index][fieldName] = newValue);
   };
 
   const Add = () => {
@@ -323,13 +324,14 @@ export const ListField = ({
       return (
         <div
           className={`list-field-entry ${index % 2 === 0 ? "even" : "odd"}`}
+          title={label || FormatName(name)}
           key={`input-container-${name}-${index}`}
         >
           <div className="actions">
             {Maybe(orderable, <OrderButtons index={index} length={values.length} Swap={Swap} />)}
             <IconButton
               icon={DeleteIcon}
-              title="Remove Item"
+              title={`Remove item from ${label || FormatName(name)}`}
               onClick={async () => await Confirm({
                 message: "Are you sure you want to remove this item?",
                 onConfirm: () => Remove(index)
@@ -365,7 +367,7 @@ export const ListField = ({
 
   return (
     <LabelledField
-      className="list-field-container"
+      className={`list-field-container ${!fields ? "array-list-container" : "field-list-container"}`}
       label={hint ? HintLabel({label, name, hint}) : label || FormatName(name)}
       formatLabel={false}
       value={
@@ -377,3 +379,8 @@ export const ListField = ({
     />
   );
 };
+
+InfoField = observer(InfoField);
+ListField = observer(ListField);
+
+export {InfoField, ListField};

@@ -4,6 +4,7 @@
 @import "./file-browser";
 @import "./site-customization";
 @import "./spec";
+@import "./inputs";
 
 .rdt {
   // sass-lint:disable no-important
@@ -79,24 +80,6 @@ button {
       border: 1px solid $elv-color-mediumgray;
       color: $elv-color-text-light;
     }
-  }
-}
-
-.odd {
-  background-color: $elv-color-bg-light-dark;
-}
-
-.even {
-  background-color: $elv-color-bg-white;
-}
-
-.even,
-.odd {
-  border: 1px solid $elv-color-gray;
-
-  & + .even,
-  & + .odd {
-    border-top: 0;
   }
 }
 
@@ -437,36 +420,6 @@ input {
   }
 }
 
-.file-input {
-  align-items: center;
-  border: 1px solid $elv-color-lightgray;
-  display: flex;
-  height: 3rem;
-  max-width: 40rem;
-  padding: $elv-spacing-xs;
-
-  & > .file-path {
-    flex-grow: 1;
-    padding: 0 $elv-spacing-xs;
-  }
-
-  & > button,
-  & > svg {
-    height: $elv-spacing-l;
-    padding: $elv-spacing-xxs;
-    width: $elv-spacing-l;
-  }
-
-  .file-selection {
-    margin-right: $elv-spacing-xs;
-
-    & > button {
-      height: $elv-spacing-m;
-      width: $elv-spacing-m;
-    }
-  }
-}
-
 .toggle-section {
   align-items: center;
   display: flex;
@@ -784,130 +737,5 @@ input {
     color: $elv-color-text-light;
     margin: 0 0 $elv-spacing-l;
     text-align: center;
-  }
-}
-
-.-elv-input {
-  &.-elv-input {
-    font-size: 1rem;
-    grid-template-columns: 8rem 1fr;
-    margin-bottom: $elv-spacing-xxs;
-
-    /*
-    input,
-    select,
-    textarea {
-      //max-width: 40rem;
-      font-size: $elv-font-l;
-    }
-     */
-  }
-
-  label {
-    align-items: center;
-    display: flex;
-  }
-
-  &.-elv-multi-select,
-  &.-elv-textarea {
-    label {
-      align-items: flex-start;
-      margin-top: $elv-spacing-xs;
-    }
-  }
-}
-
-.list-field-container {
-  & > label {
-    align-items: flex-start;
-    margin-top: $elv-spacing-xs;
-    width: 100%;
-
-    .hint-label {
-      justify-content: flex-start;
-
-      svg {
-        margin-left: $elv-spacing-xs;
-      }
-    }
-  }
-
-  input,
-  select,
-  textarea {
-    //max-width: 30rem;
-  }
-
-  .list-field-entry {
-    padding: $elv-spacing-m $elv-spacing-xl $elv-spacing-m $elv-spacing-m;
-    position: relative;
-
-    label {
-      height: 100%;
-    }
-
-    .actions {
-      display: flex;
-      position: absolute;
-      right: $elv-spacing-xs;
-      top: $elv-spacing-xs;
-    }
-  }
-
-  .array-list {
-    .list-field-entry {
-      align-items: center;
-      background-color: inherit;
-      border: 0;
-      display: flex;
-      max-width: 20rem;
-      padding: $elv-spacing-xxs $elv-spacing-xl $elv-spacing-xxs 0;
-    }
-
-    .actions {
-      align-items: center;
-    }
-  }
-
-  .info-list-icon {
-    height: $elv-font-xxl;
-  }
-
-  .info-list-add-icon {
-    margin: $elv-spacing-xs 0;
-  }
-}
-
-.hint-label {
-  align-items: flex-start;
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-
-  svg {
-    cursor: pointer;
-    height: $elv-spacing-s;
-    margin-top: $elv-spacing-xxs;
-    stroke: $elv-color-mediumgray;
-    width: $elv-spacing-s;
-  }
-}
-
-.hint-tooltip {
-  &.hint-tooltip {
-    max-width: unset;
-    min-width: 0;
-  }
-
-  pre {
-    background-color: transparent;
-    border: 0;
-    font-family: $elv-font-default;
-    font-size: $elv-font-m;
-    text-align: left;
-  }
-
-  code {
-    display: inline-block;
   }
 }

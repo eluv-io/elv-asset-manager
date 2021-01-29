@@ -56,6 +56,7 @@ list - A list of fields
 
 const hints = {
   info: <>A configurable list of fields for assets of this type. These fields will be stored in <code>public/asset_metadata/info</code> in the asset metadata.</>,
+  hint: "A hint to communicate the purpose of this field, just like this one",
   fields: "Attributes for each element in this list. If no fields are specified, this field will be a list of text strings.",
   for_title_types: "If specified, this field will only apply to assets with these title types",
   top_level: <>If specified, this field will be stored in <code>public/asset_metadata</code> instead of <code>public/asset_metadata/info</code></>
@@ -97,6 +98,7 @@ class Info extends React.Component {
         fields={[
           {name: "label"},
           {name: "name", label: "Metadata Key", required: true},
+          {name: "hint", hint: hints.hint},
           {name: "top_level", type: "checkbox", hint: hints.top_level, only: () => toplevel},
           {name: "for_title_types", type: "multiselect", hint: hints.for_title_types, options: this.props.specStore.availableTitleTypes, only: () => toplevel},
           {name: "type", type: "select", options: types, default: types[0]},

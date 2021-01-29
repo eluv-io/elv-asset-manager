@@ -191,6 +191,10 @@ class SpecStore {
         formattedField.label = field.label;
       }
 
+      if(field.hint) {
+        formattedField.hint = field.hint;
+      }
+
       if(["select", "multiselect"].includes(field.type)) {
         formattedField.options = FormatOptions(field.options);
       }

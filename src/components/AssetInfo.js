@@ -26,13 +26,13 @@ class AssetInfo extends React.Component {
       // Remove non-localized fields if localization is active
       .filter(field => !("localize" in field && !field.localize && this.props.formStore.localizationActive))
       .map(field =>
-        InfoField({
-          field,
-          entry: assetInfo,
-          Update: this.props.formStore.UpdateAssetInfo,
-          localization: this.props.formStore.InfoFieldLocalization(field.name),
-          textAddButton: true
-        })
+        <InfoField
+          field={field}
+          entry={assetInfo}
+          Update={this.props.formStore.UpdateAssetInfo}
+          localization={this.props.formStore.InfoFieldLocalization(field.name)}
+          textAddButton
+        />
       );
   }
 
