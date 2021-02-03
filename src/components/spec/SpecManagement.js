@@ -6,6 +6,7 @@ import Info from "./Info";
 import AssociatedAssets from "./AssociatedAssets";
 import Controls from "./Controls";
 import Localization from "./Localization";
+import Profile from "./Profile";
 
 @inject("rootStore")
 @inject("specStore")
@@ -23,6 +24,7 @@ class SpecManagement extends React.Component {
         // NOTE: if image control is enabled it should allow configuration of default keys
         ["Controls", "controls"],
         ["Localization", "localization"],
+        ["Load Profile", "profile"]
       ]
     };
   }
@@ -37,6 +39,8 @@ class SpecManagement extends React.Component {
         return <Controls />;
       case "localization":
         return <Localization />;
+      case "profile":
+        return <Profile />;
     }
   }
 

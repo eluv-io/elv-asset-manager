@@ -17,7 +17,7 @@
 
 .-elv-input {
   &.-elv-input {
-    font-size: 1rem;
+    font-size: 0.9rem;
     grid-template-columns: 8rem 1fr;
     margin-bottom: $elv-spacing-xxs;
 
@@ -92,29 +92,27 @@
   }
 }
 
-
 .list-field-container {
-  width: max-content;
+  // sass-lint:disable no-important
+  margin: $elv-spacing-s 0 !important;
 
   & > label {
     align-items: flex-start;
-    margin-top: $elv-spacing-l;
+    margin-top: $elv-spacing-xxs;
     width: 100%;
   }
 
-  // Add margin top top of add button for empty list
-  &.field-list-container {
-    & > div > .list-field {
-      & > button {
-        &:first-child {
-          margin-top: $elv-spacing-m;
-        }
-      }
-    }
+  & > div {
+    align-items: center;
+    display: flex;
+    min-height: 100%;
+  }
+
+  .list-field {
+    min-height: 100%;
   }
 
   .list-field-entry {
-    margin: $elv-spacing-ss 0;
     padding: $elv-spacing-ss $elv-spacing-xl $elv-spacing-ss $elv-spacing-m;
     position: relative;
     width: max-content;
@@ -150,7 +148,7 @@
   }
 
   .info-list-add-icon {
-    margin: $elv-spacing-xs 0;
+    margin-top: $elv-spacing-xxs;
   }
 }
 

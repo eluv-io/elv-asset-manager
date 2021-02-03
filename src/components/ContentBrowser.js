@@ -96,8 +96,8 @@ class BrowserList extends React.Component {
             <ul className={`browser ${this.props.hashes ? "mono" : ""}`}>
               {list.map(({id, name, objectName, objectDescription, assetType, titleType}) => {
                 let disabled =
-                  (this.props.assetTypes && !this.props.assetTypes.includes(assetType)) ||
-                  (this.props.titleTypes && !this.props.titleTypes.includes(titleType));
+                  (this.props.assetTypes && this.props.assetTypes.length > 0 && !this.props.assetTypes.includes(assetType)) ||
+                  (this.props.titleTypes && this.props.titleTypes.length > 0 && !this.props.titleTypes.includes(titleType));
 
                 let title = objectName ? `${objectName}\n\n${id}${objectDescription ? `\n\n${objectDescription}` : ""}` : id;
                 if(disabled) {
@@ -116,7 +116,7 @@ class BrowserList extends React.Component {
                       onClick={() => this.props.Select(id)}
                     >
                       <div>{name}</div>
-                      {assetType ? <div className="hint">{assetType}</div> : null}
+                      {assetType ? <div className="hint">{assetType} {titleType ? ` | ${titleType}` : ""}</div> : null}
                     </button>
                   </li>
                 );

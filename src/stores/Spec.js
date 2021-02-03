@@ -1,5 +1,7 @@
 import {observable, action, flow, toJS} from "mobx";
 
+import DefaultSpec from "../specs/Default";
+
 // Incrementing unique IDs
 let __id = 0;
 class Id {
@@ -25,82 +27,6 @@ const Duplicates = (values) =>
     .filter((value, index, self) => value && self.indexOf(value) !== index);
 
 class SpecStore {
-  @observable defaultSpec = {
-    controls: [
-      "images",
-      "playlists"
-    ],
-    availableAssetTypes: [
-      "primary",
-      "clip"
-    ],
-    availableTitleTypes: [
-      "collection",
-      "episode",
-      "season",
-      "series",
-      "site",
-      "title"
-    ],
-    defaultImageKeys: [
-      "portrait",
-      "landscape"
-    ],
-    infoFields: [
-      {name: "release_date", type: "date"},
-      {name: "synopsis", type: "textarea"},
-      {name: "copyright"},
-      {name: "creator"},
-      {name: "runtime", type: "integer"},
-    ],
-    localizations: [],
-    fileControls: [],
-    fileControlItems: {},
-    associatedAssets: [
-      {
-        name: "titles",
-        label: "Titles",
-        indexed: true,
-        slugged: true,
-        defaultable: true,
-        orderable: true
-      },
-      {
-        name: "series",
-        label: "Series",
-        asset_types: ["primary"],
-        title_types: ["series"],
-        for_title_types: ["site", "collection"],
-        indexed: true,
-        slugged: true,
-        defaultable: false,
-        orderable: true
-      },
-      {
-        name: "seasons",
-        label: "Seasons",
-        asset_types: ["primary"],
-        title_types: ["season"],
-        for_title_types: ["series"],
-        indexed: true,
-        slugged: true,
-        defaultable: false,
-        orderable: true
-      },
-      {
-        name: "episodes",
-        label: "Episodes",
-        asset_types: ["primary"],
-        title_types: ["episode"],
-        for_title_types: ["season"],
-        indexed: true,
-        slugged: true,
-        defaultable: false,
-        orderable: true
-      }
-    ]
-  };
-
   @observable controls = {};
   @observable fileControlItems = {};
   @observable availableAssetTypes = [];
@@ -118,12 +44,11 @@ class SpecStore {
   }
 
   @action.bound
-  InitializeSpec() {
-    const config = this.rootStore.titleConfiguration;
-    const defaults = this.defaultSpec;
+  InitializeSpec(profile) {
+    const config = profile || this.rootStore.titleConfiguration;
 
     this.controls = {};
-    (config.controls || defaults.controls).forEach(control => {
+    (config.controls || DefaultSpec.controls).forEach(control => {
       if(typeof control === "string") {
         this.controls[control] = { name: control, simple: true };
       } else {
@@ -136,13 +61,13 @@ class SpecStore {
       }
     });
 
-    this.availableAssetTypes = config.asset_types || defaults.availableAssetTypes;
-    this.availableTitleTypes = config.title_types || defaults.availableTitleTypes;
-    this.infoFields = config.info_fields || defaults.infoFields;
-    this.associatedAssets = config.associated_assets || defaults.associatedAssets;
-    this.defaultImageKeys = config.default_image_keys || defaults.defaultImageKeys;
+    this.availableAssetTypes = config.asset_types || config.availableAssetTypes || DefaultSpec.availableAssetTypes;
+    this.availableTitleTypes = config.title_types || config.titleTypes || DefaultSpec.availableTitleTypes;
+    this.infoFields = config.info_fields || config.infoFields || DefaultSpec.infoFields;
+    this.associatedAssets = config.associated_assets || config.associatedAssets || DefaultSpec.associatedAssets;
+    this.defaultImageKeys = config.default_image_keys || config.defaultImageKeys || DefaultSpec.defaultImageKeys;
 
-    this.localizations = this.FormatLocalizations(config.localization || defaults.localization);
+    this.localizations = this.FormatLocalizations(config.localization || DefaultSpec.localization);
   }
 
   FormatLocalizations(localizations) {
@@ -203,7 +128,7 @@ class SpecStore {
         formattedField.extensions = FormatOptions(field.extensions);
       }
 
-      if(topLevel && field.for_title_types) {
+      if(topLevel && field.for_title_types && field.for_title_types.length > 0) {
         formattedField.for_title_types = field.for_title_types;
       }
 
