@@ -62,7 +62,7 @@ class SpecStore {
     });
 
     this.availableAssetTypes = config.asset_types || config.availableAssetTypes || DefaultSpec.availableAssetTypes;
-    this.availableTitleTypes = config.title_types || config.titleTypes || DefaultSpec.availableTitleTypes;
+    this.availableTitleTypes = config.title_types || config.availableTitleTypes || DefaultSpec.availableTitleTypes;
     this.infoFields = config.info_fields || config.infoFields || DefaultSpec.infoFields;
     this.associatedAssets = config.associated_assets || config.associatedAssets || DefaultSpec.associatedAssets;
     this.defaultImageKeys = config.default_image_keys || config.defaultImageKeys || DefaultSpec.defaultImageKeys;

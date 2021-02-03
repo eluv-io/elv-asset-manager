@@ -6,7 +6,7 @@ const eventSiteSelectorSpec = {
     "primary",
   ],
   availableTitleTypes: [
-    "site"
+    "site-selector"
   ],
   infoFields: [
     {
