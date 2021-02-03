@@ -3,6 +3,8 @@ import {DateTime} from "luxon";
 import {ElvClient} from "@eluvio/elv-client-js";
 import UrlJoin from "url-join";
 
+import DefaultSpec from "../specs/Default";
+
 require("elv-components-js/src/utils/LimitedMap");
 
 // Incremental numerical IDs
@@ -231,9 +233,8 @@ class FormStore {
 
   InitializeSpec() {
     const config = this.rootStore.titleConfiguration;
-    const defaults = this.rootStore.specStore.defaultSpec;
 
-    const controls = config.controls || defaults.controls;
+    const controls = config.controls || DefaultSpec.controls;
     this.fileControls = controls
       .filter(control => typeof control === "object")
       .map(control => {
@@ -242,12 +243,12 @@ class FormStore {
       });
     this.controls = controls;
 
-    this.availableAssetTypes = config.asset_types || defaults.availableAssetTypes;
-    this.availableTitleTypes = config.title_types || defaults.availableTitleTypes;
-    this.infoFields = config.info_fields || defaults.infoFields;
+    this.availableAssetTypes = config.asset_types || DefaultSpec.availableAssetTypes;
+    this.availableTitleTypes = config.title_types || DefaultSpec.availableTitleTypes;
+    this.infoFields = config.info_fields || DefaultSpec.infoFields;
     this.infoFieldLocalizations = config.info_field_localizations;
-    this.associatedAssets = config.associated_assets || defaults.associatedAssets;
-    this.defaultImageKeys = config.default_image_keys || defaults.defaultImageKeys;
+    this.associatedAssets = config.associated_assets || DefaultSpec.associatedAssets;
+    this.defaultImageKeys = config.default_image_keys || DefaultSpec.defaultImageKeys;
 
     this.localization = config.localization;
   }
