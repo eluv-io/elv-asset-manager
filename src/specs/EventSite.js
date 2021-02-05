@@ -45,15 +45,15 @@ const eventSiteSpec = {
     {
       "fields": [
         {
-          "name": "artist",
+          "name": "event_header",
+          "type": "text"
+        },
+        {
+          "name": "event_subheader",
           "type": "text"
         },
         {
           "name": "event_title",
-          "type": "text"
-        },
-        {
-          "name": "event_header",
           "type": "text"
         },
         {
