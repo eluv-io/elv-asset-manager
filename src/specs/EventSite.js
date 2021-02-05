@@ -1,9 +1,7 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 
 const eventSiteSpec = {
-  controls: [
-    "images"
-  ],
+  controls: [],
   availableAssetTypes: [
     "primary"
   ],
@@ -76,6 +74,7 @@ const eventSiteSpec = {
     },
     {
       "fields": [
+        /*
         {
           "name": "intro",
           "type": "textarea"
@@ -114,6 +113,8 @@ const eventSiteSpec = {
           "name": "bio",
           "type": "subsection"
         },
+
+         */
         {
           "fields": [
             {
@@ -178,6 +179,7 @@ const eventSiteSpec = {
           "name": "name",
           "type": "text"
         },
+        /*
         {
           "name": "footer_text",
           "type": "text"
@@ -186,6 +188,8 @@ const eventSiteSpec = {
           "name": "stream_text",
           "type": "text"
         },
+
+         */
         {
           "extensions": imageTypes,
           "name": "image",
@@ -245,6 +249,7 @@ const eventSiteSpec = {
           "type": "text"
         },
         {
+          "label": "PayPal Client ID",
           "name": "paypal_client_id",
           "type": "text"
         }
@@ -280,7 +285,7 @@ const eventSiteSpec = {
               "type": "text"
             },
             {
-              "label": "OTP ID",
+              "label": "NTP ID",
               "name": "otp_id",
               "type": "text"
             },
@@ -369,7 +374,7 @@ const eventSiteSpec = {
           "type": "textarea"
         },
         {
-          "label": "OTP ID",
+          "label": "NTP ID",
           "name": "otp_id",
           "type": "text"
         },
