@@ -45,6 +45,11 @@ const eventSiteSpec = {
     {
       "fields": [
         {
+          "extensions": imageTypes,
+          "name": "event_logo",
+          "type": "file"
+        },
+        {
           "name": "event_header",
           "type": "text"
         },

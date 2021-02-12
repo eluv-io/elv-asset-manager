@@ -139,7 +139,7 @@ class ChannelStore {
       metadataSubtree: "public/asset_metadata",
       metadata: {
         sources: {
-          default: this.rootStore.formStore.CreateLink(streamHash, "/meta/public/asset_metadata/sources/default")
+          default: this.rootStore.formStore.CreateLink({targetHash: streamHash, linkTarget: "/meta/public/asset_metadata/sources/default"})
         }
       }
     });
@@ -149,7 +149,7 @@ class ChannelStore {
       objectId,
       writeToken,
       metadataSubtree: "public/asset_metadata/channel_info/stream",
-      metadata: this.rootStore.formStore.CreateLink(streamHash, "/meta/public/asset_metadata/sources/default")
+      metadata: this.rootStore.formStore.CreateLink({targetHash: streamHash, linkTarget: "/meta/public/asset_metadata/sources/default"})
     });
 
     if(finalize) {
@@ -318,8 +318,8 @@ class ChannelStore {
           // Image is file specifier (loaded from schedule import). Make link
           image = {
             file: program.program_image,
-            default: this.rootStore.formStore.CreateLink(null, UrlJoin("files", program.program_image)),
-            thumbnail: this.rootStore.formStore.CreateLink(null, UrlJoin("rep", "thumbnail", "files", program.program_image))
+            default: this.rootStore.formStore.CreateLink({linkTarget: UrlJoin("files", program.program_image)}),
+            thumbnail: this.rootStore.formStore.CreateLink({linkTarget: UrlJoin("rep", "thumbnail", "files", program.program_image)})
           };
         }
 

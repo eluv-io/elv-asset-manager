@@ -307,10 +307,10 @@ class SiteArrangementEntry extends React.Component {
                         imagePath,
                         path,
                         ...(
-                          this.props.formStore.CreateLink(
+                          this.props.formStore.CreateLink({
                             targetHash,
-                            UrlJoin("files", imagePath)
-                          )
+                            linkTarget: UrlJoin("files", imagePath)
+                          })
                         )
                       }
                     }

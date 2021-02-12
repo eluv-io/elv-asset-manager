@@ -155,18 +155,24 @@ class FormStore {
     return !!this.controls.find(c => typeof c === "string" ? control === c : c.type === control);
   }
 
-  CreateLink(versionHash, linkTarget="/meta/public/asset_metadata", options={}) {
-    if(!versionHash || versionHash === this.rootStore.params.versionHash) {
+  CreateLink({targetHash, linkTarget="/meta/public/asset_metadata", options={}}) {
+    if(!targetHash || targetHash === this.rootStore.params.versionHash) {
       return {
         ...options,
-        ".": {"auto_update":{"tag":"latest"}},
+        ".": {
+          ...(options["."] || {}),
+          "auto_update":{"tag":"latest"}
+        },
         "/": UrlJoin("./", linkTarget)
       };
     } else {
       return {
         ...options,
-        ".": {"auto_update":{"tag":"latest"}},
-        "/": UrlJoin("/qfab", versionHash, linkTarget)
+        ".": {
+          ...(options["."] || {}),
+          "auto_update":{"tag":"latest"}
+        },
+        "/": UrlJoin("/qfab", targetHash, linkTarget)
       };
     }
   }
@@ -762,6 +768,7 @@ class FormStore {
           const asset = {
             versionHash: targetHash,
             isDefault: false,
+            originalLink: hasSlug ? metadata[key][slug] : metadata[key],
             ...this.targets[targetHash]
           };
 
@@ -1105,8 +1112,8 @@ class FormStore {
     let index = hasDefault ? 1 : 0;
 
     await Promise.all(
-      (assets || []).map(async ({displayTitle, versionHash, isDefault, slug}) => {
-        const link = this.CreateLink(versionHash);
+      (assets || []).map(async ({displayTitle, versionHash, isDefault, slug, originalLink={}}) => {
+        const link = this.CreateLink({targetHash: versionHash, options: originalLink});
 
         let key;
         if(isDefault) {
@@ -1130,11 +1137,11 @@ class FormStore {
             };
           } else {
             if(key === "default") {
-              formattedAssets.default = this.CreateLink(
-                this.rootStore.params.versionHash,
-                `/meta/public/asset_metadata/${assetType.name}/${slug}`,
-                { order: 0 }
-              );
+              formattedAssets.default = this.CreateLink({
+                targetHash: this.rootStore.params.versionHash,
+                linkTarget: `/meta/public/asset_metadata/${assetType.name}/${slug}`,
+                options: { order: 0 },
+              });
               link.order = 0;
             } else {
               link.order = key;
@@ -1188,7 +1195,7 @@ class FormStore {
         value = this.FormatDate(values[name], true);
       } else if(type === "file") {
         if(values[name].path) {
-          value = this.CreateLink(values[name].targetHash, UrlJoin("files", values[name].path));
+          value = this.CreateLink({targetHash: values[name].targetHash, linkTarget: UrlJoin("files", values[name].path)});
         }
       } else if(type === "subsection") {
         value = this.FormatFields({infoFields: fields, values: values[name], titleType}).info;
@@ -1331,8 +1338,8 @@ class FormStore {
           }
 
           images[imageKey] = {
-            default: this.CreateLink(targetHash, UrlJoin("files", imagePath)),
-            thumbnail: this.CreateLink(targetHash, UrlJoin("rep", "thumbnail", "files", imagePath))
+            default: this.CreateLink({targetHash, linkTarget: UrlJoin("files", imagePath)}),
+            thumbnail: this.CreateLink({targetHash, linkTarget: UrlJoin("rep", "thumbnail", "files", imagePath)})
           };
         });
 
@@ -1420,11 +1427,11 @@ class FormStore {
             let file;
             if(control.thumbnail) {
               file = {
-                default: this.CreateLink(targetHash, UrlJoin("files", path)),
-                thumbnail: this.CreateLink(targetHash, UrlJoin("rep", "thumbnail", "files", path))
+                default: this.CreateLink({targetHash, linkTarget: UrlJoin("files", path)}),
+                thumbnail: this.CreateLink({targetHash, linkTarget: UrlJoin("rep", "thumbnail", "files", path)})
               };
             } else {
-              file = this.CreateLink(targetHash, UrlJoin("files", path));
+              file = this.CreateLink({targetHash, linkTarget: UrlJoin("files", path)});
             }
 
             items[index.toString()] = {
@@ -1454,15 +1461,24 @@ class FormStore {
         let siteCustomization = {...toJS(this.siteCustomization)};
 
         if(siteCustomization.logo && siteCustomization.logo.targetHash && siteCustomization.logo.imagePath) {
-          siteCustomization.logo = this.CreateLink(siteCustomization.logo.targetHash, UrlJoin("files", siteCustomization.logo.imagePath));
+          siteCustomization.logo = this.CreateLink({
+            targetHash: siteCustomization.logo.targetHash,
+            linkTarget: UrlJoin("files", siteCustomization.logo.imagePath)
+          });
         }
 
         if(siteCustomization.dark_logo && siteCustomization.dark_logo.targetHash && siteCustomization.dark_logo.imagePath) {
-          siteCustomization.dark_logo = this.CreateLink(siteCustomization.dark_logo.targetHash, UrlJoin("files", siteCustomization.dark_logo.imagePath));
+          siteCustomization.dark_logo = this.CreateLink({
+            targetHash: siteCustomization.dark_logo.targetHash,
+            linkTarget: UrlJoin("files", siteCustomization.dark_logo.imagePath)
+          });
         }
 
         if(siteCustomization.background_image && siteCustomization.background_image.targetHash && siteCustomization.background_image.imagePath) {
-          siteCustomization.background_image = this.CreateLink(siteCustomization.background_image.targetHash, UrlJoin("files", siteCustomization.background_image.imagePath));
+          siteCustomization.background_image = this.CreateLink({
+            targetHash: siteCustomization.background_image.targetHash,
+            linkTarget: UrlJoin("files", siteCustomization.background_image.imagePath)
+          });
         }
 
         siteCustomization.arrangement = this.siteCustomization.arrangement.map(entry => {
@@ -1473,7 +1489,7 @@ class FormStore {
             entry.name = "playlist";
             delete entry.playlistId;
           } else if(entry.title) {
-            entry.title = this.CreateLink(entry.title.versionHash);
+            entry.title = this.CreateLink({targetHash: entry.title.versionHash});
           }
 
           return entry;
@@ -1488,7 +1504,7 @@ class FormStore {
             let price = parseFloat(this.siteCustomization.premiere.price);
             price = isNaN(price) ? "0.00" : price.toFixed(2);
 
-            siteCustomization.premiere.title = this.CreateLink(siteCustomization.premiere.title.versionHash);
+            siteCustomization.premiere.title = this.CreateLink({targetHash: siteCustomization.premiere.title.versionHash});
             siteCustomization.premiere.premieresAt = this.FormatDate(siteCustomization.premiere.premieresAt || Date.now(), true);
             siteCustomization.premiere.price = price;
           }
