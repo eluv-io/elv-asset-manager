@@ -45,11 +45,6 @@ const eventSiteSpec = {
     {
       "fields": [
         {
-          "extensions": imageTypes,
-          "name": "event_logo",
-          "type": "file"
-        },
-        {
           "name": "event_header",
           "type": "text"
         },
@@ -75,6 +70,27 @@ const eventSiteSpec = {
         }
       ],
       "name": "event_info",
+      "type": "subsection"
+    },
+    {
+      "fields": [
+        {
+          "extensions": imageTypes,
+          "name": "hero_background",
+          "type": "file"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "header",
+          "type": "file"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "poster",
+          "type": "file"
+        }
+      ],
+      "name": "event_images",
       "type": "subsection"
     },
     {
@@ -160,22 +176,6 @@ const eventSiteSpec = {
         }
       ],
       "name": "artist_info",
-      "type": "subsection"
-    },
-    {
-      "fields": [
-        {
-          "extensions": imageTypes,
-          "name": "hero_background",
-          "type": "file"
-        },
-        {
-          "extensions": imageTypes,
-          "name": "poster",
-          "type": "file"
-        }
-      ],
-      "name": "event_images",
       "type": "subsection"
     },
     {

@@ -1196,6 +1196,8 @@ class FormStore {
       } else if(type === "file") {
         if(values[name].path) {
           value = this.CreateLink({targetHash: values[name].targetHash, linkTarget: UrlJoin("files", values[name].path)});
+        } else {
+          value = null;
         }
       } else if(type === "subsection") {
         value = this.FormatFields({infoFields: fields, values: values[name], titleType}).info;
