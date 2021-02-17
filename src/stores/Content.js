@@ -173,7 +173,6 @@ class ContentStore {
     if(!this.playoutOptions[versionHash]) {
       this.playoutOptions[versionHash] = (yield this.rootStore.client.PlayoutOptions({
         versionHash,
-        linkPath: "public/asset_metadata/sources/default",
         protocols: ["hls"],
         drms: ["aes-128"]
       }));

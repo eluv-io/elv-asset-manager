@@ -1,6 +1,5 @@
 import {action, observable, flow, toJS, computed} from "mobx";
 import {Settings, DateTime} from "luxon";
-import UrlJoin from "url-join";
 
 class ChannelStore {
   @observable streamLibraryId;
@@ -139,7 +138,10 @@ class ChannelStore {
       metadataSubtree: "public/asset_metadata",
       metadata: {
         sources: {
-          default: this.rootStore.formStore.CreateLink({targetHash: streamHash, linkTarget: "/meta/public/asset_metadata/sources/default"})
+          default: this.rootStore.formStore.CreateLink({
+            targetHash: streamHash,
+            linkTarget: "/rep/playout/default/options.json"
+          })
         }
       }
     });
@@ -149,7 +151,10 @@ class ChannelStore {
       objectId,
       writeToken,
       metadataSubtree: "public/asset_metadata/channel_info/stream",
-      metadata: this.rootStore.formStore.CreateLink({targetHash: streamHash, linkTarget: "/meta/public/asset_metadata/sources/default"})
+      metadata: this.rootStore.formStore.CreateLink({
+        targetHash: streamHash,
+        linkTarget: "/rep/playout/default/options.json"
+      })
     });
 
     if(finalize) {
@@ -159,18 +164,24 @@ class ChannelStore {
 
   @action.bound
   RetrieveStreamInfo = flow(function * ({streamLibraryId, streamId}) {
-    this.streamInfo = (yield this.rootStore.client.ContentObjectMetadata({
+    const streamInfo = (yield this.rootStore.client.ContentObjectMetadata({
       libraryId: streamLibraryId,
       objectId: streamId,
-      metadataSubtree: "public/asset_metadata"
+      metadataSubtree: "public",
+      select: ["name", "asset_metadata"]
     })) || {};
 
+    this.streamInfo = { ...(streamInfo.asset_metadata || {}), name: streamInfo.name };
 
     this.streamInfo.originUrl = yield this.rootStore.client.ContentObjectMetadata({
       libraryId: streamLibraryId,
       objectId: streamId,
       metadataSubtree: "origin_url"
     });
+
+    if(this.streamInfo.originUrl === "undefined") {
+      this.streamInfo.originUrl = "";
+    }
 
     this.streamLibraryId = streamLibraryId;
     this.streamId = streamId;
@@ -310,6 +321,7 @@ class ChannelStore {
     const client = this.rootStore.client;
     const {libraryId, objectId} = this.rootStore.params;
 
+    /*
     let schedule = {};
     Object.keys(this.dailySchedule).map(date => {
       schedule[date] = this.dailySchedule[date].map(program => {
@@ -335,16 +347,15 @@ class ChannelStore {
       });
     });
 
+     */
+
     yield client.ReplaceMetadata({
       libraryId,
       objectId,
       writeToken,
       metadataSubtree: "public/asset_metadata/channel_info",
       metadata: {
-        stream_id: this.streamId,
-        schedule: {
-          daily_schedules: toJS(schedule)
-        }
+        stream_id: this.streamId
       }
     });
 

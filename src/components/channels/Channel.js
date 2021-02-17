@@ -4,7 +4,7 @@ import {Action, Confirm, IconButton, ImageIcon, Modal} from "elv-components-js";
 
 import VideoPreview from "../VideoPreview";
 import ContentBrowser from "../ContentBrowser";
-import Schedule from "./Schedule";
+//import Schedule from "./Schedule";
 
 import StreamActive from "../../static/icons/video.svg";
 import StreamInactive from "../../static/icons/video-off.svg";
@@ -141,7 +141,7 @@ class StreamInfo extends React.Component {
           </div>
           <div className="light">{ this.props.channelStore.streamStatus.status }</div>
           <div className="light">{ this.props.channelStore.streamId }</div>
-          <div className="light">{ info.originUrl }</div>
+          <div className="light">{ info.originUrl || "" }</div>
           <div className="stream-actions">
             { this.ToggleStream() }
             { previewStreamButton }
@@ -177,7 +177,6 @@ class Channel extends React.Component {
         </h3>
 
         <StreamInfo />
-        <Schedule />
       </div>
     );
   }

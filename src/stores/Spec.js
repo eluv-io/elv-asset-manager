@@ -27,6 +27,7 @@ const Duplicates = (values) =>
     .filter((value, index, self) => value && self.indexOf(value) !== index);
 
 class SpecStore {
+  @observable profile;
   @observable controls = {};
   @observable fileControlItems = {};
   @observable availableAssetTypes = [];
@@ -46,6 +47,8 @@ class SpecStore {
   @action.bound
   InitializeSpec(profile) {
     const config = profile || this.rootStore.titleConfiguration;
+
+    this.profile = profile ? { name: profile.name, version: profile.version } : config.profile;
 
     this.controls = {};
     (config.controls || DefaultSpec.controls).forEach(control => {
@@ -141,6 +144,10 @@ class SpecStore {
         formattedField.fields = infoFields;
 
         infoFieldErrors = infoFieldErrors.concat(errors);
+
+        if(field.tight) {
+          formattedField.tight = true;
+        }
       }
 
       return formattedField;
@@ -164,6 +171,7 @@ class SpecStore {
 
       let titleConfiguration = {
         ...toJS(this.rootStore.titleConfiguration || {}),
+        profile: toJS(this.profile),
         asset_types: toJS(FormatOptions(this.availableAssetTypes)),
         title_types: toJS(FormatOptions(this.availableTitleTypes)),
         associated_assets: toJS(this.associatedAssets),

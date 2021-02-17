@@ -1254,15 +1254,6 @@ class FormStore {
         throw Error("Update request denied");
       }
 
-      if(this.HasControl("live_stream")) {
-        yield this.rootStore.liveStore.SaveLiveParameters({writeToken});
-      }
-
-      if(this.HasControl("channel")) {
-        yield this.rootStore.channelStore.SaveChannelInfo({writeToken});
-      }
-
-
       // Localizable data
       let localizationKeys = [["", "", ""]];
       for(let l0 of Object.keys(this.localizedData)) {
@@ -1519,6 +1510,14 @@ class FormStore {
           metadataSubtree: "public/asset_metadata/site_customization",
           metadata: siteCustomization
         });
+      }
+
+      if(this.HasControl("live_stream")) {
+        yield this.rootStore.liveStore.SaveLiveParameters({writeToken});
+      }
+
+      if(this.HasControl("channel")) {
+        yield this.rootStore.channelStore.SaveChannelInfo({writeToken});
       }
 
       if(!commit) {

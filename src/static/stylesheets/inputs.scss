@@ -68,7 +68,9 @@
   position: relative;
 
   & > .file-path {
+    @include elv-ellipsis;
     flex-grow: 1;
+    max-width: 100%;
     padding: 0 $elv-spacing-xs;
 
     &.empty {
@@ -124,6 +126,27 @@
     &:not(.subsection-field) {
       &.even {
         border: 1px solid $elv-color-lightgray;
+      }
+    }
+
+    &.tight {
+      display: grid;
+      grid-column-gap: 1rem;
+      grid-template-columns: 1fr 1fr;
+
+      .-elv-input {
+        grid-template-columns: 5rem 1fr;
+      }
+
+      label {
+        width: 5rem;
+      }
+
+      input,
+      select,
+      textarea {
+        max-width: 10rem;
+        min-width: 10rem;
       }
     }
 

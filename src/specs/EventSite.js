@@ -1,6 +1,8 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 
 const eventSiteSpec = {
+  name: "Event Site",
+  version: "0.1",
   controls: [],
   availableAssetTypes: [
     "primary"
@@ -88,6 +90,18 @@ const eventSiteSpec = {
           "extensions": imageTypes,
           "name": "poster",
           "type": "file"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "tv_main_background",
+          "type": "file",
+          "label": "Main Background (TV)"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "tv_main_logo",
+          "type": "file",
+          "label": "Main Logo (TV)"
         }
       ],
       "name": "event_images",
@@ -316,6 +330,7 @@ const eventSiteSpec = {
                   "type": "select"
                 }
               ],
+              "tight": true,
               "name": "price",
               "type": "subsection"
             },
@@ -371,10 +386,6 @@ const eventSiteSpec = {
           "type": "text"
         },
         {
-          "name": "heading",
-          "type": "text"
-        },
-        {
           "name": "description",
           "type": "textarea"
         },
@@ -418,6 +429,7 @@ const eventSiteSpec = {
                   "type": "select"
                 }
               ],
+              "tight": true,
               "name": "price",
               "type": "subsection"
             },

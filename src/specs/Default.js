@@ -1,4 +1,6 @@
 const defaultSpec = {
+  name: "Default",
+  version: "0.1",
   controls: [
     "images",
     "playlists"

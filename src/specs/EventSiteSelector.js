@@ -1,4 +1,6 @@
 const eventSiteSelectorSpec = {
+  name: "Event Site Selector",
+  version: "0.1",
   controls: [
     "images",
   ],

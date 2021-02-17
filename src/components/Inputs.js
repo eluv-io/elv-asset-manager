@@ -90,7 +90,7 @@ let InfoField = ({field, entry, Update, localization={}, textAddButton=false}) =
         label={hintLabel || field.label || FormatName(field.name)}
         key={`input-${name}-${field.name}`}
       >
-        <div className="list-field subsection-field list-field-entry even" title={field.label || FormatName(field.name)}>
+        <div className={`list-field subsection-field list-field-entry even ${field.tight ? "tight" : ""}`} title={field.label || FormatName(field.name)}>
           {
             field.fields.map((subField, index) => (
               <InfoField
