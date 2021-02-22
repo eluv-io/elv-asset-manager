@@ -20,13 +20,14 @@ import {
 import OrderButtons from "./OrderButtons";
 import FileSelection from "./FileBrowser";
 import PreviewIcon from "./PreviewIcon";
+import Utils from "@eluvio/elv-client-js/src/Utils";
 
 import AddIcon from "../static/icons/plus-square.svg";
 import DeleteIcon from "../static/icons/trash.svg";
 import HintIcon from "../static/icons/help-circle.svg";
 import FileIcon from "../static/icons/file.svg";
 
-let InfoField = ({field, entry, Update, localization={}, textAddButton=false}) => {
+let InfoField = ({HEAD, field, entry, Update, localization={}, textAddButton=false}) => {
   const hintLabel = field.hint ? HintLabel({label: field.label, name: field.name, hint: field.hint, required: field.required}) : null;
 
   if(field.type === "textarea") {
@@ -76,14 +77,20 @@ let InfoField = ({field, entry, Update, localization={}, textAddButton=false}) =
     return (
       <MultiSelect
         key={`input-${name}-${field.name}`}
-        name={field.name}
-        label={hintLabel || field.label}
+        name={field.label || FormatName(field.name)}
+        label={hintLabel || field.label || FormatName(field.name)}
         values={entry[field.name] || []}
         options={localization.options || field.options}
         onChange={newValue => Update(field.name, newValue)}
       />
     );
-  } else if(field.type === "subsection") {
+  } else if(field.type === "subsection" || field.type === "reference_subsection") {
+    let fields = field.fields;
+    if(field.type === "reference_subsection") {
+      fields = (Utils.SafeTraverse(HEAD || {}, ...(field.reference.split("/"))) || [])
+        .map(name => ({name, type: field.value_type || ""}));
+    }
+
     return (
       <LabelledField
         className="list-field-container subsection-field-container"
@@ -92,8 +99,9 @@ let InfoField = ({field, entry, Update, localization={}, textAddButton=false}) =
       >
         <div className={`list-field subsection-field list-field-entry even ${field.tight ? "tight" : ""}`} title={field.label || FormatName(field.name)}>
           {
-            field.fields.map((subField, index) => (
+            fields.map((subField, index) => (
               <InfoField
+                HEAD={HEAD}
                 key={`input-${name}-${field.name}-${subField.name}-${index}`}
                 field={subField}
                 entry={entry[field.name]}
@@ -113,6 +121,7 @@ let InfoField = ({field, entry, Update, localization={}, textAddButton=false}) =
   } else if(field.type === "list") {
     return (
       <ListField
+        HEAD={HEAD}
         orderable
         key={`input-${name}-${field.name}`}
         name={field.name}
@@ -237,6 +246,7 @@ const InitializeField = ({fields, defaultValue}) => {
 };
 
 let ListField = ({
+  HEAD,
   name,
   label,
   values,
@@ -309,6 +319,7 @@ let ListField = ({
 
           return (
             <InfoField
+              HEAD={HEAD}
               key={`entry-field-${index}-${field.name}`}
               field={field}
               entry={entry || {}}

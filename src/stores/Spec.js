@@ -123,12 +123,25 @@ class SpecStore {
         formattedField.hint = field.hint;
       }
 
+      if(field.default_value) {
+        formattedField.default_value = field.default_value;
+      }
+
       if(["select", "multiselect"].includes(field.type)) {
         formattedField.options = FormatOptions(field.options);
       }
 
       if(field.type === "file") {
         formattedField.extensions = FormatOptions(field.extensions);
+      }
+
+      if(field.type === "reference_subsection") {
+        if(!field.reference) {
+          infoFieldErrors.push(`${field.name} is missing a reference`);
+        }
+
+        formattedField.reference = field.reference;
+        formattedField.value_type = field.value_type;
       }
 
       if(topLevel && field.for_title_types && field.for_title_types.length > 0) {

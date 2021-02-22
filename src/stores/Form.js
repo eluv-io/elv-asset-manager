@@ -552,11 +552,11 @@ class FormStore {
 
   LoadInfoFields({infoFields, values, isTopLevel=false, topLevelValues}) {
     let info = {};
-    infoFields.forEach(({name, type, top_level, fields}) => {
+    infoFields.forEach(({name, type, default_value, top_level, fields}) => {
       if(isTopLevel && top_level) {
-        info[name] = topLevelValues[name] || "";
+        info[name] = topLevelValues[name] || default_value || "";
       } else {
-        info[name] = values[name] || "";
+        info[name] = values[name] || default_value || "";
       }
 
       if((type === "date" || type === "datetime") && info[name]) {

@@ -78,7 +78,8 @@ class Info extends React.Component {
       "date",
       "datetime",
       "subsection",
-      "list"
+      "list",
+      "reference_subsection"
     ];
 
     const UpdateFields = (index, newFields) => {
@@ -104,6 +105,8 @@ class Info extends React.Component {
           {name: "type", type: "select", options: types, default: types[0]},
           {name: "options", type: "list", only: entry => ["select", "multiselect"].includes(entry.type)},
           {name: "extensions", type: "list", only: entry => entry.type === "file"},
+          {name: "reference", only: entry => entry.type === "reference_subsection"},
+          {name: "value_type", type: "select", options: types, default: types[0], only: entry => entry.type === "reference_subsection"},
           {
             name: "fields",
             type: "list",
