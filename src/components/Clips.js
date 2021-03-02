@@ -164,7 +164,7 @@ class Clips extends React.Component {
           OnClickOutside={this.CloseModal}
         >
           <ContentBrowser
-            header="Clip Selection"
+            header={`Select ${this.props.name}`}
             titleTypes={this.props.titleTypes}
             assetTypes={this.props.assetTypes}
             onComplete={this.AddClip}

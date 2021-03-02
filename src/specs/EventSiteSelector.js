@@ -10,23 +10,7 @@ const eventSiteSelectorSpec = {
   availableTitleTypes: [
     "site-selector"
   ],
-  infoFields: [
-    {
-      "fields": [
-        {
-          "name": "question",
-          "type": "textarea"
-        },
-        {
-          "name": "answer",
-          "type": "textarea"
-        }
-      ],
-      "label": "FAQ",
-      "name": "faq",
-      "type": "list"
-    }
-  ],
+  infoFields: [],
   localizations: [],
   fileControls: [],
   fileControlItems: {},
