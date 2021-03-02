@@ -487,7 +487,7 @@ const eventSiteSpec = {
             {
               "name": "price",
               "type": "reference_subsection",
-              "reference": "payment_currencies",
+              "reference": "/payment_currencies",
               "value_type": "number",
               "hint": "Available price currencies are based on the 'Payment Currencies' field above",
             },
@@ -563,50 +563,68 @@ const eventSiteSpec = {
           "type": "list"
         },
         {
+          "name": "price",
+          "type": "reference_subsection",
+          "reference": "/payment_currencies",
+          "value_type": "number",
+          "hint": "Available price currencies are based on the 'Payment Currencies' field above",
+        },
+        {
+          "name": "featured",
+          "type": "checkbox",
+          "hint": "A featured item will be shown at checkout."
+        },
+        {
           "fields": [
             {
-              "name": "label",
-              "type": "text"
+              "name": "name",
             },
             {
-              "name": "price",
-              "type": "reference_subsection",
-              "reference": "payment_currencies",
-              "value_type": "number",
-              "hint": "Available price currencies are based on the 'Payment Currencies' field above",
-            },
+              "name": "type",
+              "type": "select",
+              "options": [
+                "text",
+                "color",
+                "number"
+              ]
+            }
+          ],
+          "hint": "Specify the characteristics each variation of this product has, for example 'Size' and 'Color'",
+          "name": "option_fields",
+          "type": "list"
+        },
+        {
+          "name": "product_options",
+          "type": "reference_list",
+          "reference": "./option_fields"
+        },
+        {
+          "fields": [
             {
               "fields": [
                 {
-                  "fields": [
-                    {
-                      "label": "Price ID",
-                      "name": "price_id",
-                      "type": "text"
-                    },
-                    {
-                      "label": "Product ID",
-                      "name": "product_id",
-                      "type": "text"
-                    },
-                    {
-                      "label": "SKU ID",
-                      "name": "sku_id",
-                      "type": "text"
-                    }
-                  ],
-                  "name": "stripe",
-                  "type": "subsection"
+                  "label": "Price ID",
+                  "name": "price_id",
+                  "type": "text"
+                },
+                {
+                  "label": "Product ID",
+                  "name": "product_id",
+                  "type": "text"
+                },
+                {
+                  "label": "SKU ID",
+                  "name": "sku_id",
+                  "type": "text"
                 }
               ],
-              "label": "Payment IDs",
-              "name": "payment_ids",
+              "name": "stripe",
               "type": "subsection"
             }
           ],
-          "label": "SKUs",
-          "name": "skus",
-          "type": "list"
+          "label": "Payment IDs",
+          "name": "payment_ids",
+          "type": "subsection"
         }
       ],
       "name": "products",

@@ -21,13 +21,35 @@ import OrderButtons from "./OrderButtons";
 import FileSelection from "./FileBrowser";
 import PreviewIcon from "./PreviewIcon";
 import Utils from "@eluvio/elv-client-js/src/Utils";
+import UrlJoin from "url-join";
 
 import AddIcon from "../static/icons/plus-square.svg";
 import DeleteIcon from "../static/icons/trash.svg";
 import HintIcon from "../static/icons/help-circle.svg";
 import FileIcon from "../static/icons/file.svg";
 
-let InfoField = ({HEAD, field, entry, Update, localization={}, textAddButton=false}) => {
+const ReferencePathElements = (PATH, reference) => {
+  let pathElements;
+  if(reference.startsWith("/")) {
+    pathElements = reference.split("/");
+  } else {
+    pathElements = PATH.split("/");
+
+    reference.split("/").forEach(element => {
+      if(element === ".") {
+        // No action
+      } else if(element === "..") {
+        pathElements = pathElements.slice(0, -1);
+      } else {
+        pathElements.push(element);
+      }
+    });
+  }
+
+  return pathElements.filter(e => e);
+};
+
+let InfoField = ({HEAD, PATH="", field, entry, Update, localization={}, textAddButton=false}) => {
   const hintLabel = field.hint ? HintLabel({label: field.label, name: field.name, hint: field.hint, required: field.required}) : null;
 
   if(field.type === "textarea") {
@@ -85,9 +107,13 @@ let InfoField = ({HEAD, field, entry, Update, localization={}, textAddButton=fal
       />
     );
   } else if(field.type === "subsection" || field.type === "reference_subsection") {
+    if(typeof entry[field.name] !== "object") {
+      Update(field.name, {});
+    }
+
     let fields = field.fields;
     if(field.type === "reference_subsection") {
-      fields = (Utils.SafeTraverse(HEAD || {}, ...(field.reference.split("/"))) || [])
+      fields = (Utils.SafeTraverse(HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || [])
         .map(name => ({name, type: field.value_type || ""}));
     }
 
@@ -102,11 +128,17 @@ let InfoField = ({HEAD, field, entry, Update, localization={}, textAddButton=fal
             fields.map((subField, index) => (
               <InfoField
                 HEAD={HEAD}
+                PATH={UrlJoin(PATH, field.name)}
                 key={`input-${name}-${field.name}-${subField.name}-${index}`}
                 field={subField}
                 entry={entry[field.name]}
                 Update={(_, newValue) => {
                   let newValues = toJS(entry[field.name]);
+
+                  if(typeof newValues !== "object") {
+                    newValues = {};
+                  }
+
                   newValues[subField.name] = newValue;
 
                   Update(field.name, newValues);
@@ -118,16 +150,23 @@ let InfoField = ({HEAD, field, entry, Update, localization={}, textAddButton=fal
         </div>
       </LabelledField>
     );
-  } else if(field.type === "list") {
+  } else if(field.type === "list" || field.type === "reference_list") {
+    let fields = field.fields;
+    if(field.type === "reference_list") {
+      fields = (Utils.SafeTraverse(HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || []);
+    }
+
     return (
       <ListField
         HEAD={HEAD}
+        PATH={UrlJoin(PATH, field.name)}
         orderable
         key={`input-${name}-${field.name}`}
         name={field.name}
-        label={hintLabel || field.label}
+        label={field.label}
+        hint={field.hint}
         values={entry[field.name] || []}
-        fields={field.fields}
+        fields={fields}
         Update={(name, newValues) => Update(field.name, newValues)}
         textAddButton={textAddButton}
       />
@@ -179,6 +218,35 @@ let InfoField = ({HEAD, field, entry, Update, localization={}, textAddButton=fal
               />
             )
           }
+        </div>
+      </LabelledField>
+    );
+  } else if(field.type === "color") {
+    if(!(entry[field.name] || {}).color) {
+      Update(field.name, {...(entry[field.name] || {label: ""}), color: "#000000"});
+    }
+
+    return (
+      <LabelledField
+        key={`input-${name}-${field.name}`}
+        label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
+      >
+        <div className="color-field">
+          <input
+            className="color-input"
+            type="color"
+            value={(entry[field.name] || {}).color || ""}
+            required={field.required}
+            onChange={event => Update(field.name, {...(entry[field.name] || {color: "", label: ""}), color: event.target.value})}
+          />
+          <input
+            className="color-label"
+            type="text"
+            placeholder="Color Label"
+            value={(entry[field.name] || {}).label || ""}
+            required={field.required}
+            onChange={event => Update(field.name, {...(entry[field.name] || {color: "", label: ""}), label: event.target.value})}
+          />
         </div>
       </LabelledField>
     );
@@ -247,6 +315,7 @@ const InitializeField = ({fields, defaultValue}) => {
 
 let ListField = ({
   HEAD,
+  PATH="",
   name,
   label,
   values,
@@ -320,6 +389,7 @@ let ListField = ({
           return (
             <InfoField
               HEAD={HEAD}
+              PATH={UrlJoin(PATH, index.toString())}
               key={`entry-field-${index}-${field.name}`}
               field={field}
               entry={entry || {}}

@@ -71,6 +71,7 @@ class Info extends React.Component {
       "textarea",
       "integer",
       "number",
+      "color",
       "checkbox",
       "select",
       "multiselect",
@@ -79,7 +80,8 @@ class Info extends React.Component {
       "datetime",
       "subsection",
       "list",
-      "reference_subsection"
+      "reference_subsection",
+      "reference_list"
     ];
 
     const UpdateFields = (index, newFields) => {
@@ -105,7 +107,7 @@ class Info extends React.Component {
           {name: "type", type: "select", options: types, default: types[0]},
           {name: "options", type: "list", only: entry => ["select", "multiselect"].includes(entry.type)},
           {name: "extensions", type: "list", only: entry => entry.type === "file"},
-          {name: "reference", only: entry => entry.type === "reference_subsection"},
+          {name: "reference", only: entry => ["reference_subsection", "reference_list"].includes(entry.type)},
           {name: "value_type", type: "select", options: types, default: types[0], only: entry => entry.type === "reference_subsection"},
           {
             name: "fields",

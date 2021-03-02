@@ -23,6 +23,26 @@
   .browser-filter {
     margin-bottom: $elv-spacing-xs;
     width: 100%;
+
+    &.browser-filter {
+      max-width: unset;
+      min-width: unset;
+    }
+  }
+
+  .lookup-container {
+    display: flex;
+    margin-bottom: $elv-spacing-m;
+
+    button {
+      margin-left: $elv-spacing-xs;
+      max-height: 32px;
+    }
+
+    input {
+      max-width: unset;
+      min-width: unset;
+    }
   }
 
   .browser-pagination {

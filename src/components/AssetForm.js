@@ -1,6 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {Action, Confirm, IconButton, Maybe, Tabs} from "elv-components-js";
+import {Action, Confirm, FormatName, IconButton, Maybe, Tabs} from "elv-components-js";
 import Clips from "./Clips";
 import Images from "./Images";
 import AssetInfo from "./AssetInfo";
@@ -159,7 +159,7 @@ class AssetForm extends React.Component {
 
     // Inject relevant assets
     this.props.formStore.relevantAssociatedAssets.forEach(({label, name}) => {
-      tabs.push([label, name]);
+      tabs.push([label || FormatName(name), name]);
     });
 
     tabs.push(["Images", "IMAGES"]);
@@ -233,8 +233,8 @@ class AssetForm extends React.Component {
     return (
       <Clips
         storeKey={assetType.name}
-        header={assetType.label}
-        name={assetType.label}
+        header={assetType.label || FormatName(assetType.name)}
+        name={assetType.label || FormatName(assetType.name)}
         assetTypes={assetType.asset_types}
         titleTypes={assetType.title_types}
         defaultable={(assetType.indexed || assetType.slugged) && assetType.defaultable}

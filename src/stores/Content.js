@@ -180,6 +180,66 @@ class ContentStore {
 
     return versionHash;
   });
+
+  @action.bound
+  LookupContent = flow(function * (contentId) {
+    const client = this.rootStore.client;
+
+    contentId = contentId.replace(/ /g, "");
+
+    if(!contentId) { return; }
+
+    try {
+      let libraryId, objectId, versionHash, accessType;
+      if(contentId.startsWith("ilib")) {
+        libraryId = contentId;
+        accessType = "library";
+      } else if(contentId.startsWith("hq__")) {
+        objectId = client.utils.DecodeVersionHash(contentId).objectId;
+        versionHash = contentId;
+      } else if(contentId.startsWith("iq__")) {
+        objectId = contentId;
+      } else if(contentId.startsWith("0x")) {
+        const id = client.utils.AddressToObjectId(contentId);
+        accessType = yield client.AccessType({id});
+
+        if(accessType === "library") {
+          libraryId = client.utils.AddressToLibraryId(contentId);
+        } else {
+          objectId = id;
+        }
+      } else {
+        objectId = client.utils.AddressToObjectId(client.utils.HashToAddress(contentId));
+      }
+
+      if(objectId && !libraryId) {
+        libraryId = yield client.ContentObjectLibraryId({objectId});
+      }
+
+      if(!accessType) {
+        accessType = yield client.AccessType({id: objectId});
+      }
+
+      if(accessType === "library") {
+        return { libraryId };
+      } else if(accessType === "object") {
+        if(!versionHash) {
+          versionHash = yield client.LatestVersionHash({objectId});
+        }
+
+        return { libraryId, objectId, versionHash };
+      }
+
+      throw "Invalid content ID";
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to look up ID:");
+      // eslint-disable-next-line no-console
+      console.error(error);
+
+      return { error: "Invalid content ID" };
+    }
+  });
 }
 
 export default ContentStore;

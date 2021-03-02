@@ -1200,7 +1200,7 @@ class FormStore {
           value = null;
         }
       } else if(type === "subsection") {
-        value = this.FormatFields({infoFields: fields, values: values[name], titleType}).info;
+        value = this.FormatFields({infoFields: fields, values: values[name], titleType}).info || {};
       } else if(type === "list") {
         value = (value || []).map(entry => {
           entry = toJS(entry);
@@ -1209,7 +1209,7 @@ class FormStore {
             return entry;
           }
 
-          return (this.FormatFields({infoFields: fields, values: entry, titleType})).info;
+          return (this.FormatFields({infoFields: fields, values: entry, titleType})).info || [];
         });
       }
 

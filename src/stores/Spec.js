@@ -135,7 +135,7 @@ class SpecStore {
         formattedField.extensions = FormatOptions(field.extensions);
       }
 
-      if(field.type === "reference_subsection") {
+      if(field.type === "reference_subsection" || field.type === "reference_list") {
         if(!field.reference) {
           infoFieldErrors.push(`${field.name} is missing a reference`);
         }

@@ -5,11 +5,13 @@ import {inject, observer} from "mobx-react";
 import DefaultSpec from "../../specs/Default";
 import EventSiteSelectorSpec from "../../specs/EventSiteSelector";
 import EventSiteSpec from "../../specs/EventSite";
+import MainSiteSpec from "../../specs/MainSite";
 
 const specs = {
   "Default": DefaultSpec,
   "Event Site": EventSiteSpec,
-  "Event Site Selector": EventSiteSelectorSpec
+  "Event Site Selector": EventSiteSelectorSpec,
+  "Main Live Site": MainSiteSpec
 };
 
 @inject("rootStore")

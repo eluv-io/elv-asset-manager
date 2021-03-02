@@ -4,7 +4,7 @@ import React from "react";
 import AsyncComponent from "./AsyncComponent";
 import {inject, observer} from "mobx-react";
 import PropTypes from "prop-types";
-import {Action, Maybe} from "elv-components-js";
+import {Action, Maybe, onEnterPressed} from "elv-components-js";
 
 @observer
 class BrowserList extends React.Component {
@@ -13,8 +13,10 @@ class BrowserList extends React.Component {
 
     this.state = {
       page: 1,
+      version: 1,
       filter: "",
-      version: 1
+      lookup: "",
+      lookupError: ""
     };
   }
 
@@ -55,6 +57,38 @@ class BrowserList extends React.Component {
     );
   }
 
+  Lookup() {
+    const Lookup = async () => {
+      this.setState({lookupError: ""});
+
+      const { libraryId, objectId, versionHash, error } = await this.props.Lookup(this.state.lookup);
+
+      if(error) {
+        this.setState({lookupError: error});
+        return;
+      }
+
+      this.props.QuickSelect({libraryId, objectId, versionHash});
+    };
+
+    return (
+      <div className="lookup-container">
+        <div className="lookup-error">{ this.state.lookupError }</div>
+        <input
+          name="lookup"
+          placeholder="Find content by ID, version hash or address"
+          className="browser-filter"
+          onChange={event => {
+            this.setState({lookup: event.target.value});
+          }}
+          value={this.state.lookup}
+          onKeyPress={onEnterPressed(Lookup)}
+        />
+        <Action onClick={Lookup}>Search</Action>
+      </div>
+    );
+  }
+
   Filter() {
     return (
       <input
@@ -87,6 +121,7 @@ class BrowserList extends React.Component {
       <div className="browser-container">
         <h3>{this.props.header}</h3>
         <h4>{this.props.subHeader}</h4>
+        { this.Lookup() }
         { this.Pagination() }
         { this.Filter() }
         <AsyncComponent
@@ -146,6 +181,8 @@ BrowserList.propTypes = {
   titleTypes: PropTypes.arrayOf(PropTypes.string),
   Load: PropTypes.func.isRequired,
   Select: PropTypes.func.isRequired,
+  Lookup: PropTypes.func.isRequired,
+  QuickSelect: PropTypes.func.isRequired,
   paginated: PropTypes.bool,
   paginationInfo: PropTypes.object
 };
@@ -160,6 +197,17 @@ class ContentBrowser extends React.Component {
       libraryId: undefined,
       objectId: undefined
     };
+
+    this.QuickSelect = this.QuickSelect.bind(this);
+  }
+
+  async QuickSelect({libraryId, objectId, versionHash}) {
+    if(!objectId) {
+      this.setState({libraryId});
+      return;
+    }
+
+    await this.props.onComplete({libraryId, objectId, versionHash});
   }
 
   render() {
@@ -181,6 +229,8 @@ class ContentBrowser extends React.Component {
             list={this.props.contentStore.libraries}
             Load={this.props.contentStore.LoadLibraries}
             Select={libraryId => this.setState({libraryId})}
+            Lookup={this.props.contentStore.LookupContent}
+            QuickSelect={this.QuickSelect}
             paginated={false}
           />
         </React.Fragment>
@@ -232,6 +282,8 @@ class ContentBrowser extends React.Component {
                 this.setState({objectId});
               }
             }}
+            Lookup={this.props.contentStore.LookupContent}
+            QuickSelect={this.QuickSelect}
           />
         </React.Fragment>
       );
@@ -269,6 +321,8 @@ class ContentBrowser extends React.Component {
               objectId: this.state.objectId,
               versionHash
             })}
+            Lookup={this.props.contentStore.LookupContent}
+            QuickSelect={this.QuickSelect}
             paginated={false}
           />
         </React.Fragment>
