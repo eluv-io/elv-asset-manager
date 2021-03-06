@@ -24,12 +24,10 @@ const eventSiteSpec = {
       orderable: true
     },
     {
-      name: "streams",
-      label: "Streams",
+      name: "channels",
+      label: "Channels",
       indexed: true,
-      slugged: true,
-      defaultable: true,
-      orderable: true
+      defaultable: true
     },
   ],
   infoFields: [
