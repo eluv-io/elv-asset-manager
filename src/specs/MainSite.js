@@ -21,8 +21,9 @@ const mainSiteSelectorSpec = {
     },
     {
       "name": "featured_events",
-      "indexed": false,
+      "indexed": true,
       "slugged": true,
+      "orderable": true
     },
     {
       "name": "tenants",
@@ -41,9 +42,15 @@ const mainSiteSelectorSpec = {
               "type": "file"
             },
             {
-              "extensions": imageTypes,
-              "name": "card_image",
-              "type": "file"
+              "type": "list",
+              "name": "card_images",
+              "fields": [
+                {
+                  "extensions": imageTypes,
+                  "name": "card_image",
+                  "type": "file"
+                }
+              ]
             }
           ],
           "name": "beautiful_quality",
@@ -57,9 +64,15 @@ const mainSiteSelectorSpec = {
               "type": "file"
             },
             {
-              "extensions": imageTypes,
-              "name": "card_image",
-              "type": "file"
+              "type": "list",
+              "name": "card_images",
+              "fields": [
+                {
+                  "extensions": imageTypes,
+                  "name": "card_image",
+                  "type": "file"
+                }
+              ]
             }
           ],
           "name": "directly_to_fans",
@@ -73,9 +86,15 @@ const mainSiteSelectorSpec = {
               "type": "file"
             },
             {
-              "extensions": imageTypes,
-              "name": "card_image",
-              "type": "file"
+              "type": "list",
+              "name": "card_images",
+              "fields": [
+                {
+                  "extensions": imageTypes,
+                  "name": "card_image",
+                  "type": "file"
+                }
+              ]
             }
           ],
           "name": "retain_control",
@@ -89,9 +108,15 @@ const mainSiteSelectorSpec = {
               "type": "file"
             },
             {
-              "extensions": imageTypes,
-              "name": "card_image",
-              "type": "file"
+              "type": "list",
+              "name": "card_images",
+              "fields": [
+                {
+                  "extensions": imageTypes,
+                  "name": "card_image",
+                  "type": "file"
+                }
+              ]
             }
           ],
           "name": "push_boundaries",
@@ -105,9 +130,15 @@ const mainSiteSelectorSpec = {
               "type": "file"
             },
             {
-              "extensions": imageTypes,
-              "name": "card_image",
-              "type": "file"
+              "type": "list",
+              "name": "card_images",
+              "fields": [
+                {
+                  "extensions": imageTypes,
+                  "name": "card_image",
+                  "type": "file"
+                }
+              ]
             }
           ],
           "name": "remonetize_endlessly",
@@ -124,7 +155,7 @@ const mainSiteSelectorSpec = {
           "type": "text"
         },
         {
-          "name": "blurb",
+          "name": "text",
           "type": "textarea"
         },
         {
@@ -143,7 +174,7 @@ const mainSiteSelectorSpec = {
           "type": "text"
         },
         {
-          "name": "blurb",
+          "name": "text",
           "type": "textarea"
         },
         {
