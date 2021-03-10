@@ -22,6 +22,7 @@ import FileSelection from "./FileBrowser";
 import PreviewIcon from "./PreviewIcon";
 import Utils from "@eluvio/elv-client-js/src/Utils";
 import UrlJoin from "url-join";
+import {v4 as UUID, parse as UUIDParse} from "uuid";
 
 import AddIcon from "../static/icons/plus-square.svg";
 import DeleteIcon from "../static/icons/trash.svg";
@@ -82,6 +83,22 @@ let InfoField = ({HEAD, PATH="", field, entry, Update, localization={}, textAddB
         dateOnly={field.type === "date"}
         referenceTimezone={field.zone}
         onChange={newValue => Update(field.name, newValue)}
+      />
+    );
+  } else if(field.type === "uuid") {
+    if(!entry[field.name]) {
+      Update(field.name, Utils.B58(UUIDParse(UUID())));
+    }
+
+    return (
+      <Input
+        key={`input-${name}-${field.name}`}
+        name={field.name}
+        label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
+        type={field.type}
+        value={entry[field.name] || ""}
+        required={field.required}
+        readonly
       />
     );
   } else if(field.type === "select") {

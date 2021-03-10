@@ -36,6 +36,8 @@ number - Decimal number
 
 checkbox - True/false value
 
+uuid - Auto generated UUID
+
 select - Select from a list of options
 - additional field: 'options' - List of allowable options
 
@@ -71,6 +73,7 @@ class Info extends React.Component {
       "textarea",
       "integer",
       "number",
+      "uuid",
       "color",
       "checkbox",
       "select",
