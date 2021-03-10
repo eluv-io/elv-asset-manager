@@ -5,6 +5,7 @@ const currencyOptions = [...new Set(Object.values(require("country-codes-list").
 const eventSiteSpec = {
   name: "Event Site",
   version: "0.11",
+  associate_permissions: true,
   controls: [],
   availableAssetTypes: [
     "primary"
@@ -333,7 +334,7 @@ const eventSiteSpec = {
             {
               "label": "NTP ID",
               "name": "otp_id",
-              "type": "text"
+              "type": "ntp_id"
             },
             {
               "name": "start_time",
@@ -409,7 +410,7 @@ const eventSiteSpec = {
         {
           "label": "NTP ID",
           "name": "otp_id",
-          "type": "text"
+          "type": "ntp_id"
         },
         {
           "fields": [

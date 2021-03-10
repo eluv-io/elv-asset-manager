@@ -1,6 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {ListField} from "../Inputs";
+import {RecursiveField} from "../Inputs";
 
 /*
       {
@@ -132,7 +132,8 @@ class AssociatedAssets extends React.Component {
       <div className="asset-form-section-container">
         <h3>Associated Assets</h3>
         <div className="asset-info-container">
-          <ListField
+          <RecursiveField
+            list
             name="Associated Assets"
             values={this.props.specStore.associatedAssets}
             hint={hints.associated_assets}

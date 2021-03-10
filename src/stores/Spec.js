@@ -28,6 +28,7 @@ const Duplicates = (values) =>
 
 class SpecStore {
   @observable profile;
+  @observable associatePermissions = false;
   @observable controls = {};
   @observable fileControlItems = {};
   @observable availableAssetTypes = [];
@@ -64,6 +65,7 @@ class SpecStore {
       }
     });
 
+    this.associatePermissions = config.associate_permissions || false;
     this.availableAssetTypes = config.asset_types || config.availableAssetTypes || DefaultSpec.availableAssetTypes;
     this.availableTitleTypes = config.title_types || config.availableTitleTypes || DefaultSpec.availableTitleTypes;
     this.infoFields = config.info_fields || config.infoFields || DefaultSpec.infoFields;
@@ -184,6 +186,7 @@ class SpecStore {
 
       let titleConfiguration = {
         ...toJS(this.rootStore.titleConfiguration || {}),
+        associate_permissions: this.associatePermissions,
         profile: toJS(this.profile),
         asset_types: toJS(FormatOptions(this.availableAssetTypes)),
         title_types: toJS(FormatOptions(this.availableTitleTypes)),
@@ -312,6 +315,11 @@ class SpecStore {
         simple: true
       };
     }
+  }
+
+  @action.bound
+  TogglePermissionAssociation(enabled) {
+    this.associatePermissions = enabled;
   }
 
   @action.bound

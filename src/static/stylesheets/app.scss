@@ -670,6 +670,31 @@ input {
   grid-template-columns: 2rem 2fr 3fr 2fr 1rem 1rem 1.5rem;
 }
 
+.asset-form-object-selection {
+  margin: $elv-spacing-m 0;
+
+  .asset-form-object-selection-contents {
+    label {
+      align-items: flex-start;
+      padding-top: $elv-spacing-xs;
+    }
+  }
+
+  .asset-form-object-selection-selected {
+    align-items: center;
+    border: 1px solid $elv-color-lightgray;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: $elv-spacing-xs;
+    padding: $elv-spacing-xs;
+    width: 35rem;
+
+    button {
+      height: $elv-spacing-m;
+      width: $elv-spacing-m;
+    }
+  }
+}
 
 .asset-form-modal {
   .-elv-modal-content {

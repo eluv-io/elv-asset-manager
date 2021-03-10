@@ -1,7 +1,8 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {ListField} from "../Inputs";
+import {RecursiveField} from "../Inputs";
 import {toJS} from "mobx";
+import {Checkbox} from "elv-components-js";
 
 /*
 "info_fields": [
@@ -78,6 +79,7 @@ class Info extends React.Component {
       "checkbox",
       "select",
       "multiselect",
+      "ntp_id",
       "file",
       "date",
       "datetime",
@@ -95,7 +97,8 @@ class Info extends React.Component {
     };
 
     return (
-      <ListField
+      <RecursiveField
+        list
         key={`list-field-${name}`}
         name={name}
         values={values}
@@ -129,13 +132,21 @@ class Info extends React.Component {
       <div className="asset-form-section-container">
         <h3>Asset Info Fields</h3>
         <div className="asset-info-container">
-          <ListField
+          <Checkbox
+            name="Associate Permissions Object"
+            value={this.props.specStore.associatePermissions}
+            onChange={enabled => this.props.specStore.TogglePermissionAssociation(enabled)}
+          />
+
+          <RecursiveField
+            list
             name="Asset Types"
             orderable
             values={this.props.specStore.availableAssetTypes}
             Update={(_, types, operation) => this.props.specStore.UpdateAssetTypes(types, operation)}
           />
-          <ListField
+          <RecursiveField
+            list
             name="Title Types"
             orderable
             values={this.props.specStore.availableTitleTypes}

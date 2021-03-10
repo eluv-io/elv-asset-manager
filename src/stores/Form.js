@@ -76,6 +76,9 @@ class FormStore {
     arrangement: []
   };
 
+  @observable associatePermissions = false;
+  @observable permissionsObject;
+
   @observable controls = [];
   @observable fileControls = [];
   @observable fileControlItems = {};
@@ -122,6 +125,14 @@ class FormStore {
     return this.fileControls.filter(control =>
       control.target.startsWith("public/asset_metadata") || control.target.startsWith("/public/asset_metadata")
     );
+  }
+
+  @computed get availableNTPs() {
+    if(!this.permissionsObject) { return []; }
+
+    const ntps = (this.permissionsObject.auth_policy_settings || {}).ntp_instances || {};
+
+    return Object.keys(ntps).map(ntpId => ({ntpId, name: ntps[ntpId].name}));
   }
 
   InfoFieldLocalization(name) {
@@ -249,6 +260,7 @@ class FormStore {
       });
     this.controls = controls;
 
+    this.associatePermissions = config.associate_permissions;
     this.availableAssetTypes = config.asset_types || DefaultSpec.availableAssetTypes;
     this.availableTitleTypes = config.title_types || DefaultSpec.availableTitleTypes;
     this.infoFields = config.info_fields || DefaultSpec.infoFields;
@@ -261,6 +273,8 @@ class FormStore {
 
   InitializeFormData = flow(function * () {
     this.InitializeSpec();
+
+    yield this.LoadPermissionsObject();
 
     const assetMetadata = this.rootStore.assetMetadata || {};
 
@@ -305,6 +319,74 @@ class FormStore {
       }
     }
   }
+
+  // Permissions
+  @action.bound
+  LoadPermissionsObject = flow(function * () {
+    const {libraryId, objectId} = this.rootStore.params;
+
+    this.permissionsObject = yield this.rootStore.client.ContentObjectMetadata({
+      libraryId,
+      objectId,
+      writeToken: this.editWriteToken,
+      metadataSubtree: "associated_permissions",
+      select: [
+        "auth_policy_settings",
+        "public/name"
+      ],
+      resolveLinks: true
+    });
+
+    if(this.permissionsObject) {
+      this.permissionsObject.name = this.permissionsObject.public.name;
+    }
+  });
+
+  @action.bound
+  SetPermissionsObject = flow(function * ({objectId}) {
+    const params = this.rootStore.params;
+
+    if(!this.editWriteToken) {
+      this.editWriteToken = (yield this.rootStore.client.EditContentObject({
+        libraryId: params.libraryId,
+        objectId: params.objectId
+      })).writeToken;
+    }
+
+    yield this.rootStore.client.ReplaceMetadata({
+      libraryId: params.libraryId,
+      objectId: params.objectId,
+      writeToken: this.editWriteToken,
+      metadataSubtree: UrlJoin("associated_permissions"),
+      metadata: this.CreateLink({
+        targetHash: yield this.rootStore.client.LatestVersionHash({objectId}),
+        linkTarget: "/meta"
+      })
+    });
+
+    yield this.LoadPermissionsObject();
+  });
+
+  @action.bound
+  RemovePermissionsObject = flow(function * () {
+    this.permissionsObject = undefined;
+
+    const params = this.rootStore.params;
+
+    if(!this.editWriteToken) {
+      this.editWriteToken = (yield this.rootStore.client.EditContentObject({
+        libraryId: params.libraryId,
+        objectId: params.objectId
+      })).writeToken;
+    }
+
+    yield this.rootStore.client.DeleteMetadata({
+      libraryId: params.libraryId,
+      objectId: params.objectId,
+      writeToken: this.editWriteToken,
+      metadataSubtree: UrlJoin("associated_permissions"),
+    });
+  });
 
   // Credits
 

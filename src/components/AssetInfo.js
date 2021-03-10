@@ -4,10 +4,11 @@ import {
   Input,
   Selection,
   Warning,
-  Maybe
+  Maybe,
 } from "elv-components-js";
 
-import {InfoField} from "./Inputs";
+import {RecursiveField} from "./Inputs";
+import ObjectSelection from "./ObjectSelection";
 
 @inject("formStore")
 @observer
@@ -26,7 +27,7 @@ class AssetInfo extends React.Component {
       // Remove non-localized fields if localization is active
       .filter(field => !("localize" in field && !field.localize && this.props.formStore.localizationActive))
       .map((field, index) =>
-        <InfoField
+        <RecursiveField
           HEAD={assetInfo}
           key={`info-field-${index}`}
           field={field}
@@ -34,6 +35,7 @@ class AssetInfo extends React.Component {
           Update={this.props.formStore.UpdateAssetInfo}
           localization={this.props.formStore.InfoFieldLocalization(field.name)}
           textAddButton
+          ntps={this.props.formStore.availableNTPs}
         />
       );
   }
@@ -110,6 +112,19 @@ class AssetInfo extends React.Component {
             )
           }
 
+          {
+            Maybe(
+              this.props.formStore.associatePermissions,
+              <ObjectSelection
+                browseHeader="Select Permissions"
+                buttonText="Select Permissions"
+                selectedObject={this.props.formStore.permissionsObject}
+                Select={this.props.formStore.SetPermissionsObject}
+                Remove={this.props.formStore.RemovePermissionsObject}
+              />
+            )
+          }
+          
           { this.InfoFields(assetInfo) }
         </div>
       </div>

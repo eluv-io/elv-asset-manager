@@ -94,6 +94,22 @@
   }
 }
 
+.ntp-selection-container {
+  label {
+    align-items: flex-start;
+    padding-top: $elv-spacing-xs;
+  }
+}
+
+.ntp-selection {
+  display: flex;
+  flex-direction: column;
+
+  input {
+    margin-top: $elv-spacing-xxs;
+  }
+}
+
 .list-field-container {
   // sass-lint:disable no-important
   margin: $elv-spacing-m 0 !important;

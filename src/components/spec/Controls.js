@@ -1,7 +1,7 @@
 import React from "react";
 import {Checkbox} from "elv-components-js";
 import {inject, observer} from "mobx-react";
-import {ListField} from "../Inputs";
+import {RecursiveField} from "../Inputs";
 
 const hints = {
   default_image_keys: "These image keys will be populated by default for all assets.",
@@ -103,7 +103,8 @@ class Controls extends React.Component {
     const fileControls = Object.values(this.props.specStore.controls).filter(control => !control.simple);
 
     return (
-      <ListField
+      <RecursiveField
+        list
         name="File Controls"
         label="File Controls"
         values={fileControls}
@@ -142,7 +143,8 @@ class Controls extends React.Component {
       <div className="control simple-control">
         <Checkbox name="Images" value={true} disabled />
         <div className="indented image-keys-list">
-          <ListField
+          <RecursiveField
+            list
             orderable
             hint={hints.default_image_keys}
             name="Default Image Keys"

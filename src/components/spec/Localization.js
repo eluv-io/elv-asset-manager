@@ -1,6 +1,6 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import {ListField} from "../Inputs";
+import {RecursiveField} from "../Inputs";
 
 const hints = {
   localization: (
@@ -64,7 +64,8 @@ class Localization extends React.Component {
       <div className="asset-form-section-container">
         <h3>Localization Options</h3>
         <div className="asset-info-container">
-          <ListField
+          <RecursiveField
+            list
             name="Localization"
             values={this.props.specStore.localizations}
             hint={hints.localization}
