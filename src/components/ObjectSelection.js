@@ -90,7 +90,7 @@ ObjectSelection.propTypes = {
   label: PropTypes.string.isRequired,
   browseHeader: PropTypes.string,
   buttonText: PropTypes.string,
-  selectedObject: PropTypes.object,
+  selectedObject: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   Select: PropTypes.func.isRequired,
   Remove: PropTypes.func.isRequired,
   className: PropTypes.string

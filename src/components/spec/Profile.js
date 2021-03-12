@@ -3,13 +3,15 @@ import {Action, Confirm, LabelledField, Selection} from "elv-components-js";
 import {inject, observer} from "mobx-react";
 
 import DefaultSpec from "../../specs/Default";
-import EventSiteSelectorSpec from "../../specs/EventSiteSelector";
 import EventSiteSpec from "../../specs/EventSite";
+import EventSiteExtrasSpec from "../../specs/EventSiteExtras";
+import EventSiteSelectorSpec from "../../specs/EventSiteSelector";
 import MainSiteSpec from "../../specs/MainSite";
 
 const specs = {
   "Default": DefaultSpec,
   "Event Site": EventSiteSpec,
+  "Event Site Extras": EventSiteExtrasSpec,
   "Event Site Selector": EventSiteSelectorSpec,
   "Main Live Site": MainSiteSpec
 };
