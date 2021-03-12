@@ -116,7 +116,7 @@
 
   & > label {
     align-items: flex-start;
-    margin-top: $elv-spacing-xxs;
+    margin-top: $elv-spacing-xs;
     width: 100%;
   }
 
@@ -187,7 +187,9 @@
   }
 
   .info-list-add-icon {
-    margin-top: $elv-spacing-xxs;
+    &:not(:first-child) {
+      margin-top: $elv-spacing-xs;
+    }
   }
 }
 

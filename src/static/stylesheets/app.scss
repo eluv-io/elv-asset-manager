@@ -674,6 +674,8 @@ input {
   margin: $elv-spacing-m 0;
 
   .asset-form-object-selection-contents {
+    width: 35rem;
+
     label {
       align-items: flex-start;
       padding-top: $elv-spacing-xs;
@@ -686,8 +688,8 @@ input {
     display: flex;
     justify-content: space-between;
     margin-bottom: $elv-spacing-xs;
+    margin-right: $elv-spacing-s;
     padding: $elv-spacing-xs;
-    width: 35rem;
 
     button {
       height: $elv-spacing-m;

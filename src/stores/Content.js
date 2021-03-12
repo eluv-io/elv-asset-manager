@@ -137,6 +137,10 @@ class ContentStore {
     }));
   });
 
+  async LatestVersionHash({objectId, versionHash}) {
+    return await this.rootStore.client.LatestVersionHash({objectId, versionHash});
+  }
+
   @action.bound
   LoadFiles = flow(function * (versionHash) {
     if(this.files[versionHash]) { return; }
@@ -220,14 +224,24 @@ class ContentStore {
         accessType = yield client.AccessType({id: objectId});
       }
 
+      const name = yield client.ContentObjectMetadata({
+        libraryId,
+        objectId: objectId || libraryId.replace(/^ilib/, "iq__"),
+        select: [
+          "public/name",
+          "public/asset_metadata/title",
+          "public/asset_metadata/display_title"
+        ]
+      });
+
       if(accessType === "library") {
-        return { libraryId };
+        return { name, libraryId };
       } else if(accessType === "object") {
         if(!versionHash) {
           versionHash = yield client.LatestVersionHash({objectId});
         }
 
-        return { libraryId, objectId, versionHash };
+        return { name, libraryId, objectId, versionHash };
       }
 
       throw "Invalid content ID";

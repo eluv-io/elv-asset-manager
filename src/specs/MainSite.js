@@ -49,6 +49,9 @@ const mainSiteSelectorSpec = {
                   "extensions": imageTypes,
                   "name": "card_image",
                   "type": "file"
+                },
+                {
+                  "name": "title"
                 }
               ]
             }
@@ -71,6 +74,9 @@ const mainSiteSelectorSpec = {
                   "extensions": imageTypes,
                   "name": "card_image",
                   "type": "file"
+                },
+                {
+                  "name": "title"
                 }
               ]
             }
@@ -93,6 +99,9 @@ const mainSiteSelectorSpec = {
                   "extensions": imageTypes,
                   "name": "card_image",
                   "type": "file"
+                },
+                {
+                  "name": "title"
                 }
               ]
             }
@@ -115,6 +124,9 @@ const mainSiteSelectorSpec = {
                   "extensions": imageTypes,
                   "name": "card_image",
                   "type": "file"
+                },
+                {
+                  "name": "title"
                 }
               ]
             }
@@ -137,6 +149,9 @@ const mainSiteSelectorSpec = {
                   "extensions": imageTypes,
                   "name": "card_image",
                   "type": "file"
+                },
+                {
+                  "name": "title"
                 }
               ]
             }

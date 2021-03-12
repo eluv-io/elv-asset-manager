@@ -61,14 +61,14 @@ class BrowserList extends React.Component {
     const Lookup = async () => {
       this.setState({lookupError: ""});
 
-      const { libraryId, objectId, versionHash, error } = await this.props.Lookup(this.state.lookup);
+      const { name, libraryId, objectId, versionHash, error } = await this.props.Lookup(this.state.lookup);
 
       if(error) {
         this.setState({lookupError: error});
         return;
       }
 
-      this.props.QuickSelect({libraryId, objectId, versionHash});
+      this.props.QuickSelect({name, libraryId, objectId, versionHash});
     };
 
     return (
@@ -148,7 +148,7 @@ class BrowserList extends React.Component {
                     <button
                       disabled={disabled}
                       title={title}
-                      onClick={() => this.props.Select(id)}
+                      onClick={() => this.props.Select({name, id})}
                     >
                       <div>{name}</div>
                       {assetType ? <div className="hint">{assetType} {titleType ? ` | ${titleType}` : ""}</div> : null}
@@ -195,7 +195,8 @@ class ContentBrowser extends React.Component {
 
     this.state = {
       libraryId: undefined,
-      objectId: undefined
+      objectId: undefined,
+      name: undefined
     };
 
     this.QuickSelect = this.QuickSelect.bind(this);
@@ -228,7 +229,7 @@ class ContentBrowser extends React.Component {
             header="Choose a library"
             list={this.props.contentStore.libraries}
             Load={this.props.contentStore.LoadLibraries}
-            Select={libraryId => this.setState({libraryId})}
+            Select={({id}) => this.setState({libraryId: id})}
             Lookup={this.props.contentStore.LookupContent}
             QuickSelect={this.QuickSelect}
             paginated={false}
@@ -272,14 +273,18 @@ class ContentBrowser extends React.Component {
               assetTypes: this.props.assetTypes,
               titleTypes: this.props.titleTypes
             })}
-            Select={async objectId => {
+            Select={async ({name, id}) => {
               if(this.props.objectOnly) {
+                const versionHash = await this.props.contentStore.LatestVersionHash({objectId: id});
+
                 await this.props.onComplete({
+                  name,
                   libraryId: this.state.libraryId,
-                  objectId
+                  objectId: id,
+                  versionHash
                 });
               } else {
-                this.setState({objectId});
+                this.setState({name, objectId: id});
               }
             }}
             Lookup={this.props.contentStore.LookupContent}
@@ -316,10 +321,11 @@ class ContentBrowser extends React.Component {
             list={this.props.contentStore.versions[this.state.objectId]}
             hashes={true}
             Load={async () => await this.props.contentStore.LoadVersions(this.state.libraryId, this.state.objectId)}
-            Select={async versionHash => await this.props.onComplete({
+            Select={async ({id}) => await this.props.onComplete({
+              name: this.state.name,
               libraryId: this.state.libraryId,
               objectId: this.state.objectId,
-              versionHash
+              versionHash: id
             })}
             Lookup={this.props.contentStore.LookupContent}
             QuickSelect={this.QuickSelect}

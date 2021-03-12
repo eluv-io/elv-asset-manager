@@ -5,9 +5,10 @@ import ContentBrowser from "./ContentBrowser";
 import RemoveIcon from "../static/icons/trash.svg";
 
 const ObjectSelection = ({
-  selectedObject,
+  label,
   browseHeader="Select an object",
   buttonText="Select an object",
+  selectedObject,
   Select,
   Remove,
   className=""
@@ -54,7 +55,7 @@ const ObjectSelection = ({
 
   return (
     <div className={`asset-form-object-selection ${className || ""}`}>
-      <LabelledField label="Permissions" className="asset-form-object-selection-contents">
+      <LabelledField label={label} className="asset-form-object-selection-contents">
         { selected }
         <Action onClick={ActivateModal}>
           { buttonText }

@@ -206,7 +206,7 @@ class FormStore {
     }
 
     if(!target._loaded) {
-      target.assetInfo = this.LoadAssetInfo(assetMetadata);
+      target.assetInfo = yield this.LoadAssetInfo(assetMetadata);
       target.credits = this.LoadCredits((assetMetadata.info || {}).talent);
 
       target.images = [];
@@ -278,7 +278,7 @@ class FormStore {
 
     const assetMetadata = this.rootStore.assetMetadata || {};
 
-    this.assetInfo = this.LoadAssetInfo(assetMetadata);
+    this.assetInfo = yield this.LoadAssetInfo(assetMetadata);
     this.credits = this.LoadCredits((assetMetadata.info || {}).talent);
     this.images = yield this.LoadImages(assetMetadata.images, true);
     this.playlists = yield this.LoadPlaylists(assetMetadata.playlists);
@@ -632,9 +632,11 @@ class FormStore {
     this.currentLocalizedData.playlists[i2] = playlist;
   }
 
-  LoadInfoFields({infoFields, values, isTopLevel=false, topLevelValues}) {
+  async LoadInfoFields({infoFields, values, isTopLevel=false, topLevelValues}) {
     let info = {};
-    infoFields.forEach(({name, type, default_value, top_level, fields}) => {
+
+    for(const infoField of infoFields) {
+      const { name, type, default_value, top_level, fields } = infoField;
       if(isTopLevel && top_level) {
         info[name] = topLevelValues[name] || default_value || "";
       } else {
@@ -658,23 +660,50 @@ class FormStore {
 
         info[name] = linkInfo;
       } else if(type === "subsection") {
-        info[name] = this.LoadInfoFields({infoFields: fields, values: info[name]});
+        info[name] = await this.LoadInfoFields({infoFields: fields, values: info[name]});
       } else if(type === "list") {
-        info[name] = (info[name] || []).map(listValues => {
-          if(!fields || fields.length === 0) {
-            return listValues;
-          }
+        info[name] = await Promise.all(
+          (info[name] || []).map(async listValues => {
+            if(!fields || fields.length === 0) {
+              return listValues;
+            }
 
-          return this.LoadInfoFields({infoFields: fields, values: listValues});
-        });
+            return await this.LoadInfoFields({infoFields: fields, values: listValues});
+          })
+        );
+      } else if(type === "fabric_link") {
+        const linkInfo = this.LinkComponents(values[name]);
+
+        if(!linkInfo) {
+          return;
+        }
+
+        const meta = (await this.rootStore.client.ContentObjectMetadata({
+          versionHash: linkInfo.targetHash,
+          metadataSubtree: "public",
+          select: [
+            "name",
+            "asset_metadata/title",
+            "asset_metadata/display_title"
+          ]
+        }));
+
+        const targetName = (meta.asset_metadata || {}).display_title || (meta.asset_metadata || {}).title || meta.name;
+
+        info[name] = {
+          name: targetName,
+          libraryId: this.rootStore.client.ContentObjectLibraryId({versionHash: linkInfo.targetHash}),
+          objectId: this.rootStore.client.utils.DecodeVersionHash(linkInfo.targetHash).objectId,
+          versionHash: linkInfo.targetHash
+        };
       }
-    });
+    }
 
     return info;
   }
 
   // Load methods
-  LoadAssetInfo(metadata) {
+  LoadAssetInfo = flow(function * (metadata) {
     metadata = metadata || {};
 
     const info = (metadata.info || {});
@@ -690,7 +719,7 @@ class FormStore {
 
     this.originalSlug = assetInfo.slug;
 
-    const loadedInfo = this.LoadInfoFields({
+    const loadedInfo = yield this.LoadInfoFields({
       infoFields: this.infoFields,
       values: info,
       isTopLevel: true,
@@ -703,7 +732,7 @@ class FormStore {
     };
 
     return assetInfo;
-  }
+  });
 
   LoadCredits(metadata) {
     if(!metadata) { return []; }
@@ -1293,6 +1322,8 @@ class FormStore {
 
           return (this.FormatFields({infoFields: fields, values: entry, titleType})).info || [];
         });
+      } else if(type === "fabric_link") {
+        value = this.CreateLink({targetHash: values[name].versionHash});
       }
 
       value = toJS(value);

@@ -116,6 +116,7 @@ class AssetInfo extends React.Component {
             Maybe(
               this.props.formStore.associatePermissions,
               <ObjectSelection
+                label="Permissions"
                 browseHeader="Select Permissions"
                 buttonText="Select Permissions"
                 selectedObject={this.props.formStore.permissionsObject}
@@ -124,7 +125,7 @@ class AssetInfo extends React.Component {
               />
             )
           }
-          
+
           { this.InfoFields(assetInfo) }
         </div>
       </div>

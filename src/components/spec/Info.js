@@ -83,6 +83,7 @@ class Info extends React.Component {
       "file",
       "date",
       "datetime",
+      "fabric_link",
       "subsection",
       "list",
       "reference_subsection",
@@ -137,7 +138,6 @@ class Info extends React.Component {
             value={this.props.specStore.associatePermissions}
             onChange={enabled => this.props.specStore.TogglePermissionAssociation(enabled)}
           />
-
           <RecursiveField
             list
             name="Asset Types"
