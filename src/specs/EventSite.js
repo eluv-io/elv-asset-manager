@@ -490,6 +490,33 @@ const eventSiteSpec = {
       ],
       "name": "products",
       "type": "list"
+    },
+    {
+      "fields": [
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "description",
+          "type": "textarea"
+        },
+        {
+          "name": "release_date",
+          "type": "datetime"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "image",
+          "type": "file"
+        },
+        {
+          "name": "package",
+          "type": "fabric_link"
+        }
+      ],
+      "name": "extras",
+      "type": "list"
     }
   ]
 };

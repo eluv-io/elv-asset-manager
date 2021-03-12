@@ -46,7 +46,7 @@ const eventSiteExtrasSpec = {
           "type": "fabric_link"
         }
       ],
-      "name": "Gallery",
+      "name": "gallery",
       "type": "list"
     }
   ]
