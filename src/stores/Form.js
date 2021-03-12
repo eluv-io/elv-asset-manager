@@ -675,7 +675,7 @@ class FormStore {
         const linkInfo = this.LinkComponents(values[name]);
 
         if(!linkInfo) {
-          return;
+          continue;
         }
 
         const meta = (await this.rootStore.client.ContentObjectMetadata({
@@ -1323,7 +1323,9 @@ class FormStore {
           return (this.FormatFields({infoFields: fields, values: entry, titleType})).info || [];
         });
       } else if(type === "fabric_link") {
-        value = this.CreateLink({targetHash: values[name].versionHash});
+        if(values[name]) {
+          value = this.CreateLink({targetHash: values[name].versionHash});
+        }
       }
 
       value = toJS(value);

@@ -696,6 +696,17 @@ input {
       width: $elv-spacing-m;
     }
   }
+
+  .asset-form-object-selection-actions {
+    align-items: center;
+    display: flex;
+
+    button {
+      &:not(:last-child) {
+        margin-right: $elv-spacing-xs;
+      }
+    }
+  }
 }
 
 .asset-form-modal {

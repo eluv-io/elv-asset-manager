@@ -271,7 +271,7 @@ class RecursiveField extends React.Component {
         })
       );
     } else if(field.type === "file") {
-      const path = entry[field.name].path || "";
+      const { path, targetHash } = entry[field.name] || {};
       const extension = ((path || "").split(".").pop() || "").toLowerCase();
       const isImage = ["apng", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
 
@@ -284,7 +284,7 @@ class RecursiveField extends React.Component {
                 <React.Fragment>
                   {
                     isImage ?
-                      <PreviewIcon className="file-icon" imagePath={path} targetHash={entry[field.name].targetHash}/> :
+                      <PreviewIcon className="file-icon" imagePath={path} targetHash={targetHash}/> :
                       <ImageIcon className="file-icon" icon={FileIcon}/>
                   }
                   <div className="file-path" title={path}>{ path }</div>
@@ -299,7 +299,7 @@ class RecursiveField extends React.Component {
             }
             <FileSelection
               header={`Select an item for '${field.label || field.name}'`}
-              versionHash={entry[field.name].targetHash}
+              versionHash={targetHash}
               extensions={field.extensions}
               Select={({path, targetHash}) => Update(field.name, { path, targetHash })}
             />
@@ -311,7 +311,7 @@ class RecursiveField extends React.Component {
                   onClick={() =>
                     Confirm({
                       message: "Are you sure you want to remove this file?",
-                      onConfirm: async () => await Update(field.name, {...entry[field.name], path: ""})
+                      onConfirm: async () => await Update(field.name, {...(entry[field.name] || {}), path: ""})
                     })
                   }
                 />
