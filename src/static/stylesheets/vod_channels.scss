@@ -1,0 +1,13 @@
+@import "~elv-components-js/src/stylesheets/styles";
+
+.asset-form-section-container {
+  &.vod-channel {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  h3 {
+    text-align: center;
+    width: 100%;
+  }
+}

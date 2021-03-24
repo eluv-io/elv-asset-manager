@@ -101,6 +101,11 @@ $preview-background: rgba(0, 0, 0, 0.5);
       .item-path {
         max-width: 150px;
       }
+
+      .encrypted-file-icon {
+        fill: $elv-color-darkgray;
+        stroke: transparent;
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import {runInAction, toJS} from "mobx";
-import {observer} from "mobx-react";
+import {inject, observer} from "mobx-react";
 import {
   Confirm,
   IconButton,
@@ -99,6 +99,7 @@ const InitializeField = ({fields, defaultValue}) => {
   return newValue;
 };
 
+@inject("contentStore")
 @observer
 class RecursiveField extends React.Component {
   InfoField({PATH="", field, entry, Update, localization={}, textAddButton=false}) {
@@ -265,6 +266,7 @@ class RecursiveField extends React.Component {
           label: field.label,
           hint: field.hint,
           values: entry[field.name] || [],
+          buttonText: field.buttonText,
           fields,
           Update: (name, newValues) => Update(field.name, newValues),
           textAddButton: {textAddButton}
@@ -356,8 +358,16 @@ class RecursiveField extends React.Component {
           label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
           browseHeader="Select Object"
           buttonText="Select Object"
+          objectOnly={!field.version}
+          offering={field.offering}
           selectedObject={entry[field.name]}
           Select={ids => Update(field.name, ids)}
+          Update={async () => {
+            await Update(field.name, {
+              ...entry[field.name],
+              versionHash: await this.props.contentStore.LatestVersionHash(entry[field.name])
+            });
+          }}
           Remove={() => Update(field.name, undefined)}
         />
       );
@@ -381,6 +391,7 @@ class RecursiveField extends React.Component {
     name,
     label,
     values,
+    buttonText,
     fields,
     defaultValue,
     hint,
@@ -494,14 +505,14 @@ class RecursiveField extends React.Component {
       />
     );
 
-    if(textAddButton) {
+    if(textAddButton || buttonText) {
       addButton = (
         <Action
-          title={`Add ${label || name}`}
+          title={buttonText || `Add ${label || name}`}
           onClick={Add}
           className="info-list-icon info-list-add-icon secondary"
         >
-          Add { label || FormatName(name) }
+          { buttonText ? buttonText : `Add ${ label || FormatName(name) }` }
         </Action>
       );
     }

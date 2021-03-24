@@ -166,6 +166,7 @@ class Controls extends React.Component {
           { this.SimpleControl("playlists") }
           { this.SimpleControl("credits") }
           { this.SimpleControl("channel") }
+          { this.SimpleControl("vod_channel") }
           { this.SimpleControl("live_stream") }
           { this.SimpleControl("site_codes", "Access Codes") }
         </div>

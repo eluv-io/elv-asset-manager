@@ -69,7 +69,7 @@ class FileBrowser extends React.Component {
       ["apng", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
 
     if(encrypted) {
-      return <ImageIcon icon={EncryptedFileIcon} label="Encrypted File"/>;
+      return <ImageIcon icon={EncryptedFileIcon} className={encrypted ? "encrypted-file-icon" : ""} label="Encrypted File"/>;
     } else if(!isImage) {
       return <ImageIcon icon={FileIcon} label="File"/>;
     }

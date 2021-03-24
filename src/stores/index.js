@@ -6,6 +6,7 @@ import FormStore from "./Form";
 import LiveStore from "./Live";
 import ChannelStore from "./Channel";
 import SpecStore from "./Spec";
+import VoDChannel from "./VoDChannel";
 
 // Force strict mode so mutations are only allowed within actions.
 configure({
@@ -41,6 +42,7 @@ class RootStore {
     this.formStore = new FormStore(this);
     this.liveStore = new LiveStore(this);
     this.specStore = new SpecStore(this);
+    this.vodChannelStore = new VoDChannel(this);
 
     window.rootStore = this;
   }
@@ -211,4 +213,5 @@ export const formStore = rootStore.formStore;
 export const liveStore = rootStore.liveStore;
 export const channelStore = rootStore.channelStore;
 export const specStore = rootStore.specStore;
+export const vodChannelStore = rootStore.vodChannelStore;
 

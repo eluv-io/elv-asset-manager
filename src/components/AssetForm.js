@@ -9,6 +9,7 @@ import Credits from "./Credits";
 import LinkUpdate from "./LinkUpdate";
 import LiveStream from "./channels/LiveStream";
 import Channel from "./channels/Channel";
+import VoDChannel from "./vod_channels/VoDChannel";
 import SiteAccessCode from "./SiteAccessCode";
 import SiteCustomization from "./SiteCustomization";
 import FileControl from "./FileControl";
@@ -147,6 +148,10 @@ class AssetForm extends React.Component {
       tabs.push(["Channel", "CHANNEL"]);
     }
 
+    if(this.props.formStore.HasControl("vod_channel")) {
+      tabs.push(["Channel", "VOD_CHANNEL"]);
+    }
+
     if(this.props.formStore.HasControl("live_stream")) {
       tabs.push(["Live Stream", "LIVE"]);
     }
@@ -189,6 +194,8 @@ class AssetForm extends React.Component {
     switch (this.state.form) {
       case "CHANNEL":
         return <Channel />;
+      case "VOD_CHANNEL":
+        return <VoDChannel />;
       case "LIVE":
         return <LiveStream />;
       case "INFO":

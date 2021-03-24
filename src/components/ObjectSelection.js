@@ -5,6 +5,7 @@ import ContentBrowser from "./ContentBrowser";
 
 import RemoveIcon from "../static/icons/trash.svg";
 import LinkIcon from "../static/icons/external-link.svg";
+import UpdateLinkIcon from "../static/icons/arrow-up-circle.svg";
 import {inject, observer} from "mobx-react";
 
 @inject("rootStore")
@@ -32,7 +33,8 @@ class ObjectSelection extends React.Component {
         >
           <ContentBrowser
             header={this.props.browseHeader ||  "Select an object"}
-            objectOnly
+            objectOnly={!this.props.version}
+            offering={this.props.offering}
             onComplete={async (args) => {
               await this.props.Select(args);
 
@@ -50,8 +52,19 @@ class ObjectSelection extends React.Component {
     if(this.props.selectedObject) {
       selected = (
         <div className="asset-form-object-selection-selected">
-          { this.props.selectedObject.name }
+          { this.props.selectedObject.name } { this.props.selectedObject.offering ? `(Offering: ${this.props.selectedObject.offering})` : ""}
           <div className="asset-form-object-selection-actions">
+            <IconButton
+              className="update-object-link"
+              icon={UpdateLinkIcon}
+              label="Update link"
+              onClick={async () =>
+                await Confirm({
+                  message: `Are you sure you want to update '${this.props.selectedObject.name}'?`,
+                  onConfirm: () => this.props.Update()
+                })
+              }
+            />
             <IconButton
               className="open-object-link"
               icon={LinkIcon}
@@ -91,7 +104,10 @@ ObjectSelection.propTypes = {
   browseHeader: PropTypes.string,
   buttonText: PropTypes.string,
   selectedObject: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  version: PropTypes.bool,
+  offering: PropTypes.bool,
   Select: PropTypes.func.isRequired,
+  Update: PropTypes.func.isRequired,
   Remove: PropTypes.func.isRequired,
   className: PropTypes.string
 };

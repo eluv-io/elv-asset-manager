@@ -302,6 +302,10 @@ class FormStore {
     if(this.HasControl("site_customization")) {
       yield this.LoadSiteCustomization(assetMetadata.site_customization);
     }
+
+    if(this.HasControl("vod_channel")) {
+      yield this.rootStore.vodChannelStore.LoadChannelInfo();
+    }
   });
 
   @action.bound
@@ -331,19 +335,26 @@ class FormStore {
       writeToken: this.editWriteToken,
       metadataSubtree: "associated_permissions",
       select: [
+        ".",
         "auth_policy_settings",
         "public/name"
       ],
-      resolveLinks: true
+      resolveLinks: true,
+      resolveIncludeSource: true
     });
 
     if(this.permissionsObject) {
       this.permissionsObject.name = this.permissionsObject.public.name;
+      this.permissionsObject.versionHash = this.permissionsObject["."].source;
     }
   });
 
   @action.bound
-  SetPermissionsObject = flow(function * ({objectId}) {
+  SetPermissionsObject = flow(function * ({objectId, versionHash}) {
+    if(!objectId && versionHash) {
+      objectId = this.rootStore.client.utils.DecodeVersionHash(versionHash).objectId;
+    }
+
     const params = this.rootStore.params;
 
     if(!this.editWriteToken) {
@@ -925,6 +936,7 @@ class FormStore {
     return assets;
   });
 
+  @action.bound
   LinkComponents(link) {
     if(!link || !link["/"]) {
       return;
@@ -932,7 +944,7 @@ class FormStore {
 
     let targetHash = this.rootStore.params.versionHash;
     let path = link["/"].replace(/^\.\/files\//, "");
-    if(link["/"].startsWith("/qfab/")) {
+    if(link["/"].startsWith("/qfab/") || link["/"].startsWith("/q/")) {
       targetHash = link["/"].split("/")[2];
       path = link["/"].split("/").slice(4).join("/");
     }
@@ -1324,7 +1336,7 @@ class FormStore {
         });
       } else if(type === "fabric_link") {
         if(values[name]) {
-          value = this.CreateLink({targetHash: values[name].versionHash});
+          value = this.CreateLink({targetHash: values[name].versionHash });
         }
       }
 
@@ -1345,7 +1357,6 @@ class FormStore {
         }
       }
     });
-
 
     return { info, topInfo, listFields };
   }
@@ -1633,6 +1644,10 @@ class FormStore {
 
       if(this.HasControl("channel")) {
         yield this.rootStore.channelStore.SaveChannelInfo({writeToken});
+      }
+
+      if(this.HasControl("vod_channel")) {
+        yield this.rootStore.vodChannelStore.SaveChannelInfo({writeToken});
       }
 
       if(!commit) {

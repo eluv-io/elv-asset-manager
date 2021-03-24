@@ -121,6 +121,7 @@ class AssetInfo extends React.Component {
                 buttonText="Select Permissions"
                 selectedObject={this.props.formStore.permissionsObject}
                 Select={this.props.formStore.SetPermissionsObject}
+                Update={async () => await this.props.formStore.SetPermissionsObject({versionHash: this.props.formStore.permissionsObject.versionHash})}
                 Remove={this.props.formStore.RemovePermissionsObject}
               />
             )

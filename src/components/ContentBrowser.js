@@ -4,8 +4,9 @@ import React from "react";
 import AsyncComponent from "./AsyncComponent";
 import {inject, observer} from "mobx-react";
 import PropTypes from "prop-types";
-import {Action, Maybe, onEnterPressed} from "elv-components-js";
+import {Action, LoadingElement, Maybe, onEnterPressed} from "elv-components-js";
 
+@inject("contentStore")
 @observer
 class BrowserList extends React.Component {
   constructor(props) {
@@ -61,7 +62,7 @@ class BrowserList extends React.Component {
     const Lookup = async () => {
       this.setState({lookupError: ""});
 
-      const { name, libraryId, objectId, versionHash, error } = await this.props.Lookup(this.state.lookup);
+      const { name, libraryId, objectId, versionHash, error } = await this.props.contentStore.LookupContent(this.state.lookup);
 
       if(error) {
         this.setState({lookupError: error});
@@ -181,7 +182,6 @@ BrowserList.propTypes = {
   titleTypes: PropTypes.arrayOf(PropTypes.string),
   Load: PropTypes.func.isRequired,
   Select: PropTypes.func.isRequired,
-  Lookup: PropTypes.func.isRequired,
   QuickSelect: PropTypes.func.isRequired,
   paginated: PropTypes.bool,
   paginationInfo: PropTypes.object
@@ -199,140 +199,199 @@ class ContentBrowser extends React.Component {
       name: undefined
     };
 
-    this.QuickSelect = this.QuickSelect.bind(this);
+    this.Update = this.Update.bind(this);
   }
 
-  async QuickSelect({libraryId, objectId, versionHash}) {
-    if(!objectId) {
-      this.setState({libraryId});
-      return;
-    }
+  async Update({name, libraryId, objectId, versionHash, offering}) {
+    this.setState({loading: true});
 
-    await this.props.onComplete({libraryId, objectId, versionHash});
+    try {
+      const complete =
+        libraryId &&
+        objectId &&
+        versionHash &&
+        (!this.props.offering || offering);
+
+      if(complete) {
+        if(!name) {
+          name = (await this.props.contentStore.LookupContent(versionHash || objectId)).name;
+        }
+
+        await this.props.onComplete({name, libraryId, objectId, versionHash, offering});
+      }
+
+      this.setState({
+        name,
+        libraryId,
+        objectId,
+        versionHash,
+        offering
+      });
+    } finally {
+      this.setState({loading: false});
+    }
+  }
+
+  BrowseLibraries() {
+    return (
+      <React.Fragment>
+        <div className="content-browser-actions">
+          <Action
+            className="back tertiary"
+            onClick={this.props.onCancel}
+          >
+            Cancel
+          </Action>
+        </div>
+        <BrowserList
+          key="browser-list-libraries"
+          header="Choose a library"
+          list={this.props.contentStore.libraries}
+          Load={this.props.contentStore.LoadLibraries}
+          Select={async ({id}) => await this.Update({libraryId: id})}
+          QuickSelect={this.Update}
+          paginated={false}
+        />
+      </React.Fragment>
+    );
+  }
+
+  BrowseObjects() {
+    const library = this.props.contentStore.libraries
+      .find(({libraryId}) => libraryId === this.state.libraryId);
+
+    let list = this.props.contentStore.objects[this.state.libraryId] || [];
+
+    return (
+      <React.Fragment>
+        <div className="content-browser-actions">
+          <Action
+            className="back secondary"
+            onClick={() => this.setState({libraryId: undefined})}
+          >
+            Back
+          </Action>
+          <Action
+            className="back tertiary"
+            onClick={this.props.onCancel}
+          >
+            Cancel
+          </Action>
+        </div>
+        <BrowserList
+          key={`browser-list-${this.state.libraryId}`}
+          header={library.name}
+          list={list}
+          paginated
+          paginationInfo={this.props.contentStore.objectPaginationInfo[this.state.libraryId]}
+          assetTypes={this.props.assetTypes}
+          titleTypes={this.props.titleTypes}
+          Load={async ({page, filter}) => await this.props.contentStore.LoadObjects({
+            libraryId: this.state.libraryId,
+            page,
+            filter,
+            assetTypes: this.props.assetTypes,
+            titleTypes: this.props.titleTypes
+          })}
+          Select={async ({id}) => {
+            let versionHash;
+            if(this.props.objectOnly) {
+              versionHash = await this.props.contentStore.LatestVersionHash({objectId: id});
+            }
+
+            await this.Update({libraryId: this.state.libraryId, objectId: id, versionHash});
+          }}
+          QuickSelect={this.Update}
+        />
+      </React.Fragment>
+    );
+  }
+
+  BrowseVersions() {
+    const library = this.props.contentStore.libraries
+      .find(({libraryId}) => libraryId === this.state.libraryId);
+    const object = this.props.contentStore.objects[this.state.libraryId]
+      .find(({objectId}) => objectId === this.state.objectId);
+
+    return (
+      <React.Fragment>
+        <div className="content-browser-actions">
+          <Action
+            className="back secondary"
+            onClick={() => this.setState({objectId: undefined})}
+          >
+            Back
+          </Action>
+          <Action
+            className="back tertiary"
+            onClick={this.props.onCancel}
+          >
+            Cancel
+          </Action>
+        </div>
+        <BrowserList
+          key={`browser-list-${this.state.objectId}`}
+          header="Choose a version"
+          subHeader={<React.Fragment><div>{library.name}</div><div>{object.name}</div></React.Fragment>}
+          list={this.props.contentStore.versions[this.state.objectId]}
+          hashes={true}
+          Load={async () => await this.props.contentStore.LoadVersions(this.state.libraryId, this.state.objectId)}
+          Select={async ({id}) => await this.Update({libraryId: this.state.libraryId, objectId: this.state.objectId, versionHash: id})}
+          QuickSelect={this.Update}
+          paginated={false}
+        />
+      </React.Fragment>
+    );
+  }
+
+  BrowseOfferings() {
+    const library = this.props.contentStore.libraries
+      .find(({libraryId}) => libraryId === this.state.libraryId);
+    const object = this.props.contentStore.objects[this.state.libraryId]
+      .find(({objectId}) => objectId === this.state.objectId);
+
+    return (
+      <React.Fragment>
+        <div className="content-browser-actions">
+          <Action
+            className="back secondary"
+            onClick={() => this.setState({objectId: undefined})}
+          >
+            Back
+          </Action>
+          <Action
+            className="back tertiary"
+            onClick={this.props.onCancel}
+          >
+            Cancel
+          </Action>
+        </div>
+        <BrowserList
+          key={`browser-list-${this.state.objectId}-offerings`}
+          header="Choose an offering"
+          subHeader={<React.Fragment><div>{library.name}</div><div>{object.name}</div></React.Fragment>}
+          list={this.props.contentStore.offerings[this.state.objectId]}
+          Load={async () => await this.props.contentStore.LoadOfferings(this.state.objectId, this.state.versionHash)}
+          Select={async ({id}) => await this.Update({libraryId: this.state.libraryId, objectId: this.state.objectId, versionHash: this.state.versionHash, offering: id})}
+          QuickSelect={this.Update}
+          paginated={false}
+        />
+      </React.Fragment>
+    );
   }
 
   render() {
     let content;
-    if(!this.state.libraryId) {
-      content = (
-        <React.Fragment>
-          <div className="content-browser-actions">
-            <Action
-              className="back tertiary"
-              onClick={this.props.onCancel}
-            >
-              Cancel
-            </Action>
-          </div>
-          <BrowserList
-            key="browser-list-libraries"
-            header="Choose a library"
-            list={this.props.contentStore.libraries}
-            Load={this.props.contentStore.LoadLibraries}
-            Select={({id}) => this.setState({libraryId: id})}
-            Lookup={this.props.contentStore.LookupContent}
-            QuickSelect={this.QuickSelect}
-            paginated={false}
-          />
-        </React.Fragment>
-      );
+    if(this.state.loading) {
+      content = <div className="browser-container loading"><LoadingElement loading /></div>;
+    } else if(!this.state.libraryId) {
+      content = this.BrowseLibraries();
     } else if(!this.state.objectId) {
-      const library = this.props.contentStore.libraries
-        .find(({libraryId}) => libraryId === this.state.libraryId);
-
-      let list = this.props.contentStore.objects[this.state.libraryId] || [];
-
-      content = (
-        <React.Fragment>
-          <div className="content-browser-actions">
-            <Action
-              className="back secondary"
-              onClick={() => this.setState({libraryId: undefined})}
-            >
-              Back
-            </Action>
-            <Action
-              className="back tertiary"
-              onClick={this.props.onCancel}
-            >
-              Cancel
-            </Action>
-          </div>
-          <BrowserList
-            key={`browser-list-${this.state.libraryId}`}
-            header={library.name}
-            list={list}
-            paginated
-            paginationInfo={this.props.contentStore.objectPaginationInfo[this.state.libraryId]}
-            assetTypes={this.props.assetTypes}
-            titleTypes={this.props.titleTypes}
-            Load={async ({page, filter}) => await this.props.contentStore.LoadObjects({
-              libraryId: this.state.libraryId,
-              page,
-              filter,
-              assetTypes: this.props.assetTypes,
-              titleTypes: this.props.titleTypes
-            })}
-            Select={async ({name, id}) => {
-              if(this.props.objectOnly) {
-                const versionHash = await this.props.contentStore.LatestVersionHash({objectId: id});
-
-                await this.props.onComplete({
-                  name,
-                  libraryId: this.state.libraryId,
-                  objectId: id,
-                  versionHash
-                });
-              } else {
-                this.setState({name, objectId: id});
-              }
-            }}
-            Lookup={this.props.contentStore.LookupContent}
-            QuickSelect={this.QuickSelect}
-          />
-        </React.Fragment>
-      );
-    } else {
-      const library = this.props.contentStore.libraries
-        .find(({libraryId}) => libraryId === this.state.libraryId);
-      const object = this.props.contentStore.objects[this.state.libraryId]
-        .find(({objectId}) => objectId === this.state.objectId);
-
-      content = (
-        <React.Fragment>
-          <div className="content-browser-actions">
-            <Action
-              className="back secondary"
-              onClick={() => this.setState({objectId: undefined})}
-            >
-              Back
-            </Action>
-            <Action
-              className="back tertiary"
-              onClick={this.props.onCancel}
-            >
-              Cancel
-            </Action>
-          </div>
-          <BrowserList
-            key={`browser-list-${this.state.objectId}`}
-            header="Choose a version"
-            subHeader={<React.Fragment><div>{library.name}</div><div>{object.name}</div></React.Fragment>}
-            list={this.props.contentStore.versions[this.state.objectId]}
-            hashes={true}
-            Load={async () => await this.props.contentStore.LoadVersions(this.state.libraryId, this.state.objectId)}
-            Select={async ({id}) => await this.props.onComplete({
-              name: this.state.name,
-              libraryId: this.state.libraryId,
-              objectId: this.state.objectId,
-              versionHash: id
-            })}
-            Lookup={this.props.contentStore.LookupContent}
-            QuickSelect={this.QuickSelect}
-            paginated={false}
-          />
-        </React.Fragment>
-      );
+      content = this.BrowseObjects();
+    } else if(!this.state.versionHash && !this.props.objectOnly) {
+      content = this.BrowseVersions();
+    } else if(this.props.offering) {
+      content = this.BrowseOfferings();
     }
 
     return (
@@ -350,6 +409,7 @@ ContentBrowser.propTypes = {
   titleTypes: PropTypes.arrayOf(PropTypes.string),
   playableOnly: PropTypes.bool,
   objectOnly: PropTypes.bool,
+  offering: PropTypes.bool,
   onComplete: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired
 };

@@ -4,7 +4,9 @@
   align-items: center;
   display: flex;
   flex-direction: column;
+  height: 50%;
   margin-bottom: $elv-spacing-l;
+  width: 40rem;
 
   .-elv-async-component-loading {
     min-height: 8rem;
@@ -13,6 +15,14 @@
   .browser-container {
     max-width: 100%;
     width: 40rem;
+
+    &.loading {
+      align-items: center;
+      display: flex;
+      height: 100%;
+      justify-content: center;
+      width: 100%;
+    }
   }
 
   .browser {

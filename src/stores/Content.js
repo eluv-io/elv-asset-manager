@@ -5,6 +5,7 @@ class ContentStore {
   @observable objectLists = {};
   @observable objects = {};
   @observable versions = {};
+  @observable offerings = {};
 
   @observable objectsPerPage = 100;
   @observable objectPaginationInfo = {};
@@ -137,6 +138,21 @@ class ContentStore {
     }));
   });
 
+  @action.bound
+  LoadOfferings = flow(function * (objectId, versionHash) {
+    const offerings = yield this.rootStore.client.AvailableOfferings({
+      objectId,
+      versionHash
+    });
+
+    this.offerings[objectId] = Object.keys(offerings).map(offeringKey => ({
+      id: offeringKey,
+      name: offerings[offeringKey].display_name || offeringKey,
+      objectDescription: offerings[offeringKey].description,
+      sortKey: offeringKey
+    }));
+  });
+
   async LatestVersionHash({objectId, versionHash}) {
     return await this.rootStore.client.LatestVersionHash({objectId, versionHash});
   }
@@ -227,11 +243,7 @@ class ContentStore {
       const name = yield client.ContentObjectMetadata({
         libraryId,
         objectId: objectId || libraryId.replace(/^ilib/, "iq__"),
-        select: [
-          "public/name",
-          "public/asset_metadata/title",
-          "public/asset_metadata/display_title"
-        ]
+        metadataSubtree: "public/name"
       });
 
       if(accessType === "library") {
