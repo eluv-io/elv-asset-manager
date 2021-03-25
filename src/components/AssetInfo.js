@@ -114,6 +114,13 @@ class AssetInfo extends React.Component {
 
           {
             Maybe(
+              !this.props.formStore.localizationActive,
+              <div className="asset-form-separator" />
+            )
+          }
+
+          {
+            Maybe(
               this.props.formStore.associatePermissions,
               <ObjectSelection
                 label="Permissions"

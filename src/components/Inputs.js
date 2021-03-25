@@ -260,7 +260,7 @@ class RecursiveField extends React.Component {
 
       return (
         this.ListField({
-          path: UrlJoin(PATH, field.name),
+          PATH: UrlJoin(PATH, field.name),
           orderable: true,
           name: field.name,
           label: field.label,

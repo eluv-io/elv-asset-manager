@@ -35,6 +35,11 @@ const eventSiteSpec = {
   ],
   infoFields: [
     {
+      "name": "accessible",
+      "type": "checkbox",
+      "hint": "If specified, this site will be accessible in places it is featured, for example on the main page of live.eluv.io."
+    },
+    {
       "label": "Tenant ID",
       "name": "tenant_id",
       "type": "text"
@@ -78,6 +83,10 @@ const eventSiteSpec = {
         {
           "name": "description",
           "type": "textarea"
+        },
+        {
+          "name": "copyright",
+          "type": "textarea"
         }
       ],
       "name": "event_info",
@@ -92,12 +101,19 @@ const eventSiteSpec = {
         },
         {
           "extensions": imageTypes,
+          "name": "hero_background_mobile",
+          "label": "Hero Background (Mobile)",
+          "type": "file"
+        },
+        {
+          "extensions": imageTypes,
           "name": "header",
           "type": "file"
         },
         {
           "extensions": imageTypes,
-          "name": "poster",
+          "name": "header_mobile",
+          "label": "Header (Mobile)",
           "type": "file"
         },
         {
@@ -118,47 +134,6 @@ const eventSiteSpec = {
     },
     {
       "fields": [
-        /*
-        {
-          "name": "intro",
-          "type": "textarea"
-        },
-        {
-          "fields": [
-            {
-              "name": "full_name",
-              "type": "text"
-            },
-            {
-              "name": "age",
-              "type": "text"
-            },
-            {
-              "name": "gender",
-              "type": "text"
-            },
-            {
-              "name": "birth_date",
-              "type": "text"
-            },
-            {
-              "name": "birth_place",
-              "type": "text"
-            },
-            {
-              "name": "nationality",
-              "type": "text"
-            },
-            {
-              "name": "trivia",
-              "type": "textarea"
-            }
-          ],
-          "name": "bio",
-          "type": "subsection"
-        },
-
-         */
         {
           "fields": [
             {
@@ -207,17 +182,6 @@ const eventSiteSpec = {
           "name": "name",
           "type": "text"
         },
-        /*
-        {
-          "name": "footer_text",
-          "type": "text"
-        },
-        {
-          "name": "stream_text",
-          "type": "text"
-        },
-
-         */
         {
           "extensions": imageTypes,
           "name": "image",
@@ -288,6 +252,12 @@ const eventSiteSpec = {
       "fields": [
         {
           "name": "stripe_public_key",
+          "label": "Stripe Public Key (Production)",
+          "type": "text"
+        },
+        {
+          "name": "stripe_public_key_test",
+          "label": "Stripe Public Key (Test)",
           "type": "text"
         },
         {
@@ -348,22 +318,25 @@ const eventSiteSpec = {
               "hint": "Available price currencies are based on the 'Payment Currencies' field above",
             },
             {
+              "name": "external_url",
+              "hint": "External URL from which to purchase this ticket. If specified, the payment information below is not required."
+            },
+            {
               "fields": [
                 {
                   "fields": [
                     {
-                      "label": "Price ID",
+                      "label": "Price ID (Production)",
                       "name": "price_id",
                       "type": "text"
                     },
                     {
-                      "label": "Product ID",
-                      "name": "product_id",
-                      "type": "text"
+                      "label": "Price ID (Test)",
+                      "name": "price_id_test",
                     },
                     {
-                      "label": "SKU ID",
-                      "name": "sku_id",
+                      "label": "Product ID",
+                      "name": "product_id",
                       "type": "text"
                     }
                   ],
@@ -464,18 +437,13 @@ const eventSiteSpec = {
             {
               "fields": [
                 {
-                  "label": "Price ID",
-                  "name": "price_id",
-                  "type": "text"
-                },
-                {
-                  "label": "Product ID",
-                  "name": "product_id",
-                  "type": "text"
-                },
-                {
-                  "label": "SKU ID",
+                  "label": "SKU ID (Production)",
                   "name": "sku_id",
+                  "type": "text"
+                },
+                {
+                  "label": "SKU ID (Test)",
+                  "name": "sku_id_test",
                   "type": "text"
                 }
               ],

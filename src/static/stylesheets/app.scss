@@ -356,6 +356,13 @@ button {
   margin-top: $elv-spacing-m;
   padding: $elv-spacing-m $elv-spacing-m $elv-spacing-xl;
 
+  .asset-form-separator {
+    background: $elv-color-lightgray;
+    height: 1px;
+    margin: $elv-spacing-ml auto;
+    width: 90%;
+  }
+
   &:last-child {
     border: 0;
   }

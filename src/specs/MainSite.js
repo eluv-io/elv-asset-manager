@@ -33,6 +33,12 @@ const mainSiteSelectorSpec = {
   ],
   "info_fields": [
     {
+      "name": "mode",
+      "type": "select",
+      "options": ["test", "production"],
+      "default_value": "test"
+    },
+    {
       "fields": [
         {
           "fields": [
