@@ -154,7 +154,7 @@ class SpecStore {
         formattedField.top_level = field.top_level;
       }
 
-      if(field.type === "list" || field.type === "subsection") {
+      if(["list", "subsection", "reference_list", "reference_subsection"].includes(field.type)) {
         const { infoFields, errors } = this.FormatInfoFields(field.fields);
         formattedField.fields = infoFields;
 

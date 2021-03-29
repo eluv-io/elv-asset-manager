@@ -255,7 +255,8 @@ class RecursiveField extends React.Component {
     } else if(field.type === "list" || field.type === "reference_list") {
       let fields = field.fields;
       if(field.type === "reference_list") {
-        fields = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || []);
+        fields = field.fields || [];
+        fields = fields.concat(Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || []);
       }
 
       return (

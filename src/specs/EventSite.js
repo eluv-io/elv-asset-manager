@@ -107,13 +107,14 @@ const eventSiteSpec = {
         },
         {
           "extensions": imageTypes,
-          "name": "header",
+          "label": "Header Image (Dark)",
+          "name": "header_dark",
           "type": "file"
         },
         {
           "extensions": imageTypes,
-          "name": "header_mobile",
-          "label": "Header (Mobile)",
+          "label": "Header Image (Light)",
+          "name": "header_light",
           "type": "file"
         },
         {
@@ -251,28 +252,6 @@ const eventSiteSpec = {
     {
       "fields": [
         {
-          "name": "stripe_public_key",
-          "label": "Stripe Public Key (Production)",
-          "type": "text"
-        },
-        {
-          "name": "stripe_public_key_test",
-          "label": "Stripe Public Key (Test)",
-          "type": "text"
-        },
-        {
-          "label": "PayPal Client ID",
-          "name": "paypal_client_id",
-          "type": "text"
-        }
-      ],
-      "label": "Payment Service Configurations",
-      "name": "payment_config",
-      "type": "subsection"
-    },
-    {
-      "fields": [
-        {
           "name": "name",
           "type": "text"
         },
@@ -320,33 +299,6 @@ const eventSiteSpec = {
             {
               "name": "external_url",
               "hint": "External URL from which to purchase this ticket. If specified, the payment information below is not required."
-            },
-            {
-              "fields": [
-                {
-                  "fields": [
-                    {
-                      "label": "Price ID (Production)",
-                      "name": "price_id",
-                      "type": "text"
-                    },
-                    {
-                      "label": "Price ID (Test)",
-                      "name": "price_id_test",
-                    },
-                    {
-                      "label": "Product ID",
-                      "name": "product_id",
-                      "type": "text"
-                    }
-                  ],
-                  "name": "stripe",
-                  "type": "subsection"
-                }
-              ],
-              "label": "Payment IDs",
-              "name": "payment_ids",
-              "type": "subsection"
             }
           ],
           "label": "SKUs",
@@ -379,11 +331,6 @@ const eventSiteSpec = {
         {
           "name": "description",
           "type": "textarea"
-        },
-        {
-          "label": "NTP ID",
-          "name": "otp_id",
-          "type": "ntp_id"
         },
         {
           "fields": [
@@ -430,30 +377,14 @@ const eventSiteSpec = {
         {
           "name": "product_options",
           "type": "reference_list",
-          "reference": "./option_fields"
-        },
-        {
+          "reference": "./option_fields",
           "fields": [
             {
-              "fields": [
-                {
-                  "label": "SKU ID (Production)",
-                  "name": "sku_id",
-                  "type": "text"
-                },
-                {
-                  "label": "SKU ID (Test)",
-                  "name": "sku_id_test",
-                  "type": "text"
-                }
-              ],
-              "name": "stripe",
-              "type": "subsection"
+              "label": "SKU ID",
+              "name": "uuid",
+              "type": "uuid"
             }
-          ],
-          "label": "Payment IDs",
-          "name": "payment_ids",
-          "type": "subsection"
+          ]
         }
       ],
       "name": "products",

@@ -119,7 +119,7 @@ class Info extends React.Component {
           {
             name: "fields",
             type: "list",
-            only: entry => entry.type === "list" || entry.type === "subsection",
+            only: entry => ["list", "subsection", "reference_list", "reference_subsection"].includes(entry.type),
             render: index => this.InfoListField("Fields", values[index].fields, newValues => UpdateFields(index, newValues))
           }
         ]}

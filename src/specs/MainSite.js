@@ -39,6 +39,24 @@ const mainSiteSelectorSpec = {
       "default_value": "test"
     },
     {
+      "name": "site_images",
+      "type": "subsection",
+      "fields": [
+        {
+          "extensions": imageTypes,
+          "label": "Eluvio Live Logo (Light)",
+          "name": "eluvio_live_logo_light",
+          "type": "file"
+        },
+        {
+          "extensions": imageTypes,
+          "label": "Eluvio Live Logo (Dark)",
+          "name": "eluvio_live_logo_dark",
+          "type": "file"
+        }
+      ]
+    },
+    {
       "fields": [
         {
           "fields": [
