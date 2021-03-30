@@ -40,6 +40,7 @@
     "react": "^16.8.6",
     "react-datetime": "^2.16.3",
     "react-dom": "^16.8.6",
+    "react-rte": "^0.16.3",
     "urijs": "^1.19.6",
     "url-join": "^4.0.1",
     "uuid": "^8.3.2"

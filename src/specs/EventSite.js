@@ -136,6 +136,36 @@ const eventSiteSpec = {
     {
       "fields": [
         {
+          "name": "name",
+          "type": "text"
+        },
+        {
+          "fields": [
+            {
+              "hint": "A description displayed next to the 'Next' button when viewing the previous page.",
+              "name": "page_title",
+              "type": "text"
+            },
+            {
+              "extensions": imageTypes,
+              "name": "image",
+              "type": "file"
+            },
+            {
+              "name": "text",
+              "type": "rich_text"
+            }
+          ],
+          "name": "pages",
+          "type": "list"
+        }
+      ],
+      "name": "event_descriptions",
+      "type": "list"
+    },
+    {
+      "fields": [
+        {
           "fields": [
             {
               "name": "youtube",

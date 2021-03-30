@@ -29,6 +29,7 @@ import DeleteIcon from "../static/icons/trash.svg";
 import HintIcon from "../static/icons/help-circle.svg";
 import FileIcon from "../static/icons/file.svg";
 import ObjectSelection from "./ObjectSelection";
+import TextEditor from "./TextEditor";
 
 const ReferencePathElements = (PATH, reference) => {
   let pathElements;
@@ -116,6 +117,15 @@ class RecursiveField extends React.Component {
           value={entry[field.name] || ""}
           onChange={newValue => Update(field.name, newValue)}
         />
+      );
+    } else if(field.type === "rich_text") {
+      return (
+        <LabelledField key={key} label={hintLabel || field.label || FormatName(field.name)} className="text-editor-labelled-field">
+          <TextEditor
+            value={entry[field.name] || ""}
+            onChange={newValue => Update(field.name, newValue)}
+          />
+        </LabelledField>
       );
     } else if(field.type === "checkbox") {
       return (

@@ -250,3 +250,30 @@
     display: inline-block;
   }
 }
+
+.text-editor-labelled-field {
+  label {
+    align-items: flex-start;
+    padding-top: $elv-spacing-m;
+  }
+}
+
+.text-editor-component {
+  max-width: 800px;
+
+  .show-hide-button {
+    padding: $elv-spacing-s 0;
+  }
+
+  .rich-text-editor {
+    display: grid;
+    grid-template-rows: 4rem 1fr;
+    min-height: 300px;
+
+    // sass-lint:disable class-name-format
+    .DraftEditor-root {
+      height: 100%;
+      max-width: 100%;
+    }
+  }
+}

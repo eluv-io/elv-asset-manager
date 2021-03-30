@@ -72,6 +72,7 @@ class Info extends React.Component {
     const types = [
       "text",
       "textarea",
+      "rich_text",
       "integer",
       "number",
       "uuid",
@@ -88,7 +89,7 @@ class Info extends React.Component {
       "list",
       "reference_subsection",
       "reference_list"
-    ];
+    ].sort();
 
     const UpdateFields = (index, newFields) => {
       let newValues = [...toJS(values)];
