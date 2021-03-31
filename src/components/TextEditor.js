@@ -8,7 +8,7 @@ class TextEditor extends React.Component {
 
     this.state = {
       show: false,
-      value: RichTextEditor.createValueFromString(this.props.value, "markdown")
+      value: RichTextEditor.createValueFromString(this.props.value, "html")
     };
   }
 
@@ -19,13 +19,12 @@ class TextEditor extends React.Component {
       <RichTextEditor
         className="rich-text-editor"
         value={this.state.value}
-        onChange={value => this.setState({value}, this.props.onChange(value.toString("markdown")))}
+        onChange={value => this.setState({value}, this.props.onChange(value.toString("html").replace(/<a /g, "<a target=\"_blank\" ")))}
         toolbarConfig={{
           display: ["INLINE_STYLE_BUTTONS", "BLOCK_TYPE_DROPDOWN", "BLOCK_TYPE_BUTTONS", "LINK_BUTTONS", "HISTORY_BUTTONS"],
           INLINE_STYLE_BUTTONS: [
             {label: "Bold", style: "BOLD", className: "custom-css-class"},
-            {label: "Italic", style: "ITALIC"},
-            {label: "Underline", style: "UNDERLINE"}
+            {label: "Italic", style: "ITALIC"}
           ],
           BLOCK_TYPE_DROPDOWN: [
             {label: "Normal", style: "unstyled"},
@@ -35,6 +34,7 @@ class TextEditor extends React.Component {
             {label: "Heading Extra Small", style: "header-four"}
           ],
           BLOCK_TYPE_BUTTONS: [
+            {label: "Block Quote", style: "blockquote"},
             {label: "UL", style: "unordered-list-item"},
             {label: "OL", style: "ordered-list-item"}
           ]
