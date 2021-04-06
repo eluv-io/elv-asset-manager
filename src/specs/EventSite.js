@@ -59,6 +59,12 @@ const eventSiteSpec = {
       ]
     },
     {
+      "name": "google_analytics_id",
+      "label": "Analytics ID",
+      "hint": "Specify your own Google Analytics ID (GA_MEASUREMENT_ID)",
+      "type": "text"
+    },
+    {
       "fields": [
         {
           "name": "event_header",
@@ -78,7 +84,7 @@ const eventSiteSpec = {
         },
         {
           "name": "date",
-          "type": "datetime"
+          "type": "text"
         },
         {
           "name": "description",
@@ -214,6 +220,10 @@ const eventSiteSpec = {
           "type": "text"
         },
         {
+          "name": "link",
+          "type": "text"
+        },
+        {
           "extensions": imageTypes,
           "name": "image",
           "type": "file"
@@ -249,16 +259,6 @@ const eventSiteSpec = {
         {
           "name": "location",
           "type": "text"
-        },
-        {
-          "label": "Start Time",
-          "name": "start_time",
-          "type": "datetime"
-        },
-        {
-          "label": "End Time",
-          "name": "end_time",
-          "type": "datetime"
         }
       ],
       "label": "Calendar Event",
@@ -291,6 +291,11 @@ const eventSiteSpec = {
           "type": "uuid"
         },
         {
+          "name": "release_date",
+          "type": "datetime",
+          "hint": "If the tickets should not be available for purchase immediately, specify a release date"
+        },
+        {
           "name": "description",
           "type": "textarea"
         },
@@ -318,6 +323,12 @@ const eventSiteSpec = {
             {
               "name": "start_time",
               "type": "datetime"
+            },
+            {
+              "label": "Start Time (Text)",
+              "hint": "This label will be displayed in emails where time zone localization is not possible.",
+              "name": "start_time_text",
+              "type": "text"
             },
             {
               "name": "price",

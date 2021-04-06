@@ -112,7 +112,7 @@ class Info extends React.Component {
           {name: "hint", hint: hints.hint},
           {name: "top_level", type: "checkbox", hint: hints.top_level, only: () => toplevel},
           {name: "for_title_types", type: "multiselect", hint: hints.for_title_types, options: this.props.specStore.availableTitleTypes, only: () => toplevel},
-          {name: "type", type: "select", options: types, default: types[0]},
+          {name: "type", type: "select", options: types, default: "text"},
           {name: "options", type: "list", only: entry => ["select", "multiselect"].includes(entry.type)},
           {name: "extensions", type: "list", only: entry => entry.type === "file"},
           {name: "reference", only: entry => ["reference_subsection", "reference_list"].includes(entry.type)},
