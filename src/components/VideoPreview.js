@@ -38,7 +38,11 @@ class VideoPreview extends React.Component {
       // Prefer AES playout
       const playoutUrl = (playoutMethods["aes-128"] || playoutMethods.clear).playoutUrl;
 
-      this.player = new HLSPlayer();
+      this.player = new HLSPlayer({
+        maxBufferLength: 30,
+        maxBufferSize: 300,
+        enableWorker: true
+      });
 
       this.player.loadSource(playoutUrl);
       this.player.attachMedia(element);

@@ -4,6 +4,7 @@ import {ElvClient} from "@eluvio/elv-client-js";
 import UrlJoin from "url-join";
 
 import DefaultSpec from "../specs/Default";
+import {parse} from "node-html-parser";
 
 require("elv-components-js/src/utils/LimitedMap");
 
@@ -1318,10 +1319,23 @@ class FormStore {
         value = this.FormatDate(values[name], true);
       } else if(type === "file") {
         if(values[name].path) {
-          value = this.CreateLink({targetHash: values[name].targetHash, linkTarget: UrlJoin("files", values[name].path)});
+          value = this.CreateLink({
+            targetHash: values[name].targetHash,
+            linkTarget: UrlJoin("files", values[name].path)
+          });
         } else {
           value = null;
         }
+      } else if(type === "rich_text") {
+        // Set target="_blank" and rel="noopener" on all links
+        const html = parse(value.toString("html"));
+        const links = html.querySelectorAll("a");
+        links.forEach(link => {
+          link.setAttribute("target", "_blank");
+          link.setAttribute("rel", "noopener");
+        });
+
+        value = html.toString();
       } else if(type === "subsection") {
         value = this.FormatFields({infoFields: fields, values: values[name], titleType}).info || {};
       } else if(type === "list") {

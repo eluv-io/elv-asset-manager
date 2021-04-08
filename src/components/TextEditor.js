@@ -19,7 +19,7 @@ class TextEditor extends React.Component {
       <RichTextEditor
         className="rich-text-editor"
         value={this.state.value}
-        onChange={value => this.setState({value}, this.props.onChange(value.toString("html").replace(/<a /g, "<a target=\"_blank\" ")))}
+        onChange={value => this.setState({value}, this.props.onChange(value.toString("html")))}
         toolbarConfig={{
           display: ["INLINE_STYLE_BUTTONS", "BLOCK_TYPE_DROPDOWN", "BLOCK_TYPE_BUTTONS", "LINK_BUTTONS", "HISTORY_BUTTONS"],
           INLINE_STYLE_BUTTONS: [

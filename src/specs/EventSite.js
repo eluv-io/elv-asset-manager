@@ -249,6 +249,99 @@ const eventSiteSpec = {
     {
       "fields": [
         {
+          "name": "name",
+          "type": "text"
+        },
+        {
+          "name": "description",
+          "type": "textarea"
+        },
+        {
+          "name": "location",
+          "type": "text"
+        },
+        {
+          "name": "type",
+          "type": "select",
+          "options": ["Online Only", "Online and In-Person"]
+        },
+        {
+          "name": "images",
+          "type": "list",
+          "fields": [{
+            "name": "image",
+            "type": "file",
+            "extensions": imageTypes
+          }]
+        },
+        {
+          "name": "performers",
+          "type": "list",
+          "fields": [
+            {
+              "name": "name",
+              "type": "text"
+            },
+            {
+              "name": "url",
+              "label": "URL",
+              "type": "text"
+            },
+            {
+              "name": "image",
+              "type": "file",
+              "extensions": imageTypes
+            }
+          ]
+        },
+        {
+          "name": "organizers",
+          "type": "list",
+          "fields": [
+            {
+              "name": "name",
+              "type": "text"
+            },
+            {
+              "name": "url",
+              "label": "URL",
+              "type": "text"
+            },
+            {
+              "name": "image",
+              "type": "file",
+              "extensions": imageTypes
+            }
+          ]
+        },
+        {
+          "name": "showings",
+          "type": "list",
+          "fields": [
+            {
+              "name": "name",
+              "type": "text"
+            },
+            {
+              "name": "start_time",
+              "type": "datetime",
+              "hint": "Make sure this time exactly matches the corresponding ticket SKU start times"
+            },
+            {
+              "name": "end_time",
+              "type": "datetime"
+            }
+          ]
+        }
+      ],
+      "label": "Search Listing Info",
+      "name": "search_data",
+      "type": "subsection",
+      "hint": "This information will be used to populate data used by search engines for displaying this event"
+    },
+    {
+      "fields": [
+        {
           "name": "title",
           "type": "text"
         },
@@ -329,6 +422,10 @@ const eventSiteSpec = {
               "hint": "This label will be displayed in emails where time zone localization is not possible.",
               "name": "start_time_text",
               "type": "text"
+            },
+            {
+              "name": "end_time",
+              "type": "datetime"
             },
             {
               "name": "price",
