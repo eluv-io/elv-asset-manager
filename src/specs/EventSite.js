@@ -4,7 +4,7 @@ const currencyOptions = [...new Set(Object.values(require("country-codes-list").
 
 const eventSiteSpec = {
   name: "Event Site",
-  version: "0.11",
+  version: "0.12",
   associate_permissions: true,
   controls: [],
   availableAssetTypes: [
@@ -59,10 +59,41 @@ const eventSiteSpec = {
       ]
     },
     {
-      "name": "google_analytics_id",
-      "label": "Analytics ID",
-      "hint": "Specify your own Google Analytics ID (GA_MEASUREMENT_ID)",
-      "type": "text"
+      "name": "analytics",
+      "type": "subsection",
+      "hint": "Specify IDs for your own analytics",
+      "fields": [
+        {
+          "name": "google",
+          "label": "Google Analytics ID",
+          "type": "text"
+        },
+        {
+          "name": "google_conversion_id",
+          "label": "Google Conversion ID",
+          "type": "text"
+        },
+        {
+          "name": "google_conversion_label",
+          "label": "Google Conversion Label",
+          "type": "text"
+        },
+        {
+          "name": "facebook",
+          "label": "Facebook Pixel ID",
+          "type": "text"
+        },
+        {
+          "name": "adnxs_segment_id",
+          "label": "App Nexus Segment ID",
+          "type": "text"
+        },
+        {
+          "name": "adnxs_pixel_id",
+          "label": "App Nexus Pixel ID",
+          "type": "text"
+        }
+      ]
     },
     {
       "fields": [
@@ -225,7 +256,14 @@ const eventSiteSpec = {
         },
         {
           "extensions": imageTypes,
+          "label": "Image (for light background)",
           "name": "image",
+          "type": "file"
+        },
+        {
+          "extensions": imageTypes,
+          "label": "Image (for dark background)",
+          "name": "image_light",
           "type": "file"
         }
       ],
