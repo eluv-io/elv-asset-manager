@@ -4,7 +4,7 @@ const currencyOptions = [...new Set(Object.values(require("country-codes-list").
 
 const eventSiteSpec = {
   name: "Event Site",
-  version: "0.12",
+  version: "0.13",
   associate_permissions: true,
   controls: [],
   availableAssetTypes: [
@@ -40,6 +40,11 @@ const eventSiteSpec = {
       "hint": "If specified, this site will be accessible in places it is featured, for example on the main page of live.eluv.io."
     },
     {
+      "name": "free",
+      "type": "checkbox",
+      "hint": "If specified, the event is free for all users and tickets will not be necessary."
+    },
+    {
       "label": "Tenant ID",
       "name": "tenant_id",
       "type": "text"
@@ -69,6 +74,11 @@ const eventSiteSpec = {
           "type": "text"
         },
         {
+          "name": "google_tag_manager_id",
+          "label": "Google Tag Manager ID",
+          "type": "text"
+        },
+        {
           "name": "google_conversion_id",
           "label": "Google Conversion ID",
           "type": "text"
@@ -91,6 +101,16 @@ const eventSiteSpec = {
         {
           "name": "adnxs_pixel_id",
           "label": "App Nexus Pixel ID",
+          "type": "text"
+        },
+        {
+          "name": "tradedoubler_organization_id",
+          "label": "TradeDoubler Organization ID",
+          "type": "text"
+        },
+        {
+          "name": "tradedoubler_event_id",
+          "label": "TradeDoubler Event ID",
           "type": "text"
         }
       ]
