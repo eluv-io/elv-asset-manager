@@ -35,9 +35,16 @@ const eventSiteSpec = {
   ],
   infoFields: [
     {
-      "name": "accessible",
-      "type": "checkbox",
-      "hint": "If specified, this site will be accessible in places it is featured, for example on the main page of live.eluv.io."
+      "name": "state",
+      "type": "select",
+      "options": [
+        "Inaccessible",
+        "Live Available",
+        "Live Ended",
+        "VoD Available"
+      ],
+      "default_value": "Inaccessible",
+      "hint": "Specify the current state of the event. Inaccessible and ended events will not be visible to users."
     },
     {
       "name": "free",
