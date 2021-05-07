@@ -7,13 +7,15 @@ import EventSiteSpec from "../../specs/EventSite";
 import EventSiteExtrasSpec from "../../specs/EventSiteExtras";
 import EventSiteSelectorSpec from "../../specs/EventSiteSelector";
 import MainSiteSpec from "../../specs/MainSite";
+import EmbeddedCollectionSpec from "../../specs/EmbeddedCollection";
 
 const specs = {
   "Default": DefaultSpec,
   "Event Site": EventSiteSpec,
   "Event Site Extras": EventSiteExtrasSpec,
   "Event Site Selector": EventSiteSelectorSpec,
-  "Main Live Site": MainSiteSpec
+  "Main Live Site": MainSiteSpec,
+  "Embedded Collection": EmbeddedCollectionSpec
 };
 
 @inject("rootStore")
