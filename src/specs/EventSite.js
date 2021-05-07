@@ -449,6 +449,11 @@ const eventSiteSpec = {
           "type": "uuid"
         },
         {
+          "name": "hidden",
+          "type": "checkbox",
+          "hint": "If checked, this ticket class will not be displayed and won't be available for purchase."
+        },
+        {
           "name": "release_date",
           "type": "datetime",
           "hint": "If the tickets should not be available for purchase immediately, specify a release date"
@@ -472,6 +477,11 @@ const eventSiteSpec = {
               "label": "Item ID",
               "name": "uuid",
               "type": "uuid"
+            },
+            {
+              "name": "hidden",
+              "type": "checkbox",
+              "hint": "If checked, this ticket SKU will not be displayed and won't be available for purchase."
             },
             {
               "label": "NTP ID",
