@@ -23,6 +23,15 @@ const eventSiteSelectorSpec = {
       defaultable: false,
       orderable: false,
       title_types: ["site"]
+    },
+    {
+      name: "collections",
+      label: "Collections",
+      indexed: false,
+      slugged: true,
+      defaultable: false,
+      orderable: false,
+      title_types: ["collection"]
     }
   ]
 };

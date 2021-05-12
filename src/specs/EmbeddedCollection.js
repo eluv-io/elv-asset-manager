@@ -29,6 +29,10 @@ const EmbeddedCollectionSpec = {
       "type": "textarea"
     },
     {
+      "name": "footer_text",
+      "type": "textarea"
+    },
+    {
       "fields": [
         {
           "extensions": imageTypes,
@@ -37,17 +41,43 @@ const EmbeddedCollectionSpec = {
         },
         {
           "extensions": imageTypes,
-          "name": "hero_image",
-          "type": "file"
-        },
-        {
-          "extensions": imageTypes,
-          "label": "Hero Image (Mobile)",
-          "name": "hero_image_mobile",
+          "name": "background",
           "type": "file"
         }
       ],
       "name": "images",
+      "type": "subsection"
+    },
+    {
+      "fields": [
+        {
+          "label": "Tenant ID",
+          "name": "tenant_id",
+          "type": "text"
+        },
+        {
+          "label": "NTP ID",
+          "name": "ntp_id",
+          "type": "text"
+        }
+      ],
+      "name": "access",
+      "type": "subsection"
+    },
+    {
+      "fields": [
+        {
+          "label": "Transfer Message",
+          "name": "transfer_message",
+          "type": "textarea"
+        },
+        {
+          "label": "Transfer Terms",
+          "name": "transfer_terms",
+          "type": "rich_text"
+        }
+      ],
+      "name": "transfer",
       "type": "subsection"
     }
   ]
