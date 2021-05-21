@@ -21,6 +21,14 @@ const EmbeddedCollectionSpec = {
   ],
   "info_fields": [
     {
+      "name": "public_title",
+      "type": "text",
+    },
+    {
+      "name": "public_description",
+      "type": "textarea",
+    },
+    {
       "name": "header",
       "type": "text"
     },
@@ -33,10 +41,20 @@ const EmbeddedCollectionSpec = {
       "type": "textarea"
     },
     {
+      "name": "transfer_message",
+      "type": "textarea",
+      "hint": "This text will appear in the form for transfering the NFT to Ethereum"
+    },
+    {
       "fields": [
         {
           "extensions": imageTypes,
           "name": "logo",
+          "type": "file"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "image",
           "type": "file"
         },
         {
@@ -67,17 +85,48 @@ const EmbeddedCollectionSpec = {
     {
       "fields": [
         {
-          "label": "Transfer Message",
-          "name": "transfer_message",
-          "type": "textarea"
+          "label": "UUID",
+          "name": "uuid",
+          "type": "uuid"
         },
         {
-          "label": "Transfer Terms",
-          "name": "transfer_terms",
-          "type": "rich_text"
-        }
+          "name": "address",
+          "label": "NFT Contract Address",
+          "type": "text"
+        },
+        {
+          "name": "base_hash",
+          "label": "Base Content Hash",
+          "type": "text"
+        },
+        {
+          "name": "eth_locator",
+          "label": "Ethereum Locator",
+          "type": "text"
+        },
+        {
+          "name": "cauth_id",
+          "label": "Mint ID",
+          "type": "text"
+        },
+        {
+          "name": "fauth_id",
+          "label": "Permissions ID",
+          "type": "text"
+        },
+        {
+          "name": "token_template",
+          "label": "NFT Token Template",
+          "type": "text"
+        },
+        {
+          "name": "merge_meta",
+          "label": "Metadata",
+          "type": "textarea"
+        },
       ],
-      "name": "transfer",
+      "name": "nft",
+      "label": "NFT",
       "type": "subsection"
     }
   ]

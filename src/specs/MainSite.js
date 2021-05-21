@@ -182,7 +182,28 @@ const mainSiteSelectorSpec = {
           ],
           "name": "remonetize_endlessly",
           "type": "subsection"
-        }
+        },
+        {
+          "fields": [
+            {
+              "type": "list",
+              "name": "card_images",
+              "fields": [
+                {
+                  "extensions": imageTypes,
+                  "name": "card_image",
+                  "type": "file"
+                },
+                {
+                  "name": "title"
+                }
+              ]
+            }
+          ],
+          "name": "nft_collections",
+          "label": "NFT Collections",
+          "type": "subsection"
+        },
       ],
       "name": "images",
       "type": "subsection"

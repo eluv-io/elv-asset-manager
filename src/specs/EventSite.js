@@ -101,6 +101,11 @@ const eventSiteSpec = {
           "type": "text"
         },
         {
+          "name": "facebook_verification",
+          "label": "Facebook Domain Verification ID",
+          "type": "text"
+        },
+        {
           "name": "adnxs_segment_id",
           "label": "App Nexus Segment ID",
           "type": "text"
@@ -124,6 +129,12 @@ const eventSiteSpec = {
     },
     {
       "fields": [
+        {
+          "label": "Event Info on Hero Image",
+          "name": "hero_info",
+          "type": "checkbox",
+          "hint": "Check this box if your event info is in your hero image. This will reduce the gradient and omit the text, allowing for more visible real estate on the hero image."
+        },
         {
           "name": "event_header",
           "type": "text"
