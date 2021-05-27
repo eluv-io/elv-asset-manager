@@ -1,6 +1,7 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 const countryOptions = Object.values(require("country-codes-list").customList("countryNameEn", "{countryCode}: {countryNameEn}")).sort();
 const currencyOptions = [...new Set(Object.values(require("country-codes-list").customList("countryNameEn", "{currencyCode}")))].filter(c => c).sort();
+const languageOptions = require("./LanguageCodes").default;
 
 const eventSiteSpec = {
   name: "Event Site",
@@ -14,7 +15,9 @@ const eventSiteSpec = {
     "site"
   ],
   defaultImageKeys: [],
-  localizations: [],
+  localization: {
+    localizations: Object.keys(languageOptions)
+  },
   fileControls: [],
   fileControlItems: {},
   associatedAssets: [
@@ -37,6 +40,7 @@ const eventSiteSpec = {
     {
       "name": "state",
       "type": "select",
+      "no_localize": true,
       "options": [
         "Inaccessible",
         "Live Available",
@@ -49,17 +53,20 @@ const eventSiteSpec = {
     {
       "name": "free",
       "type": "checkbox",
+      "no_localize": true,
       "hint": "If specified, the event is free for all users and tickets will not be necessary."
     },
     {
       "label": "Tenant ID",
       "name": "tenant_id",
-      "type": "text"
+      "type": "text",
+      "no_localize": true,
     },
     {
       "label": "Base URL Slug",
       "name": "base_slug",
       "type": "text",
+      "no_localize": true,
       "hint": "Base URL Slug for this site (e.g. https://live.eluv.io/<base_slug>/<site>) (Optional)"
     },
     {
@@ -68,11 +75,21 @@ const eventSiteSpec = {
       "options": [
         "light",
         "dark"
-      ]
+      ],
+      "no_localize": true,
+    },
+    {
+      "name": "localizations",
+      "label": "Localizations",
+      "type": "multiselect",
+      "no_localize": true,
+      "hint": "Additional languages to support",
+      "options": Object.keys(languageOptions)
     },
     {
       "name": "analytics",
       "type": "subsection",
+      "no_localize": true,
       "hint": "Specify IDs for your own analytics",
       "fields": [
         {
@@ -98,11 +115,6 @@ const eventSiteSpec = {
         {
           "name": "facebook",
           "label": "Facebook Pixel ID",
-          "type": "text"
-        },
-        {
-          "name": "facebook_verification",
-          "label": "Facebook Domain Verification ID",
           "type": "text"
         },
         {
@@ -276,11 +288,13 @@ const eventSiteSpec = {
             }
           ],
           "name": "social_media_links",
-          "type": "subsection"
+          "type": "subsection",
         }
       ],
       "name": "artist_info",
-      "type": "subsection"
+      "type": "subsection",
+      "label": "Links",
+      "no_localize": true
     },
     {
       "fields": [
@@ -437,6 +451,7 @@ const eventSiteSpec = {
     {
       "name": "shipping_countries",
       "type": "multiselect",
+      "no_localize": true,
       "hint": "Countries to which merchandise shipment is available",
       "default_value": ["US: United States of America"],
       "options": countryOptions
@@ -444,6 +459,7 @@ const eventSiteSpec = {
     {
       "name": "payment_currencies",
       "type": "multiselect",
+      "no_localize": true,
       "hint": "List of accepted currencies for tickets and merchandise",
       "default_value": ["USD"],
       "options": currencyOptions
@@ -457,17 +473,26 @@ const eventSiteSpec = {
         {
           "label": "Item ID",
           "name": "uuid",
+          "no_localize": true,
           "type": "uuid"
         },
         {
           "name": "hidden",
           "type": "checkbox",
+          "no_localize": true,
           "hint": "If checked, this ticket class will not be displayed and won't be available for purchase."
         },
         {
           "name": "release_date",
           "type": "datetime",
+          "no_localize": true,
           "hint": "If the tickets should not be available for purchase immediately, specify a release date"
+        },
+        {
+          "name": "requires_shipping",
+          "type": "checkbox",
+          "no_localize": true,
+          "hint": "If checked, shipping information and taxes will be collected for purchases of this ticket class."
         },
         {
           "name": "description",
@@ -487,21 +512,25 @@ const eventSiteSpec = {
             {
               "label": "Item ID",
               "name": "uuid",
-              "type": "uuid"
+              "type": "uuid",
+              "no_localize": true,
             },
             {
               "name": "hidden",
               "type": "checkbox",
+              "no_localize": true,
               "hint": "If checked, this ticket SKU will not be displayed and won't be available for purchase."
             },
             {
               "label": "NTP ID",
               "name": "otp_id",
+              "no_localize": true,
               "type": "ntp_id"
             },
             {
               "name": "start_time",
-              "type": "datetime"
+              "type": "datetime",
+              "no_localize": true,
             },
             {
               "label": "Start Time (Text)",
@@ -511,11 +540,13 @@ const eventSiteSpec = {
             },
             {
               "name": "end_time",
-              "type": "datetime"
+              "type": "datetime",
+              "no_localize": true,
             },
             {
               "name": "price",
               "type": "reference_subsection",
+              "no_localize": true,
               "reference": "/payment_currencies",
               "value_type": "number",
               "hint": "Available price currencies are based on the 'Payment Currencies' field above",
@@ -541,7 +572,8 @@ const eventSiteSpec = {
             "merchandise",
             "donation"
           ],
-          "type": "select"
+          "type": "select",
+          "no_localize": true,
         },
         {
           "name": "name",
@@ -550,7 +582,8 @@ const eventSiteSpec = {
         {
           "label": "Item ID",
           "name": "uuid",
-          "type": "uuid"
+          "type": "uuid",
+          "no_localize": true,
         },
         {
           "name": "description",
@@ -570,6 +603,7 @@ const eventSiteSpec = {
         {
           "name": "price",
           "type": "reference_subsection",
+          "no_localize": true,
           "reference": "/payment_currencies",
           "value_type": "number",
           "hint": "Available price currencies are based on the 'Payment Currencies' field above",
@@ -577,6 +611,7 @@ const eventSiteSpec = {
         {
           "name": "featured",
           "type": "checkbox",
+          "no_localize": true,
           "hint": "A featured item will be shown at checkout."
         },
         {
@@ -596,11 +631,13 @@ const eventSiteSpec = {
           ],
           "hint": "Specify the characteristics each variation of this product has, for example 'Size' and 'Color'",
           "name": "option_fields",
+          "no_localize": true,
           "type": "list"
         },
         {
           "name": "product_options",
           "type": "reference_list",
+          "no_localize": true,
           "reference": "./option_fields",
           "fields": [
             {
@@ -626,7 +663,8 @@ const eventSiteSpec = {
         },
         {
           "name": "release_date",
-          "type": "datetime"
+          "type": "datetime",
+          "no_localize": true,
         },
         {
           "extensions": imageTypes,
@@ -635,7 +673,8 @@ const eventSiteSpec = {
         },
         {
           "name": "package",
-          "type": "fabric_link"
+          "type": "fabric_link",
+          "no_localize": true,
         }
       ],
       "name": "extras",

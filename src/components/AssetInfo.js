@@ -28,6 +28,7 @@ class AssetInfo extends React.Component {
       .filter(field => !("localize" in field && !field.localize && this.props.formStore.localizationActive))
       .map((field, index) =>
         <RecursiveField
+          localizing={this.props.formStore.localizationActive}
           HEAD={assetInfo}
           key={`info-field-${index}`}
           field={field}
@@ -121,7 +122,7 @@ class AssetInfo extends React.Component {
 
           {
             Maybe(
-              this.props.formStore.associatePermissions,
+              this.props.formStore.associatePermissions && !this.props.formStore.localizationActive,
               <ObjectSelection
                 label="Permissions"
                 browseHeader="Select Permissions"

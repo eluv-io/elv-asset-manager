@@ -108,6 +108,8 @@ class RecursiveField extends React.Component {
 
     const key = `input-${name}-${field.name}`;
 
+    if(this.props.localizing && field.no_localize) { return null; }
+
     if(field.type === "textarea") {
       return (
         <TextArea
@@ -491,16 +493,21 @@ class RecursiveField extends React.Component {
             key={`input-container-${name}-${index}`}
           >
             <div className="actions">
-              {Maybe(orderable, <OrderButtons index={index} length={values.length} Swap={Swap} />)}
-              <IconButton
-                icon={DeleteIcon}
-                title={`Remove item from ${label || FormatName(name)}`}
-                onClick={async () => await Confirm({
-                  message: "Are you sure you want to remove this item?",
-                  onConfirm: () => Remove(index)
-                })}
-                className="info-list-icon info-list-remove-icon"
-              />
+              { Maybe(orderable && !this.props.localizing, <OrderButtons index={index} length={values.length} Swap={Swap} />) }
+              {
+                Maybe(
+                  !this.props.localizing,
+                  <IconButton
+                    icon={DeleteIcon}
+                    title={`Remove item from ${label || FormatName(name)}`}
+                    onClick={async () => await Confirm({
+                      message: "Are you sure you want to remove this item?",
+                      onConfirm: () => Remove(index)
+                    })}
+                    className="info-list-icon info-list-remove-icon"
+                  />
+                )
+              }
             </div>
             { entryFields }
           </div>
@@ -537,7 +544,7 @@ class RecursiveField extends React.Component {
         value={
           <div className={`list-field ${!fields ? "array-list" : ""}`}>
             { fieldInputs }
-            { addButton }
+            { this.props.localizing ? null : addButton }
           </div>
         }
       />

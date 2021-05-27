@@ -225,10 +225,12 @@
 
   svg {
     cursor: pointer;
-    height: $elv-spacing-s;
     margin-left: $elv-spacing-xs;
+    max-height: $elv-spacing-s;
+    max-width: $elv-spacing-s;
+    min-height: $elv-spacing-s;
+    min-width: $elv-spacing-s;
     stroke: $elv-color-mediumgray;
-    width: $elv-spacing-s;
   }
 }
 

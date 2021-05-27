@@ -110,6 +110,7 @@ class Info extends React.Component {
           {name: "label"},
           {name: "name", label: "Metadata Key", required: true},
           {name: "hint", hint: hints.hint},
+          {name: "no_localize", label: "No Localization", type: "checkbox", hint: "If checked, this field will not be displayed when filling out localized info"},
           {name: "top_level", type: "checkbox", hint: hints.top_level, only: () => toplevel},
           {name: "for_title_types", type: "multiselect", hint: hints.for_title_types, options: this.props.specStore.availableTitleTypes, only: () => toplevel},
           {name: "type", type: "select", options: types, default: "text"},

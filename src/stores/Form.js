@@ -5,6 +5,7 @@ import UrlJoin from "url-join";
 
 import DefaultSpec from "../specs/Default";
 import {parse} from "node-html-parser";
+import IsEqual from "lodash/isEqual";
 
 require("elv-components-js/src/utils/LimitedMap");
 
@@ -42,6 +43,36 @@ const AssetMetadataFields =(level) => {
     )
     .flat()
     .sort();
+};
+
+const LocalizationUnmerge = (localized, main) => {
+  if(Array.isArray(main)) {
+    return main.map((item, index) => LocalizationUnmerge((localized || [])[index], item)).filter(item => item);
+  } else if(typeof main === "object") {
+    let item = {};
+    Object.keys(main).map(key =>
+      item[key] = LocalizationUnmerge((localized || {})[key], main[key])
+    );
+
+    return item;
+  } else {
+    return IsEqual(localized, main) ? undefined : localized;
+  }
+};
+
+const LocalizationMerge = (localized, main) => {
+  if(Array.isArray(main)) {
+    return main.map((item, index) => LocalizationMerge((localized || [])[index], item)).filter(item => item);
+  } else if(typeof main === "object") {
+    let item = {};
+    Object.keys(main).map(key =>
+      item[key] = LocalizationMerge((localized || {})[key], main[key])
+    );
+
+    return item;
+  } else {
+    return localized || main;
+  }
 };
 
 
@@ -191,19 +222,28 @@ class FormStore {
 
   @action.bound
   SetCurrentLocalization = flow(function * (options) {
-    const [l0, l1, l2] = options;
+    // If switching from localization, unmerge it
+    const [c0, c1, c2] = this.currentLocalization;
+    if(c2) {
+      this.localizedData[c0][c1][c2].assetInfo = LocalizationUnmerge(this.localizedData[c0][c1][c2].assetInfo, this.assetInfo);
+    } else if(c1) {
+      this.localizedData[c0][c1].assetInfo = LocalizationUnmerge(this.localizedData[c0][c1].assetInfo, this.assetInfo);
+    }
+
+    const l0 = options[0] || "";
+    const l1 = options[1] || "";
+    const l2 = options[2] || "";
 
     this.localizedData[l0] = this.localizedData[l0] || {};
     this.localizedData[l0][l1] = this.localizedData[l0][l1] || {};
 
-    let target = this.localizedData[l0][l1];
+    let assetMetadata = this.rootStore.client.utils.SafeTraverse(this.rootStore.assetMetadata, l0, l1) || {};
 
-    let assetMetadata = this.rootStore.client.utils.SafeTraverse(this.rootStore.assetMetadata, l0, l1);
+    let target;
     if(l2) {
-      this.localizedData[l0][l1][l2] = this.localizedData[l0][l1][l2] || {};
-
       target = this.localizedData[l0][l1][l2];
-      assetMetadata = this.rootStore.client.utils.SafeTraverse(this.rootStore.assetMetadata, l0, l1, l2);
+    } else {
+      target = this.localizedData[l0][l1];
     }
 
     if(!target._loaded) {
@@ -241,11 +281,27 @@ class FormStore {
       target._loaded = true;
     }
 
+    target.assetInfo = LocalizationMerge(target.assetInfo, this.assetInfo);
+
+    if(l2) {
+      this.localizedData[l0][l1][l2] = target;
+    } else {
+      this.localizedData[l0][l1] = target;
+    }
+
     this.currentLocalization = options;
   });
 
   @action.bound
   ClearCurrentLocalization() {
+    // Unmerge current localization
+    const [c0, c1, c2] = this.currentLocalization;
+    if(c2) {
+      this.localizedData[c0][c1][c2].assetInfo = LocalizationUnmerge(this.localizedData[c0][c1][c2].assetInfo, this.assetInfo);
+    } else if(c1) {
+      this.localizedData[c0][c1].assetInfo = LocalizationUnmerge(this.localizedData[c0][c1].assetInfo, this.assetInfo);
+    }
+
     this.currentLocalization = ["", "", ""];
   }
 
@@ -1328,7 +1384,7 @@ class FormStore {
         }
       } else if(type === "rich_text") {
         // Set target="_blank" and rel="noopener" on all links
-        const html = parse(value.toString("html"));
+        const html = parse((value || "").toString("html"));
         const links = html.querySelectorAll("a");
         links.forEach(link => {
           link.setAttribute("target", "_blank");
@@ -1416,6 +1472,10 @@ class FormStore {
           localizedData = this.localizedData[l0][l1];
         }
 
+        if(l1) {
+          localizedData.assetInfo = LocalizationUnmerge(localizedData.assetInfo, this.assetInfo);
+        }
+
         const {info, topInfo} = this.FormatFields({
           infoFields: this.infoFields,
           values: localizedData.assetInfo,
@@ -1482,9 +1542,7 @@ class FormStore {
           const assetType = this.associatedAssets[i];
           const assets = toJS(localizedData.assets[assetType.name]);
 
-          const formattedAssets = yield this.FormatAssets({assetType, assets});
-
-          assetData[assetType.name] = formattedAssets;
+          assetData[assetType.name] = yield this.FormatAssets({assetType, assets});
         }
 
         // Playlists

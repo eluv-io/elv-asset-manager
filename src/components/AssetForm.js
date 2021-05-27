@@ -35,7 +35,9 @@ class LocalizationSelection extends React.Component {
       <select
         value={this.props.formStore.currentLocalization[0]}
         onChange={event => {
-          const options = this.props.formStore.localization[event.target.value];
+          const options = event.target.value === "localizations" && this.props.formStore.assetInfo.localizations ?
+            this.props.formStore.assetInfo.localizations :
+            this.props.formStore.localization[event.target.value];
           const secondOption = options ? (Array.isArray(options) ? options[0] : Object.keys(options)[0]) : undefined;
           const thirdOption = secondOption && !Array.isArray(options) ? options[secondOption][0] : undefined;
           this.props.formStore.SetCurrentLocalization([

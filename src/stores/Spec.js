@@ -121,6 +121,10 @@ class SpecStore {
         formattedField.label = field.label;
       }
 
+      if(field.no_localize) {
+        formattedField.no_localize = true;
+      }
+
       if(field.hint) {
         formattedField.hint = field.hint;
       }

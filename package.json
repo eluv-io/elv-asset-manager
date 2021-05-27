@@ -29,6 +29,7 @@
     "country-codes-list": "^1.6.8",
     "elv-components-js": "git+https://github.com/eluv-io/elv-components-js.git",
     "hls.js": "^0.12.4",
+    "lodash": "^4.17.21",
     "luxon": "^1.22.0",
     "mobx": "^5.13.0",
     "mobx-react": "^6.1.3",
