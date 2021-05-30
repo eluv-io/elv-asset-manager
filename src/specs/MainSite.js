@@ -39,6 +39,25 @@ const mainSiteSelectorSpec = {
       "default_value": "test"
     },
     {
+      "name": "domain_map",
+      "label": "Domain Name Mapping",
+      "type": "list",
+      "fields": [
+        {
+          "name": "domain",
+          "type": "text"
+        },
+        {
+          "name": "tenant_slug",
+          "type": "text"
+        },
+        {
+          "name": "event_slug",
+          "type": "text"
+        },
+      ]
+    },
+    {
       "name": "site_images",
       "type": "subsection",
       "fields": [
