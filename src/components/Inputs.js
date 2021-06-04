@@ -106,9 +106,9 @@ class RecursiveField extends React.Component {
   InfoField({PATH="", field, entry, Update, localization={}, textAddButton=false}) {
     const hintLabel = field.hint ? HintLabel({label: field.label, name: field.name, hint: field.hint, required: field.required}) : null;
 
-    const key = `input-${name}-${field.name}`;
+    const key = `input-${name}-${field.name}-${this.props.localizationKey}`;
 
-    if(this.props.localizing && field.no_localize) { return null; }
+    if(this.props.localizationKey && field.no_localize) { return null; }
 
     if(field.type === "textarea") {
       return (
@@ -391,7 +391,7 @@ class RecursiveField extends React.Component {
           name={field.name}
           label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
           type={field.type}
-          value={entry[field.name] || ""}
+          value={(entry || {})[field.name] || ""}
           required={field.required}
           onChange={newValue => Update(field.name, newValue)}
         />
@@ -493,10 +493,10 @@ class RecursiveField extends React.Component {
             key={`input-container-${name}-${index}`}
           >
             <div className="actions">
-              { Maybe(orderable && !this.props.localizing, <OrderButtons index={index} length={values.length} Swap={Swap} />) }
+              { Maybe(orderable && !this.props.localizationKey, <OrderButtons index={index} length={values.length} Swap={Swap} />) }
               {
                 Maybe(
-                  !this.props.localizing,
+                  !this.props.localizationKey,
                   <IconButton
                     icon={DeleteIcon}
                     title={`Remove item from ${label || FormatName(name)}`}
@@ -544,7 +544,7 @@ class RecursiveField extends React.Component {
         value={
           <div className={`list-field ${!fields ? "array-list" : ""}`}>
             { fieldInputs }
-            { this.props.localizing ? null : addButton }
+            { this.props.localizationKey ? null : addButton }
           </div>
         }
       />

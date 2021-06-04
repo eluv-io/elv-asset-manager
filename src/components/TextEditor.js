@@ -8,7 +8,7 @@ class TextEditor extends React.Component {
 
     this.state = {
       show: false,
-      value: RichTextEditor.createValueFromString(this.props.value, "html")
+      value: RichTextEditor.createValueFromString(props.value, "html")
     };
   }
 

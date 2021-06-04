@@ -87,55 +87,43 @@ const eventSiteSpec = {
       "options": Object.keys(languageOptions)
     },
     {
-      "name": "analytics",
-      "type": "subsection",
+      "name": "analytics_ids",
+      "label": "Analytics IDs",
+      "type": "list",
       "no_localize": true,
       "hint": "Specify IDs for your own analytics",
       "fields": [
         {
-          "name": "google",
-          "label": "Google Analytics ID",
-          "type": "text"
+          "name": "label",
+          "type": "text",
+          "hint": "A label for this collection of analytics"
         },
         {
-          "name": "google_tag_manager_id",
-          "label": "Google Tag Manager ID",
-          "type": "text"
-        },
-        {
-          "name": "google_conversion_id",
-          "label": "Google Conversion ID",
-          "type": "text"
-        },
-        {
-          "name": "google_conversion_label",
-          "label": "Google Conversion Label",
-          "type": "text"
-        },
-        {
-          "name": "facebook",
-          "label": "Facebook Pixel ID",
-          "type": "text"
-        },
-        {
-          "name": "adnxs_segment_id",
-          "label": "App Nexus Segment ID",
-          "type": "text"
-        },
-        {
-          "name": "adnxs_pixel_id",
-          "label": "App Nexus Pixel ID",
-          "type": "text"
-        },
-        {
-          "name": "tradedoubler_organization_id",
-          "label": "TradeDoubler Organization ID",
-          "type": "text"
-        },
-        {
-          "name": "tradedoubler_event_id",
-          "label": "TradeDoubler Event ID",
-          "type": "text"
+          "name": "ids",
+          "label": "IDs",
+          "type": "list",
+          "fields": [
+            {
+              "name": "type",
+              "type": "select",
+              "options": [
+                "Google Analytics ID",
+                "Google Tag Manager ID",
+                "Google Conversion ID",
+                "Google Conversion Label",
+                "Facebook Pixel ID",
+                "App Nexus Segment ID",
+                "App Nexus Pixel ID",
+                "TradeDoubler Organization ID",
+                "TradeDoubler Event ID",
+              ]
+            },
+            {
+              "name": "id",
+              "label": "ID",
+              "type": "text"
+            }
+          ]
         }
       ]
     },

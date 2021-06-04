@@ -139,6 +139,10 @@ class FormStore {
     return this.currentLocalization[0] && this.currentLocalization[1];
   }
 
+  @computed get localizationKey() {
+    return this.currentLocalization.filter(key => key).join("-");
+  }
+
   @computed get currentLocalizedData() {
     if(!this.localizationActive) {
       return this;
