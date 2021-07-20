@@ -2,7 +2,7 @@ import React from "react";
 import {inject, observer} from "mobx-react";
 import {RecursiveField} from "../Inputs";
 import {toJS} from "mobx";
-import {Checkbox} from "elv-components-js";
+import {Checkbox, Selection} from "elv-components-js";
 
 /*
 "info_fields": [
@@ -72,6 +72,7 @@ class Info extends React.Component {
     const types = [
       "text",
       "textarea",
+      "json",
       "rich_text",
       "integer",
       "number",
@@ -88,7 +89,8 @@ class Info extends React.Component {
       "subsection",
       "list",
       "reference_subsection",
-      "reference_list"
+      "reference_list",
+      "reference_type"
     ].sort();
 
     const UpdateFields = (index, newFields) => {
@@ -116,7 +118,7 @@ class Info extends React.Component {
           {name: "type", type: "select", options: types, default: "text"},
           {name: "options", type: "list", only: entry => ["select", "multiselect"].includes(entry.type)},
           {name: "extensions", type: "list", only: entry => entry.type === "file"},
-          {name: "reference", only: entry => ["reference_subsection", "reference_list"].includes(entry.type)},
+          {name: "reference", only: entry => ["reference_subsection", "reference_list", "reference_type"].includes(entry.type)},
           {name: "value_type", type: "select", options: types, default: types[0], only: entry => entry.type === "reference_subsection"},
           {
             name: "fields",
@@ -139,6 +141,37 @@ class Info extends React.Component {
             name="Associate Permissions Object"
             value={this.props.specStore.associatePermissions}
             onChange={enabled => this.props.specStore.TogglePermissionAssociation(enabled)}
+          />
+          <Checkbox
+            name="Playable"
+            value={this.props.specStore.playable}
+            onChange={enabled => this.props.specStore.TogglePlayable(enabled)}
+          />
+          <Selection
+            name="displayApp"
+            label="Display App"
+            value={this.props.specStore.displayApp}
+            options={[
+              ["None", ""],
+              ["Default", "default"],
+              ["Asset Manager", "asset-manager"],
+              ["Permissions Manager", "avails-manager"],
+              ["Stream Sample", "stream-sample"]
+            ]}
+            onChange={newValue => this.props.specStore.UpdateApp("display", newValue)}
+          />
+          <Selection
+            name="manageApp"
+            label="Manage App"
+            value={this.props.specStore.manageApp}
+            options={[
+              ["None", ""],
+              ["Default", "default"],
+              ["Asset Manager", "asset-manager"],
+              ["Permissions Manager", "avails-manager"],
+              ["Stream Sample", "stream-sample"]
+            ]}
+            onChange={newValue => this.props.specStore.UpdateApp("manage", newValue)}
           />
           <RecursiveField
             list

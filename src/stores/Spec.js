@@ -29,6 +29,9 @@ const Duplicates = (values) =>
 class SpecStore {
   @observable profile;
   @observable associatePermissions = false;
+  @observable playable = false;
+  @observable displayApp = "";
+  @observable manageApp = "";
   @observable controls = {};
   @observable fileControlItems = {};
   @observable availableAssetTypes = [];
@@ -66,6 +69,9 @@ class SpecStore {
     });
 
     this.associatePermissions = config.associate_permissions || false;
+    this.playable = config.playable || false;
+    this.displayApp = config.displayApp || "";
+    this.manageApp = config.manageApp || "";
     this.availableAssetTypes = config.asset_types || config.availableAssetTypes || DefaultSpec.availableAssetTypes;
     this.availableTitleTypes = config.title_types || config.availableTitleTypes || DefaultSpec.availableTitleTypes;
     this.infoFields = config.info_fields || config.infoFields || DefaultSpec.infoFields;
@@ -141,7 +147,7 @@ class SpecStore {
         formattedField.extensions = FormatOptions(field.extensions);
       }
 
-      if(field.type === "reference_subsection" || field.type === "reference_list") {
+      if(["reference_subsection", "reference_list", "reference_type"].includes(field.type)) {
         if(!field.reference) {
           infoFieldErrors.push(`${field.name} is missing a reference`);
         }
@@ -281,17 +287,41 @@ class SpecStore {
         throw Error(specErrors);
       }
 
+      const libraryId = (yield client.ContentSpaceId()).replace(/^ispc/, "ilib");
       yield client.EditAndFinalizeContentObject({
-        libraryId: (yield client.ContentSpaceId()).replace(/^ispc/, "ilib"),
+        libraryId,
         objectId: this.rootStore.typeId,
         commitMessage: commitMessage || "Asset Manager",
         callback: async ({writeToken}) => {
           await client.ReplaceMetadata({
-            libraryId: (await client.ContentSpaceId()).replace(/^ispc/, "ilib"),
+            libraryId,
             objectId: this.rootStore.typeId,
             writeToken,
             metadataSubtree: "public/title_configuration",
             metadata: toJS(titleConfiguration)
+          });
+
+          if(this.playable) {
+            await client.MergeMetadata({
+              libraryId,
+              objectId: this.rootStore.typeId,
+              writeToken,
+              metadata: {
+                "bitcode_flags": "abrmaster",
+                "bitcode_format": "builtin"
+              }
+            });
+          }
+
+          await client.MergeMetadata({
+            libraryId,
+            objectId: this.rootStore.typeId,
+            writeToken,
+            metadataSubtree: "public",
+            metadata: {
+              "eluv.displayApp": this.displayApp,
+              "eluv.manageApp": this.manageApp
+            }
           });
         }
       });
@@ -324,6 +354,16 @@ class SpecStore {
   @action.bound
   TogglePermissionAssociation(enabled) {
     this.associatePermissions = enabled;
+  }
+
+  @action.bound
+  TogglePlayable(enabled) {
+    this.playable = enabled;
+  }
+
+  @action.bound
+  UpdateApp(type, app) {
+    this[`${type}App`] = app;
   }
 
   @action.bound

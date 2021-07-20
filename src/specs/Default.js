@@ -1,6 +1,7 @@
 const defaultSpec = {
   name: "Default",
   version: "0.1",
+  manageApp: "default",
   controls: [
     "images",
     "playlists"

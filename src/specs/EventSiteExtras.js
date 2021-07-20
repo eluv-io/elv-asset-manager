@@ -3,6 +3,7 @@ const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 const eventSiteExtrasSpec = {
   name: "Event Site",
   version: "0.11",
+  manageApp: "default",
   "asset_types": [
     "primary"
   ],

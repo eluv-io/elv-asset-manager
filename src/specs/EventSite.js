@@ -6,6 +6,7 @@ const languageOptions = require("./LanguageCodes").default;
 const eventSiteSpec = {
   name: "Event Site",
   version: "0.13",
+  manageApp: "default",
   associate_permissions: true,
   controls: [],
   availableAssetTypes: [
@@ -309,6 +310,62 @@ const eventSiteSpec = {
       ],
       "name": "sponsors",
       "type": "list"
+    },
+    {
+      "fields": [
+        {
+          "name": "coupon_mode",
+          "type": "checkbox",
+          "no_localize": true,
+          "hint": "If specified, ticket redemptions will be for coupon codes only"
+        },
+        {
+          "name": "redemption_message",
+          "type": "text",
+          "hint": "Text to be displayed on coupon redemption page"
+        },
+        {
+          "name": "event_page_message_1",
+          "type": "text",
+          "hint": "Text to be displayed on event page after redemption"
+        },
+        {
+          "name": "event_page_message_2",
+          "type": "text",
+          "hint": "Text to be displayed on event page after redemption"
+        }
+      ],
+      "name": "coupon_redemption",
+      "type": "subsection"
+    },
+    {
+      "fields": [
+        {
+          "name": "header_image",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
+          "name": "header_text",
+          "type": "text"
+        },
+        {
+          "name": "hide_countdown",
+          "type": "checkbox"
+        },
+        {
+          "name": "message_1",
+          "type": "textarea",
+          "hint": "Message above the countdown. Default: 'Your Ticket is Redeemed. Event Begins In'"
+        },
+        {
+          "name": "message_2",
+          "type": "textarea",
+          "hint": "Message below the countdown. Default: 'Use the link in your ticket email to return here at the time of the event'"
+        }
+      ],
+      "name": "event_landing_page",
+      "type": "subsection"
     },
     {
       "fields": [

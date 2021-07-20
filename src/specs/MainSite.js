@@ -3,6 +3,7 @@ const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 const mainSiteSelectorSpec = {
   name: "Main Live Site",
   version: "0.1",
+  manageApp: "default",
   controls: [
     "images",
   ],

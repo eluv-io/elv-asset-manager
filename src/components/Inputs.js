@@ -9,6 +9,7 @@ import {
   Selection,
   MultiSelect,
   Checkbox,
+  JsonInput,
   LabelledField,
   DateSelection,
   Maybe,
@@ -31,7 +32,7 @@ import FileIcon from "../static/icons/file.svg";
 import ObjectSelection from "./ObjectSelection";
 import TextEditor from "./TextEditor";
 
-const ReferencePathElements = (PATH, reference) => {
+export const ReferencePathElements = (PATH, reference) => {
   let pathElements;
   if(reference.startsWith("/")) {
     pathElements = reference.split("/");
@@ -74,7 +75,7 @@ const InitializeField = ({fields, defaultValue}) => {
   let newValue = defaultValue || {};
 
   fields.forEach(field => {
-    let value = "";
+    let value = field.default_value || "";
     switch (field.type) {
       case "subsection":
         value = InitializeField({fields: field.fields});
@@ -85,13 +86,13 @@ const InitializeField = ({fields, defaultValue}) => {
         break;
       case "number":
       case "integer":
-        value = 0;
+        value = field.default_value || 0;
         break;
       case "checkbox":
-        value = false;
+        value = field.default_value || false;
         break;
       case "select":
-        value = field.options[0];
+        value = field.default_value || field.options[0];
     }
 
     newValue[field.name] = field.default || newValue[field.name] || value;
@@ -110,7 +111,12 @@ class RecursiveField extends React.Component {
 
     if(this.props.localizationKey && field.no_localize) { return null; }
 
-    if(field.type === "textarea") {
+    let fieldType = field.type;
+    if(fieldType === "reference_type") {
+      fieldType = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || "text");
+    }
+
+    if(fieldType === "textarea") {
       return (
         <TextArea
           key={key}
@@ -120,7 +126,18 @@ class RecursiveField extends React.Component {
           onChange={newValue => Update(field.name, newValue)}
         />
       );
-    } else if(field.type === "rich_text") {
+    } else if(fieldType === "json") {
+      return (
+        <LabelledField key={key} label={hintLabel || field.label || FormatName(field.name)} className="json-labelled-field">
+          <JsonInput
+            key={key}
+            name={field.name}
+            value={entry[field.name] || ""}
+            onChange={event => Update(field.name, event.target.value)}
+          />
+        </LabelledField>
+      );
+    } else if(fieldType === "rich_text") {
       return (
         <LabelledField key={key} label={hintLabel || field.label || FormatName(field.name)} className="text-editor-labelled-field">
           <TextEditor
@@ -129,7 +146,7 @@ class RecursiveField extends React.Component {
           />
         </LabelledField>
       );
-    } else if(field.type === "checkbox") {
+    } else if(fieldType === "checkbox") {
       return (
         <Checkbox
           key={key}
@@ -139,19 +156,19 @@ class RecursiveField extends React.Component {
           onChange={newValue => Update(field.name, newValue)}
         />
       );
-    } else if(field.type === "date" || field.type === "datetime") {
+    } else if(fieldType === "date" || fieldType === "datetime") {
       return (
         <DateSelection
           key={key}
           name={field.name}
           label={hintLabel || field.label}
           value={entry[field.name]}
-          dateOnly={field.type === "date"}
+          dateOnly={fieldType === "date"}
           referenceTimezone={field.zone}
           onChange={newValue => Update(field.name, newValue)}
         />
       );
-    } else if(field.type === "uuid") {
+    } else if(fieldType === "uuid") {
       if(!entry[field.name]) {
         Update(field.name, Utils.B58(UUIDParse(UUID())));
       }
@@ -161,13 +178,13 @@ class RecursiveField extends React.Component {
           key={key}
           name={field.name}
           label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
-          type={field.type}
+          type={fieldType}
           value={entry[field.name] || ""}
           required={field.required}
           readonly
         />
       );
-    } else if(field.type === "select") {
+    } else if(fieldType === "select") {
       return (
         <Selection
           key={key}
@@ -178,7 +195,7 @@ class RecursiveField extends React.Component {
           onChange={newValue => Update(field.name, newValue)}
         />
       );
-    } else if(field.type === "multiselect") {
+    } else if(fieldType === "multiselect") {
       return (
         <MultiSelect
           key={key}
@@ -189,7 +206,7 @@ class RecursiveField extends React.Component {
           onChange={newValue => Update(field.name, newValue)}
         />
       );
-    } else if(field.type === "ntp_id") {
+    } else if(fieldType === "ntp_id") {
       let options = [
         ...(this.props.ntps || []).map(({ntpId, name}) => [name, ntpId])
       ];
@@ -222,13 +239,13 @@ class RecursiveField extends React.Component {
           </div>
         </LabelledField>
       );
-    } else if(field.type === "subsection" || field.type === "reference_subsection") {
+    } else if(fieldType === "subsection" || fieldType === "reference_subsection") {
       if(typeof entry[field.name] !== "object") {
         Update(field.name, {});
       }
 
       let fields = field.fields;
-      if(field.type === "reference_subsection") {
+      if(fieldType === "reference_subsection") {
         fields = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || [])
           .map(name => ({name, type: field.value_type || ""}));
       }
@@ -264,9 +281,9 @@ class RecursiveField extends React.Component {
           </div>
         </LabelledField>
       );
-    } else if(field.type === "list" || field.type === "reference_list") {
+    } else if(fieldType === "list" || fieldType === "reference_list") {
       let fields = field.fields;
-      if(field.type === "reference_list") {
+      if(fieldType === "reference_list") {
         fields = field.fields || [];
         fields = fields.concat(Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || []);
       }
@@ -285,7 +302,7 @@ class RecursiveField extends React.Component {
           textAddButton: {textAddButton}
         })
       );
-    } else if(field.type === "file") {
+    } else if(fieldType === "file") {
       const { path, targetHash } = entry[field.name] || {};
       const extension = ((path || "").split(".").pop() || "").toLowerCase();
       const isImage = ["apng", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
@@ -335,7 +352,7 @@ class RecursiveField extends React.Component {
           </div>
         </LabelledField>
       );
-    } else if(field.type === "color") {
+    } else if(fieldType === "color") {
       if(!(entry[field.name] || {}).color) {
         Update(field.name, {...(entry[field.name] || {label: ""}), color: "#000000"});
       }
@@ -364,7 +381,7 @@ class RecursiveField extends React.Component {
           </div>
         </LabelledField>
       );
-    } else if(field.type === "fabric_link") {
+    } else if(fieldType === "fabric_link") {
       return (
         <ObjectSelection
           key={key}
@@ -390,7 +407,7 @@ class RecursiveField extends React.Component {
           key={key}
           name={field.name}
           label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
-          type={field.type}
+          type={fieldType}
           value={(entry || {})[field.name] || ""}
           required={field.required}
           onChange={newValue => Update(field.name, newValue)}

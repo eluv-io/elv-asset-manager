@@ -1,6 +1,8 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
+const currencyOptions = [...new Set(Object.values(require("country-codes-list").customList("countryNameEn", "{currencyCode}")))].filter(c => c).sort();
 
 const EmbeddedCollectionSpec = {
+  manageApp: "default",
   "asset_types": [
     "primary"
   ],
@@ -43,7 +45,7 @@ const EmbeddedCollectionSpec = {
     {
       "name": "transfer_message",
       "type": "textarea",
-      "hint": "This text will appear in the form for transfering the NFT to Ethereum"
+      "hint": "This text will appear in the form for transferring the NFT to Ethereum"
     },
     {
       "fields": [
@@ -83,11 +85,31 @@ const EmbeddedCollectionSpec = {
       "type": "subsection"
     },
     {
+      "name": "payment_currencies",
+      "type": "multiselect",
+      "no_localize": true,
+      "hint": "List of accepted currencies",
+      "default_value": ["USD"],
+      "options": currencyOptions
+    },
+    {
       "fields": [
+        {
+          "name": "name",
+          "type": "text"
+        },
         {
           "label": "UUID",
           "name": "uuid",
           "type": "uuid"
+        },
+        {
+          "name": "price",
+          "type": "reference_subsection",
+          "no_localize": true,
+          "reference": "/payment_currencies",
+          "value_type": "number",
+          "hint": "Available price currencies are based on the 'Payment Currencies' field above",
         },
         {
           "name": "address",
@@ -95,9 +117,10 @@ const EmbeddedCollectionSpec = {
           "type": "text"
         },
         {
-          "name": "base_hash",
-          "label": "Base Content Hash",
-          "type": "text"
+          "name": "base_template",
+          "type": "fabric_link",
+          "no_localize": true,
+          "version": true
         },
         {
           "name": "eth_locator",
@@ -106,12 +129,12 @@ const EmbeddedCollectionSpec = {
         },
         {
           "name": "cauth_id",
-          "label": "Mint ID",
+          "label": "Mint Key ID",
           "type": "text"
         },
         {
           "name": "fauth_id",
-          "label": "Permissions ID",
+          "label": "Fabric Key ID",
           "type": "text"
         },
         {

@@ -8,6 +8,7 @@ import EventSiteExtrasSpec from "../../specs/EventSiteExtras";
 import EventSiteSelectorSpec from "../../specs/EventSiteSelector";
 import MainSiteSpec from "../../specs/MainSite";
 import EmbeddedCollectionSpec from "../../specs/EmbeddedCollection";
+import NFTTemplateSpec from "../../specs/NFTTemplate";
 
 const specs = {
   "Default": DefaultSpec,
@@ -15,7 +16,8 @@ const specs = {
   "Event Site Extras": EventSiteExtrasSpec,
   "Event Site Selector": EventSiteSelectorSpec,
   "Main Live Site": MainSiteSpec,
-  "Embedded Collection": EmbeddedCollectionSpec
+  "Embedded Collection": EmbeddedCollectionSpec,
+  "NFT Template": NFTTemplateSpec
 };
 
 @inject("rootStore")

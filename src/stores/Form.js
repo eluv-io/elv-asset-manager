@@ -6,6 +6,7 @@ import UrlJoin from "url-join";
 import DefaultSpec from "../specs/Default";
 import {parse} from "node-html-parser";
 import IsEqual from "lodash/isEqual";
+import {ReferencePathElements} from "../components/Inputs";
 
 require("elv-components-js/src/utils/LimitedMap");
 
@@ -704,18 +705,25 @@ class FormStore {
     this.currentLocalizedData.playlists[i2] = playlist;
   }
 
-  async LoadInfoFields({infoFields, values, isTopLevel=false, topLevelValues}) {
+  async LoadInfoFields({HEAD, PATH="", infoFields, values, isTopLevel=false, topLevelValues}) {
     let info = {};
 
     for(const infoField of infoFields) {
-      const { name, type, default_value, top_level, fields } = infoField;
+      let {name, type, reference, default_value, top_level, fields} = infoField;
+
       if(isTopLevel && top_level) {
         info[name] = topLevelValues[name] || default_value || "";
       } else {
         info[name] = values[name] || default_value || "";
       }
 
-      if((type === "date" || type === "datetime") && info[name]) {
+      if(type === "reference_type") {
+        type = this.rootStore.client.utils.SafeTraverse(HEAD, ...(ReferencePathElements(PATH, reference))) || "text";
+      }
+
+      if(type === "json") {
+        info[name] = JSON.stringify(info[name], null, 2);
+      } else if((type === "date" || type === "datetime") && info[name]) {
         const date = DateTime.fromISO(values[name]);
 
         if(!date || date.invalid) {
@@ -732,15 +740,15 @@ class FormStore {
 
         info[name] = linkInfo;
       } else if(type === "subsection") {
-        info[name] = await this.LoadInfoFields({infoFields: fields, values: info[name]});
+        info[name] = await this.LoadInfoFields({HEAD, PATH: UrlJoin(PATH, name), infoFields: fields, values: info[name]});
       } else if(type === "list") {
         info[name] = await Promise.all(
-          (info[name] || []).map(async listValues => {
+          (info[name] || []).map(async (listValues, i) => {
             if(!fields || fields.length === 0) {
               return listValues;
             }
 
-            return await this.LoadInfoFields({infoFields: fields, values: listValues});
+            return await this.LoadInfoFields({HEAD, PATH: UrlJoin(PATH, name, i.toString()), infoFields: fields, values: listValues});
           })
         );
       } else if(type === "fabric_link") {
@@ -792,6 +800,7 @@ class FormStore {
     this.originalSlug = assetInfo.slug;
 
     const loadedInfo = yield this.LoadInfoFields({
+      HEAD: info,
       infoFields: this.infoFields,
       values: info,
       isTopLevel: true,
@@ -1360,19 +1369,29 @@ class FormStore {
     return "";
   }
 
-  FormatFields({infoFields, values, titleType, isTopLevel=false, splitListFields=true}) {
+  FormatFields({HEAD, PATH="", infoFields, values, titleType, isTopLevel=false, splitListFields=true}) {
     let topInfo = {};
     let info = {};
     let listFields = [];
 
-    infoFields.forEach(({name, type, for_title_types, top_level, fields}) => {
+    infoFields.forEach(({name, type, reference, for_title_types, top_level, fields}) => {
       if(for_title_types && for_title_types.length > 0 && !for_title_types.includes(titleType)) { return; }
+
+      if(type === "reference_type") {
+        type = this.rootStore.client.utils.SafeTraverse(HEAD, ...(ReferencePathElements(PATH, reference))) || "text";
+      }
 
       let value = values[name];
       if(type === "integer") {
         value = parseInt(values[name]);
       } else if(type === "number") {
         value = parseFloat(values[name]);
+      } else if(type === "json") {
+        try {
+          value = JSON.parse(values[name]);
+        } catch (error) {
+          throw Error(`Failed to parse JSON field ${name}`);
+        }
       } else if(type === "date") {
         value = this.FormatDate(values[name]);
       } else if(type === "datetime") {
@@ -1397,16 +1416,16 @@ class FormStore {
 
         value = html.toString();
       } else if(type === "subsection") {
-        value = this.FormatFields({infoFields: fields, values: values[name], titleType}).info || {};
+        value = this.FormatFields({HEAD, PATH: UrlJoin(PATH, name), infoFields: fields, values: values[name], titleType}).info || {};
       } else if(type === "list") {
-        value = (value || []).map(entry => {
+        value = (value || []).map((entry, i) => {
           entry = toJS(entry);
 
           if(!fields || fields.length === 0) {
             return entry;
           }
 
-          return (this.FormatFields({infoFields: fields, values: entry, titleType})).info || [];
+          return (this.FormatFields({HEAD, PATH: UrlJoin(PATH, name, i.toString()), infoFields: fields, values: entry, titleType})).info || [];
         });
       } else if(type === "fabric_link") {
         if(values[name]) {
@@ -1481,6 +1500,7 @@ class FormStore {
         }
 
         const {info, topInfo} = this.FormatFields({
+          HEAD: localizedData.assetInfo,
           infoFields: this.infoFields,
           values: localizedData.assetInfo,
           titleType: this.assetInfo.title_type,

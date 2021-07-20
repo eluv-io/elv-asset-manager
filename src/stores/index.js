@@ -100,18 +100,27 @@ class RootStore {
       this.typeId = this.client.utils.DecodeVersionHash(this.typeHash).objectId;
       const libraryId = (yield this.client.ContentSpaceId()).replace("ispc", "ilib");
 
-      const {name, title_configuration} = (yield this.client.ContentObjectMetadata({
+      let typeMetadata = (yield this.client.ContentObjectMetadata({
         libraryId,
         objectId: this.typeId,
-        metadataSubtree: "public",
         select: [
-          "name",
-          "title_configuration"
+          "bitcode_flags",
+          "bitcode_format",
+          "public/eluv.displayApp",
+          "public/eluv.manageApp",
+          "public/name",
+          "public/title_configuration"
         ]
       })) || {};
 
-      this.titleConfiguration = title_configuration || {};
-      this.typeName = name || this.typeId;
+      typeMetadata.public = typeMetadata.public || {};
+
+      this.titleConfiguration = typeMetadata.public.title_configuration || {};
+      this.titleConfiguration.playable = typeMetadata.bitcode_flags === "abrmaster" && typeMetadata.bitcode_format === "builtin";
+      this.titleConfiguration.displayApp = typeMetadata.public["eluv.displayApp"];
+      this.titleConfiguration.manageApp = typeMetadata.public["eluv.manageApp"];
+
+      this.typeName = typeMetadata.public.name || this.typeId;
 
       try {
         this.canEditType = yield this.client.CallContractMethod({

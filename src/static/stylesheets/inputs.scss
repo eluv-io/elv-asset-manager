@@ -38,15 +38,16 @@
   label {
     align-items: center;
     display: flex;
-    //color: $elv-color-text-black;
     text-rendering: optimizeLegibility;
   }
 
   &.-elv-multi-select,
-  &.-elv-textarea {
+  &.-elv-textarea,
+  &.json-labelled-field {
     label {
       align-items: flex-start;
       margin-top: $elv-spacing-xs;
+      padding: 0;
     }
   }
 

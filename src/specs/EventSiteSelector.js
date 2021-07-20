@@ -3,6 +3,7 @@ const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 const eventSiteSelectorSpec = {
   name: "Event Site Selector",
   version: "0.1",
+  manageApp: "default",
   controls: [
     "images",
   ],
