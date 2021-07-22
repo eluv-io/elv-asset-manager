@@ -1010,48 +1010,70 @@ class FormStore {
 
   @action.bound
   LinkComponents(link) {
-    if(link && typeof link === "string") {
-      // URL
+    try {
+      if(link && typeof link === "string") {
+        // URL
 
-      let path = new URL(link).pathname;
-      const domain = path.match(/\/s\/([^\/]+)\//)[1];
+        let path = new URL(link).pathname;
 
-      // Remove /s/<domain>/
-      let libraryId, objectId, versionHash;
-      path = path.replace(/\/s\/[^\/]+\//, "");
-      if(path.startsWith("qlibs")) {
-        const parsed = path.match(/qlibs\/([^\/]+)\/q\/([^\/]+)/);
-        libraryId = parsed[1];
-        objectId = parsed[2];
-        path = "/" + path.split("/").slice(4).join("/");
-      } else {
-        const parsed = path.match(/q\/([^\/]+)/);
-        versionHash = parsed[1];
-        path = "/" + path.split("/").slice(3).join("/");
+        let domain = rootStore.networkInfo.name;
+        if(path.startsWith("/s")) {
+          domain = path.match(/\/s\/([^\/]+)\//)[1];
+
+          // Remove /s/<domain>/
+          path = path.replace(/\/s\/[^\/]+\//, "");
+        }
+
+        path = path.replace(/^\/+/g, "");
+
+        let libraryId, objectId, versionHash;
+        if(path.startsWith("qlibs")) {
+          const parsed = path.match(/qlibs\/([^\/]+)\/q\/([^\/]+)\/(.+)/);
+          libraryId = parsed[1];
+
+          if(parsed[2].startsWith("iq__")) {
+            objectId = parsed[2];
+          } else {
+            versionHash = parsed[2];
+          }
+
+          path = parsed[3];
+        } else {
+          const parsed = path.match(/q\/([^\/]+)\/(.+)/);
+          versionHash = parsed[1];
+          path = parsed[2];
+        }
+
+        path = path.startsWith("meta") ? path.replace(/^meta\//, "") : path.replace(/^files\//, "");
+
+        return {
+          domain,
+          libraryId,
+          objectId,
+          targetHash: versionHash,
+          path,
+          imagePath: path
+        };
       }
 
-      return {
-        domain,
-        libraryId,
-        objectId,
-        targetHash: versionHash,
-        path,
-        imagePath: path
-      };
-    }
+      if(!link || !link["/"]) {
+        return;
+      }
 
-    if(!link || !link["/"]) {
-      return;
-    }
+      let targetHash = this.rootStore.params.versionHash;
+      let path = link["/"].replace(/^\.\/files\//, "");
+      if(link["/"].startsWith("/qfab/") || link["/"].startsWith("/q/")) {
+        targetHash = link["/"].split("/")[2];
+        path = link["/"].split("/").slice(4).join("/");
+      }
 
-    let targetHash = this.rootStore.params.versionHash;
-    let path = link["/"].replace(/^\.\/files\//, "");
-    if(link["/"].startsWith("/qfab/") || link["/"].startsWith("/q/")) {
-      targetHash = link["/"].split("/")[2];
-      path = link["/"].split("/").slice(4).join("/");
+      return {targetHash, path, imagePath: path};
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to parse link", link);
+      // eslint-disable-next-line no-console
+      console.error(error);
     }
-
-    return {targetHash, path, imagePath: path};
   }
 
   LoadImages = flow(function * (metadata) {

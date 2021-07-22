@@ -337,7 +337,7 @@ class RecursiveField extends React.Component {
                       <PreviewIcon className="file-icon" imagePath={path} targetHash={targetHash}/> :
                       <ImageIcon className="file-icon" icon={FileIcon}/>
                   }
-                  <div className="file-path" title={path}>{ path }</div>
+                  <div className="file-path" title={decodeURI(path)}>{ decodeURI(path) }</div>
                 </React.Fragment>
               )
             }

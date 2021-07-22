@@ -101,7 +101,7 @@ class FileBrowser extends React.Component {
         <td className="item-icon">
           { this.FileIcon(name, info) }
         </td>
-        <td title={name}>{ name }</td>
+        <td title={decodeURI(name)}>{ decodeURI(name) }</td>
         <td title={size} className="info-cell">{ size }</td>
       </tr>
     );
@@ -109,12 +109,13 @@ class FileBrowser extends React.Component {
 
   Directory(item) {
     const changeDirectory = () => this.ChangeDirectory(UrlJoin(this.state.path, item.name));
+    const name = decodeURI(item.name);
     return (
-      <tr key={`entry-${this.state.path}-${item.name}`} className="directory" onClick={changeDirectory} onKeyPress={changeDirectory}>
+      <tr key={`entry-${this.state.path}-${name}`} className="directory" onClick={changeDirectory} onKeyPress={changeDirectory}>
         <td className="item-icon">
           <ImageIcon icon={DirectoryIcon} label="Directory" />
         </td>
-        <td tabIndex="0" title={item.name}>{item.name}</td>
+        <td tabIndex="0" title={name}>{name}</td>
         <td className="info-cell">{(Object.keys(item.item).length - 1) + " Items"}</td>
       </tr>
     );
