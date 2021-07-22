@@ -5,6 +5,7 @@ const NFTCollectionSpec = {
   "name": "NFT Collection",
   "version": "0.1",
   "manageApp": "default",
+  "hide_image_tab": true,
   "asset_types": [
     "primary"
   ],

@@ -30,6 +30,7 @@ class SpecStore {
   @observable profile;
   @observable associatePermissions = false;
   @observable playable = false;
+  @observable hideImageTab = false;
   @observable displayApp = "";
   @observable manageApp = "";
   @observable controls = {};
@@ -70,8 +71,9 @@ class SpecStore {
 
     this.associatePermissions = config.associate_permissions || false;
     this.playable = config.playable || false;
-    this.displayApp = config.displayApp || "";
-    this.manageApp = config.manageApp || "";
+    this.hideImageTab = config.hide_image_tab || config.hideImageTab || false;
+    this.displayApp = config.display_app || config.displayApp || "";
+    this.manageApp = config.manage_app || config.manageApp || "";
     this.availableAssetTypes = config.asset_types || config.availableAssetTypes || DefaultSpec.availableAssetTypes;
     this.availableTitleTypes = config.title_types || config.availableTitleTypes || DefaultSpec.availableTitleTypes;
     this.infoFields = config.info_fields || config.infoFields || DefaultSpec.infoFields;
@@ -201,6 +203,10 @@ class SpecStore {
       let titleConfiguration = {
         ...toJS(this.rootStore.titleConfiguration || {}),
         associate_permissions: this.associatePermissions,
+        hide_image_tab: this.hideImageTab,
+        playable: this.playable,
+        display_app: this.display_app,
+        manage_app: this.manage_app,
         profile: toJS(this.profile),
         asset_types: toJS(FormatOptions(this.availableAssetTypes)),
         title_types: toJS(FormatOptions(this.availableTitleTypes)),
@@ -363,6 +369,11 @@ class SpecStore {
   @action.bound
   TogglePlayable(enabled) {
     this.playable = enabled;
+  }
+
+  @action.bound
+  ToggleImageTabHidden(hidden) {
+    this.hideImageTab = hidden;
   }
 
   @action.bound

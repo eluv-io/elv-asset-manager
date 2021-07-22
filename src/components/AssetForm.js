@@ -169,7 +169,9 @@ class AssetForm extends React.Component {
       tabs.push([label || FormatName(name), name]);
     });
 
-    tabs.push(["Images", "IMAGES"]);
+    if(!this.props.formStore.hideImageTab) {
+      tabs.push(["Images", "IMAGES"]);
+    }
 
     if(this.props.formStore.HasControl("playlists")) {
       tabs.push(["Playlists", "PLAYLISTS"]);
@@ -253,6 +255,7 @@ class AssetForm extends React.Component {
   }
 
   render() {
+    const tabs = this.Tabs();
     return (
       <div className="asset-form">
         <div className="sticky app-header">
@@ -310,12 +313,17 @@ class AssetForm extends React.Component {
             <LocalizationSelection Close={() => this.setState({showLocalizationOptions: false})} />
           )
         }
-        <Tabs
-          className="asset-form-page-selection"
-          selected={this.state.form}
-          onChange={form => this.setState({form})}
-          options={this.Tabs()}
-        />
+        {
+          Maybe(
+            tabs.length > 1,
+            <Tabs
+              className="asset-form-page-selection"
+              selected={this.state.form}
+              onChange={form => this.setState({form})}
+              options={tabs}
+            />
+          )
+        }
         <div className="asset-form-container">
           { this.CurentForm() }
         </div>

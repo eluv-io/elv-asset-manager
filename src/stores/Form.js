@@ -109,6 +109,7 @@ class FormStore {
     arrangement: []
   };
 
+  @observable hideImageTab = false;
   @observable associatePermissions = false;
   @observable permissionsObject;
 
@@ -329,6 +330,7 @@ class FormStore {
     this.infoFieldLocalizations = config.info_field_localizations;
     this.associatedAssets = config.associated_assets || DefaultSpec.associatedAssets;
     this.defaultImageKeys = config.default_image_keys || DefaultSpec.defaultImageKeys;
+    this.hideImageTab = config.hide_image_tab;
 
     this.localization = config.localization;
   }
@@ -705,20 +707,25 @@ class FormStore {
     this.currentLocalizedData.playlists[i2] = playlist;
   }
 
-  async LoadInfoFields({HEAD, PATH="", infoFields, values, isTopLevel=false, topLevelValues}) {
+  async LoadInfoFields({PATH="", infoFields, values, isTopLevel=false, topLevelValues}) {
     let info = {};
 
     for(const infoField of infoFields) {
       let {name, type, reference, default_value, top_level, fields} = infoField;
 
+      let BASE_PATH = PATH;
       if(isTopLevel && top_level) {
         info[name] = topLevelValues[name] || default_value || "";
       } else {
         info[name] = values[name] || default_value || "";
+
+        if(isTopLevel) {
+          BASE_PATH = "info";
+        }
       }
 
       if(type === "reference_type") {
-        type = this.rootStore.client.utils.SafeTraverse(HEAD, ...(ReferencePathElements(PATH, reference))) || "text";
+        type = this.rootStore.client.utils.SafeTraverse(topLevelValues, ...(ReferencePathElements(BASE_PATH, reference))) || "text";
       }
 
       if(type === "json") {
@@ -742,7 +749,7 @@ class FormStore {
 
         info[name] = linkInfo;
       } else if(type === "subsection") {
-        info[name] = await this.LoadInfoFields({HEAD, PATH: UrlJoin(PATH, name), infoFields: fields, values: info[name]});
+        info[name] = await this.LoadInfoFields({PATH: UrlJoin(BASE_PATH, name), infoFields: fields, values: info[name], topLevelValues});
       } else if(type === "list") {
         info[name] = await Promise.all(
           (info[name] || []).map(async (listValues, i) => {
@@ -750,7 +757,7 @@ class FormStore {
               return listValues;
             }
 
-            return await this.LoadInfoFields({HEAD, PATH: UrlJoin(PATH, name, i.toString()), infoFields: fields, values: listValues});
+            return await this.LoadInfoFields({PATH: UrlJoin(BASE_PATH, name, i.toString()), infoFields: fields, values: listValues, topLevelValues});
           })
         );
       } else if(type === "fabric_link") {

@@ -149,6 +149,11 @@ class Info extends React.Component {
             value={this.props.specStore.playable}
             onChange={enabled => this.props.specStore.TogglePlayable(enabled)}
           />
+          <Checkbox
+            name="Hide Images Tab"
+            value={this.props.specStore.hideImageTab}
+            onChange={hidden => this.props.specStore.ToggleImageTabHidden(hidden)}
+          />
           <Selection
             name="displayApp"
             label="Display App"

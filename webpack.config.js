@@ -13,7 +13,7 @@ module.exports = {
   output: {
     path: Path.resolve(__dirname, "dist"),
     filename: "index.js",
-    chunkFilename: "[name].bundle.js"
+    chunkFilename: "[name].[contenthash].bundle.js"
   },
   devServer: {
     disableHostCheck: true,
