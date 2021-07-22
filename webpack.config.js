@@ -48,9 +48,6 @@ module.exports = {
       from: Path.join(__dirname, "configuration.js"),
       to: Path.join(__dirname, "dist", "configuration.js")
     }]),
-    new webpack.optimize.LimitChunkCountPlugin({
-      maxChunks: 1,
-    }),
     new HtmlWebpackPlugin({
       title: "Eluvio Video Asset Manager",
       template: Path.join(__dirname, "src", "index.html"),
@@ -59,8 +56,7 @@ module.exports = {
       filename: "index.html",
       inlineSource: ".(js|css)$",
       favicon: "node_modules/elv-components-js/src/icons/favicon.png"
-    }),
-    new HtmlWebpackInlineSourcePlugin()
+    })
   ],
   module: {
     rules: [
