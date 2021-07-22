@@ -1,8 +1,10 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 const currencyOptions = [...new Set(Object.values(require("country-codes-list").customList("countryNameEn", "{currencyCode}")))].filter(c => c).sort();
 
-const EmbeddedCollectionSpec = {
-  manageApp: "default",
+const NFTCollectionSpec = {
+  "name": "NFT Collection",
+  "version": "0.1",
+  "manageApp": "default",
   "asset_types": [
     "primary"
   ],
@@ -112,47 +114,18 @@ const EmbeddedCollectionSpec = {
           "hint": "Available price currencies are based on the 'Payment Currencies' field above",
         },
         {
-          "name": "address",
-          "label": "NFT Contract Address",
-          "type": "text"
-        },
-        {
+          "label": "NFT Template",
           "name": "base_template",
           "type": "fabric_link",
           "no_localize": true,
           "version": true
-        },
-        {
-          "name": "eth_locator",
-          "label": "Ethereum Locator",
-          "type": "text"
-        },
-        {
-          "name": "cauth_id",
-          "label": "Mint Key ID",
-          "type": "text"
-        },
-        {
-          "name": "fauth_id",
-          "label": "Fabric Key ID",
-          "type": "text"
-        },
-        {
-          "name": "token_template",
-          "label": "NFT Token Template",
-          "type": "text"
-        },
-        {
-          "name": "merge_meta",
-          "label": "Metadata",
-          "type": "textarea"
-        },
+        }
       ],
-      "name": "nft",
-      "label": "NFT",
-      "type": "subsection"
+      "name": "nfts",
+      "label": "NFTs",
+      "type": "list"
     }
   ]
 };
 
-export default EmbeddedCollectionSpec;
+export default NFTCollectionSpec;

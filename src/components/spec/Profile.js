@@ -7,7 +7,7 @@ import EventSiteSpec from "../../specs/EventSite";
 import EventSiteExtrasSpec from "../../specs/EventSiteExtras";
 import EventSiteSelectorSpec from "../../specs/EventSiteSelector";
 import MainSiteSpec from "../../specs/MainSite";
-import EmbeddedCollectionSpec from "../../specs/EmbeddedCollection";
+import NFTCollectionSpec from "../../specs/NFTCollection";
 import NFTTemplateSpec from "../../specs/NFTTemplate";
 
 const specs = {
@@ -16,7 +16,7 @@ const specs = {
   "Event Site Extras": EventSiteExtrasSpec,
   "Event Site Selector": EventSiteSelectorSpec,
   "Main Live Site": MainSiteSpec,
-  "Embedded Collection": EmbeddedCollectionSpec,
+  "NFT Collection": NFTCollectionSpec,
   "NFT Template": NFTTemplateSpec
 };
 

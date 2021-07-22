@@ -722,7 +722,7 @@ class FormStore {
       }
 
       if(type === "json") {
-        info[name] = JSON.stringify(info[name], null, 2);
+        info[name] = info[name] ? JSON.stringify(info[name], null, 2) : "{}";
       } else if((type === "date" || type === "datetime") && info[name]) {
         const date = DateTime.fromISO(values[name]);
 
@@ -731,11 +731,13 @@ class FormStore {
         } else {
           info[name] = date.ts;
         }
-      } else if(type === "file") {
+      } else if(type === "file" || type === "file_url") {
         let linkInfo = this.LinkComponents(info[name]);
 
         if(!linkInfo) {
           linkInfo = {targetHash: this.rootStore.params.versionHash};
+        } else if(!linkInfo.targetHash) {
+          linkInfo.targetHash = await this.rootStore.client.LatestVersionHash({objectId: linkInfo.objectId});
         }
 
         info[name] = linkInfo;
@@ -1008,6 +1010,36 @@ class FormStore {
 
   @action.bound
   LinkComponents(link) {
+    if(link && typeof link === "string") {
+      // URL
+
+      let path = new URL(link).pathname;
+      const domain = path.match(/\/s\/([^\/]+)\//)[1];
+
+      // Remove /s/<domain>/
+      let libraryId, objectId, versionHash;
+      path = path.replace(/\/s\/[^\/]+\//, "");
+      if(path.startsWith("qlibs")) {
+        const parsed = path.match(/qlibs\/([^\/]+)\/q\/([^\/]+)/);
+        libraryId = parsed[1];
+        objectId = parsed[2];
+        path = "/" + path.split("/").slice(4).join("/");
+      } else {
+        const parsed = path.match(/q\/([^\/]+)/);
+        versionHash = parsed[1];
+        path = "/" + path.split("/").slice(3).join("/");
+      }
+
+      return {
+        domain,
+        libraryId,
+        objectId,
+        targetHash: versionHash,
+        path,
+        imagePath: path
+      };
+    }
+
     if(!link || !link["/"]) {
       return;
     }
@@ -1405,6 +1437,13 @@ class FormStore {
         } else {
           value = null;
         }
+      } else if(type === "file_url") {
+        if(!values[name].targetHash || !values[name].path) { return ""; }
+
+        const url = new URL(`https://${this.rootStore.networkInfo.name}.net${this.rootStore.networkInfo.id}.contentfabric.io`);
+        url.pathname = UrlJoin("s", this.rootStore.networkInfo.name, "q", values[name].targetHash, "files", values[name].path);
+
+        value = url.toString();
       } else if(type === "rich_text") {
         // Set target="_blank" and rel="noopener" on all links
         const html = parse((value || "").toString("html"));

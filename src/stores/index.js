@@ -16,6 +16,8 @@ configure({
 class RootStore {
   @observable editingConfiguration = false;
 
+  @observable networkInfo;
+
   @observable balance = 0;
   @observable params = {};
   @observable assetMetadata;
@@ -68,6 +70,8 @@ class RootStore {
     } else if(!this.params.versionHash) {
       throw Error("Missing query parameter 'versionHash'");
     }
+
+    this.networkInfo = yield this.client.NetworkInfo();
 
     this.assetName =
       (yield this.client.ContentObjectMetadata({

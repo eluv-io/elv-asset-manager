@@ -74,7 +74,7 @@ class SpecManagement extends React.Component {
               });
             }}
           >
-            Save
+            Save Spec
           </Action>
         </div>
         <Tabs

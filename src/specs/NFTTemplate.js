@@ -8,6 +8,7 @@ const nftTemplateSpec = {
   displayApp: "default",
   manageApp: "default",
   associate_permissions: false,
+  associated_assets: [],
   controls: [],
   availableAssetTypes: [
     "primary"
@@ -23,7 +24,17 @@ const nftTemplateSpec = {
   fileControlItems: {},
   infoFields: [
     {
+      "name": "tenant_id",
+      "label": "Tenant ID",
+      "type": "text",
+      "no_localize": true
+    },
+    {
       "name": "name",
+      "type": "text"
+    },
+    {
+      "name": "display_name",
       "type": "text"
     },
     {
@@ -31,21 +42,40 @@ const nftTemplateSpec = {
       "type": "textarea"
     },
     {
-      "extensions": imageTypes,
-      "name": "image",
-      "type": "file",
-      "hint": "Square image recommended"
+      "label": "Token ID",
+      "name": "token_id",
+      "type": "text"
     },
     {
-      "name": "external_url",
-      "label": "External URL",
+      "name": "creator",
       "type": "text"
+    },
+    {
+      "name": "copyright",
+      "type": "text"
+    },
+    {
+      "name": "created_at",
+      "type": "datetime"
+    },
+    {
+      "extensions": imageTypes,
+      "name": "image",
+      "type": "file_url",
+      "hint": "Square image recommended"
     },
     {
       "name": "embed_url",
       "label": "Embed URL",
-      "type": "text",
-      "hint": "URL can be generated on https://embed.v3.contentfabric.io"
+      "type": "self_embed_url",
+      "hint": "URL can be generated on https://embed.v3.contentfabric.io",
+      "no_localize": true
+    },
+    {
+      "name": "external_url",
+      "label": "External URL",
+      "type": "self_embed_url",
+      "no_localize": true
     },
     {
       "name": "background_color",
@@ -53,7 +83,8 @@ const nftTemplateSpec = {
     },
     {
       "name": "enable_watermark",
-      "type": "checkbox"
+      "type": "checkbox",
+      "no_localize": true
     },
     {
       "name": "attributes",
@@ -93,11 +124,9 @@ const nftTemplateSpec = {
       "name": "nft",
       "label": "NFT Details",
       "type": "subsection",
+      "no_localize": true,
+      "top_level": true,
       "fields": [
-        {
-          "name": "contract_address",
-          "type": "text"
-        },
         {
           "name": "total_supply",
           "type": "integer"
@@ -107,19 +136,31 @@ const nftTemplateSpec = {
           "type": "text"
         },
         {
-          "name": "merge_metadata",
+          "name": "merge_meta",
+          "label": "Merge Metadata",
           "type": "json"
         },
         {
-          "name": "base_content_object",
-          "type": "fabric_link",
-          "hint": "By default, this object is the base content object"
+          "name": "address",
+          "label": "NFT Contract Address",
+          "type": "text"
+        },
+        {
+          "name": "cauth_id",
+          "label": "Mint Key ID",
+          "type": "text"
+        },
+        {
+          "name": "fauth_id",
+          "label": "Fabric Key ID",
+          "type": "text"
         }
       ]
     },
     {
       "name": "marketplace_attributes",
       "type": "subsection",
+      "no_localize": true,
       "fields": [
         {
           "name": "opensea",
@@ -128,8 +169,7 @@ const nftTemplateSpec = {
           "fields": [
             {
               "name": "youtube_url",
-              "type": "text",
-              "hint": "Can be the same as Embed URL, above"
+              "type": "self_embed_url"
             }
           ]
         }

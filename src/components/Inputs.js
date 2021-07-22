@@ -101,6 +101,7 @@ const InitializeField = ({fields, defaultValue}) => {
   return newValue;
 };
 
+@inject("rootStore")
 @inject("contentStore")
 @observer
 class RecursiveField extends React.Component {
@@ -171,6 +172,23 @@ class RecursiveField extends React.Component {
     } else if(fieldType === "uuid") {
       if(!entry[field.name]) {
         Update(field.name, Utils.B58(UUIDParse(UUID())));
+      }
+
+      return (
+        <Input
+          key={key}
+          name={field.name}
+          label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
+          type={fieldType}
+          value={entry[field.name] || ""}
+          required={field.required}
+          readonly
+        />
+      );
+    } else if(fieldType === "self_embed_url") {
+      if(!entry[field.name]) {
+        const net = this.props.rootStore.networkInfo.name === "demov3" ? "demo" : this.props.rootStore.networkInfo.name;
+        Update(field.name, `https://embed.v3.contentfabric.io?p&net=${net}&ct=h&oid=${this.props.rootStore.params.objectId}`);
       }
 
       return (
@@ -302,7 +320,7 @@ class RecursiveField extends React.Component {
           textAddButton: {textAddButton}
         })
       );
-    } else if(fieldType === "file") {
+    } else if(fieldType === "file" || fieldType === "file_url") {
       const { path, targetHash } = entry[field.name] || {};
       const extension = ((path || "").split(".").pop() || "").toLowerCase();
       const isImage = ["apng", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);

@@ -143,8 +143,12 @@ class SpecStore {
         formattedField.options = FormatOptions(field.options);
       }
 
-      if(field.type === "file") {
+      if(field.type === "file" || field.type === "file_url") {
         formattedField.extensions = FormatOptions(field.extensions);
+      }
+
+      if(["fabric_link"].includes(field.type)) {
+        formattedField.version = !!field.version;
       }
 
       if(["reference_subsection", "reference_list", "reference_type"].includes(field.type)) {
