@@ -126,6 +126,7 @@ class AssetInfo extends React.Component {
                 label="Permissions"
                 browseHeader="Select Permissions"
                 buttonText="Select Permissions"
+                objectOnly
                 selectedObject={this.props.formStore.permissionsObject}
                 Select={this.props.formStore.SetPermissionsObject}
                 Update={async () => await this.props.formStore.SetPermissionsObject({versionHash: this.props.formStore.permissionsObject.versionHash})}

@@ -197,6 +197,19 @@ class RootStore {
     }
   });
 
+  SelfEmbedUrl(version=false) {
+    const net = this.networkInfo.name === "demov3" ? "demo" : this.networkInfo.name;
+
+    let embedUrl = `https://embed.v3.contentfabric.io?p&net=${net}&ct=h`;
+    if(version) {
+      embedUrl = embedUrl + `&vid=${this.params.versionHash}`;
+    } else {
+      embedUrl = embedUrl + `&oid=${this.params.objectId}`;
+    }
+
+    return embedUrl;
+  }
+
   @action.bound
   SetEditingConfiguration(editing) {
     this.editingConfiguration = editing;

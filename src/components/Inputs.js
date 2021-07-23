@@ -31,6 +31,7 @@ import HintIcon from "../static/icons/help-circle.svg";
 import FileIcon from "../static/icons/file.svg";
 import ObjectSelection from "./ObjectSelection";
 import TextEditor from "./TextEditor";
+import UpdateLinkIcon from "../static/icons/arrow-up-circle.svg";
 
 export const ReferencePathElements = (PATH, reference) => {
   let pathElements;
@@ -186,22 +187,37 @@ class RecursiveField extends React.Component {
         />
       );
     } else if(fieldType === "self_embed_url") {
-      if(!entry[field.name]) {
-        const net = this.props.rootStore.networkInfo.name === "demov3" ? "demo" : this.props.rootStore.networkInfo.name;
-        Update(field.name, `https://embed.v3.contentfabric.io?p&net=${net}&ct=h&oid=${this.props.rootStore.params.objectId}`);
-      }
-
-      return (
+      let input =
         <Input
-          key={key}
+          key={key + "-input"}
           name={field.name}
           label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
           type={fieldType}
           value={entry[field.name] || ""}
           required={field.required}
           readonly
-        />
-      );
+        />;
+
+      if(field.version) {
+        return (
+          <div className="embed-url-field" key={key + entry[field.name]}>
+            { input }
+            <IconButton
+              className="update-object-link"
+              icon={UpdateLinkIcon}
+              label="Update link"
+              onClick={async () =>
+                await Confirm({
+                  message: `Are you sure you want to update '${field.name}'?`,
+                  onConfirm: () => Update(field.name, this.props.rootStore.SelfEmbedUrl(field.version))
+                })
+              }
+            />
+          </div>
+        );
+      } else {
+        return input;
+      }
     } else if(fieldType === "select") {
       return (
         <Selection

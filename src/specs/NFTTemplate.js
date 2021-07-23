@@ -21,11 +21,6 @@ const nftTemplateSpec = {
   "fileControlItems": {},
   "infoFields": [
     {
-      "name": "tenant_id",
-      "label": "Tenant ID",
-      "type": "text",
-    },
-    {
       "name": "mint",
       "label": "Minting Info",
       "type": "subsection",
@@ -35,6 +30,11 @@ const nftTemplateSpec = {
           "name": "merge_meta",
           "label": "Merge Metadata",
           "type": "json"
+        },
+        {
+          "name": "token_template",
+          "label": "Token ID Template",
+          "type": "text"
         },
         {
           "name": "cauth_id",
@@ -76,11 +76,6 @@ const nftTemplateSpec = {
           "type": "text"
         },
         {
-          "label": "Token ID",
-          "name": "token_id",
-          "type": "text"
-        },
-        {
           "name": "total_supply",
           "type": "integer"
         },
@@ -106,11 +101,13 @@ const nftTemplateSpec = {
           "name": "embed_url",
           "label": "Embed URL",
           "type": "self_embed_url",
+          "version": true
         },
         {
           "name": "external_url",
           "label": "External URL",
           "type": "self_embed_url",
+          "version": true
         },
         {
           "name": "background_color",
@@ -131,7 +128,8 @@ const nftTemplateSpec = {
               "fields": [
                 {
                   "name": "youtube_url",
-                  "type": "self_embed_url"
+                  "type": "self_embed_url",
+                  "version": true
                 }
               ]
             }

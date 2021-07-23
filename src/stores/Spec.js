@@ -149,7 +149,7 @@ class SpecStore {
         formattedField.extensions = FormatOptions(field.extensions);
       }
 
-      if(["fabric_link"].includes(field.type)) {
+      if(["fabric_link", "self_embed_url", "embed_url"].includes(field.type)) {
         formattedField.version = !!field.version;
       }
 

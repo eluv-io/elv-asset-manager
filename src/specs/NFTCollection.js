@@ -1,4 +1,4 @@
-const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
+//const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 const currencyOptions = [...new Set(Object.values(require("country-codes-list").customList("countryNameEn", "{currencyCode}")))].filter(c => c).sort();
 
 const NFTCollectionSpec = {
@@ -25,6 +25,7 @@ const NFTCollectionSpec = {
     }
   ],
   "info_fields": [
+    /*
     {
       "name": "public_title",
       "type": "text",
@@ -71,6 +72,8 @@ const NFTCollectionSpec = {
       "name": "images",
       "type": "subsection"
     },
+
+     */
     {
       "fields": [
         {

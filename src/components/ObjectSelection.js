@@ -33,7 +33,7 @@ class ObjectSelection extends React.Component {
         >
           <ContentBrowser
             header={this.props.browseHeader ||  "Select an object"}
-            objectOnly={!this.props.version}
+            objectOnly={this.props.objectOnly}
             offering={this.props.offering}
             onComplete={async (args) => {
               await this.props.Select(args);
