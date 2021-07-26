@@ -711,7 +711,7 @@ class FormStore {
     let info = {};
 
     for(const infoField of infoFields) {
-      let {name, type, version, reference, default_value, top_level, fields} = infoField;
+      let {name, type, reference, default_value, top_level, fields} = infoField;
 
       let BASE_PATH = PATH;
       if(isTopLevel && top_level) {
@@ -786,8 +786,8 @@ class FormStore {
           versionHash: linkInfo.targetHash
         };
       } else if(type === "self_embed_url") {
-        if(!info[name]) {
-          info[name] = this.rootStore.SelfEmbedUrl(version);
+        if(!info[name] || infoField.auto_update) {
+          info[name] = this.rootStore.SelfEmbedUrl(infoField.version);
         }
       }
     }

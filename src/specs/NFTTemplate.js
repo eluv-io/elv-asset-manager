@@ -101,13 +101,15 @@ const nftTemplateSpec = {
           "name": "embed_url",
           "label": "Embed URL",
           "type": "self_embed_url",
-          "version": true
+          "version": true,
+          "auto_update": true
         },
         {
           "name": "external_url",
           "label": "External URL",
           "type": "self_embed_url",
-          "version": true
+          "version": true,
+          "auto_update": true
         },
         {
           "name": "background_color",
@@ -129,7 +131,8 @@ const nftTemplateSpec = {
                 {
                   "name": "youtube_url",
                   "type": "self_embed_url",
-                  "version": true
+                  "version": true,
+                  "auto_update": true
                 }
               ]
             }

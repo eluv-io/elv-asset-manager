@@ -153,6 +153,10 @@ class SpecStore {
         formattedField.version = !!field.version;
       }
 
+      if(["self_embed_url", "embed_url"].includes(field.type)) {
+        formattedField.auto_update = !!field.auto_update;
+      }
+
       if(["reference_subsection", "reference_list", "reference_type"].includes(field.type)) {
         if(!field.reference) {
           infoFieldErrors.push(`${field.name} is missing a reference`);
