@@ -1023,6 +1023,11 @@ class FormStore {
   LinkComponents(link) {
     try {
       if(link && typeof link === "string") {
+        // Object ID
+        if(link.startsWith("hq__")) {
+          return { targetHash: link, path: "", imagePath: "" };
+        }
+
         // URL
 
         let path = new URL(link).pathname;
@@ -1439,11 +1444,14 @@ class FormStore {
     let info = {};
     let listFields = [];
 
-    infoFields.forEach(({name, type, reference, for_title_types, top_level, fields}) => {
-      if(for_title_types && for_title_types.length > 0 && !for_title_types.includes(titleType)) { return; }
+    infoFields.forEach(field => {
+      const name = field.name;
+      const type = field.type;
+
+      if(field.for_title_types && field.for_title_types.length > 0 && !field.for_title_types.includes(titleType)) { return; }
 
       if(type === "reference_type") {
-        type = this.rootStore.client.utils.SafeTraverse(HEAD, ...(ReferencePathElements(PATH, reference))) || "text";
+        field.type = this.rootStore.client.utils.SafeTraverse(HEAD, ...(ReferencePathElements(PATH, field.reference))) || "text";
       }
 
       let value = values[name];
@@ -1488,20 +1496,24 @@ class FormStore {
 
         value = html.toString();
       } else if(type === "subsection") {
-        value = this.FormatFields({HEAD, PATH: UrlJoin(PATH, name), infoFields: fields, values: values[name], titleType}).info || {};
+        value = this.FormatFields({HEAD, PATH: UrlJoin(PATH, name), infoFields: field.fields, values: values[name], titleType}).info || {};
       } else if(type === "list") {
         value = (value || []).map((entry, i) => {
           entry = toJS(entry);
 
-          if(!fields || fields.length === 0) {
+          if(!field.fields || field.fields.length === 0) {
             return entry;
           }
 
-          return (this.FormatFields({HEAD, PATH: UrlJoin(PATH, name, i.toString()), infoFields: fields, values: entry, titleType})).info || [];
+          return (this.FormatFields({HEAD, PATH: UrlJoin(PATH, name, i.toString()), infoFields: field.fields, values: entry, titleType})).info || [];
         });
       } else if(type === "fabric_link") {
         if(values[name]) {
-          value = this.CreateLink({targetHash: values[name].versionHash });
+          if(field.hash_only) {
+            value = values[name].versionHash;
+          } else {
+            value = this.CreateLink({targetHash: values[name].versionHash});
+          }
         }
       }
 
@@ -1512,8 +1524,8 @@ class FormStore {
       } else {
         if(splitListFields && (type === "list" || type === "multiselect")) {
           // List type - Since we're doing a merge on the info metadata, we must do an explicit replace call to modify lists
-          listFields.push({name, value, top_level});
-        } else if(top_level) {
+          listFields.push({name, value, top_level: field.top_level});
+        } else if(field.top_level) {
           // Top level specified, keep value at root level `public/asset_metadata/
           topInfo[name] = value;
         } else {

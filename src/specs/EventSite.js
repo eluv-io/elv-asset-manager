@@ -4,9 +4,10 @@ const currencyOptions = [...new Set(Object.values(require("country-codes-list").
 const languageOptions = require("./LanguageCodes").default;
 
 const eventSiteSpec = {
-  name: "Event Site",
+  name: "Eluvio LIVE Event Site",
   version: "0.13",
   manageApp: "default",
+  "hide_image_tab": true,
   associate_permissions: true,
   controls: [],
   availableAssetTypes: [
@@ -39,6 +40,19 @@ const eventSiteSpec = {
   ],
   infoFields: [
     {
+      "label": "Eluvio LIVE Tenant",
+      "name": "tenant",
+      "type": "fabric_link",
+      "hash_only": true,
+      "no_localize": true
+    },
+    {
+      "name": "marketplace",
+      "type": "fabric_link",
+      "hash_only": true,
+      "no_localize": true
+    },
+    {
       "name": "state",
       "type": "select",
       "no_localize": true,
@@ -62,13 +76,6 @@ const eventSiteSpec = {
       "name": "tenant_id",
       "type": "text",
       "no_localize": true,
-    },
-    {
-      "label": "Base URL Slug",
-      "name": "base_slug",
-      "type": "text",
-      "no_localize": true,
-      "hint": "Base URL Slug for this site (e.g. https://live.eluv.io/<base_slug>/<site>) (Optional)"
     },
     {
       "name": "theme",
@@ -137,16 +144,29 @@ const eventSiteSpec = {
           "hint": "Check this box if your event info is in your hero image. This will reduce the gradient and omit the text, allowing for more visible real estate on the hero image."
         },
         {
+          "name": "event_title",
+          "type": "text",
+          "hint": "The title of the page in the browser"
+        },
+        {
+          "name": "feature_header",
+          "type": "text",
+          "hint": "Displayed when the event is featured on the main page"
+        },
+        {
+          "name": "feature_subheader",
+          "type": "text",
+          "hint": "Displayed when the event is featured on the main page"
+        },
+        {
           "name": "event_header",
-          "type": "text"
+          "type": "text",
+          "hint": "Displayed on the main event page"
         },
         {
           "name": "event_subheader",
-          "type": "text"
-        },
-        {
-          "name": "event_title",
-          "type": "text"
+          "type": "text",
+          "hint": "Displayed on the main event page"
         },
         {
           "name": "location",
@@ -180,6 +200,13 @@ const eventSiteSpec = {
           "name": "hero_background_mobile",
           "label": "Hero Background (Mobile)",
           "type": "file"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "card_image",
+          "label": "Feature Card Image",
+          "type": "file",
+          "hint": "Used when featured in upcoming events on the main page"
         },
         {
           "extensions": imageTypes,

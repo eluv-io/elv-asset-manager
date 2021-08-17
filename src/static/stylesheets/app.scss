@@ -367,10 +367,6 @@ button {
     border: 0;
   }
 
-  button {
-    //max-width: 130px;
-  }
-
   h3 {
     margin-bottom: $elv-spacing-m;
     text-align: center;
@@ -398,6 +394,19 @@ textarea {
 }
 
 input {
+  padding: 0 $elv-spacing-xs;
+
+  &:read-only {
+    background: transparent;
+    border: 0;
+    color: $elv-color-text-lighter;
+    cursor: auto;
+
+    &:focus {
+      outline: 0;
+    }
+  }
+
   &.color-input {
     &.color-input {
       height: 32px;
@@ -434,21 +443,6 @@ select {
 
   &::placeholder {
     color: $elv-color-mediumgray;
-  }
-}
-
-input {
-  padding: 0 $elv-spacing-xs;
-
-  &:read-only {
-    background: transparent;
-    border: 0;
-    color: $elv-color-text-lighter;
-    cursor: auto;
-
-    &:focus {
-      outline: 0;
-    }
   }
 }
 
@@ -715,6 +709,10 @@ input {
       }
     }
   }
+
+  .asset-form-object-selection-preview-container {
+    margin-top: $elv-spacing-xs;
+  }
 }
 
 .asset-form-modal {
@@ -722,7 +720,6 @@ input {
     max-height: 70%;
     max-width: 70%;
     min-height: 50%;
-    //min-width: 70%;
   }
 }
 

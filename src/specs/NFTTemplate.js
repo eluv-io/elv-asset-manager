@@ -172,6 +172,44 @@ const nftTemplateSpec = {
               "reference": "./type"
             }
           ]
+        },
+        {
+          "name": "pack_options",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "is_openable",
+              "type": "checkbox"
+            },
+            {
+              "name": "open_animation",
+              "type": "fabric_link",
+              "video_preview": true
+            },
+            {
+              "name": "item_slots",
+              "type": "list",
+              "fields": [
+                {
+                  "name": "possible_items",
+                  "type": "list",
+                  "fields": [
+                    {
+                      "name": "nft",
+                      "label": "NFT Template or Collection",
+                      "type": "fabric_link"
+                    },
+                    {
+                      "name": "probability",
+                      "type": "integer",
+                      "hint": "Integer percentage from 0 to 100",
+                      "default_value": 100
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     }

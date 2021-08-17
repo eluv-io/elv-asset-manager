@@ -141,12 +141,21 @@ class SpecStore {
         formattedField.default_value = field.default_value;
       }
 
+      if(field.readonly) {
+        formattedField.readonly = true;
+      }
+
       if(["select", "multiselect"].includes(field.type)) {
         formattedField.options = FormatOptions(field.options);
       }
 
       if(field.type === "file" || field.type === "file_url") {
         formattedField.extensions = FormatOptions(field.extensions);
+      }
+
+      if(["fabric_link"].includes(field.type)) {
+        formattedField.video_preview = !!field.video_preview;
+        formattedField.hash_only = !!field.hash_only;
       }
 
       if(["fabric_link", "self_embed_url", "embed_url"].includes(field.type)) {

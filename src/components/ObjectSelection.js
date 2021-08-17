@@ -6,7 +6,10 @@ import ContentBrowser from "./ContentBrowser";
 import RemoveIcon from "../static/icons/trash.svg";
 import LinkIcon from "../static/icons/external-link.svg";
 import UpdateLinkIcon from "../static/icons/arrow-up-circle.svg";
+import PlayIcon from "../static/icons/play-circle.svg";
+import StopIcon from "../static/icons/x-circle.svg";
 import {inject, observer} from "mobx-react";
+import VideoPreview from "./VideoPreview";
 
 @inject("rootStore")
 @observer
@@ -15,7 +18,8 @@ class ObjectSelection extends React.Component {
     super(props);
 
     this.state = {
-      modal: null
+      modal: null,
+      showPreview: false
     };
   }
 
@@ -54,6 +58,15 @@ class ObjectSelection extends React.Component {
         <div className="asset-form-object-selection-selected">
           { this.props.selectedObject.name } { this.props.selectedObject.offering ? `(Offering: ${this.props.selectedObject.offering})` : ""}
           <div className="asset-form-object-selection-actions">
+            {
+              this.props.videoPreview ?
+                <IconButton
+                  className="show-preview"
+                  icon={this.state.showPreview ? StopIcon : PlayIcon}
+                  label={this.state.showPreview ? "Hide Preview" : "Show Preview"}
+                  onClick={() => this.setState({showPreview: !this.state.showPreview})}
+                /> : null
+            }
             <IconButton
               className="update-object-link"
               icon={UpdateLinkIcon}
@@ -91,6 +104,12 @@ class ObjectSelection extends React.Component {
           <Action onClick={() => this.ActivateModal()}>
             { this.props.buttonText || "Select an object" }
           </Action>
+          {
+            this.state.showPreview && selected ?
+              <div className="asset-form-object-selection-preview-container" key={this.props.selectedObject.versionHash}>
+                <VideoPreview versionHash={this.props.selectedObject.versionHash}/>
+              </div> : null
+          }
         </LabelledField>
 
         { this.state.modal }

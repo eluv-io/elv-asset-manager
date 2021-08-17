@@ -124,6 +124,7 @@ class Info extends React.Component {
           {name: "value_type", type: "select", options: types, default: types[0], only: entry => entry.type === "reference_subsection"},
           {name: "version", label: "Allow Version Selection", type: "checkbox", default: false, only: entry => ["fabric_link"].includes(entry.type)},
           {name: "version", label: "Use Version Hash", type: "checkbox", default: false, only: entry => ["self_embed_url", "embed_url"].includes(entry.type)},
+          {name: "hash_only", label: "Version Hash Only (No link)", type: "checkbox", default: false, only: entry => ["fabric_link"].includes(entry.type)},
           {name: "auto_update", type: "checkbox", default: false, only: entry => ["self_embed_url", "embed_url"].includes(entry.type)},
           {
             name: "fields",

@@ -1,7 +1,8 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 
-const eventSiteSelectorSpec = {
-  name: "Event Site Selector",
+const eventTenantSpec = {
+  name: "Eluvio LIVE Tenant",
+  "hide_image_tab": true,
   version: "0.1",
   manageApp: "default",
   controls: [
@@ -55,12 +56,20 @@ const eventSiteSelectorSpec = {
   associatedAssets: [
     {
       name: "sites",
-      label: "Sites",
+      label: "Events",
       indexed: false,
       slugged: true,
       defaultable: false,
       orderable: false,
       title_types: ["site"]
+    },
+    {
+      name: "marketplaces",
+      index: false,
+      slugged: true,
+      defaultable: false,
+      orderable: false,
+      title_types: ["marketplace"]
     },
     {
       name: "collections",
@@ -74,4 +83,4 @@ const eventSiteSelectorSpec = {
   ]
 };
 
-export default eventSiteSelectorSpec;
+export default eventTenantSpec;

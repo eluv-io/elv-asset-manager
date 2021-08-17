@@ -423,6 +423,7 @@ class RecursiveField extends React.Component {
           buttonText="Select Object"
           objectOnly={!field.version}
           offering={field.offering}
+          videoPreview={field.video_preview}
           selectedObject={entry[field.name]}
           Select={ids => Update(field.name, ids)}
           Update={async () => {
@@ -443,6 +444,7 @@ class RecursiveField extends React.Component {
           type={fieldType}
           value={(entry || {})[field.name] || ""}
           required={field.required}
+          readonly={field.readonly}
           onChange={newValue => Update(field.name, newValue)}
         />
       );

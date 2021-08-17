@@ -1,7 +1,7 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 
 const mainSiteSelectorSpec = {
-  name: "Main Live Site",
+  name: "Eluvio LIVE Main Site",
   version: "0.1",
   manageApp: "default",
   controls: [
@@ -25,6 +25,11 @@ const mainSiteSelectorSpec = {
       "indexed": true,
       "slugged": true,
       "orderable": true
+    },
+    {
+      "name": "carousel_events",
+      "indexed": true,
+      "slugged": true
     },
     {
       "name": "tenants",

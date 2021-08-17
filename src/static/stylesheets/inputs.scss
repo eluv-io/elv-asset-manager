@@ -21,9 +21,9 @@
     grid-template-columns: 8rem 1fr;
     margin-bottom: $elv-spacing-xxs;
 
-    input,
-    select,
-    textarea {
+    & > input,
+    & > select,
+    & > textarea {
       border: 1px solid $elv-color-gray;
       max-width: 35rem;
       min-width: 35rem;

@@ -4,18 +4,22 @@ import {inject, observer} from "mobx-react";
 
 import DefaultSpec from "../../specs/Default";
 import EventSiteSpec from "../../specs/EventSite";
+import DropEventSiteSpec from "../../specs/DropEventSite";
 import EventSiteExtrasSpec from "../../specs/EventSiteExtras";
-import EventSiteSelectorSpec from "../../specs/EventSiteSelector";
+import EventTenantSpec from "../../specs/EventTenant";
 import MainSiteSpec from "../../specs/MainSite";
 import NFTCollectionSpec from "../../specs/NFTCollection";
 import NFTTemplateSpec from "../../specs/NFTTemplate";
+import MarketplaceSpec from "../../specs/Marketplace";
 
 const specs = {
   "Default": DefaultSpec,
-  "Event Site": EventSiteSpec,
-  "Event Site Extras": EventSiteExtrasSpec,
-  "Event Site Selector": EventSiteSelectorSpec,
-  "Main Live Site": MainSiteSpec,
+  "Eluvio LIVE Event Site": EventSiteSpec,
+  "Eluvio LIVE Drop Event Site": DropEventSiteSpec,
+  "Eluvio LIVE Event Site Extras": EventSiteExtrasSpec,
+  "Eluvio LIVE Tenant": EventTenantSpec,
+  "Eluvio LIVE Main Site": MainSiteSpec,
+  "Marketplace": MarketplaceSpec,
   "NFT Collection": NFTCollectionSpec,
   "NFT Template": NFTTemplateSpec
 };

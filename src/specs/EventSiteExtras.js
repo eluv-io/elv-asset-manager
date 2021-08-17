@@ -1,7 +1,8 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 
 const eventSiteExtrasSpec = {
-  name: "Event Site",
+  name: "Eluvio LIVE Event Site Extras",
+  "hide_image_tab": true,
   version: "0.11",
   manageApp: "default",
   "asset_types": [

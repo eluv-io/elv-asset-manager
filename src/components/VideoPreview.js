@@ -1,8 +1,9 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
 import PropTypes from "prop-types";
-import HLSPlayer from "hls.js";
+import {EluvioPlayer, EluvioPlayerParameters} from "@eluvio/elv-player-js";
 
+@inject("rootStore")
 @inject("contentStore")
 @observer
 class VideoPreview extends React.Component {
@@ -10,47 +11,9 @@ class VideoPreview extends React.Component {
     super(props);
 
     this.state = {
-      versionHash: "",
+      player: undefined,
       errorMessage: ""
     };
-
-    this.InitializeVideo = this.InitializeVideo.bind(this);
-  }
-
-  componentWillUnmount() {
-    if(this.player) {
-      this.player.destroy();
-    }
-  }
-
-  async InitializeVideo(element) {
-    if(!element) { return; }
-
-    try {
-      this.setState({errorMessage: undefined});
-
-      const versionHash = await this.props.contentStore.LoadPlayoutOptions({
-        objectId: this.props.objectId,
-        versionHash: this.props.versionHash
-      });
-
-      const playoutMethods = this.props.contentStore.playoutOptions[versionHash].hls.playoutMethods;
-      // Prefer AES playout
-      const playoutUrl = (playoutMethods["aes-128"] || playoutMethods.clear).playoutUrl;
-
-      this.player = new HLSPlayer({
-        maxBufferLength: 30,
-        maxBufferSize: 300,
-        enableWorker: true
-      });
-
-      this.player.loadSource(playoutUrl);
-      this.player.attachMedia(element);
-    } catch (error) {
-      this.setState({errorMessage: "Error loading video preview"});
-      // eslint-disable-next-line no-console
-      console.error(error);
-    }
   }
 
   render() {
@@ -60,12 +23,37 @@ class VideoPreview extends React.Component {
 
     return (
       <div className="video-preview">
-        <video
-          crossOrigin="anonymous"
-          ref={this.InitializeVideo}
-          autoPlay={true}
-          controls
-          preload="auto"
+        <div
+          ref={element => {
+            if(!element || this.state.player) { return; }
+
+            this.setState({
+              player: (
+                new EluvioPlayer(
+                  element,
+                  {
+                    clientOptions: {
+                      client: this.props.rootStore.client
+                    },
+                    sourceOptions: {
+                      playoutParameters: {
+                        versionHash: this.props.versionHash
+                      }
+                    },
+                    playerOptions: {
+                      watermark: EluvioPlayerParameters.watermark.OFF,
+                      muted: EluvioPlayerParameters.muted.OFF,
+                      autoplay: EluvioPlayerParameters.autoplay.OFF,
+                      controls: EluvioPlayerParameters.controls.ON,
+                      loop: EluvioPlayerParameters.loop.OFF,
+                      playerCallback: ({videoElement}) => this.setState({video: videoElement}),
+                      errorCallback: (error) => this.setState({errorMessage: error.message || error.toString()})
+                    }
+                  }
+                )
+              )
+            });
+          }}
         />
       </div>
     );
