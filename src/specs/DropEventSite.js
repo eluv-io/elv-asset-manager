@@ -1,6 +1,5 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 const languageOptions = require("./LanguageCodes").default;
-const currencyOptions = [...new Set(Object.values(require("country-codes-list").customList("countryNameEn", "{currencyCode}")))].filter(c => c).sort();
 
 const eventSiteSpec = {
   name: "Eluvio LIVE Drop Event Site",
@@ -278,14 +277,6 @@ const eventSiteSpec = {
       "type": "subsection"
     },
     {
-      "name": "payment_currencies",
-      "type": "multiselect",
-      "no_localize": true,
-      "hint": "List of accepted currencies",
-      "default_value": ["USD"],
-      "options": currencyOptions
-    },
-    {
       "fields": [
         {
           "name": "id",
@@ -320,30 +311,17 @@ const eventSiteSpec = {
           "video_preview": true
         },
         {
-          "name": "nfts",
-          "label": "NFTs",
+          "name": "votable",
+          "type": "checkbox",
+          "default_value": true
+        },
+        {
+          "name": "candidates",
           "type": "list",
           "fields": [
             {
-              "name": "uuid",
-              "type": "uuid"
-            },
-            {
               "name": "name",
               "type": "text",
-            },
-            {
-              "name": "image",
-              "type": "file",
-              "extensions": imageTypes
-            },
-            {
-              "name": "price",
-              "type": "reference_subsection",
-              "no_localize": true,
-              "reference": "/payment_currencies",
-              "value_type": "number",
-              "hint": "Available price currencies are based on the 'Payment Currencies' field above",
             },
             {
               "name": "nft_template",

@@ -14,12 +14,12 @@ import MarketplaceSpec from "../../specs/Marketplace";
 
 const specs = {
   "Default": DefaultSpec,
-  "Eluvio LIVE Event Site": EventSiteSpec,
   "Eluvio LIVE Drop Event Site": DropEventSiteSpec,
+  "Eluvio LIVE Event Site": EventSiteSpec,
   "Eluvio LIVE Event Site Extras": EventSiteExtrasSpec,
-  "Eluvio LIVE Tenant": EventTenantSpec,
   "Eluvio LIVE Main Site": MainSiteSpec,
-  "Marketplace": MarketplaceSpec,
+  "Eluvio LIVE Marketplace": MarketplaceSpec,
+  "Eluvio LIVE Tenant": EventTenantSpec,
   "NFT Collection": NFTCollectionSpec,
   "NFT Template": NFTTemplateSpec
 };

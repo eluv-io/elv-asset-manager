@@ -2,7 +2,7 @@ const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 const currencyOptions = [...new Set(Object.values(require("country-codes-list").customList("countryNameEn", "{currencyCode}")))].filter(c => c).sort();
 
 const MarketplaceSpec = {
-  "name": "Marketplace",
+  "name": "Eluvio LIVE Marketplace",
   "version": "0.1",
   "manageApp": "default",
   "hide_image_tab": true,
@@ -66,8 +66,8 @@ const MarketplaceSpec = {
     {
       "fields": [
         {
-          "label": "UUID",
-          "name": "uuid",
+          "label": "SKU",
+          "name": "sku",
           "type": "uuid"
         },
         {
