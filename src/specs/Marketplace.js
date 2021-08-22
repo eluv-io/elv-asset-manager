@@ -112,7 +112,8 @@ const MarketplaceSpec = {
           "type": "fabric_link",
           "hint": "For type 'nft' only",
           "no_localize": true,
-          "version": true
+          "version": true,
+          "video_preview": true
         }
       ],
       "name": "items",

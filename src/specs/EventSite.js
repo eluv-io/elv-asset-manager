@@ -255,6 +255,24 @@ const eventSiteSpec = {
               "type": "file"
             },
             {
+              "name": "text_color",
+              "type": "color",
+              "no_label": true,
+              "default_value": {
+                "color": "#000000",
+                "label": "Black"
+              }
+            },
+            {
+              "name": "background_color",
+              "type": "color",
+              "no_label": true,
+              "default_value": {
+                "color": "#FFFFFF",
+                "label": "White"
+              }
+            },
+            {
               "name": "text",
               "type": "rich_text"
             }

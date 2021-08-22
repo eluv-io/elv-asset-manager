@@ -403,14 +403,20 @@ class RecursiveField extends React.Component {
               required={field.required}
               onChange={event => Update(field.name, {...(entry[field.name] || {color: "", label: ""}), color: event.target.value})}
             />
-            <input
-              className="color-label"
-              type="text"
-              placeholder="Color Label"
-              value={(entry[field.name] || {}).label || ""}
-              required={field.required}
-              onChange={event => Update(field.name, {...(entry[field.name] || {color: "", label: ""}), label: event.target.value})}
-            />
+            {
+              field.no_label ? null :
+                <input
+                  className="color-label"
+                  type="text"
+                  placeholder="Color Label"
+                  value={(entry[field.name] || {}).label || ""}
+                  required={field.required}
+                  onChange={event => Update(field.name, {
+                    ...(entry[field.name] || {color: "", label: ""}),
+                    label: event.target.value
+                  })}
+                />
+            }
           </div>
         </LabelledField>
       );

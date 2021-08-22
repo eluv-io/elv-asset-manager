@@ -175,6 +175,10 @@ class SpecStore {
         formattedField.value_type = field.value_type;
       }
 
+      if(field.type === "color") {
+        formattedField.no_label = field.no_label;
+      }
+
       if(topLevel && field.for_title_types && field.for_title_types.length > 0) {
         formattedField.for_title_types = field.for_title_types;
       }

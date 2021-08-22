@@ -300,6 +300,7 @@
       width: unset;
     }
 
+    // sass-lint:disable force-attribute-nesting no-qualifying-elements
     input[type="checkbox"] {
       height: unset;
     }
@@ -319,7 +320,7 @@
       }
 
       a {
-        color: #1b73e8;
+        color: $elv-color-mediumblue;
       }
 
       h1,

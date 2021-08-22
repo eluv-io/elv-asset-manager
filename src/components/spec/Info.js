@@ -62,6 +62,7 @@ const hints = {
   hint: "A hint to communicate the purpose of this field, just like this one",
   fields: "Attributes for each element in this list. If no fields are specified, this field will be a list of text strings.",
   for_title_types: "If specified, this field will only apply to assets with these title types",
+  video_preview: "Specify this field for links to playable content. If enabled, a button to show an embedded preview of the content in the form will be available.",
   top_level: <>If specified, this field will be stored in <code>public/asset_metadata</code> instead of <code>public/asset_metadata/info</code></>
 };
 
@@ -125,6 +126,8 @@ class Info extends React.Component {
           {name: "version", label: "Allow Version Selection", type: "checkbox", default: false, only: entry => ["fabric_link"].includes(entry.type)},
           {name: "version", label: "Use Version Hash", type: "checkbox", default: false, only: entry => ["self_embed_url", "embed_url"].includes(entry.type)},
           {name: "hash_only", label: "Version Hash Only (No link)", type: "checkbox", default: false, only: entry => ["fabric_link"].includes(entry.type)},
+          {name: "no_label", label: "No Label", type: "checkbox", default: false, only: entry => ["color"].includes(entry.type)},
+          {name: "video_preview", label: "Show Video Preview", type: "checkbox", hint: hints.video_preview, default: false, only: entry => ["fabric_link"].includes(entry.type)},
           {name: "auto_update", type: "checkbox", default: false, only: entry => ["self_embed_url", "embed_url"].includes(entry.type)},
           {
             name: "fields",

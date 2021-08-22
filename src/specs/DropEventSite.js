@@ -279,54 +279,73 @@ const eventSiteSpec = {
     {
       "fields": [
         {
-          "name": "id",
-          "label": "ID",
+          "name": "uuid",
+          "label": "Drop ID",
           "type": "uuid",
           "no_localize": true
         },
         {
           "name": "event_header",
-          "type": "text"
+          "type": "text",
+          "hint": "Used when displayed in upcoming events"
         },
         {
           "name": "event_image",
           "type": "file",
-          "extensions": imageTypes
-        },
-        {
-          "name": "date",
-          "type": "datetime"
+          "extensions": imageTypes,
+          "hint": "Used when displayed in upcoming events"
         },
         {
           "name": "drop_header",
-          "type": "text"
+          "type": "text",
+          "hint": "Displayed on the drop event page"
         },
         {
           "name": "drop_subheader",
-          "type": "text"
+          "type": "text",
+          "hint": "Displayed on the drop event page"
         },
         {
-          "name": "video",
+          "name": "start_date",
+          "type": "datetime",
+          "no_localize": true
+        },
+        {
+          "name": "end_date",
+          "type": "datetime",
+          "no_localize": true
+        },
+        {
+          "name": "stream",
           "type": "fabric_link",
           "video_preview": true
         },
         {
           "name": "votable",
           "type": "checkbox",
+          "hint": "If specified, users will be able to vote on the available NFTs",
           "default_value": true
         },
         {
-          "name": "candidates",
+          "name": "nfts",
+          "label": "NFTs",
           "type": "list",
+          "hint": "NFTs available in this drop",
           "fields": [
             {
-              "name": "name",
-              "type": "text",
+              "name": "label",
+              "type": "text"
             },
             {
-              "name": "nft_template",
-              "label": "NFT Template",
-              "type": "fabric_link"
+              "name": "image",
+              "type": "file",
+              "extensions": imageTypes
+            },
+            {
+              "name": "sku",
+              "label": "SKU",
+              "type": "text",
+              "hint": "Find NFT SKUs in the associated Marketplace",
             }
           ]
         }
