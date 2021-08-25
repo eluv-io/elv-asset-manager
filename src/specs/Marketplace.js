@@ -120,6 +120,41 @@ const MarketplaceSpec = {
       "type": "list"
     },
     {
+      "name": "storefront",
+      "type": "subsection",
+      "fields": [
+        {
+          "name": "header",
+          "type": "text"
+        },
+        {
+          "name": "subheader",
+          "type": "text"
+        },
+        {
+          "name": "sections",
+          "type": "list",
+          "fields": [
+            {
+              "name": "section_header",
+              "type": "text"
+            },
+            {
+              "name": "section_subheader",
+              "type": "text"
+            },
+            {
+              "name": "items",
+              "type": "reference_multiselect",
+              "reference": "/items",
+              "label_key": "name",
+              "value_key": "sku"
+            }
+          ]
+        },
+      ]
+    },
+    {
       "name": "associated_collections",
       "type": "list",
       "fields": [{

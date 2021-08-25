@@ -348,6 +348,27 @@ const eventSiteSpec = {
               "hint": "Find NFT SKUs in the associated Marketplace",
             }
           ]
+        },
+        {
+          "name": "modal_message",
+          "type": "subsection",
+          "hint": "If specified, this message will be displayed in a popup modal when the event is opened. You can use this to communicate event info to your users as they enter the event.",
+          "fields": [
+            {
+              "name": "show",
+              "type": "checkbox",
+              "hint": "The message box will only be displayed if this is checked"
+            },
+            {
+              "name": "image",
+              "type": "file",
+              "extensions": imageTypes
+            },
+            {
+              "name": "message",
+              "type": "rich_text"
+            }
+          ]
         }
       ],
       "name": "drops",

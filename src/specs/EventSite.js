@@ -555,6 +555,31 @@ const eventSiteSpec = {
       "options": currencyOptions
     },
     {
+      "name": "service_charges",
+      "hint": "Use this field to add additional charges to the price of tickets and merchandise. These charges will be enumerated in the checkout page.",
+      "type": "list",
+      "no_localize": true,
+      "fields": [
+        {
+          "name": "name",
+          "type": "text"
+        },
+        {
+          "name": "percentage",
+          "type": "number",
+          "hint": "A percentage charge that will be added to every purchase. Use whole numbers for percentage points, e.g. '6.5' will be a 6.5% charge",
+          "default_value": 0
+        },
+        {
+          "name": "flat_charge",
+          "type": "reference_subsection",
+          "reference": "/payment_currencies",
+          "value_type": "number",
+          "hint": "A flat charge that will be added to every purchase. Available price currencies are based on the 'Payment Currencies' field above"
+        },
+      ]
+    },
+    {
       "fields": [
         {
           "name": "name",

@@ -166,13 +166,18 @@ class SpecStore {
         formattedField.auto_update = !!field.auto_update;
       }
 
-      if(["reference_subsection", "reference_list", "reference_type"].includes(field.type)) {
+      if(["reference_subsection", "reference_list", "reference_type", "reference_select", "reference_multiselect"].includes(field.type)) {
         if(!field.reference) {
           infoFieldErrors.push(`${field.name} is missing a reference`);
         }
 
         formattedField.reference = field.reference;
         formattedField.value_type = field.value_type;
+      }
+
+      if(["reference_select", "reference_multiselect"].includes(field.type)) {
+        formattedField.label_key = field.label_key;
+        formattedField.value_key = field.value_key;
       }
 
       if(field.type === "color") {

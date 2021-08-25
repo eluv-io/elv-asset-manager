@@ -198,7 +198,7 @@ class RecursiveField extends React.Component {
           readonly
         />;
 
-      if(field.version) {
+      if(field.version && !field.auto_update) {
         return (
           <div className="embed-url-field" key={key + entry[field.name]}>
             { input }
@@ -218,25 +218,37 @@ class RecursiveField extends React.Component {
       } else {
         return input;
       }
-    } else if(fieldType === "select") {
+    } else if(fieldType === "select" || fieldType === "reference_select") {
+      let options = localization.options || field.options;
+      if(fieldType === "reference_select") {
+        options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || [])
+          .map(option => [option[field.label_key], option[field.value_key]]);
+      }
+
       return (
         <Selection
           key={key}
           name={field.name}
           label={hintLabel || field.label}
           value={entry[field.name]}
-          options={localization.options || field.options}
+          options={options}
           onChange={newValue => Update(field.name, newValue)}
         />
       );
-    } else if(fieldType === "multiselect") {
+    } else if(fieldType === "multiselect" || fieldType === "reference_multiselect") {
+      let options = localization.options || field.options;
+      if(fieldType === "reference_multiselect") {
+        options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || [])
+          .map(option => [option[field.label_key], option[field.value_key]]);
+      }
+
       return (
         <MultiSelect
           key={key}
           name={field.label || FormatName(field.name)}
           label={hintLabel || field.label || FormatName(field.name)}
           values={entry[field.name] || []}
-          options={localization.options || field.options}
+          options={options}
           onChange={newValue => Update(field.name, newValue)}
         />
       );

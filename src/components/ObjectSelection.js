@@ -119,7 +119,10 @@ class ObjectSelection extends React.Component {
 }
 
 ObjectSelection.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object
+  ]).isRequired,
   browseHeader: PropTypes.string,
   buttonText: PropTypes.string,
   selectedObject: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
