@@ -155,7 +155,7 @@ const MarketplaceSpec = {
       ]
     },
     {
-      "name": "associated_collections",
+      "name": "collections",
       "type": "list",
       "fields": [{
         "name": "collection",

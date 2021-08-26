@@ -20,7 +20,7 @@ const NFTCollectionSpec = {
     },
     {
       "name": "description",
-      "type": "textarea",
+      "type": "text",
     },
     {
       "extensions": imageTypes,
@@ -38,6 +38,26 @@ const NFTCollectionSpec = {
           "type": "fabric_link",
           "no_localize": true,
           "version": true
+        },
+        {
+          "name": "placeholder",
+          "type": "subsection",
+          "hint": "These fields will be used for display if the user does not yet have access to the NFT",
+          "fields": [
+            {
+              "name": "name",
+              "type": "text"
+            },
+            {
+              "name": "description",
+              "type": "text"
+            },
+            {
+              "name": "image",
+              "type": "file",
+              "extensions": imageTypes,
+            }
+          ]
         }
       ]
     }
