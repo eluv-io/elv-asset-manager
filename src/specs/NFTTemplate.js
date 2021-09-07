@@ -21,10 +21,6 @@ const nftTemplateSpec = {
   "fileControlItems": {},
   "infoFields": [
     {
-      "name": "requires_permission",
-      "type": "checkbox"
-    },
-    {
       "name": "permission",
       "type": "metadata_link",
       "default_value": "/permissioned",
@@ -128,6 +124,11 @@ const nftTemplateSpec = {
           "name": "playable",
           "type": "checkbox",
           "default_value": true
+        },
+        {
+          "name": "token_uri",
+          "type": "self_metadata_url",
+          "path": "public/asset_metadata/nft"
         },
         {
           "name": "embed_url",

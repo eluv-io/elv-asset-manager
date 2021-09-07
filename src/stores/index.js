@@ -8,6 +8,8 @@ import ChannelStore from "./Channel";
 import SpecStore from "./Spec";
 import VoDChannel from "./VoDChannel";
 
+import UrlJoin from "url-join";
+
 // Force strict mode so mutations are only allowed within actions.
 configure({
   enforceActions: "always"
@@ -223,6 +225,25 @@ class RootStore {
     }
 
     return embedUrl;
+  }
+
+  SelfMetadataUrl(path) {
+    const net = this.networkInfo.name === "demov3" ? "demo" : this.networkInfo.name;
+
+    let url;
+    switch (net) {
+      case "main":
+        url = "https://main.net955305.contentfabric.io/s/main";
+        break;
+      case "demo":
+        url = "https://demov3.net955210.contentfabric.io/s/demov3";
+        break;
+      case "test":
+        url = "https://test.net955210.contentfabric.io/s/test";
+        break;
+    }
+
+    return UrlJoin(url, "q", this.params.versionHash, "meta", path);
   }
 
   @action.bound

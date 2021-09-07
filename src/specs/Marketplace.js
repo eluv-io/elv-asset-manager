@@ -99,6 +99,12 @@ const MarketplaceSpec = {
           "default_value": true
         },
         {
+          "name": "requires_permissions",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If checked, users must have special permissions to the NFT template in order to view and buy the NFT in the marketplace"
+        },
+        {
           "name": "price",
           "type": "reference_subsection",
           "no_localize": true,

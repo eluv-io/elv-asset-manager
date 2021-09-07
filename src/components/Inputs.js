@@ -453,6 +453,18 @@ class RecursiveField extends React.Component {
           Remove={() => Update(field.name, undefined)}
         />
       );
+    } else if(fieldType === "self_metadata_url") {
+      return (
+        <Input
+          key={key}
+          name={field.name}
+          label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
+          type={fieldType}
+          value={(entry || {})[field.name] || ""}
+          readonly={true}
+          onChange={newValue => Update(field.name, newValue)}
+        />
+      );
     } else {
       return (
         <Input

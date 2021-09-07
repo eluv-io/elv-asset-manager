@@ -808,6 +808,8 @@ class FormStore {
         if(!info[name] || infoField.auto_update) {
           info[name] = this.rootStore.SelfEmbedUrl(infoField.version);
         }
+      } else if(type === "self_metadata_url") {
+        info[name] = this.rootStore.SelfMetadataUrl(infoField.path);
       }
     }
 
