@@ -23,6 +23,9 @@ class RootStore {
   @observable assetMetadata;
   @observable assetName;
 
+  @observable nonStandardFields = [];
+  @observable otherMetadata = {};
+
   @observable typeId = "";
   @observable typeHash = "";
   @observable typeName = "";
@@ -90,12 +93,6 @@ class RootStore {
         resolveLinks: true
       })) || "";
 
-    this.assetMetadata =
-      (yield this.client.ContentObjectMetadata({
-        versionHash: this.params.versionHash,
-        metadataSubtree: "public/asset_metadata"
-      })) || {};
-
     this.typeHash = (yield this.client.ContentObject({
       versionHash: this.params.versionHash
     })).type;
@@ -125,6 +122,24 @@ class RootStore {
       this.titleConfiguration.manageApp = typeMetadata.public["eluv.manageApp"];
 
       this.typeName = typeMetadata.public.name || this.typeId;
+
+      this.nonStandardFields = (this.titleConfiguration.info_fields || []).filter(field => field.path);
+
+      let metadata =
+        (yield this.client.ContentObjectMetadata({
+          versionHash: this.params.versionHash,
+          select: [
+            "public/asset_metadata",
+            ...(this.nonStandardFields.map(field => field.path))
+          ]
+        })) || {};
+      metadata.public = metadata.public || {};
+      metadata.public.asset_metadata = metadata.public.asset_metadata || {};
+
+      this.assetMetadata = { ...metadata.public.asset_metadata };
+      delete metadata.public.asset_metadata;
+
+      this.otherMetadata = metadata;
 
       try {
         this.canEditType = yield this.client.CallContractMethod({

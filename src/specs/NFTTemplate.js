@@ -21,6 +21,28 @@ const nftTemplateSpec = {
   "fileControlItems": {},
   "infoFields": [
     {
+      "name": "requires_permission",
+      "type": "checkbox"
+    },
+    {
+      "name": "permission",
+      "type": "metadata_link",
+      "default_value": "/permissioned",
+      "readonly": true
+    },
+    {
+      "name": "mint_private",
+      "label": "Minting Info (Private)",
+      "type": "subsection",
+      "path": "/permissioned",
+      "fields": [
+        {
+          "name": "address",
+          "type": "text"
+        }
+      ]
+    },
+    {
       "name": "mint",
       "label": "Minting Info",
       "type": "subsection",
@@ -54,6 +76,11 @@ const nftTemplateSpec = {
       "type": "subsection",
       "top_level": true,
       "fields": [
+        {
+          "name": "template_id",
+          "label": "Template ID",
+          "type": "uuid"
+        },
         {
           "name": "name",
           "type": "text"
@@ -98,6 +125,11 @@ const nftTemplateSpec = {
           "hint": "Square image recommended"
         },
         {
+          "name": "playable",
+          "type": "checkbox",
+          "default_value": true
+        },
+        {
           "name": "embed_url",
           "label": "Embed URL",
           "type": "self_embed_url",
@@ -133,6 +165,22 @@ const nftTemplateSpec = {
                   "type": "self_embed_url",
                   "version": true,
                   "auto_update": true
+                }
+              ]
+            },
+            {
+              "name": "Eluvio",
+              "type": "subsection",
+              "fields": [
+                {
+                  "name": "marketplace_id",
+                  "label": "Marketplace ID",
+                  "type": "text"
+                },
+                {
+                  "name": "sku",
+                  "label": "SKU",
+                  "type": "text"
                 }
               ]
             }

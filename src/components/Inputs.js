@@ -111,7 +111,7 @@ class RecursiveField extends React.Component {
 
     const key = `input-${name}-${field.name}-${this.props.localizationKey}`;
 
-    if(this.props.localizationKey && field.no_localize) { return null; }
+    if(this.props.localizationKey && (field.no_localize || field.path)) { return null; }
 
     let fieldType = field.type;
     if(fieldType === "reference_type") {

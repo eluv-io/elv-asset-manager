@@ -205,7 +205,8 @@ class FormStore {
   }
 
   CreateLink({targetHash, linkTarget="/meta/public/asset_metadata", options={}}) {
-    if(!targetHash || targetHash === this.rootStore.params.versionHash) {
+    const Utils = rootStore.client.utils;
+    if(!targetHash || Utils.DecodeVersionHash(targetHash).objectId === Utils.DecodeVersionHash(this.rootStore.params.versionHash).objectId) {
       return {
         ...options,
         ".": {
@@ -711,7 +712,12 @@ class FormStore {
     let info = {};
 
     for(const infoField of infoFields) {
-      let {name, type, reference, default_value, top_level, fields} = infoField;
+      let {name, type, path, reference, default_value, top_level, fields} = infoField;
+
+      if(isTopLevel && path) {
+        // Non-standard metadata path - values should be root of path
+        values = this.rootStore.client.utils.SafeTraverse(this.rootStore.otherMetadata, path.replace(/^\/|\/$/g, "").split("/")) || {};
+      }
 
       let BASE_PATH = PATH;
       if(isTopLevel && top_level) {
@@ -757,9 +763,22 @@ class FormStore {
               return listValues;
             }
 
-            return await this.LoadInfoFields({PATH: UrlJoin(BASE_PATH, name, i.toString()), infoFields: fields, values: listValues, topLevelValues});
+            return await this.LoadInfoFields({
+              PATH: UrlJoin(BASE_PATH, name, i.toString()),
+              infoFields: fields,
+              values: listValues,
+              topLevelValues
+            });
           })
         );
+      } else if(type === "metadata_link") {
+        const linkInfo = this.LinkComponents(values[name]);
+
+        if(!linkInfo) {
+          continue;
+        }
+
+        info[name] = linkInfo.path.replace(/^\.\/meta/, "");
       } else if(type === "fabric_link") {
         const linkInfo = this.LinkComponents(values[name]);
 
@@ -1442,6 +1461,7 @@ class FormStore {
   FormatFields({HEAD, PATH="", infoFields, values, titleType, isTopLevel=false, splitListFields=true}) {
     let topInfo = {};
     let info = {};
+    let nonStandardInfo = {};
     let listFields = [];
 
     infoFields.forEach(field => {
@@ -1515,11 +1535,23 @@ class FormStore {
             value = this.CreateLink({targetHash: values[name].versionHash});
           }
         }
+      } else if(type === "metadata_link") {
+        if(values[name]) {
+          value = this.CreateLink({
+            targetHash: this.rootStore.params.versionHash,
+            linkTarget: UrlJoin("/meta", values[name])
+          });
+        }
       }
 
       value = toJS(value);
 
-      if(!isTopLevel) {
+      if(isTopLevel && field.path) {
+        nonStandardInfo[name] = {
+          value,
+          path: UrlJoin(field.path, name)
+        };
+      } else if(!isTopLevel) {
         info[name] = value;
       } else {
         if(splitListFields && (type === "list" || type === "multiselect")) {
@@ -1535,7 +1567,7 @@ class FormStore {
       }
     });
 
-    return { info, topInfo, listFields };
+    return { info, topInfo, nonStandardInfo, listFields };
   }
 
   @action.bound
@@ -1583,7 +1615,7 @@ class FormStore {
           localizedData.assetInfo = LocalizationUnmerge(localizedData.assetInfo, this.assetInfo);
         }
 
-        const {info, topInfo} = this.FormatFields({
+        const {info, topInfo, nonStandardInfo} = this.FormatFields({
           HEAD: localizedData.assetInfo,
           infoFields: this.infoFields,
           values: localizedData.assetInfo,
@@ -1707,6 +1739,18 @@ class FormStore {
             }
           }
         });
+
+        yield Promise.all(
+          Object.values(nonStandardInfo).map(async ({path, value}) => {
+            await client.ReplaceMetadata({
+              libraryId,
+              objectId,
+              writeToken,
+              metadataSubtree: path,
+              metadata: value
+            });
+          })
+        );
 
         // Configurable Controls
         for(let i = 0; i < this.fileControls.length; i++) {

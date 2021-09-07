@@ -107,6 +107,10 @@ const MarketplaceSpec = {
           "hint": "Available price currencies are based on the 'Payment Currencies' field above",
         },
         {
+          "name": "tags",
+          "type": "list"
+        },
+        {
           "label": "NFT Template",
           "name": "nft_template",
           "type": "fabric_link",
@@ -157,10 +161,23 @@ const MarketplaceSpec = {
     {
       "name": "collections",
       "type": "list",
-      "fields": [{
-        "name": "collection",
-        "type": "fabric_link"
-      }]
+      "fields": [
+        {
+          "name": "collection_header",
+          "type": "text"
+        },
+        {
+          "name": "collection_subheader",
+          "type": "text"
+        },
+        {
+          "name": "items",
+          "type": "reference_multiselect",
+          "reference": "/items",
+          "label_key": "name",
+          "value_key": "sku"
+        }
+      ]
     }
   ]
 };

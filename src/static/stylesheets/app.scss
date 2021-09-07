@@ -692,6 +692,7 @@ select {
     margin-bottom: $elv-spacing-xs;
     margin-right: $elv-spacing-s;
     padding: $elv-spacing-xs;
+    word-break: break-all;
 
     button {
       height: $elv-spacing-m;

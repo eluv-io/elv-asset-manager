@@ -62,8 +62,9 @@ const hints = {
   hint: "A hint to communicate the purpose of this field, just like this one",
   fields: "Attributes for each element in this list. If no fields are specified, this field will be a list of text strings.",
   for_title_types: "If specified, this field will only apply to assets with these title types",
+  path: <>If specified, this field will change the location this field is saved in metadata. If blank, fields will be saved in <code>public/asset_metadata/info</code>, or <code>public/asset_metadata</code> if Top Level is specified. If the field is not at the top level (e.g. inside a list or a subsection), this field has no effect. Fields with non-standard paths are NOT localizable.</>,
   video_preview: "Specify this field for links to playable content. If enabled, a button to show an embedded preview of the content in the form will be available.",
-  top_level: <>If specified, this field will be stored in <code>public/asset_metadata</code> instead of <code>public/asset_metadata/info</code></>
+  top_level: <>If specified, this field will be stored in <code>public/asset_metadata</code> instead of <code>public/asset_metadata/info</code>. If Metadata Path is specified, this field has no effect.</>
 };
 
 @inject("specStore")
@@ -88,6 +89,7 @@ class Info extends React.Component {
       "date",
       "datetime",
       "fabric_link",
+      "metadata_link",
       "self_embed_url",
       "subsection",
       "list",
@@ -119,6 +121,7 @@ class Info extends React.Component {
           {name: "hint", hint: hints.hint},
           {name: "no_localize", label: "No Localization", type: "checkbox", hint: "If checked, this field will not be displayed when filling out localized info"},
           {name: "top_level", type: "checkbox", hint: hints.top_level, only: () => toplevel},
+          {name: "path", type: "text", label: "Metadata Path", hint: hints.path},
           {name: "for_title_types", type: "multiselect", hint: hints.for_title_types, options: this.props.specStore.availableTitleTypes, only: () => toplevel},
           {name: "type", type: "select", options: types, default: "text"},
           {name: "options", type: "list", only: entry => ["select", "multiselect"].includes(entry.type)},

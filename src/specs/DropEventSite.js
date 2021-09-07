@@ -71,47 +71,6 @@ const eventSiteSpec = {
       "options": Object.keys(languageOptions)
     },
     {
-      "name": "analytics_ids",
-      "label": "Analytics IDs",
-      "type": "list",
-      "no_localize": true,
-      "hint": "Specify IDs for your own analytics",
-      "fields": [
-        {
-          "name": "label",
-          "type": "text",
-          "hint": "A label for this collection of analytics"
-        },
-        {
-          "name": "ids",
-          "label": "IDs",
-          "type": "list",
-          "fields": [
-            {
-              "name": "type",
-              "type": "select",
-              "options": [
-                "Google Analytics ID",
-                "Google Tag Manager ID",
-                "Google Conversion ID",
-                "Google Conversion Label",
-                "Facebook Pixel ID",
-                "App Nexus Segment ID",
-                "App Nexus Pixel ID",
-                "TradeDoubler Organization ID",
-                "TradeDoubler Event ID",
-              ]
-            },
-            {
-              "name": "id",
-              "label": "ID",
-              "type": "text"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "fields": [
         {
           "label": "Event Info on Hero Image",
@@ -151,6 +110,28 @@ const eventSiteSpec = {
         {
           "name": "copyright",
           "type": "textarea"
+        },
+        {
+          "name": "modal_message_get_started",
+          "label": "Modal Message (Get Started)",
+          "type": "subsection",
+          "hint": "If specified, this message will be displayed in a popup modal the 'Get Started' button is pressed. You can use this to communicate event info before they create or sign in to their wallet.",
+          "fields": [
+            {
+              "name": "show",
+              "type": "checkbox",
+              "hint": "The message box will only be displayed if this is checked"
+            },
+            {
+              "name": "image",
+              "type": "file",
+              "extensions": imageTypes
+            },
+            {
+              "name": "message",
+              "type": "rich_text"
+            }
+          ]
         }
       ],
       "name": "event_info",
@@ -158,6 +139,11 @@ const eventSiteSpec = {
     },
     {
       "fields": [
+        {
+          "name": "logo",
+          "type": "file",
+          "extensions": imageTypes
+        },
         {
           "extensions": imageTypes,
           "name": "hero_background",
@@ -201,6 +187,17 @@ const eventSiteSpec = {
       ],
       "name": "event_images",
       "type": "subsection"
+    },
+    {
+      "name": "promo_videos",
+      "type": "list",
+      "fields": [
+        {
+          "name": "video",
+          "type": "fabric_link",
+          "video_preview": true
+        }
+      ]
     },
     {
       "fields": [
@@ -260,25 +257,6 @@ const eventSiteSpec = {
     {
       "fields": [
         {
-          "name": "header",
-          "type": "text"
-        },
-        {
-          "name": "subheader",
-          "type": "text"
-        },
-        {
-          "name": "image",
-          "type": "file",
-          "extensions": imageTypes
-        },
-      ],
-      "name": "wallet_info",
-      "type": "subsection"
-    },
-    {
-      "fields": [
-        {
           "name": "uuid",
           "label": "Drop ID",
           "type": "uuid",
@@ -327,6 +305,11 @@ const eventSiteSpec = {
           "default_value": true
         },
         {
+          "name": "store_filters",
+          "type": "list",
+          "hint": "After the drop, the wallet panel will be redirected to the store. Use these fields to filter the items shown"
+        },
+        {
           "name": "nfts",
           "label": "NFTs",
           "type": "list",
@@ -350,9 +333,32 @@ const eventSiteSpec = {
           ]
         },
         {
-          "name": "modal_message",
+          "name": "modal_message_start",
+          "label": "Modal Message (Event Start)",
           "type": "subsection",
           "hint": "If specified, this message will be displayed in a popup modal when the event is opened. You can use this to communicate event info to your users as they enter the event.",
+          "fields": [
+            {
+              "name": "show",
+              "type": "checkbox",
+              "hint": "The message box will only be displayed if this is checked"
+            },
+            {
+              "name": "image",
+              "type": "file",
+              "extensions": imageTypes
+            },
+            {
+              "name": "message",
+              "type": "rich_text"
+            }
+          ]
+        },
+        {
+          "name": "modal_message_end",
+          "label": "Modal Message (Event End)",
+          "type": "subsection",
+          "hint": "If specified, this message will be displayed in a popup modal when the event has ended. You can use this to communicate event info to at the end of the event.",
           "fields": [
             {
               "name": "show",
@@ -373,6 +379,47 @@ const eventSiteSpec = {
       ],
       "name": "drops",
       "type": "list"
+    },
+    {
+      "name": "analytics_ids",
+      "label": "Analytics IDs",
+      "type": "list",
+      "no_localize": true,
+      "hint": "Specify IDs for your own analytics",
+      "fields": [
+        {
+          "name": "label",
+          "type": "text",
+          "hint": "A label for this collection of analytics"
+        },
+        {
+          "name": "ids",
+          "label": "IDs",
+          "type": "list",
+          "fields": [
+            {
+              "name": "type",
+              "type": "select",
+              "options": [
+                "Google Analytics ID",
+                "Google Tag Manager ID",
+                "Google Conversion ID",
+                "Google Conversion Label",
+                "Facebook Pixel ID",
+                "App Nexus Segment ID",
+                "App Nexus Pixel ID",
+                "TradeDoubler Organization ID",
+                "TradeDoubler Event ID",
+              ]
+            },
+            {
+              "name": "id",
+              "label": "ID",
+              "type": "text"
+            }
+          ]
+        }
+      ]
     },
     {
       "fields": [

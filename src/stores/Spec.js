@@ -145,6 +145,10 @@ class SpecStore {
         formattedField.readonly = true;
       }
 
+      if(field.path) {
+        formattedField.path = field.path;
+      }
+
       if(["select", "multiselect"].includes(field.type)) {
         formattedField.options = FormatOptions(field.options);
       }
