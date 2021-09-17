@@ -255,6 +255,8 @@ const eventSiteSpec = {
       "type": "subsection"
     },
     {
+      "name": "drops",
+      "type": "list",
       "fields": [
         {
           "name": "uuid",
@@ -274,16 +276,6 @@ const eventSiteSpec = {
           "hint": "Used when displayed in upcoming events"
         },
         {
-          "name": "drop_header",
-          "type": "text",
-          "hint": "Displayed on the drop event page"
-        },
-        {
-          "name": "drop_subheader",
-          "type": "text",
-          "hint": "Displayed on the drop event page"
-        },
-        {
           "name": "start_date",
           "type": "datetime",
           "no_localize": true
@@ -292,11 +284,6 @@ const eventSiteSpec = {
           "name": "end_date",
           "type": "datetime",
           "no_localize": true
-        },
-        {
-          "name": "stream",
-          "type": "fabric_link",
-          "video_preview": true
         },
         {
           "name": "votable",
@@ -333,52 +320,260 @@ const eventSiteSpec = {
           ]
         },
         {
-          "name": "modal_message_start",
-          "label": "Modal Message (Event Start)",
+          "name": "event_state_preroll",
+          "label": "Event State: Preroll",
           "type": "subsection",
-          "hint": "If specified, this message will be displayed in a popup modal when the event is opened. You can use this to communicate event info to your users as they enter the event.",
           "fields": [
             {
-              "name": "show",
+              "name": "use_state",
               "type": "checkbox",
-              "hint": "The message box will only be displayed if this is checked"
+              "default_value": true
             },
             {
-              "name": "image",
-              "type": "file",
-              "extensions": imageTypes
+              "name": "header",
+              "type": "text"
             },
             {
-              "name": "message",
-              "type": "rich_text"
-            }
+              "name": "subheader",
+              "type": "text"
+            },
+            {
+              "name": "show_countdown",
+              "label": "Show Countdown to Next State",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "use_main_stream",
+              "type": "checkbox",
+              "default_value": false,
+              "hint": "If checked, the stream for the main event will be used instead of one specified in this section"
+            },
+            {
+              "name": "stream",
+              "type": "fabric_link",
+              "video_preview": true
+            },
+            {
+              "name": "loop_stream",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "modal_message",
+              "label": "Modal Message (Pre Event)",
+              "type": "subsection",
+              "hint": "If specified, this message will be displayed in a popup modal at the start of this part of the event. You can use this to communicate information to users.",
+              "fields": [
+                {
+                  "name": "show",
+                  "type": "checkbox",
+                  "hint": "The message box will only be displayed if this is checked"
+                },
+                {
+                  "name": "image",
+                  "type": "file",
+                  "extensions": imageTypes
+                },
+                {
+                  "name": "message",
+                  "type": "rich_text"
+                }
+              ]
+            },
           ]
         },
         {
-          "name": "modal_message_end",
-          "label": "Modal Message (Event End)",
+          "name": "event_state_main",
+          "label": "Event State: Main",
           "type": "subsection",
-          "hint": "If specified, this message will be displayed in a popup modal when the event has ended. You can use this to communicate event info to at the end of the event.",
           "fields": [
             {
-              "name": "show",
+              "name": "header",
+              "type": "text"
+            },
+            {
+              "name": "subheader",
+              "type": "text"
+            },
+            {
+              "name": "start_date",
+              "type": "datetime",
+              "no_localize": true
+            },
+            {
+              "name": "show_countdown",
+              "label": "Show Countdown to Next State",
               "type": "checkbox",
-              "hint": "The message box will only be displayed if this is checked"
+              "default_value": true
             },
             {
-              "name": "image",
-              "type": "file",
-              "extensions": imageTypes
+              "name": "stream",
+              "type": "fabric_link",
+              "video_preview": true
             },
             {
-              "name": "message",
-              "type": "rich_text"
-            }
+              "name": "loop_stream",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "modal_message",
+              "label": "Modal Message (Main Event)",
+              "type": "subsection",
+              "hint": "If specified, this message will be displayed in a popup modal at the start of this part of the event. You can use this to communicate information to users.",
+              "fields": [
+                {
+                  "name": "show",
+                  "type": "checkbox",
+                  "hint": "The message box will only be displayed if this is checked"
+                },
+                {
+                  "name": "image",
+                  "type": "file",
+                  "extensions": imageTypes
+                },
+                {
+                  "name": "message",
+                  "type": "rich_text"
+                }
+              ]
+            },
+          ]
+        },
+        {
+          "name": "event_state_post_vote",
+          "label": "Event State: Voting Ended",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "use_state",
+              "type": "checkbox",
+              "default_value": true
+            },
+            {
+              "name": "header",
+              "type": "text"
+            },
+            {
+              "name": "subheader",
+              "type": "text"
+            },
+            {
+              "name": "start_date",
+              "type": "datetime",
+              "no_localize": true
+            },
+            {
+              "name": "show_countdown",
+              "label": "Show Countdown to Next State",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "use_main_stream",
+              "type": "checkbox",
+              "default_value": false,
+              "hint": "If checked, the stream for the main event will be used instead of one specified in this section"
+            },
+            {
+              "name": "stream",
+              "type": "fabric_link",
+              "video_preview": true
+            },
+            {
+              "name": "loop_stream",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "modal_message",
+              "label": "Modal Message (Voting Ended)",
+              "type": "subsection",
+              "hint": "If specified, this message will be displayed in a popup modal at the start of this part of the event. You can use this to communicate information to users.",
+              "fields": [
+                {
+                  "name": "show",
+                  "type": "checkbox",
+                  "hint": "The message box will only be displayed if this is checked"
+                },
+                {
+                  "name": "image",
+                  "type": "file",
+                  "extensions": imageTypes
+                },
+                {
+                  "name": "message",
+                  "type": "rich_text"
+                }
+              ]
+            },
+          ]
+        },
+        {
+          "name": "event_state_mint_start",
+          "label": "Event State: Minting Start",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "use_state",
+              "type": "checkbox",
+              "default_value": true
+            },
+            {
+              "name": "header",
+              "type": "text"
+            },
+            {
+              "name": "subheader",
+              "type": "text"
+            },
+            {
+              "name": "start_date",
+              "type": "datetime",
+              "no_localize": true
+            },
+            {
+              "name": "use_main_stream",
+              "type": "checkbox",
+              "default_value": false,
+              "hint": "If checked, the stream for the main event will be used instead of one specified in this section"
+            },
+            {
+              "name": "stream",
+              "type": "fabric_link",
+              "video_preview": true
+            },
+            {
+              "name": "loop_stream",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "modal_message",
+              "label": "Modal Message (Minting Start)",
+              "type": "subsection",
+              "hint": "If specified, this message will be displayed in a popup modal at the start of this part of the event. You can use this to communicate information to users.",
+              "fields": [
+                {
+                  "name": "show",
+                  "type": "checkbox",
+                  "hint": "The message box will only be displayed if this is checked"
+                },
+                {
+                  "name": "image",
+                  "type": "file",
+                  "extensions": imageTypes
+                },
+                {
+                  "name": "message",
+                  "type": "rich_text"
+                }
+              ]
+            },
           ]
         }
-      ],
-      "name": "drops",
-      "type": "list"
+      ]
     },
     {
       "name": "analytics_ids",

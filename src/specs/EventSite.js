@@ -362,7 +362,7 @@ const eventSiteSpec = {
           "name": "coupon_mode",
           "type": "checkbox",
           "no_localize": true,
-          "hint": "If specified, ticket redemptions will be for coupon codes only"
+          "hint": "If specified, coupon redemption will be available"
         },
         {
           "name": "redemption_message",

@@ -127,6 +127,7 @@ const nftTemplateSpec = {
         },
         {
           "name": "token_uri",
+          "label": "Token URI",
           "type": "self_metadata_url",
           "path": "public/asset_metadata/nft"
         },

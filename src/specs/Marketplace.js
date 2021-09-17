@@ -105,6 +105,11 @@ const MarketplaceSpec = {
           "hint": "If checked, users must have special permissions to the NFT template in order to view and buy the NFT in the marketplace"
         },
         {
+          "name": "max_per_user",
+          "label": "Purchase Limit",
+          "type": "integer"
+        },
+        {
           "name": "price",
           "type": "reference_subsection",
           "no_localize": true,
