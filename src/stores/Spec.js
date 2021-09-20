@@ -74,11 +74,11 @@ class SpecStore {
     this.hideImageTab = config.hide_image_tab || config.hideImageTab || false;
     this.displayApp = config.display_app || config.displayApp || "";
     this.manageApp = config.manage_app || config.manageApp || "";
-    this.availableAssetTypes = config.asset_types || config.availableAssetTypes || DefaultSpec.availableAssetTypes;
-    this.availableTitleTypes = config.title_types || config.availableTitleTypes || DefaultSpec.availableTitleTypes;
-    this.infoFields = config.info_fields || config.infoFields || DefaultSpec.infoFields;
-    this.associatedAssets = config.associated_assets || config.associatedAssets || DefaultSpec.associatedAssets;
-    this.defaultImageKeys = config.default_image_keys || config.defaultImageKeys || DefaultSpec.defaultImageKeys;
+    this.availableAssetTypes = config.asset_types || config.availableAssetTypes || DefaultSpec.asset_types;
+    this.availableTitleTypes = config.title_types || config.availableTitleTypes || DefaultSpec.title_types;
+    this.infoFields = config.info_fields || config.infoFields || DefaultSpec.info_fields;
+    this.associatedAssets = config.associated_assets || config.associatedAssets || DefaultSpec.associated_assets;
+    this.defaultImageKeys = config.default_image_keys || config.defaultImageKeys || DefaultSpec.default_image_keys;
 
     this.localizations = this.FormatLocalizations(config.localization || DefaultSpec.localization);
   }

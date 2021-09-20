@@ -325,12 +325,12 @@ class FormStore {
     this.controls = controls;
 
     this.associatePermissions = config.associate_permissions;
-    this.availableAssetTypes = config.asset_types || DefaultSpec.availableAssetTypes;
-    this.availableTitleTypes = config.title_types || DefaultSpec.availableTitleTypes;
-    this.infoFields = config.info_fields || DefaultSpec.infoFields;
+    this.availableAssetTypes = config.asset_types || DefaultSpec.asset_types;
+    this.availableTitleTypes = config.title_types || DefaultSpec.title_types;
+    this.infoFields = config.info_fields || DefaultSpec.info_fields;
     this.infoFieldLocalizations = config.info_field_localizations;
-    this.associatedAssets = config.associated_assets || DefaultSpec.associatedAssets;
-    this.defaultImageKeys = config.default_image_keys || DefaultSpec.defaultImageKeys;
+    this.associatedAssets = config.associated_assets || DefaultSpec.associated_assets;
+    this.defaultImageKeys = config.default_image_keys || DefaultSpec.default_image_keys;
     this.hideImageTab = config.hide_image_tab;
 
     this.localization = config.localization;
