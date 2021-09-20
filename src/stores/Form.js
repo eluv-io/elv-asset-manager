@@ -3,7 +3,7 @@ import {DateTime} from "luxon";
 import {ElvClient} from "@eluvio/elv-client-js";
 import UrlJoin from "url-join";
 
-import DefaultSpec from "../specs/Default";
+import DefaultSpec from "@eluvio/elv-client-js/typeSpecs/Default";
 import {parse} from "node-html-parser";
 import IsEqual from "lodash/isEqual";
 import {ReferencePathElements} from "../components/Inputs";
@@ -821,17 +821,18 @@ class FormStore {
     metadata = metadata || {};
 
     const info = (metadata.info || {});
+    const name = this.rootStore.assetName;
 
     let assetInfo = {
-      title: metadata.title || "",
-      display_title: metadata.display_title || "",
-      slug: metadata.slug || Slugify(metadata.display_title || ""),
+      title: metadata.title || name,
+      display_title: metadata.display_title || name,
+      slug: metadata.slug || Slugify(metadata.display_title || name),
       ip_title_id: metadata.ip_title_id || "",
       title_type: metadata.title_type || this.availableTitleTypes[0],
       asset_type: metadata.asset_type || this.availableAssetTypes[0]
     };
 
-    this.originalSlug = assetInfo.slug;
+    this.originalSlug = metadata.slug;
 
     const loadedInfo = yield this.LoadInfoFields({
       HEAD: info,

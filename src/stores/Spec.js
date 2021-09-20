@@ -1,6 +1,6 @@
 import {observable, action, flow, toJS} from "mobx";
 
-import DefaultSpec from "../specs/Default";
+import DefaultSpec from "@eluvio/elv-client-js/typeSpecs/Default";
 
 // Incrementing unique IDs
 let __id = 0;
@@ -53,7 +53,7 @@ class SpecStore {
   InitializeSpec(profile) {
     const config = profile || this.rootStore.titleConfiguration;
 
-    this.profile = profile ? { name: profile.name, version: profile.version } : config.profile;
+    this.profile = profile ? profile.profile || { name: profile.name, version: profile.version } : config.profile;
 
     this.controls = {};
     (config.controls || DefaultSpec.controls).forEach(control => {

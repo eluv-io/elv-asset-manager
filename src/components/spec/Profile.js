@@ -2,15 +2,15 @@ import React from "react";
 import {Action, Confirm, LabelledField, Selection} from "elv-components-js";
 import {inject, observer} from "mobx-react";
 
-import DefaultSpec from "../../specs/Default";
-import EventSiteSpec from "../../specs/EventSite";
-import DropEventSiteSpec from "../../specs/DropEventSite";
-import EventSiteExtrasSpec from "../../specs/EventSiteExtras";
-import EventTenantSpec from "../../specs/EventTenant";
-import MainSiteSpec from "../../specs/MainSite";
-import NFTCollectionSpec from "../../specs/NFTCollection";
-import NFTTemplateSpec from "../../specs/NFTTemplate";
-import MarketplaceSpec from "../../specs/Marketplace";
+import DefaultSpec from "@eluvio/elv-client-js/typeSpecs/Default";
+import EventSiteSpec from "@eluvio/elv-client-js/typeSpecs/EventSite";
+import DropEventSiteSpec from "@eluvio/elv-client-js/typeSpecs/DropEventSite";
+import EventSiteExtrasSpec from "@eluvio/elv-client-js/typeSpecs/EventSiteExtras";
+import EventTenantSpec from "@eluvio/elv-client-js/typeSpecs/EventTenant";
+import MainSiteSpec from "@eluvio/elv-client-js/typeSpecs/MainSite";
+import NFTCollectionSpec from "@eluvio/elv-client-js/typeSpecs/NFTCollection";
+import NFTTemplateSpec from "@eluvio/elv-client-js/typeSpecs/NFTTemplate";
+import MarketplaceSpec from "@eluvio/elv-client-js/typeSpecs/Marketplace";
 
 const specs = {
   "Default": DefaultSpec,
