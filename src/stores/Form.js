@@ -1468,13 +1468,13 @@ class FormStore {
     let listFields = [];
 
     infoFields.forEach(field => {
-      const name = field.name;
-      const type = field.type;
-
       if(field.for_title_types && field.for_title_types.length > 0 && !field.for_title_types.includes(titleType)) { return; }
 
+      const name = field.name;
+      let type = field.type;
+
       if(type === "reference_type") {
-        field.type = this.rootStore.client.utils.SafeTraverse(HEAD, ...(ReferencePathElements(PATH, field.reference))) || "text";
+        type = this.rootStore.client.utils.SafeTraverse(HEAD, ...(ReferencePathElements(PATH, field.reference))) || "text";
       }
 
       let value = values[name];
