@@ -720,15 +720,18 @@ class FormStore {
       }
 
       let BASE_PATH = PATH;
+      let value;
       if(isTopLevel && top_level) {
-        info[name] = topLevelValues[name] || default_value || "";
+        value = topLevelValues[name];
       } else {
-        info[name] = values[name] || default_value || "";
+        value = values[name];
 
         if(isTopLevel) {
           BASE_PATH = "info";
         }
       }
+
+      info[name] = (typeof value === "undefined" ? default_value : value) || "";
 
       if(type === "reference_type") {
         type = this.rootStore.client.utils.SafeTraverse(topLevelValues, ...(ReferencePathElements(BASE_PATH, reference))) || "text";
