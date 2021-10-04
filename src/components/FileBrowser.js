@@ -323,7 +323,12 @@ class FileSelection extends React.Component {
   render() {
     return (
       <AsyncComponent
-        Load={() => this.props.contentStore.LoadFiles(this.state.versionHash)}
+        Load={async () => {
+          await this.props.contentStore.LoadFiles(this.state.versionHash);
+          if(this.props.versionHash && this.props.versionHash !== this.state.versionHash) {
+            await this.props.contentStore.LoadFiles(this.props.versionHash);
+          }
+        }}
         render={this.Selection}
       />
     );
