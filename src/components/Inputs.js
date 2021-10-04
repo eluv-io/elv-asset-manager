@@ -352,6 +352,7 @@ class RecursiveField extends React.Component {
       const { path, targetHash } = entry[field.name] || {};
       const extension = ((path || "").split(".").pop() || "").toLowerCase();
       const isImage = ["apng", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
+
       return (
         <LabelledField key={key} label={field.label || FormatName(field.name)}>
           <div className={`file-input ${path ? "" : "empty"}`}>

@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import {inject, observer} from "mobx-react";
+import Utils from "@eluvio/elv-client-js/src/Utils";
 import PrettyBytes from "pretty-bytes";
 import UrlJoin from "url-join";
 import URI from "urijs";
@@ -204,9 +205,15 @@ class FileSelection extends React.Component {
   constructor(props) {
     super(props);
 
+    // If versionHash is an older version of this object, use latest for file browsing
+    let versionHash = props.versionHash || this.props.rootStore.params.versionHash;
+    if(versionHash && Utils.DecodeVersionHash(versionHash).objectId === this.props.rootStore.params.objectId) {
+      versionHash = this.props.rootStore.params.versionHash;
+    }
+
     this.state = {
       modal: () => null,
-      versionHash: props.versionHash || this.props.rootStore.params.versionHash,
+      versionHash,
       selectingObject: false
     };
 
@@ -316,7 +323,7 @@ class FileSelection extends React.Component {
   render() {
     return (
       <AsyncComponent
-        Load={() => this.props.contentStore.LoadFiles(this.props.versionHash || this.props.rootStore.params.versionHash)}
+        Load={() => this.props.contentStore.LoadFiles(this.state.versionHash)}
         render={this.Selection}
       />
     );
