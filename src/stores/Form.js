@@ -731,7 +731,7 @@ class FormStore {
         }
       }
 
-      info[name] = (typeof value === "undefined" ? default_value : value) || "";
+      info[name] = (typeof value === "undefined" ? default_value || "" : value);
 
       if(type === "reference_type") {
         type = this.rootStore.client.utils.SafeTraverse(topLevelValues, ...(ReferencePathElements(BASE_PATH, reference))) || "text";
