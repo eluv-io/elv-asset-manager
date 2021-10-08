@@ -135,7 +135,14 @@ class Info extends React.Component {
           {name: "hash_only", label: "Version Hash Only (No link)", type: "checkbox", default: false, only: entry => ["fabric_link"].includes(entry.type)},
           {name: "no_label", label: "No Label", type: "checkbox", default: false, only: entry => ["color"].includes(entry.type)},
           {name: "video_preview", label: "Show Video Preview", type: "checkbox", hint: hints.video_preview, default: false, only: entry => ["fabric_link"].includes(entry.type)},
+
+          // Embed video options
           {name: "auto_update", type: "checkbox", default: false, only: entry => ["self_embed_url", "embed_url"].includes(entry.type)},
+          {name: "loop", type: "checkbox", default: false, only: entry => ["self_embed_url", "embed_url"].includes(entry.type)},
+          {name: "autoplay", type: "checkbox", default: false, only: entry => ["self_embed_url", "embed_url"].includes(entry.type)},
+          {name: "muted", type: "checkbox", default: false, only: entry => ["self_embed_url", "embed_url"].includes(entry.type)},
+          {name: "hide_controls", type: "checkbox", default: false, only: entry => ["self_embed_url", "embed_url"].includes(entry.type)},
+
           {
             name: "fields",
             type: "list",

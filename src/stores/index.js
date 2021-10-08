@@ -214,17 +214,35 @@ class RootStore {
     }
   });
 
-  SelfEmbedUrl(version=false) {
-    const net = this.networkInfo.name === "demov3" ? "demo" : this.networkInfo.name;
+  SelfEmbedUrl(version=false, options) {
+    let embedUrl = new URL("https://embed.v3.contentfabric.io");
 
-    let embedUrl = `https://embed.v3.contentfabric.io?p&net=${net}&ct=h`;
+    embedUrl.searchParams.set("p", "");
+    embedUrl.searchParams.set("net", this.networkInfo.name === "demov3" ? "demo" : this.networkInfo.name);
+
     if(version) {
-      embedUrl = embedUrl + `&vid=${this.params.versionHash}`;
+      embedUrl.searchParams.set("vid", this.params.versionHash);
     } else {
-      embedUrl = embedUrl + `&oid=${this.params.objectId}`;
+      embedUrl.searchParams.set("oid", this.params.objectId);
     }
 
-    return embedUrl;
+    if(!options.hide_controls) {
+      embedUrl.searchParams.set("ct", "h");
+    }
+
+    if(options.loop) {
+      embedUrl.searchParams.set("lp", "");
+    }
+
+    if(options.autoplay) {
+      embedUrl.searchParams.set("ap", "");
+    }
+
+    if(options.muted) {
+      embedUrl.searchParams.set("m", "");
+    }
+
+    return embedUrl.toString();
   }
 
   SelfMetadataUrl(path) {

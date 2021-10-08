@@ -809,7 +809,7 @@ class FormStore {
         };
       } else if(type === "self_embed_url") {
         if(!info[name] || infoField.auto_update) {
-          info[name] = this.rootStore.SelfEmbedUrl(infoField.version);
+          info[name] = this.rootStore.SelfEmbedUrl(infoField.version, infoField);
         }
       } else if(type === "self_metadata_url") {
         info[name] = this.rootStore.SelfMetadataUrl(infoField.path);

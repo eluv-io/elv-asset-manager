@@ -168,6 +168,11 @@ class SpecStore {
 
       if(["self_embed_url", "embed_url"].includes(field.type)) {
         formattedField.auto_update = !!field.auto_update;
+
+        formattedField.loop = !!field.loop;
+        formattedField.autoplay = !!field.autoplay;
+        formattedField.hide_controls = !!field.hide_controls;
+        formattedField.muted = !!field.muted;
       }
 
       if(["reference_subsection", "reference_list", "reference_type", "reference_select", "reference_multiselect"].includes(field.type)) {
