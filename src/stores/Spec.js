@@ -187,6 +187,7 @@ class SpecStore {
       if(["reference_select", "reference_multiselect"].includes(field.type)) {
         formattedField.label_key = field.label_key;
         formattedField.value_key = field.value_key;
+        formattedField.allow_null = field.allow_null;
       }
 
       if(field.type === "color") {

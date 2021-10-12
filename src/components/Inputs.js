@@ -209,7 +209,7 @@ class RecursiveField extends React.Component {
               onClick={async () =>
                 await Confirm({
                   message: `Are you sure you want to update '${field.name}'?`,
-                  onConfirm: () => Update(field.name, this.props.rootStore.SelfEmbedUrl(field.version))
+                  onConfirm: () => Update(field.name, this.props.rootStore.SelfEmbedUrl(field.version, field))
                 })
               }
             />
@@ -223,6 +223,10 @@ class RecursiveField extends React.Component {
       if(fieldType === "reference_select") {
         options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || [])
           .map(option => [option[field.label_key], option[field.value_key]]);
+
+        if(field.allow_null) {
+          options = [["<None>", ""], ...options];
+        }
       }
 
       return (
@@ -240,6 +244,10 @@ class RecursiveField extends React.Component {
       if(fieldType === "reference_multiselect") {
         options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || [])
           .map(option => [option[field.label_key], option[field.value_key]]);
+
+        if(field.allow_null) {
+          options = [["<None>", ""], ...options];
+        }
       }
 
       return (
