@@ -86,7 +86,7 @@ class FileBrowser extends React.Component {
 
   File(name, info) {
     if(this.props.extensions && this.props.extensions.length > 0) {
-      if(!this.props.extensions.includes(name.split(".").pop())) {
+      if(!this.props.extensions.includes((name.split(".").pop() || "").toString().toLowerCase())) {
         return;
       }
     }
