@@ -25,7 +25,7 @@
     ]
   },
   "dependencies": {
-    "@eluvio/elv-client-js": "^3.1.72",
+    "@eluvio/elv-client-js": "^3.1.74",
     "@eluvio/elv-player-js": "^1.0.54",
     "country-codes-list": "^1.6.8",
     "elv-components-js": "git+https://github.com/eluv-io/elv-components-js.git",

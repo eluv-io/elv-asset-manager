@@ -768,6 +768,27 @@ select {
   }
 }
 
+.asset-form-header-navigation {
+  display: flex;
+  flex-direction: column;
+
+  margin-top: -70px;
+  padding: 90px 0 0;
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  a {
+    color: $elv-color-mediumblue;
+    font-size: 20px;
+    margin-bottom: 10px;
+    width: max-content;
+  }
+}
+
 .file-browser-container {
   svg {
     padding: $elv-spacing-xxs;

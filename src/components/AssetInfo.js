@@ -5,6 +5,7 @@ import {
   Selection,
   Warning,
   Maybe,
+  FormatName,
 } from "elv-components-js";
 
 import {RecursiveField} from "./Inputs";
@@ -38,6 +39,25 @@ class AssetInfo extends React.Component {
           ntps={this.props.formStore.availableNTPs}
         />
       );
+  }
+
+  SectionNavigation() {
+    const headers = this.props.formStore.infoFields.filter(field => field.type === "header");
+
+    if(headers.length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="asset-form-header-navigation" id="form-navigation">
+        <h2>Jump To Section</h2>
+        {
+          headers.map(field =>
+            <a key={`header-${field.name}`} href={`#header-${field.name}`}>{ field.label || FormatName(field.name) }</a>
+          )
+        }
+      </div>
+    );
   }
 
   render() {
@@ -114,13 +134,6 @@ class AssetInfo extends React.Component {
 
           {
             Maybe(
-              !this.props.formStore.localizationActive,
-              <div className="asset-form-separator" />
-            )
-          }
-
-          {
-            Maybe(
               this.props.formStore.associatePermissions && !this.props.formStore.localizationActive,
               <ObjectSelection
                 label="Permissions"
@@ -135,6 +148,14 @@ class AssetInfo extends React.Component {
             )
           }
 
+          {
+            Maybe(
+              !this.props.formStore.localizationActive,
+              <div className="asset-form-separator" />
+            )
+          }
+
+          { this.SectionNavigation() }
           { this.InfoFields(assetInfo) }
         </div>
       </div>

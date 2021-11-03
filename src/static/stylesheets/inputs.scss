@@ -83,6 +83,8 @@
   & > button,
   & > svg {
     height: $elv-spacing-l;
+    min-height: $elv-spacing-l;
+    min-width: $elv-spacing-l;
     padding: $elv-spacing-xxs;
     width: $elv-spacing-l;
   }
@@ -128,6 +130,27 @@
 
   input {
     margin-top: $elv-spacing-xxs;
+  }
+}
+
+.input-header {
+  align-items: center;
+  border-bottom: 1px solid $elv-color-lightgray;
+  display: flex;
+  font-size: 42px;
+  font-weight: 200;
+  justify-content: space-between;
+  letter-spacing: 2px;
+  margin: -20px 0 30px;
+
+  padding: 80px 0 10px;
+  text-align: left;
+
+  a {
+    color: $elv-color-mediumblue;
+    font-size: 14px;
+    letter-spacing: 1px;
+    padding: 10px 0;
   }
 }
 

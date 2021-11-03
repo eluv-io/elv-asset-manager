@@ -271,6 +271,8 @@ class RootStore {
     if(editing) {
       this.specStore.InitializeSpec();
     }
+
+    window.scrollTo(0, 0);
   }
 
   @action.bound

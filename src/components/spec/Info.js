@@ -72,6 +72,7 @@ const hints = {
 class Info extends React.Component {
   InfoListField(name, values, Update, toplevel=false) {
     const types = [
+      "header",
       "text",
       "textarea",
       "json",

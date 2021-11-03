@@ -118,7 +118,14 @@ class RecursiveField extends React.Component {
       fieldType = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || "text");
     }
 
-    if(fieldType === "textarea") {
+    if(fieldType === "header") {
+      return (
+        <h2 className="input-header" id={`header-${field.name}`}>
+          { field.label || FormatName(field.name) }
+          <a href="#form-navigation">Return to Top</a>
+        </h2>
+      );
+    } else if(fieldType === "textarea") {
       return (
         <TextArea
           key={key}
