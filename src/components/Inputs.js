@@ -118,6 +118,22 @@ class RecursiveField extends React.Component {
       fieldType = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || "text");
     }
 
+    if(field.depends_on) {
+      const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.depends_on)));
+
+      if(!dependent_value) {
+        return null;
+      }
+    }
+
+    if(field.unless) {
+      const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.depends_on)));
+
+      if(dependent_value) {
+        return null;
+      }
+    }
+
     if(fieldType === "header") {
       return (
         <h2 className="input-header" id={`header-${field.name}`}>

@@ -149,6 +149,14 @@ class SpecStore {
         formattedField.path = field.path;
       }
 
+      if(field.depends_on) {
+        formattedField.depends_on = field.depends_on;
+      }
+
+      if(field.unless) {
+        formattedField.unless = field.unless;
+      }
+
       if(["select", "multiselect"].includes(field.type)) {
         formattedField.options = FormatOptions(field.options);
       }
