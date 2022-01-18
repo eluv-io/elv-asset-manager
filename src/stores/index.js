@@ -226,20 +226,27 @@ class RootStore {
       embedUrl.searchParams.set("oid", this.params.objectId);
     }
 
-    if(!options.hide_controls) {
-      embedUrl.searchParams.set("ct", "h");
+    if(options.check_has_audio_flag) {
+      // NFT has audio, set to autohide controls, audio enabled, autoplay off
+      if((this.formStore.assetInfo.nft || {}).has_audio) {
+        embedUrl.searchParams.set("ct", "h");
+      }
+    } else {
+      if(options.muted) {
+        embedUrl.searchParams.set("m", "");
+      }
+
+      if(!options.hide_controls) {
+        embedUrl.searchParams.set("ct", "h");
+      }
+
+      if(options.autoplay) {
+        embedUrl.searchParams.set("ap", "");
+      }
     }
 
     if(options.loop) {
       embedUrl.searchParams.set("lp", "");
-    }
-
-    if(options.autoplay) {
-      embedUrl.searchParams.set("ap", "");
-    }
-
-    if(options.muted) {
-      embedUrl.searchParams.set("m", "");
     }
 
     return embedUrl.toString();

@@ -1548,6 +1548,10 @@ class FormStore {
             linkTarget: UrlJoin("/meta", values[name])
           });
         }
+      } else if(type === "self_embed_url") {
+        if(field.auto_update) {
+          info[name] = this.rootStore.SelfEmbedUrl(field.version, field);
+        }
       }
 
       value = toJS(value);
