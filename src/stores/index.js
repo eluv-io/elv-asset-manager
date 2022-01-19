@@ -9,6 +9,7 @@ import SpecStore from "./Spec";
 import VoDChannel from "./VoDChannel";
 
 import UrlJoin from "url-join";
+import Utils from "@eluvio/elv-client-js/src/Utils";
 
 // Force strict mode so mutations are only allowed within actions.
 configure({
@@ -226,11 +227,15 @@ class RootStore {
       embedUrl.searchParams.set("oid", this.params.objectId);
     }
 
-    if(options.check_has_audio_flag) {
+    if(
+      options.check_has_audio_flag &&
+      (
+        Utils.SafeTraverse(this.formStore.assetInfo, "nft", "has_audio") ||
+        Utils.SafeTraverse(this.assetMetadata, "nft", "has_audio")
+      )
+    ) {
       // NFT has audio, set to autohide controls, audio enabled, autoplay off
-      if((this.formStore.assetInfo.nft || {}).has_audio) {
-        embedUrl.searchParams.set("ct", "h");
-      }
+      embedUrl.searchParams.set("ct", "h");
     } else {
       if(options.muted) {
         embedUrl.searchParams.set("m", "");
