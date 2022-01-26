@@ -34,24 +34,33 @@ import TextEditor from "./TextEditor";
 import UpdateLinkIcon from "../static/icons/arrow-up-circle.svg";
 
 export const ReferencePathElements = (PATH, reference) => {
-  let pathElements;
-  if(reference.startsWith("/")) {
-    pathElements = reference.split("/");
-  } else {
-    pathElements = PATH.split("/");
+  if(!reference) { return []; }
 
-    reference.split("/").forEach(element => {
-      if(element === ".") {
-        // No action
-      } else if(element === "..") {
-        pathElements = pathElements.slice(0, -1);
-      } else {
-        pathElements.push(element);
-      }
-    });
+  try {
+    let pathElements;
+    if(reference.startsWith("/")) {
+      pathElements = reference.split("/");
+    } else {
+      pathElements = PATH.split("/");
+
+      reference.split("/").forEach(element => {
+        if(element === ".") {
+          // No action
+        } else if(element === "..") {
+          pathElements = pathElements.slice(0, -1);
+        } else {
+          pathElements.push(element);
+        }
+      });
+    }
+
+    return pathElements.filter(e => e);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`Error referencing path ${PATH} ${reference}`, error);
+
+    return [];
   }
-
-  return pathElements.filter(e => e);
 };
 
 const HintLabel = ({label, name, hint, required}) => {
@@ -127,7 +136,7 @@ class RecursiveField extends React.Component {
     }
 
     if(field.unless) {
-      const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.depends_on)));
+      const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.unless)));
 
       if(dependent_value) {
         return null;
@@ -385,7 +394,10 @@ class RecursiveField extends React.Component {
       const isImage = ["apng", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
 
       return (
-        <LabelledField key={key} label={field.label || FormatName(field.name)}>
+        <LabelledField
+          key={key}
+          label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
+        >
           <div className={`file-input ${path ? "" : "empty"}`}>
             {
               Maybe(
@@ -420,7 +432,7 @@ class RecursiveField extends React.Component {
                   onClick={() =>
                     Confirm({
                       message: "Are you sure you want to remove this file?",
-                      onConfirm: async () => await Update(field.name, {...(entry[field.name] || {}), path: ""})
+                      onConfirm: async () => await Update(field.name, "")
                     })
                   }
                 />

@@ -1496,7 +1496,7 @@ class FormStore {
       } else if(type === "datetime") {
         value = this.FormatDate(values[name], true);
       } else if(type === "file") {
-        if(values[name].path) {
+        if(values[name] && values[name].path) {
           value = this.CreateLink({
             targetHash: values[name].targetHash,
             linkTarget: UrlJoin("files", values[name].path)
@@ -1505,7 +1505,7 @@ class FormStore {
           value = null;
         }
       } else if(type === "file_url") {
-        if(!values[name].targetHash || !values[name].path) { return ""; }
+        if(!values[name] || !values[name].targetHash || !values[name].path) { return ""; }
 
         const url = new URL(`https://${this.rootStore.networkInfo.name}.net${this.rootStore.networkInfo.id}.contentfabric.io`);
         url.pathname = UrlJoin("s", this.rootStore.networkInfo.name, "q", values[name].targetHash, "files", values[name].path);
