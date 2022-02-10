@@ -25,7 +25,12 @@ const MarketplaceSpec = {
     {
       "name": "tenant_id",
       "label": "Tenant ID",
-      "type": "Text"
+      "type": "text"
+    },
+    {
+      "name": "tenant_slug",
+      "type": "text",
+      "required": true
     },
     {
       "name": "branding",
@@ -34,6 +39,12 @@ const MarketplaceSpec = {
         {
           "name": "name",
           "type": "text"
+        },
+        {
+          "name": "show",
+          "label": "Show in Global Marketplace",
+          "type": "checkbox",
+          "default_value": false
         },
         {
           "name": "subheader",

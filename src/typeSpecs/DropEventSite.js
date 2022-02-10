@@ -47,11 +47,13 @@ const eventSiteSpec = {
     {
       "name": "tenant_id",
       "label": "Tenant ID",
-      "type": "Text"
+      "type": "Text",
+      "required": true
     },
     {
       "name": "tenant_slug",
-      "type": "text"
+      "type": "text",
+      "required": true
     },
     {
       "name": "marketplace_info",

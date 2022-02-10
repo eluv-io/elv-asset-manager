@@ -726,107 +726,134 @@ class FormStore {
     let info = {};
 
     for(const infoField of infoFields) {
-      let {name, type, path, reference, default_value, top_level, fields} = infoField;
+      try {
+        let {name, type, path, reference, default_value, top_level, fields} = infoField;
 
-      if(isTopLevel && path) {
-        // Non-standard metadata path - values should be root of path
-        values = this.rootStore.client.utils.SafeTraverse(this.rootStore.otherMetadata, path.replace(/^\/|\/$/g, "").split("/")) || {};
-      }
-
-      let BASE_PATH = PATH;
-      let value;
-      if(isTopLevel && top_level) {
-        value = topLevelValues[name];
-      } else {
-        value = values[name];
-
-        if(isTopLevel) {
-          BASE_PATH = "info";
+        if(isTopLevel && path) {
+          // Non-standard metadata path - values should be root of path
+          values = this.rootStore.client.utils.SafeTraverse(this.rootStore.otherMetadata, path.replace(/^\/|\/$/g, "").split("/")) || {};
         }
-      }
 
-      info[name] = (typeof value === "undefined" ? default_value || "" : value);
-
-      if(type === "reference_type") {
-        type = this.rootStore.client.utils.SafeTraverse(topLevelValues, ...(ReferencePathElements(BASE_PATH, reference))) || "text";
-      }
-
-      if(type === "json") {
-        info[name] = info[name] ? JSON.stringify(info[name], null, 2) : "{}";
-      } else if((type === "date" || type === "datetime") && info[name]) {
-        const date = DateTime.fromISO(values[name]);
-
-        if(!date || date.invalid) {
-          info[name] = undefined;
+        let BASE_PATH = PATH;
+        let value;
+        if(isTopLevel && top_level) {
+          value = topLevelValues[name];
         } else {
-          info[name] = date.ts;
-        }
-      } else if(type === "file" || type === "file_url") {
-        let linkInfo = this.LinkComponents(info[name]);
+          value = values[name];
 
-        if(!linkInfo) {
-          linkInfo = {targetHash: this.rootStore.params.versionHash};
-        } else if(!linkInfo.targetHash) {
-          linkInfo.targetHash = await this.rootStore.client.LatestVersionHash({objectId: linkInfo.objectId});
+          if(isTopLevel) {
+            BASE_PATH = "info";
+          }
         }
 
-        info[name] = linkInfo;
-      } else if(type === "subsection") {
-        info[name] = await this.LoadInfoFields({PATH: UrlJoin(BASE_PATH, name), infoFields: fields, values: info[name], topLevelValues});
-      } else if(type === "list") {
-        info[name] = await Promise.all(
-          (info[name] || []).map(async (listValues, i) => {
-            if(!fields || fields.length === 0) {
-              return listValues;
-            }
+        info[name] = (typeof value === "undefined" ? default_value || "" : value);
 
-            return await this.LoadInfoFields({
-              PATH: UrlJoin(BASE_PATH, name, i.toString()),
-              infoFields: fields,
-              values: listValues,
-              topLevelValues
-            });
-          })
-        );
-      } else if(type === "metadata_link") {
-        const linkInfo = this.LinkComponents(values[name]);
-
-        if(!linkInfo) {
-          continue;
+        if(type === "reference_type") {
+          type = this.rootStore.client.utils.SafeTraverse(topLevelValues, ...(ReferencePathElements(BASE_PATH, reference))) || "text";
         }
 
-        info[name] = linkInfo.path.replace(/^\.\/meta/, "");
-      } else if(type === "fabric_link") {
-        const linkInfo = this.LinkComponents(values[name]);
+        if(type === "json") {
+          info[name] = info[name] ? JSON.stringify(info[name], null, 2) : "{}";
+        } else if((type === "date" || type === "datetime") && info[name]) {
+          const date = DateTime.fromISO(values[name]);
 
-        if(!linkInfo) {
-          continue;
+          if(!date || date.invalid) {
+            info[name] = undefined;
+          } else {
+            info[name] = date.ts;
+          }
+        } else if(type === "file" || type === "file_url") {
+          let linkInfo = this.LinkComponents(info[name]);
+
+          if(!linkInfo) {
+            linkInfo = {targetHash: this.rootStore.params.versionHash};
+          } else if(!linkInfo.targetHash) {
+            linkInfo.targetHash = await this.rootStore.client.LatestVersionHash({objectId: linkInfo.objectId});
+          }
+
+          info[name] = linkInfo;
+        } else if(type === "subsection") {
+          info[name] = await this.LoadInfoFields({
+            PATH: UrlJoin(BASE_PATH, name),
+            infoFields: fields,
+            values: info[name],
+            topLevelValues
+          });
+        } else if(type === "list") {
+          if(!Array.isArray(info[name])) {
+            info[name] = [];
+          }
+
+          info[name] = await Promise.all(
+            (info[name] || []).map(async (listValues, i) => {
+              try {
+                if(!fields || fields.length === 0) {
+                  return listValues;
+                }
+
+                return await this.LoadInfoFields({
+                  PATH: UrlJoin(BASE_PATH, name, i.toString()),
+                  infoFields: fields,
+                  values: listValues,
+                  topLevelValues
+                });
+              } catch (error) {
+                // eslint-disable-next-line no-console
+                console.error("ERROR PARSING LIST:");
+                // eslint-disable-next-line no-console
+                console.error(name, info, i, listValues);
+                // eslint-disable-next-line no-console
+                console.error(error);
+              }
+            })
+          );
+        } else if(type === "metadata_link") {
+          const linkInfo = this.LinkComponents(values[name]);
+
+          if(!linkInfo) {
+            continue;
+          }
+
+          info[name] = linkInfo.path.replace(/^\.\/meta/, "");
+        } else if(type === "fabric_link") {
+          const linkInfo = this.LinkComponents(values[name]);
+
+          if(!linkInfo) {
+            continue;
+          }
+
+          const meta = (await this.rootStore.client.ContentObjectMetadata({
+            versionHash: linkInfo.targetHash,
+            metadataSubtree: "public",
+            select: [
+              "name",
+              "asset_metadata/title",
+              "asset_metadata/display_title"
+            ]
+          }));
+
+          const targetName = (meta.asset_metadata || {}).display_title || (meta.asset_metadata || {}).title || meta.name;
+
+          info[name] = {
+            name: targetName,
+            libraryId: this.rootStore.client.ContentObjectLibraryId({versionHash: linkInfo.targetHash}),
+            objectId: this.rootStore.client.utils.DecodeVersionHash(linkInfo.targetHash).objectId,
+            versionHash: linkInfo.targetHash
+          };
+        } else if(type === "self_embed_url") {
+          if(!info[name] || infoField.auto_update) {
+            info[name] = this.rootStore.SelfEmbedUrl(infoField.version, infoField);
+          }
+        } else if(type === "self_metadata_url") {
+          info[name] = this.rootStore.SelfMetadataUrl(infoField.path);
         }
-
-        const meta = (await this.rootStore.client.ContentObjectMetadata({
-          versionHash: linkInfo.targetHash,
-          metadataSubtree: "public",
-          select: [
-            "name",
-            "asset_metadata/title",
-            "asset_metadata/display_title"
-          ]
-        }));
-
-        const targetName = (meta.asset_metadata || {}).display_title || (meta.asset_metadata || {}).title || meta.name;
-
-        info[name] = {
-          name: targetName,
-          libraryId: this.rootStore.client.ContentObjectLibraryId({versionHash: linkInfo.targetHash}),
-          objectId: this.rootStore.client.utils.DecodeVersionHash(linkInfo.targetHash).objectId,
-          versionHash: linkInfo.targetHash
-        };
-      } else if(type === "self_embed_url") {
-        if(!info[name] || infoField.auto_update) {
-          info[name] = this.rootStore.SelfEmbedUrl(infoField.version, infoField);
-        }
-      } else if(type === "self_metadata_url") {
-        info[name] = this.rootStore.SelfMetadataUrl(infoField.path);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("ERROR PARSING INFO FIELD:");
+        // eslint-disable-next-line no-console
+        console.error(name, info);
+        // eslint-disable-next-line no-console
+        console.error(error);
       }
     }
 
