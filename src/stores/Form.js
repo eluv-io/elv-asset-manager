@@ -7,6 +7,7 @@ import DefaultSpec from "@eluvio/elv-client-js/typeSpecs/Default";
 import {parse} from "node-html-parser";
 import IsEqual from "lodash/isEqual";
 import {ReferencePathElements} from "../components/Inputs";
+import Specs from "../typeSpecs/Specs";
 
 require("elv-components-js/src/utils/LimitedMap");
 
@@ -75,7 +76,6 @@ const LocalizationMerge = (localized, main) => {
     return localized || main;
   }
 };
-
 
 class FormStore {
   @observable editWriteToken;
@@ -313,7 +313,21 @@ class FormStore {
   }
 
   InitializeSpec() {
-    const config = this.rootStore.titleConfiguration;
+    let config = this.rootStore.titleConfiguration;
+    if(config && config.profile.name) {
+      const configKey = Object.keys(Specs).find(name => config.profile.name.toLowerCase().includes(name.toLowerCase()));
+
+      if(configKey) {
+        // Merge so that things like localization options are preserved
+        config = {
+          ...this.rootStore.titleConfiguration,
+          ...Specs[configKey]
+        };
+      } else {
+        // eslint-disable-next-line no-console
+        console.error("Non-default type:", config.profile.name);
+      }
+    }
 
     const controls = config.controls || DefaultSpec.controls;
     this.fileControls = controls

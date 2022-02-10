@@ -7,6 +7,7 @@ import AssociatedAssets from "./AssociatedAssets";
 import Controls from "./Controls";
 import Localization from "./Localization";
 import Profile from "./Profile";
+import Specs from "../../typeSpecs/Specs";
 
 @inject("rootStore")
 @inject("specStore")
@@ -15,17 +16,25 @@ class SpecManagement extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      commitMessage: "",
-      tab: "info",
-      tabs: [
+    const config = this.props.rootStore.titleConfiguration;
+    const standardProfile = config && config.profile.name && Object.keys(Specs).find(name => config.profile.name.toLowerCase().includes(name.toLowerCase()));
+
+    const tabs = standardProfile ?
+      [
+        ["Localization", "localization"],
+      ] :
+      [
         ["Info Fields", "info"],
         ["Associated Assets", "associated_assets"],
-        // NOTE: if image control is enabled it should allow configuration of default keys
         ["Controls", "controls"],
         ["Localization", "localization"],
         ["Load Profile", "profile"]
-      ]
+      ];
+
+    this.state = {
+      commitMessage: "",
+      tab: tabs[0][1],
+      tabs
     };
   }
 
