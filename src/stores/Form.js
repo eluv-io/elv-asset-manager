@@ -314,7 +314,7 @@ class FormStore {
 
   InitializeSpec() {
     let config = this.rootStore.titleConfiguration;
-    if(config && config.profile.name) {
+    if(config && config.profile && config.profile.name) {
       const configKey = Object.keys(Specs).find(name => config.profile.name.toLowerCase().includes(name.toLowerCase()));
 
       if(configKey) {

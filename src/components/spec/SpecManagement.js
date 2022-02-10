@@ -17,7 +17,7 @@ class SpecManagement extends React.Component {
     super(props);
 
     const config = this.props.rootStore.titleConfiguration;
-    const standardProfile = config && config.profile.name && Object.keys(Specs).find(name => config.profile.name.toLowerCase().includes(name.toLowerCase()));
+    const standardProfile = config && config.profile && config.profile.name && Object.keys(Specs).find(name => config.profile.name.toLowerCase().includes(name.toLowerCase()));
 
     const tabs = standardProfile ?
       [
