@@ -56,6 +56,12 @@ const MarketplaceSpec = {
           "type": "textarea"
         },
         {
+          "name": "header_logo",
+          "extensions": imageTypes,
+          "type": "file",
+          "hint": "This logo will be displayed in the header when browsing your marketplace"
+        },
+        {
           "name": "round_logo",
           "extensions": imageTypes,
           "type": "file",
