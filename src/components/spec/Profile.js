@@ -3,7 +3,6 @@ import {Action, Confirm, LabelledField, Selection} from "elv-components-js";
 import {inject, observer} from "mobx-react";
 
 import DefaultSpec from "@eluvio/elv-client-js/typeSpecs/Default";
-import EventSiteSpec from "@eluvio/elv-client-js/typeSpecs/EventSite";
 import DropEventSiteSpec from "@eluvio/elv-client-js/typeSpecs/DropEventSite";
 import EventSiteExtrasSpec from "@eluvio/elv-client-js/typeSpecs/EventSiteExtras";
 import EventTenantSpec from "@eluvio/elv-client-js/typeSpecs/EventTenant";
@@ -15,7 +14,6 @@ import MarketplaceSpec from "@eluvio/elv-client-js/typeSpecs/Marketplace";
 const specs = {
   "Default": DefaultSpec,
   "Eluvio LIVE Drop Event Site": DropEventSiteSpec,
-  "Eluvio LIVE Event Site": EventSiteSpec,
   "Eluvio LIVE Event Site Extras": EventSiteExtrasSpec,
   "Eluvio LIVE Main Site": MainSiteSpec,
   "Eluvio LIVE Marketplace": MarketplaceSpec,
