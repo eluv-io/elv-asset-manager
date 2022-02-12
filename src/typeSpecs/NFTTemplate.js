@@ -189,6 +189,50 @@ const NFTTemplateSpec = {
           "type": "checkbox",
         },
         {
+          "name": "additional_media",
+          "type": "list",
+          "fields": [
+            {
+              "name": "name",
+              "type": "text"
+            },
+            {
+              "name": "description",
+              "type": "rich_text"
+            },
+            {
+              "name": "default",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "requires_permissions",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "media_type",
+              "type": "select",
+              "options": [
+                "Video",
+                "Image",
+                "Ebook"
+              ]
+            },
+            {
+              "name": "media_link",
+              "type": "fabric_link",
+              "hint": "For video content, select the playable content object",
+              "video_preview": true
+            },
+            {
+              "name": "media_file",
+              "type": "file",
+              "hint": "If this media is displayed via file, like an image or an Ebook, select the file to display"
+            },
+          ]
+        },
+        {
           "name": "marketplace_attributes",
           "type": "subsection",
           "fields": [
