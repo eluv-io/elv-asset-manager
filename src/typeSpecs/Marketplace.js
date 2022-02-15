@@ -256,7 +256,36 @@ const MarketplaceSpec = {
       "extensions": ["html"]
     },
 
-
+    {
+      "name": "banners",
+      "label": "Marketplace Banners",
+      "type": "list",
+      "hint": "If specified, these banner images will be shown at the top of the store page",
+      "fields": [
+        {
+          "extensions": imageTypes,
+          "name": "image",
+          "type": "file",
+        },
+        {
+          "extensions": imageTypes,
+          "name": "image_mobile",
+          "label": "Image (Mobile)",
+          "type": "file",
+        },
+        {
+          "name": "link",
+          "type": "text",
+          "hint": "If specified, the banner will link to this URL"
+        },
+        {
+          "name": "sku",
+          "label": "SKU",
+          "type": "text",
+          "hint": "If specified, the banner will link to the specified item"
+        }
+      ]
+    },
 
     {
       "label": "Item Definitions",
