@@ -47,6 +47,12 @@ const MarketplaceSpec = {
           "default_value": false
         },
         {
+          "name": "hide_global_navigation",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If specified, the global navigation to all listings and marketplaces will not be shown when this marketplace is embedded into your site"
+        },
+        {
           "name": "subheader",
           "type": "text",
           "default_value": "Marketplace"
