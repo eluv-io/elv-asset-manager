@@ -33,6 +33,11 @@ const MarketplaceSpec = {
       "required": true
     },
     {
+      "name": "tenant_name",
+      "type": "text",
+      "required": true
+    },
+    {
       "name": "branding",
       "type": "subsection",
       "fields": [
