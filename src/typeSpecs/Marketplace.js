@@ -200,6 +200,7 @@ const MarketplaceSpec = {
           ]
         },
         {
+          "label": "Require Consent for Email Collection",
           "name": "require_consent",
           "type": "checkbox",
           "default_value": false
@@ -362,6 +363,10 @@ const MarketplaceSpec = {
           "name": "free",
           "type": "checkbox",
           "hint": "If checked, this NFT will be free to claim. WARNING: This option will override any price value set below"
+        },
+        {
+          "name": "hide_available",
+          "label": "Hide Number Available"
         },
         {
           "name": "price",
