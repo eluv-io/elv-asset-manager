@@ -6,6 +6,7 @@ import UrlJoin from "url-join";
 import DefaultSpec from "@eluvio/elv-client-js/typeSpecs/Default";
 import {parse} from "node-html-parser";
 import IsEqual from "lodash/isEqual";
+import Merge from "lodash/merge";
 import {ReferencePathElements} from "../components/Inputs";
 import Specs from "../typeSpecs/Specs";
 
@@ -1772,23 +1773,30 @@ class FormStore {
           })) || {};
         }
 
+        let mergedMetadata = Merge(
+          {
+            ...existingMetadata,
+            images,
+            playlists,
+          },
+          topInfo,
+          assetData
+        );
+
+        mergedMetadata.info = Merge(
+          {
+            ...(existingMetadata.info || {}),
+            ...{ talent: credits },
+            ...info
+          }
+        );
+
         yield client.ReplaceMetadata({
           libraryId,
           objectId,
           writeToken,
           metadataSubtree: UrlJoin("public", "asset_metadata", l0, l1, l2),
-          metadata: {
-            ...existingMetadata,
-            ...topInfo,
-            ...assetData,
-            images,
-            playlists,
-            info: {
-              ...(existingMetadata.info || {}),
-              ...info,
-              talent: credits
-            }
-          }
+          metadata: mergedMetadata
         });
 
         yield Promise.all(
