@@ -208,34 +208,7 @@ const MarketplaceSpec = {
           "label": "Require Consent for Email Collection",
           "name": "require_consent",
           "type": "checkbox",
-          "default_value": false
-        },
-        {
-          "name": "consent_form_text",
-          "type": "rich_text"
-        },
-        {
-          "name": "privacy_policy",
-          "type": "subsection",
-          "fields": [
-            {
-              "name": "link",
-              "type": "text",
-              "hint": "Specify a URL to your privacy policy"
-            },
-            {
-              "name": "rich_text",
-              "type": "rich_text",
-              "hint": "Input your privacy policy in the text editor"
-            },
-            {
-              "name": "html",
-              "label": "HTML",
-              "type": "file",
-              "hint": "Input your privacy policy as an HTML file",
-              "extensions": ["html"]
-            }
-          ]
+          "default_value": true
         },
         {
           "name": "require_email_verification",
@@ -267,7 +240,6 @@ const MarketplaceSpec = {
       "type": "file",
       "extensions": ["html"]
     },
-
     {
       "name": "banners",
       "label": "Marketplace Banners",
@@ -371,7 +343,8 @@ const MarketplaceSpec = {
         },
         {
           "name": "hide_available",
-          "label": "Hide Number Available"
+          "label": "Hide Number Available",
+          "type": "checkbox"
         },
         {
           "name": "price",
