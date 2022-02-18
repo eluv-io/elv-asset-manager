@@ -139,6 +139,11 @@ const NFTTemplateSpec = {
           "hint": "Square image recommended"
         },
         {
+          "name": "generative",
+          "type": "checkbox",
+          "default_value": false
+        },
+        {
           "name": "playable",
           "type": "checkbox",
           "default_value": true
