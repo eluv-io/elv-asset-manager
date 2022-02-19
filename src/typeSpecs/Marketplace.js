@@ -142,6 +142,7 @@ const MarketplaceSpec = {
         {
           "name": "large_logo_mode",
           "type": "checkbox",
+          "default_value": false,
           "hint": "If specified, the logo in the login box will be significantly larger, but *the background image will NOT be visible in the Live app*."
         },
         {
@@ -315,6 +316,12 @@ const MarketplaceSpec = {
           "hint": "For type 'nft', the image from the NFT template will be used if this field is not specified"
         },
         {
+          "name": "video",
+          "type": "fabric_link",
+          "video_preview": true,
+          "hint": "If specified, this video for this NFT will play on the purchase page in the store."
+        },
+        {
           "name": "for_sale",
           "type": "checkbox",
           "default_value": true
@@ -339,12 +346,14 @@ const MarketplaceSpec = {
         {
           "name": "free",
           "type": "checkbox",
-          "hint": "If checked, this NFT will be free to claim. WARNING: This option will override any price value set below"
+          "hint": "If checked, this NFT will be free to claim. WARNING: This option will override any price value set below",
+          "default_value": false
         },
         {
           "name": "hide_available",
           "label": "Hide Number Available",
-          "type": "checkbox"
+          "type": "checkbox",
+          "default_value": false
         },
         {
           "name": "price",
@@ -492,6 +501,7 @@ const MarketplaceSpec = {
             {
               "name": "show",
               "type": "checkbox",
+              "default_value": false,
               "hint": "The modal will only be displayed if this is checked"
             },
             {
