@@ -68,6 +68,15 @@ const eventSiteSpec = {
           "name": "marketplace_slug",
           "type": "text",
           "hint": "The slug of the marketplace"
+        },
+        {
+          "name": "default_store_page",
+          "type": "select",
+          "default_value": "Storefront",
+          "options": [
+            "Storefront",
+            "Listings"
+          ]
         }
       ]
     },
@@ -1080,6 +1089,15 @@ const eventSiteSpec = {
           "name": "start_date",
           "type": "datetime",
           "no_localize": true
+        },
+        {
+          "name": "store_page",
+          "type": "select",
+          "default_value": "Storefront",
+          "options": [
+            "Storefront",
+            "Listings"
+          ]
         },
         {
           "label": "marketplace_filters",
