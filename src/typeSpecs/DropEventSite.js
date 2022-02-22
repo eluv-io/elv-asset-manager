@@ -143,6 +143,14 @@ const eventSiteSpec = {
           "hint": "Displayed when the event is featured on the main page"
         },
         {
+          "name": "feature_location",
+          "type": "select",
+          "options": [
+            "Event Site",
+            "Marketplace"
+          ]
+        },
+        {
           "name": "feature_button",
           "type": "subsection",
           "hint": "This section configures the button linking to this event when shown on the main site as a featured event.",
@@ -1100,7 +1108,7 @@ const eventSiteSpec = {
           ]
         },
         {
-          "label": "marketplace_filters",
+          "label": "Marketplace Filters",
           "name": "store_filters",
           "type": "list",
           "hint": "After the drop, the wallet panel will be redirected to the store. Use these fields to filter the items shown for users who voted"

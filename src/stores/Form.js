@@ -1773,23 +1773,18 @@ class FormStore {
           })) || {};
         }
 
-        let mergedMetadata = Merge(
-          {
-            ...existingMetadata,
-            images,
-            playlists,
-          },
-          topInfo,
-          assetData
-        );
-
-        mergedMetadata.info = Merge(
-          {
+        const mergedMetadata = {
+          ...existingMetadata,
+          ...topInfo,
+          ...assetData,
+          images,
+          playlists,
+          info: {
             ...(existingMetadata.info || {}),
-            ...{ talent: credits },
-            ...info
+            ...info,
+            talent: credits
           }
-        );
+        };
 
         yield client.ReplaceMetadata({
           libraryId,
