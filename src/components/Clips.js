@@ -215,6 +215,23 @@ class Clips extends React.Component {
         </div>
         { this.PageControls(clips.length) }
         <div className="asset-form-clips-container">
+          {
+            clips.length ? <div
+              className={`
+            asset-form-clip 
+            ${this.props.orderable   ? "asset-form-clip-orderable" : ""}
+            ${this.props.defaultable ? "asset-form-clip-defaultable" : ""}
+            ${this.props.showPreview ? "asset-form-clip-with-preview" : ""}
+          `}>
+              <div></div>
+              <div>Type</div>
+              <div>Title</div>
+              <div>Slug</div>
+              <div>{this.props.defaultable ? "Default" : ""}</div>
+              <div></div>
+              <div></div>
+            </div> : null
+          }
           {this.Paged(clips || []).map((clip, index) =>
             <Clip
               index={index}
