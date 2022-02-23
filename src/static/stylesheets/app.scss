@@ -553,6 +553,7 @@ select {
 }
 
 .asset-form-clip {
+  font-size: 0.9rem;
   grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 4rem;
   min-height: $elv-spacing-ml;
 
