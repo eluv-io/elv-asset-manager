@@ -828,3 +828,46 @@ select {
     text-align: center;
   }
 }
+
+.controls {
+  align-items: center;
+  display: flex;
+  margin-bottom: $elv-spacing-s;
+  max-height: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0.25rem 0;
+  position: relative;
+  width: 100%;
+
+  .filter {
+    font-size: $elv-font-l;
+    position: absolute;
+    right: 0;
+    width: 20rem;
+  }
+
+  button,
+  .-elv-button {
+    height: 2rem;
+    min-width: 10rem;
+
+    &:not(:last-child) {
+      margin-right: $elv-spacing-xs;
+    }
+  }
+}
+
+.page-controls {
+  justify-content: center;
+
+  button {
+    margin: 0 1rem;
+    max-width: 6rem;
+    min-width: 6rem;
+
+    &:disabled {
+      visibility: hidden;
+    }
+  }
+}
+
