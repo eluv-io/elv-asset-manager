@@ -10,6 +10,7 @@ import UpdateIcon from "../static/icons/arrow-up-circle.svg";
 import RemoveIcon from "../static/icons/trash.svg";
 import PlayIcon from "../static/icons/play-circle.svg";
 import LinkIcon from "../static/icons/external-link.svg";
+import {InitPSF} from "./Misc";
 
 export const Clip = ({
   index,
@@ -144,6 +145,12 @@ class Clips extends React.Component {
     this.AddClip = this.AddClip.bind(this);
     this.CloseModal = this.CloseModal.bind(this);
     this.ActivateModal = this.ActivateModal.bind(this);
+
+    this.InitPSF = InitPSF.bind(this);
+    this.InitPSF({
+      sortKey: "displayTitleWithStatus",
+      perPage: 100
+    });
   }
 
   AddClip({versionHash}) {
@@ -179,16 +186,36 @@ class Clips extends React.Component {
     this.setState({modal: null});
   }
 
+  ClipsList() {
+    let clips;
+    if(this.props.playlistIndex !== undefined) {
+      clips = this.props.formStore.currentLocalizedData.playlists[this.props.playlistIndex].clips;
+    } else {
+      clips = this.props.formStore.currentLocalizedData.assets[this.props.storeKey];
+    }
+
+    if(this.state.activeFilter) {
+      clips = clips.filter(clip => clip.displayTitle.includes(this.state.activeFilter));
+    }
+
+    return clips;
+  }
+
   render() {
-    const clips = this.props.playlistIndex !== undefined ?
-      this.props.formStore.currentLocalizedData.playlists[this.props.playlistIndex].clips :
-      this.props.formStore.currentLocalizedData.assets[this.props.storeKey];
+    const clips = this.ClipsList();
 
     return (
       <div className="asset-form-section-container">
         <h3>{this.props.header}</h3>
+        <div className="controls">
+          <Action onClick={this.ActivateModal}>
+            Add {this.props.name}
+          </Action>
+          { this.Filter("Filter Titles...") }
+        </div>
+        { this.PageControls(clips.length) }
         <div className="asset-form-clips-container">
-          {(clips || []).map((clip, index) =>
+          {this.Paged(clips || []).map((clip, index) =>
             <Clip
               index={index}
               isPlayable={clip.playable}
@@ -223,9 +250,6 @@ class Clips extends React.Component {
             />
           )}
         </div>
-        <Action onClick={this.ActivateModal}>
-          Add {this.props.name}
-        </Action>
         { this.state.modal }
       </div>
     );
