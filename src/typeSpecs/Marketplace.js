@@ -333,6 +333,12 @@ const MarketplaceSpec = {
           "hint": "(Optional) - If specified, this item will not be available for purchase until the specified time"
         },
         {
+          "label": "End Date",
+          "name": "expires_at",
+          "type": "datetime",
+          "hint": "(Optional) - If specified, this item will no longer be available for purchase at the specified time. Note: The item will still show in the storefront, if specified, but will not be accessible."
+        },
+        {
           "name": "requires_permissions",
           "type": "checkbox",
           "default_value": false,
