@@ -89,6 +89,7 @@ export const Clip = ({
         key={`clip-${versionHash}-${index}`}
         className={`
           asset-form-clip 
+          ${index % 2 === 0 ? "even" : "odd"}
           ${orderable   ? "asset-form-clip-orderable" : ""}
           ${defaultable ? "asset-form-clip-defaultable" : ""}
           ${showPreview ? "asset-form-clip-with-preview" : ""}
@@ -148,7 +149,7 @@ class Clips extends React.Component {
 
     this.InitPSF = InitPSF.bind(this);
     this.InitPSF({
-      sortKey: "displayTitleWithStatus",
+      sortKey: "displayTitle",
       perPage: 100
     });
   }
@@ -195,10 +196,14 @@ class Clips extends React.Component {
     }
 
     if(this.state.activeFilter) {
-      clips = clips.filter(clip => clip.displayTitle.includes(this.state.activeFilter));
+      clips = clips.filter(clip => {
+        const searchTerms = ["assetType", "displayTitle", "slug", "title"];
+
+        return searchTerms.some(term => (clip[term] || "").toLowerCase().includes(this.state.activeFilter));
+      });
     }
 
-    return clips;
+    return clips.sort((a, b) => a[this.state.sortKey] < b[this.state.sortKey] ? (this.state.sortAsc ? -1 : 1) : (this.state.sortAsc ? 1 : -1));
   }
 
   render() {
@@ -224,10 +229,10 @@ class Clips extends React.Component {
             ${this.props.showPreview ? "asset-form-clip-with-preview" : ""}
           `}>
               <div></div>
-              <div>Type</div>
-              <div>Title</div>
-              <div>Slug</div>
-              <div>{this.props.defaultable ? "Default" : ""}</div>
+              { this.SortableHeader("assetType", "Type") }
+              { this.SortableHeader("displayTitle", "Title") }
+              { this.SortableHeader("slug", "Slug") }
+              { this.props.defaultable ? this.SortableHeader("isDefault", "Default") : null }
               <div></div>
               <div></div>
             </div> : null

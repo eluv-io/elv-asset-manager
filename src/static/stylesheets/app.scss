@@ -872,3 +872,25 @@ select {
   }
 }
 
+.sortable-header {
+  @include elv-no-select;
+  cursor: pointer;
+
+  &.active {
+    &.asc {
+      &::after {
+        content: "▲";
+        font-size: $elv-font-m;
+        padding-left: $elv-spacing-xs;
+      }
+    }
+
+    &.desc {
+      &::after {
+        content: "▼";
+        font-size: $elv-font-m;
+        padding-left: $elv-spacing-xs;
+      }
+    }
+  }
+}
