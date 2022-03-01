@@ -20,6 +20,27 @@ export const InitPSF = function({sortKey, perPage=100, additionalState={}}) {
   this.ChangePage = ChangePage.bind(this);
   this.Paged = Paged.bind(this);
   this.HandleFilterChange = HandleFilterChange.bind(this);
+  this.SortableHeader = SortableHeader.bind(this);
+  this.ChangeSort = ChangeSort.bind(this);
+};
+
+export const SortableHeader = function(key, label, f) {
+  return (
+    <div
+      onClick={() => this.ChangeSort(key, f)}
+      className={`sortable-header ${key === this.state.sortKey ? "active" : ""} ${this.state.sortAsc ? "asc" : "desc"}`}
+    >
+      {label}
+    </div>
+  );
+};
+
+export const ChangeSort = function(key, f) {
+  if(this.state.sortKey === key) {
+    this.setState({sortAsc: !this.state.sortAsc, sortFunction: f});
+  } else {
+    this.setState({sortKey: key, sortAsc: true, sortFunction: f});
+  }
 };
 
 export const PageControls = function(total, onChange) {
