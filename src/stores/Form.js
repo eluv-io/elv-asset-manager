@@ -940,19 +940,30 @@ class FormStore {
 
   RetrieveAssetFromLink = flow(function * (linkPath, metadata) {
     if(!this.linkHashes[linkPath]) {
-      if(!metadata) {
-        metadata = yield (yield this.rootStore.client.ContentObjectMetadata({
+      try {
+        if(!metadata) {
+          metadata = yield (yield this.rootStore.client.ContentObjectMetadata({
+            versionHash: this.rootStore.params.versionHash,
+            metadataSubtree: linkPath,
+            resolveLinks: true,
+            resolveIncludeSource: true,
+            resolveIgnoreErrors: true
+          })) || {};
+        }
+
+        this.linkHashes[linkPath] = metadata["."].source;
+
+        // Cache metadata
+        yield this.RetrieveAsset(this.linkHashes[linkPath], metadata);
+      } catch(error) {
+        const linkInfo = yield (yield this.rootStore.client.ContentObjectMetadata({
           versionHash: this.rootStore.params.versionHash,
           metadataSubtree: linkPath,
-          resolveLinks: true,
-          resolveIncludeSource: true
-        })) || {};
+          resolveLinks: false
+        }));
+
+        this.linkHashes[linkPath] = linkInfo["/"].split("/").find(segment => segment.startsWith("hq__"));
       }
-
-      this.linkHashes[linkPath] = metadata["."].source;
-
-      // Cache metadata
-      yield this.RetrieveAsset(this.linkHashes[linkPath], metadata);
     }
 
     return this.linkHashes[linkPath];
