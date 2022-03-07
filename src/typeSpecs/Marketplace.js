@@ -58,6 +58,12 @@ const MarketplaceSpec = {
           "hint": "If specified, the global navigation to all listings and marketplaces will not be shown when this marketplace is embedded into your site"
         },
         {
+          "label": "Hide Marketplace Name on Store Page",
+          "name": "hide_name",
+          "type": "checkbox",
+          "default_value": false
+        },
+        {
           "name": "subheader",
           "type": "text",
           "default_value": "Marketplace"

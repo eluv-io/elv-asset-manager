@@ -98,6 +98,7 @@ const NFTTemplateSpec = {
           "type": "select",
           "options": [
             "Video",
+            "Audio",
             "Image",
             "Ebook"
           ]
@@ -202,8 +203,24 @@ const NFTTemplateSpec = {
               "type": "text"
             },
             {
+              "name": "subtitle_1",
+              "type": "text",
+              "hint": "Artist, for example"
+            },
+            {
+              "name": "subtitle_2",
+              "type": "text",
+              "hint": "Album, for example"
+            },
+            {
               "name": "description",
               "type": "rich_text"
+            },
+            {
+              "extensions": imageTypes,
+              "name": "image",
+              "type": "file_url",
+              "hint": "Square image recommended"
             },
             {
               "name": "default",
@@ -220,6 +237,7 @@ const NFTTemplateSpec = {
               "type": "select",
               "options": [
                 "Video",
+                "Audio",
                 "Image",
                 "Ebook"
               ]
