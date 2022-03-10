@@ -1099,6 +1099,11 @@ const eventSiteSpec = {
           "no_localize": true
         },
         {
+          "name": "end_date",
+          "type": "datetime",
+          "no_localize": true
+        },
+        {
           "name": "store_page",
           "type": "select",
           "default_value": "Storefront",
