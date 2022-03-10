@@ -37,8 +37,10 @@ export const SortableHeader = function(key, label, f) {
 
 export const ChangeSort = function(key, f) {
   if(this.state.sortKey === key) {
+    this.props.formStore.SortAssets(this.state.key, key, !this.state.sortAsc);
     this.setState({sortAsc: !this.state.sortAsc, sortFunction: f});
   } else {
+    this.props.formStore.SortAssets(this.state.key, key, this.state.sortAsc);
     this.setState({sortKey: key, sortAsc: true, sortFunction: f});
   }
 };

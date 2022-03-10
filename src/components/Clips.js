@@ -75,7 +75,7 @@ export const Clip = ({
         label={`Update ${title} to the latest version`}
         onClick={async () => {
           await Confirm({
-            message: `Are you sure you want to update ${name ? `the ${name}` : ""} '${title}'?`,
+            message: `Are you sure you want to update ${name ? `the ${name}` : ""} '${title || id}'?`,
             onConfirm: Update
           });
         }}
@@ -119,7 +119,7 @@ export const Clip = ({
             label={`Remove ${title}`}
             onClick={async () => {
               await Confirm({
-                message: `Are you sure you want to remove ${name ? `the ${name}` : ""} '${title}'?`,
+                message: `Are you sure you want to remove ${name ? `the ${name}` : ""} '${title || id}'?`,
                 onConfirm: Remove
               });
             }}
@@ -150,7 +150,10 @@ class Clips extends React.Component {
     this.InitPSF = InitPSF.bind(this);
     this.InitPSF({
       sortKey: "displayTitle",
-      perPage: 100
+      perPage: 100,
+      additionalState: {
+        key: this.props.storeKey
+      }
     });
   }
 
@@ -203,7 +206,7 @@ class Clips extends React.Component {
       });
     }
 
-    return clips.sort((a, b) => a[this.state.sortKey] < b[this.state.sortKey] ? (this.state.sortAsc ? -1 : 1) : (this.state.sortAsc ? 1 : -1));
+    return clips;
   }
 
   render() {
@@ -229,48 +232,50 @@ class Clips extends React.Component {
             ${this.props.showPreview ? "asset-form-clip-with-preview" : ""}
           `}>
               <div></div>
-              { this.SortableHeader("assetType", "Type") }
-              { this.SortableHeader("displayTitle", "Title") }
-              { this.SortableHeader("slug", "Slug") }
-              { this.props.defaultable ? this.SortableHeader("isDefault", "Default") : null }
+              { this.SortableHeader("assetType", "Type", this.props.name) }
+              { this.SortableHeader("displayTitle", "Title", this.props.name) }
+              { this.SortableHeader("slug", "Slug", this.props.name) }
+              { this.props.defaultable ? this.SortableHeader("isDefault", "Default", this.props.name) : null }
               <div></div>
               <div></div>
             </div> : null
           }
-          {this.Paged(clips || []).map((clip, index) =>
-            <Clip
-              index={index}
-              isPlayable={clip.playable}
-              isDefault={clip.isDefault}
-              defaultable={this.props.defaultable}
-              orderable={this.props.orderable}
-              key={`asset-clip-${this.props.storeKey || this.props.playlistIndex}-${index}`}
-              clip={clip}
-              length={clips.length}
-              Swap={(i1, i2) => this.props.formStore.SwapClip({
-                key: this.props.storeKey,
-                playlistIndex: this.props.playlistIndex,
-                i1,
-                i2
-              })}
-              SetDefault={index => this.props.formStore.SetDefaultClip({
-                key: this.props.storeKey,
-                playlistIndex: this.props.playlistIndex,
-                index
-              })}
-              Update={() => this.props.formStore.UpdateClip({
-                key: this.props.storeKey,
-                playlistIndex: this.props.playlistIndex,
-                index
-              })}
-              Remove={() => this.props.formStore.RemoveClip({
-                key: this.props.storeKey,
-                playlistIndex: this.props.playlistIndex,
-                index
-              })}
-              OpenObjectLink={this.props.rootStore.OpenObjectLink}
-            />
-          )}
+          {
+            this.Paged(clips || []).map((clip, index) =>
+              <Clip
+                index={index}
+                isPlayable={clip.playable}
+                isDefault={clip.isDefault}
+                defaultable={this.props.defaultable}
+                orderable={this.props.orderable}
+                key={`asset-clip-${this.props.storeKey || this.props.playlistIndex}-${index}`}
+                clip={clip}
+                length={clips.length}
+                Swap={(i1, i2) => this.props.formStore.SwapClip({
+                  key: this.props.storeKey,
+                  playlistIndex: this.props.playlistIndex,
+                  i1,
+                  i2
+                })}
+                SetDefault={index => this.props.formStore.SetDefaultClip({
+                  key: this.props.storeKey,
+                  playlistIndex: this.props.playlistIndex,
+                  index
+                })}
+                Update={() => this.props.formStore.UpdateClip({
+                  key: this.props.storeKey,
+                  playlistIndex: this.props.playlistIndex,
+                  index
+                })}
+                Remove={() => this.props.formStore.RemoveClip({
+                  key: this.props.storeKey,
+                  playlistIndex: this.props.playlistIndex,
+                  index
+                })}
+                OpenObjectLink={this.props.rootStore.OpenObjectLink}
+              />
+            )
+          }
         </div>
         { this.state.modal }
       </div>

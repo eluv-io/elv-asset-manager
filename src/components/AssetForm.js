@@ -17,6 +17,7 @@ import FileControl from "./FileControl";
 import LocalizationIcon from "../static/icons/world.svg";
 import CloseIcon from "../static/icons/x-circle.svg";
 import SettingsIcon from "../static/icons/settings.svg";
+import Searchables from "./Searchables";
 
 @inject("rootStore")
 @inject("formStore")
@@ -191,6 +192,8 @@ class AssetForm extends React.Component {
       this.props.formStore.fileControls.forEach(control => tabs.push([control.name, control.name]));
     }
 
+    tabs.push(["Searchables", "SEARCHABLES"]);
+
     return tabs;
   }
 
@@ -214,6 +217,8 @@ class AssetForm extends React.Component {
         return <SiteCustomization />;
       case "SITE_CODES":
         return <SiteAccessCode />;
+      case "SEARCHABLES":
+        return <Searchables />;
       default:
         const control = this.props.formStore.fileControls
           .find(control => control.name === this.state.form);

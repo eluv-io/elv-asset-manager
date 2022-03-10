@@ -139,9 +139,14 @@ class RootStore {
       metadata.public = metadata.public || {};
       metadata.public.asset_metadata = metadata.public.asset_metadata || {};
 
+      metadata.searchables = (
+        yield this.client.ContentObjectMetadata({
+          versionHash: this.params.versionHash,
+          metadataSubtree: "searchables"
+        })) || {};
+
       this.assetMetadata = { ...metadata.public.asset_metadata };
       delete metadata.public.asset_metadata;
-
       this.otherMetadata = metadata;
 
       try {

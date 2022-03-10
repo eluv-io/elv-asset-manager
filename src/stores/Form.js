@@ -93,6 +93,8 @@ class FormStore {
   @observable credits = {};
   @observable localizedCredits = {};
 
+  @observable searchables = {};
+
   @observable assets = {};
 
   @observable siteCustomization = {
@@ -245,6 +247,7 @@ class FormStore {
     this.localizedData[l0][l1] = this.localizedData[l0][l1] || {};
 
     let assetMetadata = this.rootStore.client.utils.SafeTraverse(this.rootStore.assetMetadata, l0, l1) || {};
+    let otherMetadata = this.rootStore.client.utils.SafeTraverse(this.rootStore.assetMetadata, l0, l1) || {};
 
     let target;
     if(l2) {
@@ -269,6 +272,7 @@ class FormStore {
 
       target.images = yield this.LoadImages(assetMetadata.images, true);
       target.playlists = yield this.LoadPlaylists(assetMetadata.playlists);
+      target.searchables = this.LoadSearchables(otherMetadata.searchables);
 
       for(let i = 0; i < this.localizableFileControls.length; i++) {
         const control = this.localizableFileControls[i];
@@ -356,11 +360,13 @@ class FormStore {
     yield this.LoadPermissionsObject();
 
     const assetMetadata = this.rootStore.assetMetadata || {};
+    const otherMetadata = this.rootStore.otherMetadata || {};
 
     this.assetInfo = yield this.LoadAssetInfo(assetMetadata);
     this.credits = this.LoadCredits((assetMetadata.info || {}).talent);
     this.images = yield this.LoadImages(assetMetadata.images, true);
     this.playlists = yield this.LoadPlaylists(assetMetadata.playlists);
+    this.searchables = this.LoadSearchables(otherMetadata.searchables);
 
     for(let i = 0; i < this.fileControls.length; i++) {
       const control = this.fileControls[i];
@@ -386,6 +392,21 @@ class FormStore {
       yield this.rootStore.vodChannelStore.LoadChannelInfo();
     }
   });
+
+  @action.bound
+  SortAssets(type, sortKey, sortAsc) {
+    const Sort = (list) => {
+      return list
+        .slice()
+        .sort((a, b) => a[sortKey] < b[sortKey] ? (sortAsc ? -1 : 1) : (sortAsc ? 1 : -1));
+    };
+
+    if(type === "searchables") {
+      this.searchables = Sort(this.searchables);
+    } else {
+      this.assets[type] = Sort(this.assets[type]);
+    }
+  }
 
   @action.bound
   UpdateAssetInfo(key, value) {
@@ -527,6 +548,21 @@ class FormStore {
       this.currentLocalizedData.credits[groupIndex].credits.filter((_, i) => i !== creditIndex);
   }
 
+  @action.bound
+  AddSearchable = flow(function * ({versionHash}) {
+    yield this.RetrieveAsset(versionHash);
+
+    // Prevent duplicates
+    if(this.currentLocalizedData.searchables.find(clip => clip.versionHash === versionHash)) {
+      return;
+    }
+
+    this.currentLocalizedData.searchables.push({
+      versionHash,
+      id: this.targets[versionHash].id
+    });
+  });
+
   // Clips/trailers
   @action.bound
   AddClip = flow(function * ({key, playlistIndex, versionHash}) {
@@ -560,6 +596,8 @@ class FormStore {
     let clip;
     if(playlistIndex !== undefined) {
       clip = this.currentLocalizedData.playlists[playlistIndex].clips[index];
+    } else if(key === "searchables") {
+      clip = this.currentLocalizedData.searchables[index];
     } else {
       clip = this.currentLocalizedData.assets[key][index];
     }
@@ -579,6 +617,8 @@ class FormStore {
 
     if(playlistIndex !== undefined) {
       this.currentLocalizedData.playlists[playlistIndex].clips[index] = updatedClip;
+    } else if(key === "searchables") {
+      this.currentLocalizedData.searchables[index] = updatedClip;
     } else {
       this.currentLocalizedData.assets[key][index] = updatedClip;
     }
@@ -589,6 +629,8 @@ class FormStore {
     if(playlistIndex !== undefined) {
       this.currentLocalizedData.playlists[playlistIndex].clips =
         this.currentLocalizedData.playlists[playlistIndex].clips.filter((_, i) => i !== index);
+    } else if(key === "searchables") {
+      this.currentLocalizedData.searchables = this.currentLocalizedData.searchables.filter((_, i) => i !== index);
     } else {
       this.currentLocalizedData.assets[key] = this.currentLocalizedData.assets[key].filter((_, i) => i !== index);
     }
@@ -1290,6 +1332,27 @@ class FormStore {
     return items;
   });
 
+  LoadSearchables = (metadata) => {
+    if(!metadata) { return []; }
+
+    let searchables = [];
+    if(metadata) {
+      Object.keys(metadata).forEach(id => {
+        const info = metadata[id];
+        const {targetHash} = this.LinkComponents(info);
+
+        searchables.push({
+          versionHash: targetHash,
+          id
+        });
+      });
+    }
+
+    searchables = searchables.filter(searchable => searchable);
+
+    return searchables;
+  };
+
   LoadPlaylists = flow(function * (metadata) {
     if(!metadata) { return []; }
 
@@ -1725,6 +1788,14 @@ class FormStore {
             }));
         });
 
+        // Searchables
+        let searchables = {};
+        toJS(localizedData.searchables).forEach(({id, versionHash}) => {
+          searchables[id] = {
+            "/": UrlJoin("/qfab", versionHash, "meta", "searchables")
+          };
+        });
+
         // Images
         let images = {};
         toJS(localizedData.images).forEach(({imageKey, imagePath, targetHash}) => {
@@ -1802,6 +1873,14 @@ class FormStore {
           writeToken,
           metadataSubtree: UrlJoin("public", "asset_metadata", l0, l1, l2),
           metadata: mergedMetadata
+        });
+
+        yield client.ReplaceMetadata({
+          libraryId,
+          objectId,
+          writeToken,
+          metadataSubtree: "searchables",
+          metadata: searchables
         });
 
         yield Promise.all(
