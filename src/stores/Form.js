@@ -1791,9 +1791,10 @@ class FormStore {
         // Searchables
         let searchables = {};
         toJS(localizedData.searchables).forEach(({id, versionHash}) => {
-          searchables[id] = {
-            "/": UrlJoin("/qfab", versionHash, "meta", "searchables")
-          };
+          searchables[id] = this.CreateLink({
+            targetHash: versionHash,
+            linkTarget: UrlJoin("meta", "searchables")
+          });
         });
 
         // Images
@@ -1879,7 +1880,7 @@ class FormStore {
           libraryId,
           objectId,
           writeToken,
-          metadataSubtree: "searchables",
+          metadataSubtree: "site_map/searchables",
           metadata: searchables
         });
 
