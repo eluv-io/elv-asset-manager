@@ -425,12 +425,6 @@ const MarketplaceSpec = {
               "name": "store",
               "type": "text",
               "default_value": "Store"
-            },
-            {
-              "name": "collection",
-              "label": "My Items",
-              "type": "text",
-              "default_value": "My Items"
             }
           ]
         },
