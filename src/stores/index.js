@@ -133,20 +133,17 @@ class RootStore {
           versionHash: this.params.versionHash,
           select: [
             "public/asset_metadata",
-            ...(this.nonStandardFields.map(field => field.path))
+            ...(this.nonStandardFields.map(field => field.path)),
+            "site_map/searchables"
           ]
         })) || {};
       metadata.public = metadata.public || {};
       metadata.public.asset_metadata = metadata.public.asset_metadata || {};
-
-      metadata.searchables = (
-        yield this.client.ContentObjectMetadata({
-          versionHash: this.params.versionHash,
-          metadataSubtree: "searchables"
-        })) || {};
+      metadata.searchables = metadata.site_map.searchables || {};
 
       this.assetMetadata = { ...metadata.public.asset_metadata };
       delete metadata.public.asset_metadata;
+      delete metadata.site_map;
       this.otherMetadata = metadata;
 
       try {
