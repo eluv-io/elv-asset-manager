@@ -139,12 +139,15 @@ class RootStore {
         })) || {};
       metadata.public = metadata.public || {};
       metadata.public.asset_metadata = metadata.public.asset_metadata || {};
-      metadata.searchables = metadata.site_map.searchables || {};
+      metadata.searchables = metadata.site_map?.searchables || {};
 
       this.assetMetadata = { ...metadata.public.asset_metadata };
       delete metadata.public.asset_metadata;
-      delete metadata.site_map;
       this.otherMetadata = metadata;
+
+      if(metadata.site_map) {
+        delete metadata.site_map;
+      }
 
       try {
         this.canEditType = yield this.client.CallContractMethod({
