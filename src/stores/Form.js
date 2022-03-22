@@ -594,10 +594,11 @@ class FormStore {
   @action.bound
   UpdateClip = flow(function * ({key, playlistIndex, index}) {
     let clip;
+
     if(playlistIndex !== undefined) {
       clip = this.currentLocalizedData.playlists[playlistIndex].clips[index];
     } else if(key === "searchables") {
-      clip = this.currentLocalizedData.searchables[index];
+      clip = this.currentLocalizedData.searchables[index] || {};
     } else {
       clip = this.currentLocalizedData.assets[key][index];
     }
@@ -608,12 +609,15 @@ class FormStore {
       yield this.RetrieveAsset(latestVersionHash);
     }
 
-    const updatedClip = {
+    let updatedClip = {
       ...clip,
       versionHash: latestVersionHash,
-      ...this.targets[latestVersionHash],
       latestVersionHash
     };
+
+    if(key !== "searchables") {
+      updatedClip = {...updatedClip, ...this.targets[latestVersionHash]};
+    }
 
     if(playlistIndex !== undefined) {
       this.currentLocalizedData.playlists[playlistIndex].clips[index] = updatedClip;
@@ -634,6 +638,17 @@ class FormStore {
     } else {
       this.currentLocalizedData.assets[key] = this.currentLocalizedData.assets[key].filter((_, i) => i !== index);
     }
+  }
+
+  @action.bound
+  ClipOriginalIndex({id}) {
+    let originalIndex;
+
+    this.currentLocalizedData.searchables.forEach((searchable, i) => {
+      if(searchable.id === id) originalIndex = i;
+    });
+
+    return originalIndex;
   }
 
   @action.bound
