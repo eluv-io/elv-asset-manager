@@ -211,6 +211,7 @@ class Clips extends React.Component {
 
   render() {
     const clips = this.ClipsList();
+    const startIndex = (this.state.page - 1) * this.state.perPage;
 
     return (
       <div className="asset-form-section-container">
@@ -254,8 +255,8 @@ class Clips extends React.Component {
                 Swap={(i1, i2) => this.props.formStore.SwapClip({
                   key: this.props.storeKey,
                   playlistIndex: this.props.playlistIndex,
-                  i1,
-                  i2
+                  i1: i1 + startIndex,
+                  i2: i2 + startIndex
                 })}
                 SetDefault={index => this.props.formStore.SetDefaultClip({
                   key: this.props.storeKey,
@@ -265,12 +266,12 @@ class Clips extends React.Component {
                 Update={() => this.props.formStore.UpdateClip({
                   key: this.props.storeKey,
                   playlistIndex: this.props.playlistIndex,
-                  index
+                  index: this.props.formStore.ClipOriginalIndex({id: clip.id, key: this.props.storeKey})
                 })}
                 Remove={() => this.props.formStore.RemoveClip({
                   key: this.props.storeKey,
                   playlistIndex: this.props.playlistIndex,
-                  index
+                  index: this.props.formStore.ClipOriginalIndex({id: clip.id, key: this.props.storeKey})
                 })}
                 OpenObjectLink={this.props.rootStore.OpenObjectLink}
               />

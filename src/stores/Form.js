@@ -645,10 +645,11 @@ class FormStore {
   }
 
   @action.bound
-  ClipOriginalIndex({id}) {
+  ClipOriginalIndex({id, key}) {
     let originalIndex;
+    const clips = (key === "searchables") ? this.currentLocalizedData.searchables : this.currentLocalizedData.assets[key];
 
-    this.currentLocalizedData.searchables.forEach((searchable, i) => {
+    clips.forEach((searchable, i) => {
       if(searchable.id === id) originalIndex = i;
     });
 
