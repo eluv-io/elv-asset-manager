@@ -109,13 +109,13 @@ class Searchables extends React.Component {
                 length={clips.length}
                 Update={() => this.props.formStore.UpdateClip({
                   key: "searchables",
-                  index: this.props.formStore.ClipOriginalIndex({id: clip.id}),
+                  index: this.props.formStore.ClipOriginalIndex({id: clip.id, searchables: true}),
                   clips: this.Paged(clips)
                 })}
                 Remove={() => {
                   this.props.formStore.RemoveClip({
                     key: "searchables",
-                    index: this.props.formStore.ClipOriginalIndex({id: clip.id}),
+                    index: this.props.formStore.ClipOriginalIndex({id: clip.id, searchables: true}),
                     clips
                   });
                 }}
