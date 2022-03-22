@@ -1,9 +1,10 @@
 import React from "react";
-import {Action, BallSpin, Modal} from "elv-components-js";
+import {Action, BallSpin, Maybe, Modal} from "elv-components-js";
 import {inject, observer} from "mobx-react";
 import AsyncComponent from "./AsyncComponent";
 
 @inject("rootStore")
+@inject("formStore")
 @observer
 class LinkUpdate extends React.Component {
   constructor(props) {
@@ -159,12 +160,15 @@ class LinkUpdate extends React.Component {
     return (
       <React.Fragment>
         { this.Modal() }
-        <Action
-          className="asset-form-update-button secondary"
-          onClick={() => this.setState({showModal: true})}
-        >
-          Update Links
-        </Action>
+        {Maybe(
+          !this.props.formStore.hideUpdateLinksButton,
+          <Action
+            className="asset-form-update-button secondary"
+            onClick={() => this.setState({showModal: true})}
+          >
+            Update Links
+          </Action>
+        )}
       </React.Fragment>
     );
   }

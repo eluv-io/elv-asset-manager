@@ -31,6 +31,8 @@ class SpecStore {
   @observable associatePermissions = false;
   @observable playable = false;
   @observable hideImageTab = false;
+  @observable showSearchablesTab = false;
+  @observable hideUpdateLinksButton = false;
   @observable displayApp = "";
   @observable manageApp = "";
   @observable controls = {};
@@ -72,6 +74,8 @@ class SpecStore {
     this.associatePermissions = config.associate_permissions || false;
     this.playable = config.playable || false;
     this.hideImageTab = config.hide_image_tab || config.hideImageTab || false;
+    this.hideUpdateLinksButton = config.hide_update_links_button || config.hideUpdateLinksButton || false;
+    this.showSearchablesTab = config.show_searchables_tab || config.showSearchablesTab || false;
     this.displayApp = config.display_app || config.displayApp || "";
     this.manageApp = config.manage_app || config.manageApp || "";
     this.availableAssetTypes = config.asset_types || config.availableAssetTypes || DefaultSpec.asset_types;
@@ -260,6 +264,8 @@ class SpecStore {
         ...toJS(this.rootStore.titleConfiguration || {}),
         associate_permissions: this.associatePermissions,
         hide_image_tab: this.hideImageTab,
+        hide_update_links_button: this.hideUpdateLinksButton,
+        show_searchables_tab: this.showSearchablesTab,
         playable: this.playable,
         display_app: this.display_app,
         manage_app: this.manage_app,
@@ -430,6 +436,16 @@ class SpecStore {
   @action.bound
   ToggleImageTabHidden(hidden) {
     this.hideImageTab = hidden;
+  }
+
+  @action.bound
+  ToggleSearchablesTabVisibility(enabled) {
+    this.showSearchablesTab = enabled;
+  }
+
+  @action.bound
+  ToggleUpdateLinksVisibility(hidden) {
+    this.hideUpdateLinksButton = hidden;
   }
 
   @action.bound

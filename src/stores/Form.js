@@ -112,6 +112,8 @@ class FormStore {
   };
 
   @observable hideImageTab = false;
+  @observable showSearchablesTab = false;
+  @observable hideUpdateLinksButton = false;
   @observable associatePermissions = false;
   @observable permissionsObject;
 
@@ -350,6 +352,8 @@ class FormStore {
     this.associatedAssets = config.associated_assets || DefaultSpec.associated_assets;
     this.defaultImageKeys = config.default_image_keys || DefaultSpec.default_image_keys;
     this.hideImageTab = config.hide_image_tab;
+    this.showSearchablesTab = config.show_searchables_tab;
+    this.hideUpdateLinksButton = config.hide_update_links_button;
 
     this.localization = config.localization;
   }
