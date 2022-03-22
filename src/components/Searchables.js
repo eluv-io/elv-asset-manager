@@ -109,12 +109,16 @@ class Searchables extends React.Component {
                 length={clips.length}
                 Update={() => this.props.formStore.UpdateClip({
                   key: "searchables",
-                  index
+                  index: this.props.formStore.ClipOriginalIndex({id: clip.id}),
+                  clips: this.Paged(clips)
                 })}
-                Remove={() => this.props.formStore.RemoveClip({
-                  key: "searchables",
-                  index
-                })}
+                Remove={() => {
+                  this.props.formStore.RemoveClip({
+                    key: "searchables",
+                    index: this.props.formStore.ClipOriginalIndex({id: clip.id}),
+                    clips
+                  });
+                }}
                 OpenObjectLink={this.props.rootStore.OpenObjectLink}
               />
             )
