@@ -192,7 +192,9 @@ class AssetForm extends React.Component {
       this.props.formStore.fileControls.forEach(control => tabs.push([control.name, control.name]));
     }
 
-    tabs.push(["Searchables", "SEARCHABLES"]);
+    if(this.props.formStore.showSearchablesTab) {
+      tabs.push(["Searchables", "SEARCHABLES"]);
+    }
 
     return tabs;
   }
