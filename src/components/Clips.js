@@ -248,7 +248,7 @@ class Clips extends React.Component {
                 isPlayable={clip.playable}
                 isDefault={clip.isDefault}
                 defaultable={this.props.defaultable}
-                orderable={this.props.orderable}
+                orderable={this.props.orderable && !this.state.activeFilter}
                 key={`asset-clip-${this.props.storeKey || this.props.playlistIndex}-${index}`}
                 clip={clip}
                 length={clips.length}
