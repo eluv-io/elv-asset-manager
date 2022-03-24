@@ -55,9 +55,9 @@ export const PageControls = function(total, onChange) {
 
   return (
     <div className="controls page-controls centered">
-      <Action disabled={this.state.page === 1} onClick={() => this.ChangePage(this.state.page - 1, onChange)}>Previous</Action>
+      <Action className="secondary" disabled={this.state.page === 1} onClick={() => this.ChangePage(this.state.page - 1, onChange)}>Previous</Action>
       { range }
-      <Action disabled={this.state.page * this.state.perPage >= total} onClick={() => this.ChangePage(this.state.page + 1, onChange)}>Next</Action>
+      <Action className="secondary" disabled={this.state.page * this.state.perPage >= total} onClick={() => this.ChangePage(this.state.page + 1, onChange)}>Next</Action>
     </div>
   );
 };
