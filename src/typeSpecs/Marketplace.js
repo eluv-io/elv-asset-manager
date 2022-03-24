@@ -464,6 +464,11 @@ const MarketplaceSpec = {
       "type": "list",
       "fields": [
         {
+          "label": "SKU",
+          "name": "sku",
+          "type": "uuid"
+        },
+        {
           "name": "name",
           "type": "text"
         },
@@ -533,6 +538,19 @@ const MarketplaceSpec = {
         },
         {
           "name": "items",
+          "type": "reference_multiselect",
+          "reference": "/items",
+          "label_key": "name",
+          "value_key": "sku",
+          "allow_null": true
+        },
+        {
+          "name": "redeemable",
+          "type": "checkbox",
+          "default_value": false
+        },
+        {
+          "name": "redeem_items",
           "type": "reference_multiselect",
           "reference": "/items",
           "label_key": "name",
