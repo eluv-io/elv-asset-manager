@@ -249,7 +249,7 @@ class FormStore {
     this.localizedData[l0][l1] = this.localizedData[l0][l1] || {};
 
     let assetMetadata = this.rootStore.client.utils.SafeTraverse(this.rootStore.assetMetadata, l0, l1) || {};
-    let otherMetadata = this.rootStore.client.utils.SafeTraverse(this.rootStore.assetMetadata, l0, l1) || {};
+    let otherMetadata = this.rootStore.client.utils.SafeTraverse(this.rootStore.otherMetadata, l0, l1) || {};
 
     let target;
     if(l2) {
