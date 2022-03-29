@@ -1091,7 +1091,7 @@ class FormStore {
       Object.keys(metadata);
 
     yield keys.limitedMap(
-      10,
+      30,
       async key => {
         try {
           if(!metadata[key]) { return; }
