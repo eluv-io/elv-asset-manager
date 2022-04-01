@@ -59,7 +59,7 @@ class RootStore {
   InitializeClient = flow(function * () {
     this.client = new FrameClient({
       target: window.parent,
-      timeout: 30
+      timeout: 240
     });
 
     let queryParams = window.location.search.split("?")[1];
