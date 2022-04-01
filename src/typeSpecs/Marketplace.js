@@ -351,16 +351,15 @@ const MarketplaceSpec = {
           "hint": "If checked, users must have special permissions to the NFT template in order to view and buy the NFT in the marketplace"
         },
         {
-          "name": "requires_permissions",
-          "type": "checkbox",
-          "default_value": false,
-          "hint": "If checked, users must have special permissions to the NFT template in order to view and buy the NFT in the marketplace"
-        },
-        {
           "name": "show_if_unauthorized",
           "type": "checkbox",
           "default": false,
           "hint": "If checked, this item will be shown even if permissions and the user doesn't have access."
+        },
+        {
+          "name": "permission_description",
+          "type": "textarea",
+          "hint": "If permissions are required but the user does not have permission to purchase, this description will be shown."
         },
         {
           "name": "max_per_user",
