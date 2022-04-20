@@ -147,8 +147,15 @@ const eventSiteSpec = {
           "type": "select",
           "options": [
             "Event Site",
-            "Marketplace"
+            "Marketplace",
+            "External Link"
           ]
+        },
+        {
+          "name": "external_url",
+          "label": "External URL",
+          "type": "text",
+          "hint": "If Feature Location is 'External Link', specify the URL to link to"
         },
         {
           "name": "feature_button",
@@ -930,6 +937,7 @@ const eventSiteSpec = {
             },
             {
               "name": "external_url",
+              "label": "External URL",
               "hint": "External URL from which to purchase this ticket. If specified, the payment information below is not required."
             }
           ],
