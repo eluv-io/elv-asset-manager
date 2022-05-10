@@ -1,6 +1,7 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 const currencyOptions = [...new Set(Object.values(require("country-codes-list").customList("countryNameEn", "{currencyCode}")))].filter(c => c).sort();
 
+
 const MarketplaceSpec = {
   "profile": {
     "name": "Eluvio LIVE Marketplace",
@@ -102,16 +103,7 @@ const MarketplaceSpec = {
           ]
         },
         {
-          "name": "color_scheme",
-          "type": "select",
-          "default_value": "Light",
-          "options": [
-            "Light",
-            "Dark",
-            "User Preference"
-          ]
-        },
-        {
+          "label": "Default Font",
           "name": "font",
           "type": "select",
           "options": [
@@ -119,6 +111,48 @@ const MarketplaceSpec = {
             "Inter",
             "Selawik"
           ]
+        },
+        {
+          "name": "text_justification",
+          "type": "select",
+          "default_value": "Left",
+          "options": [
+            "Left",
+            "Center"
+          ]
+        },
+        {
+          "name": "item_text_justification",
+          "type": "select",
+          "default_value": "Left",
+          "options": [
+            "Left",
+            "Center"
+          ]
+        },
+        {
+          "label": "Theme",
+          "name": "color_scheme",
+          "type": "select",
+          "default_value": "Light",
+          "options": [
+            "Light",
+            "Dark",
+            "Custom"
+          ]
+        },
+        {
+          "label": "Custom CSS",
+          "name": "custom_css",
+          "type": "textarea",
+          "depends_on": "./color_scheme",
+          "depends_on_value": "Custom",
+          "hint": "The wallet application has a number of CSS variables that can be modified to easily change fonts, colors, borders, and other attributes. Click here to see the full list.",
+          "hint_link": "https://github.com/eluv-io/elv-media-wallet/blob/custom-styling/src/static/stylesheets/themes/default.css",
+          "default_value":
+`:root {
+
+}`
         }
       ]
     },

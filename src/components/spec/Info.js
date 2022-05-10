@@ -60,6 +60,7 @@ list - A list of fields
 const hints = {
   info: <>A configurable list of fields for assets of this type. These fields will be stored in <code>public/asset_metadata/info</code> in the asset metadata.</>,
   hint: "A hint to communicate the purpose of this field, just like this one",
+  hint_link: "A URL link for a hint to point to",
   fields: "Attributes for each element in this list. If no fields are specified, this field will be a list of text strings.",
   for_title_types: "If specified, this field will only apply to assets with these title types",
   path: <>If specified, this field will change the location this field is saved in metadata. If blank, fields will be saved in <code>public/asset_metadata/info</code>, or <code>public/asset_metadata</code> if Top Level is specified. If the field is not at the top level (e.g. inside a list or a subsection), this field has no effect. Fields with non-standard paths are NOT localizable.</>,
@@ -120,6 +121,7 @@ class Info extends React.Component {
           {name: "label"},
           {name: "name", label: "Metadata Key", required: true},
           {name: "hint", hint: hints.hint},
+          {name: "hint_link", hint: hints.hint_link, only: entry => !!entry.hint},
           {name: "no_localize", label: "No Localization", type: "checkbox", hint: "If checked, this field will not be displayed when filling out localized info"},
           {name: "top_level", type: "checkbox", hint: hints.top_level, only: () => toplevel},
           {name: "path", type: "text", label: "Metadata Path", hint: hints.path},

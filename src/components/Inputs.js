@@ -63,7 +63,7 @@ export const ReferencePathElements = (PATH, reference) => {
   }
 };
 
-const HintLabel = ({label, name, hint, required}) => {
+const HintLabel = ({label, name, hint, link, required}) => {
   label = label || FormatName(name);
 
   return (
@@ -72,10 +72,19 @@ const HintLabel = ({label, name, hint, required}) => {
         { label } { required ? "*" : "" }
       </div>
       <ToolTip className="hint-tooltip" content={<pre className="hint-content">{ hint }</pre>}>
-        <ImageIcon
-          className="hint-icon"
-          icon={HintIcon}
-        />
+        {
+          link ?
+            <a href={link} target="_blank" rel="noopener">
+              <ImageIcon
+                className="hint-icon"
+                icon={HintIcon}
+              />
+            </a> :
+            <ImageIcon
+              className="hint-icon"
+              icon={HintIcon}
+            />
+        }
       </ToolTip>
     </div>
   );
@@ -121,6 +130,7 @@ class RecursiveField extends React.Component {
         label: field.label,
         name: field.name,
         hint: field.hint,
+        link: field.hint_link,
         required: field.required
       }) : null;
 
@@ -138,7 +148,9 @@ class RecursiveField extends React.Component {
       if(field.depends_on) {
         const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.depends_on)));
 
-        if(!dependent_value) {
+        if(field.depends_on_value && dependent_value !== field.depends_on_value) {
+          return null;
+        } else if(!dependent_value) {
           return null;
         }
       }
@@ -146,6 +158,9 @@ class RecursiveField extends React.Component {
       if(field.unless) {
         const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.unless)));
 
+        if(field.unless_value && dependent_value === field.unless_value) {
+          return null;
+        }
         if(dependent_value) {
           return null;
         }

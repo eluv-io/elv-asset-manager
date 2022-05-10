@@ -6,7 +6,6 @@ import UrlJoin from "url-join";
 import DefaultSpec from "@eluvio/elv-client-js/typeSpecs/Default";
 import {parse} from "node-html-parser";
 import IsEqual from "lodash/isEqual";
-import Merge from "lodash/merge";
 import {ReferencePathElements} from "../components/Inputs";
 import Specs from "../typeSpecs/Specs";
 
@@ -955,7 +954,7 @@ class FormStore {
 
         // Cache metadata
         yield this.RetrieveAsset(this.linkHashes[linkPath], metadata);
-      } catch(error) {
+      } catch (error) {
         const linkInfo = yield (yield this.rootStore.client.ContentObjectMetadata({
           versionHash: this.rootStore.params.versionHash,
           metadataSubtree: linkPath,

@@ -137,6 +137,10 @@ class SpecStore {
         formattedField.hint = field.hint;
       }
 
+      if(field.hint_link) {
+        formattedField.hint_link = field.hint_link;
+      }
+
       if(field.default_value) {
         formattedField.default_value = field.default_value;
       }
@@ -153,8 +157,16 @@ class SpecStore {
         formattedField.depends_on = field.depends_on;
       }
 
+      if(field.depends_on_value) {
+        formattedField.depends_on_value = field.depends_on_value;
+      }
+
       if(field.unless) {
         formattedField.unless = field.unless;
+      }
+
+      if(field.unless_value) {
+        formattedField.unless_value = field.unless_value;
       }
 
       if(field.check_has_audio_flag) {
