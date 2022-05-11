@@ -104,7 +104,7 @@ const MarketplaceSpec = {
             {
               "name": "listings",
               "type": "text",
-              "default_value": "My Items"
+              "default_value": "Listings"
             },
             {
               "name": "my_items",
