@@ -148,8 +148,10 @@ class RecursiveField extends React.Component {
       if(field.depends_on) {
         const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.depends_on)));
 
-        if(field.depends_on_value && dependent_value !== field.depends_on_value) {
-          return null;
+        if(field.depends_on_value) {
+          if(dependent_value !== field.depends_on_value) {
+            return null;
+          }
         } else if(!dependent_value) {
           return null;
         }
@@ -158,10 +160,11 @@ class RecursiveField extends React.Component {
       if(field.unless) {
         const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.unless)));
 
-        if(field.unless_value && dependent_value === field.unless_value) {
-          return null;
-        }
-        if(dependent_value) {
+        if(field.unless_value) {
+          if(dependent_value === field.unless_value) {
+            return null;
+          }
+        } else if(dependent_value) {
           return null;
         }
       }

@@ -92,6 +92,28 @@ const MarketplaceSpec = {
           "hint": "This banner will be displayed in the list of available marketplaces. It should be roughly 16:10 aspect ratio."
         },
         {
+          "name": "tabs",
+          "type": "subsection",
+          "hint": "Specify different text to be used for links in the header",
+          "fields": [
+            {
+              "name": "store",
+              "type": "text",
+              "default_value": "Store"
+            },
+            {
+              "name": "listings",
+              "type": "text",
+              "default_value": "My Items"
+            },
+            {
+              "name": "my_items",
+              "type": "text",
+              "default_value": "My Items"
+            }
+          ]
+        },
+        {
           "name": "tags",
           "type": "multiselect",
           "hint": "These tags will be used to help users discover your marketplace based on their interests.",
@@ -106,6 +128,8 @@ const MarketplaceSpec = {
           "label": "Default Font",
           "name": "font",
           "type": "select",
+          "unless": "./color_scheme",
+          "unless_value": "Custom",
           "options": [
             "Helvetica Neue",
             "Inter",
@@ -188,6 +212,8 @@ const MarketplaceSpec = {
         {
           "name": "log_in_button",
           "type": "subsection",
+          "unless": "../branding/color_scheme",
+          "unless_value": "Custom",
           "fields": [
             {
               "name": "text_color",
@@ -218,6 +244,8 @@ const MarketplaceSpec = {
         {
           "name": "sign_up_button",
           "type": "subsection",
+          "unless": "../branding/color_scheme",
+          "unless_value": "Custom",
           "fields": [
             {
               "name": "text_color",
@@ -379,6 +407,12 @@ const MarketplaceSpec = {
           "hint": "(Optional) - If specified, this item will no longer be available for purchase at the specified time. Note: The item will still show in the storefront, if specified, but will not be accessible."
         },
         {
+          "name": "show_if_unreleased",
+          "type": "checkbox",
+          "default": false,
+          "hint": "If checked, this item will be shown even if it has not yet released or if sale has ended."
+        },
+        {
           "name": "requires_permissions",
           "type": "checkbox",
           "default_value": false,
@@ -463,17 +497,6 @@ const MarketplaceSpec = {
           "hint": "If specified, this video will play on the status screen after a purchase is made until minting is complete"
         },
         {
-          "name": "tabs",
-          "type": "subsection",
-          "fields": [
-            {
-              "name": "store",
-              "type": "text",
-              "default_value": "Store"
-            }
-          ]
-        },
-        {
           "name": "sections",
           "type": "list",
           "fields": [
@@ -484,6 +507,32 @@ const MarketplaceSpec = {
             {
               "name": "section_subheader",
               "type": "text"
+            },
+            {
+              "name": "type",
+              "type": "select",
+              "options": [
+                "Standard",
+                "Featured"
+              ]
+            },
+            {
+              "name": "featured_view_justification",
+              "type": "select",
+              "depends_on": "./type",
+              "depends_on_value": "Featured",
+              "options": [
+                "Left",
+                "Right"
+              ]
+            },
+            {
+              "name": "show_carousel_gallery",
+              "type": "checkbox",
+              "hint": "If checked, selectable icons of items in the list will be displayed below the featured view. Will not be displayed when only one item is in the list",
+              "depends_on": "./type",
+              "depends_on_value": "Featured",
+              "default_value": false
             },
             {
               "name": "items",
