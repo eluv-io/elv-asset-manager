@@ -71,6 +71,12 @@ const MarketplaceSpec = {
           "hint": "If specified, the global navigation to all listings and marketplaces will not be shown when this marketplace is embedded into your site"
         },
         {
+          "name": "hide_profile_name",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If specified, the profile info in the top right will not include the user name/email/address, only the balance"
+        },
+        {
           "label": "Hide Marketplace Name on Store Page",
           "name": "hide_name",
           "type": "checkbox",

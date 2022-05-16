@@ -209,6 +209,10 @@ class RecursiveField extends React.Component {
           </LabelledField>
         );
       } else if(fieldType === "checkbox") {
+        if(typeof entry[field.name] !== "boolean") {
+          Update(field.name, !!entry[field.name]);
+        }
+
         return (
           <Checkbox
             key={key}
