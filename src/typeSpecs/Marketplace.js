@@ -53,6 +53,18 @@ const MarketplaceSpec = {
           "default_value": false
         },
         {
+          "label": "App Background",
+          "name": "background",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
+          "name": "background_mobile",
+          "label": "App Background (Mobile)",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
           "name": "hide_global_navigation",
           "type": "checkbox",
           "default_value": false,
@@ -430,8 +442,13 @@ const MarketplaceSpec = {
           "hint": "If permissions are required but the user does not have permission to purchase, this description will be shown."
         },
         {
+          "name": "max_per_checkout",
+          "label": "Max Purchasable per Checkout",
+          "type": "integer"
+        },
+        {
           "name": "max_per_user",
-          "label": "Purchase Limit",
+          "label": "Max Purchasable per User",
           "type": "integer"
         },
         {
