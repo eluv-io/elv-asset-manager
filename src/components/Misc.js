@@ -78,7 +78,7 @@ export const HandleFilterChange = function(event, onChange) {
   this.setState({filter: event.target.value});
 
   this.filterTimeout = setTimeout(() => {
-    this.setState({activeFilter: this.state.filter});
+    this.setState({activeFilter: this.state.filter.toLowerCase()});
     this.ChangePage(1, onChange);
   }, 250);
 };
