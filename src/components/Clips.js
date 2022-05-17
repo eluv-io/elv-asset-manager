@@ -266,12 +266,12 @@ class Clips extends React.Component {
                 Update={() => this.props.formStore.UpdateClip({
                   key: this.props.storeKey,
                   playlistIndex: this.props.playlistIndex,
-                  index: this.props.formStore.ClipOriginalIndex({id: clip.id, key: this.props.storeKey})
+                  index: this.props.formStore.ClipOriginalIndex({versionHash: clip.versionHash, key: this.props.storeKey})
                 })}
                 Remove={() => this.props.formStore.RemoveClip({
                   key: this.props.storeKey,
                   playlistIndex: this.props.playlistIndex,
-                  index: this.props.formStore.ClipOriginalIndex({id: clip.id, key: this.props.storeKey})
+                  index: this.props.formStore.ClipOriginalIndex({versionHash: clip.versionHash, key: this.props.storeKey})
                 })}
                 OpenObjectLink={this.props.rootStore.OpenObjectLink}
               />

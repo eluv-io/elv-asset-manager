@@ -645,12 +645,18 @@ class FormStore {
   }
 
   @action.bound
-  ClipOriginalIndex({id, key}) {
+  ClipOriginalIndex({versionHash, key}) {
     let originalIndex;
+    let objectId;
+    if(versionHash) objectId = this.rootStore.client.utils.DecodeVersionHash(versionHash).objectId;
     const clips = (key === "searchables") ? this.currentLocalizedData.searchables : this.currentLocalizedData.assets[key];
 
-    clips.forEach((searchable, i) => {
-      if(searchable.id === id) originalIndex = i;
+    clips.forEach((clip, i) => {
+      const clipObjectId = this.rootStore.client.utils.DecodeVersionHash(clip.versionHash).objectId;
+
+      if(clipObjectId === objectId) {
+        originalIndex = i;
+      }
     });
 
     return originalIndex;
@@ -1043,7 +1049,7 @@ class FormStore {
     }
 
     this.targets[versionHash] = {
-      id: assetMetadata.ip_title_id,
+      id: assetMetadata.ip_title_id || "",
       assetType: assetMetadata.asset_type,
       title: assetMetadata.title || assetMetadata.display_title,
       displayTitle: assetMetadata.display_title || assetMetadata.title,

@@ -94,7 +94,7 @@ class Searchables extends React.Component {
               <div className="asset-form-clip">
                 <div></div>
                 <div></div>
-                { this.SortableHeader("ipTitleId", "IP Title ID", "Searchables") }
+                { this.SortableHeader("id", "IP Title ID", "Searchables") }
                 { this.SortableHeader("versionHash", "Version Hash", "Searchables") }
                 <div></div>
                 <div></div>
@@ -109,13 +109,13 @@ class Searchables extends React.Component {
                 length={clips.length}
                 Update={() => this.props.formStore.UpdateClip({
                   key: "searchables",
-                  index: this.props.formStore.ClipOriginalIndex({id: clip.id, key: "searchables"}),
+                  index: this.props.formStore.ClipOriginalIndex({versionHash: clip.versionHash, key: "searchables"}),
                   clips: this.Paged(clips)
                 })}
                 Remove={() => {
                   this.props.formStore.RemoveClip({
                     key: "searchables",
-                    index: this.props.formStore.ClipOriginalIndex({id: clip.id, key: "searchables"}),
+                    index: this.props.formStore.ClipOriginalIndex({versionHash: clip.versionHash, key: "searchables"}),
                     clips
                   });
                 }}
