@@ -143,18 +143,6 @@ const MarketplaceSpec = {
           ]
         },
         {
-          "label": "Default Font",
-          "name": "font",
-          "type": "select",
-          "unless": "./color_scheme",
-          "unless_value": "Custom",
-          "options": [
-            "Helvetica Neue",
-            "Inter",
-            "Selawik"
-          ]
-        },
-        {
           "name": "text_justification",
           "type": "select",
           "default_value": "Left",
@@ -595,7 +583,7 @@ const MarketplaceSpec = {
         },
         {
           "name": "collection_subheader",
-          "type": "text"
+          "type": "textarea"
         },
         {
           "extensions": imageTypes,
