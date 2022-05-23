@@ -359,7 +359,7 @@ const NFTTemplateSpec = {
             },
             {
               "name": "reveal_animation_mobile",
-              "label": "Open Complete Animation (Mobile)",
+              "label": "Reveal Animation (Mobile)",
               "type": "fabric_link",
               "video_preview": true
             },
