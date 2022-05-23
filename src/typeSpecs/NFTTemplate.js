@@ -342,6 +342,25 @@ const NFTTemplateSpec = {
             {
               "name": "open_animation",
               "type": "fabric_link",
+              "hint": "Looping video that will play while pack is opening",
+              "video_preview": true
+            },
+            {
+              "name": "open_animation_mobile",
+              "label": "Open Animation (Mobile)",
+              "type": "fabric_link",
+              "video_preview": true
+            },
+            {
+              "name": "open_complete_animation",
+              "type": "fabric_link",
+              "hint": "Video that will play after pack has opened and before displaying results",
+              "video_preview": true
+            },
+            {
+              "name": "open_complete_animation_mobile",
+              "label": "Open Complete Animation (Mobile)",
+              "type": "fabric_link",
               "video_preview": true
             },
             {
