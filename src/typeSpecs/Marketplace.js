@@ -508,6 +508,22 @@ const MarketplaceSpec = {
           "hint": "If specified, this video will play on the status screen after a purchase is made until minting is complete"
         },
         {
+          "name": "purchase_animation_mobile",
+          "type": "fabric_link",
+          "video_preview": true
+        },
+        {
+          "name": "reveal_animation",
+          "type": "fabric_link",
+          "video_preview": true,
+          "hint": "If specified, this video will play after minting has finished and before displaying results"
+        },
+        {
+          "name": "reveal_animation_mobile",
+          "type": "fabric_link",
+          "video_preview": true
+        },
+        {
           "name": "sections",
           "type": "list",
           "fields": [
