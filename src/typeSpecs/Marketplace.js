@@ -502,6 +502,12 @@ const MarketplaceSpec = {
           "type": "text"
         },
         {
+          "name": "hide_text",
+          "label": "Hide Default Text",
+          "default_value": false,
+          "hint": "If specified, the default text displayed while opening the pack will be hidden and the purchase animation will be larger"
+        },
+        {
           "name": "purchase_animation",
           "type": "fabric_link",
           "video_preview": true,

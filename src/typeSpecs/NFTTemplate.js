@@ -340,6 +340,12 @@ const NFTTemplateSpec = {
               "type": "checkbox"
             },
             {
+              "name": "hide_text",
+              "label": "Hide Default Text",
+              "default_value": false,
+              "hint": "If specified, the default text displayed while opening the pack will be hidden and the open animation will be larger"
+            },
+            {
               "name": "open_animation",
               "type": "fabric_link",
               "hint": "Looping video that will play while pack is opening",
