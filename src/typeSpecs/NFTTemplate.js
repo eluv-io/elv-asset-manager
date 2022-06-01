@@ -340,8 +340,14 @@ const NFTTemplateSpec = {
               "type": "checkbox"
             },
             {
+              "name": "Open Button Text",
+              "type": "text",
+              "default_value": "Open Pack"
+            },
+            {
               "name": "hide_text",
               "label": "Hide Default Text",
+              "type": "checkbox",
               "default_value": false,
               "hint": "If specified, the default text displayed while opening the pack will be hidden and the open animation will be larger"
             },

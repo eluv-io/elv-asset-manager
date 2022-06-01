@@ -505,7 +505,7 @@ const MarketplaceSpec = {
           "name": "hide_text",
           "label": "Hide Default Text",
           "default_value": false,
-          "hint": "If specified, the default text displayed while opening the pack will be hidden and the purchase animation will be larger"
+          "hint": "If specified, the default text displayed while awaiting minting will be hidden and the purchase animation will be larger"
         },
         {
           "name": "purchase_animation",
