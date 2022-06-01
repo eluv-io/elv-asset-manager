@@ -340,7 +340,7 @@ const NFTTemplateSpec = {
               "type": "checkbox"
             },
             {
-              "name": "Open Button Text",
+              "name": "open_button_text",
               "type": "text",
               "default_value": "Open Pack"
             },
