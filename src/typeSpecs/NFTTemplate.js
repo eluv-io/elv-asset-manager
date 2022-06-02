@@ -191,6 +191,12 @@ const NFTTemplateSpec = {
           "type": "color"
         },
         {
+          "name": "style",
+          "label": "Style Variant",
+          "type": "text",
+          "hint": "If specified, this will be added to the HTML container class when this NFT is displayed (e.g. 'card-container--variant-(style)', 'featured-item__icon-container--variant-(style)' 'feature-gallery__icon-container--variant-(style)')"
+        },
+        {
           "name": "enable_watermark",
           "type": "checkbox",
         },
