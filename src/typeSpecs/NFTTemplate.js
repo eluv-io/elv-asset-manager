@@ -245,7 +245,8 @@ const NFTTemplateSpec = {
                 "Video",
                 "Audio",
                 "Image",
-                "Ebook"
+                "Ebook",
+                "HTML"
               ]
             },
             {
@@ -257,8 +258,24 @@ const NFTTemplateSpec = {
             {
               "name": "media_file",
               "type": "file",
-              "hint": "If this media is displayed via file, like an image or an Ebook, select the file to display"
+              "hint": "If this media is displayed via file, like an image, Ebook or HTML, select the file to display"
             },
+            {
+              "name": "parameters",
+              "type": "list",
+              "depends_on": "./media_type",
+              "depends_on_value": "HTML",
+              "fields": [
+                {
+                  "name": "name",
+                  "type": "text"
+                },
+                {
+                  "name": "value",
+                  "type": "text"
+                }
+              ]
+            }
           ]
         },
         {

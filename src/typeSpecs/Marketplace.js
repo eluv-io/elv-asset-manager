@@ -503,7 +503,7 @@ const MarketplaceSpec = {
         },
         {
           "name": "hide_text",
-          "label": "Hide Default Text",
+          "label": "Hide Default Text During Animation",
           "default_value": false,
           "hint": "If specified, the default text displayed while awaiting minting will be hidden and the purchase animation will be larger"
         },
@@ -586,6 +586,60 @@ const MarketplaceSpec = {
       "name": "header_collections",
       "type": "header"
     },
+
+    {
+      "name": "collections_info",
+      "type": "subsection",
+      "fields": [
+        {
+          "name": "header",
+          "type": "text",
+          "default_value": "Explore Collections"
+        },
+        {
+          "name": "subheader",
+          "type": "textarea"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "icon",
+          "type": "file"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "banner",
+          "type": "file"
+        },
+        {
+          "name": "hide_text",
+          "label": "Hide Default Text During Animation",
+          "default_value": false,
+          "hint": "If specified, the default text displayed while awaiting minting will be hidden and the purchase animation will be larger"
+        },
+        {
+          "name": "redeem_animation",
+          "type": "fabric_link",
+          "video_preview": true,
+          "hint": "If specified, this video will play on the status screen after a collection is redeemed until minting is complete. This can be overridden for individual collections."
+        },
+        {
+          "name": "redeem_animation_mobile",
+          "type": "fabric_link",
+          "video_preview": true
+        },
+        {
+          "name": "reveal_animation",
+          "type": "fabric_link",
+          "video_preview": true,
+          "hint": "If specified, this video will play after minting has finished and before displaying results. This can be overridden for individual collections."
+        },
+        {
+          "name": "reveal_animation_mobile",
+          "type": "fabric_link",
+          "video_preview": true
+        }
+      ]
+    },
     {
       "name": "collections",
       "type": "list",
@@ -613,55 +667,9 @@ const MarketplaceSpec = {
           "type": "file"
         },
         {
-          "name": "placeholder",
-          "type": "subsection",
-          "hint": "Used for explicitly unspecified item slots (<None>). Will not override item definitions.",
-          "fields": [
-            {
-              "name": "name",
-              "type": "text"
-            },
-            {
-              "name": "description",
-              "type": "text"
-            },
-            {
-              "extensions": imageTypes,
-              "name": "image",
-              "type": "file"
-            }
-          ]
-        },
-        {
-          "name": "collection_info_modal",
-          "type": "subsection",
-          "fields": [
-            {
-              "name": "show",
-              "type": "checkbox",
-              "default_value": false,
-              "hint": "The modal will only be displayed if this is checked"
-            },
-            {
-              "name": "message",
-              "type": "rich_text"
-            },
-            {
-              "name": "image",
-              "type": "file",
-              "extensions": imageTypes
-            },
-            {
-              "name": "background_image",
-              "type": "file",
-              "extensions": imageTypes
-            },
-            {
-              "name": "button_text",
-              "type": "text",
-              "hint": "Text for the button at the bottom of the modal. By default, it will be 'Create Wallet' if login is required for the next drop, otherwise it will be 'Join the Drop'"
-            }
-          ]
+          "extensions": imageTypes,
+          "name": "collection_banner",
+          "type": "file"
         },
         {
           "name": "items",
@@ -683,6 +691,34 @@ const MarketplaceSpec = {
           "label_key": "name",
           "value_key": "sku",
           "allow_null": true
+        },
+        {
+          "name": "hide_text",
+          "label": "Hide Default Text During Animation",
+          "default_value": false,
+          "hint": "If specified, the default text displayed while awaiting minting will be hidden and the purchase animation will be larger"
+        },
+        {
+          "name": "redeem_animation",
+          "type": "fabric_link",
+          "video_preview": true,
+          "hint": "If specified, this video will play on the status screen after a collection is redeemed until minting is complete. This will override the animation selected in Collections Info above."
+        },
+        {
+          "name": "redeem_animation_mobile",
+          "type": "fabric_link",
+          "video_preview": true
+        },
+        {
+          "name": "reveal_animation",
+          "type": "fabric_link",
+          "video_preview": true,
+          "hint": "If specified, this video will play after minting has finished and before displaying results. This will override the animation selected in Collections Info above."
+        },
+        {
+          "name": "reveal_animation_mobile",
+          "type": "fabric_link",
+          "video_preview": true
         }
       ]
     }
