@@ -100,13 +100,17 @@ const NFTTemplateSpec = {
             "Video",
             "Audio",
             "Image",
-            "Ebook"
+            "Ebook",
+            "HTML"
           ]
         },
         {
           "name": "media",
+          "label": "Media File",
           "type": "file",
-          "hint": "Additional media for this NFT, for example the Ebook file."
+          "hint": "If this media is displayed via file, like an image, Ebook or HTML, select the file to display",
+          "depends_on": "./media_type",
+          "depends_on_value": ["Image", "Ebook", "HTML"]
         },
         {
           "name": "address",
@@ -201,6 +205,12 @@ const NFTTemplateSpec = {
           "type": "checkbox",
         },
         {
+          "name": "hide_additional_media_player_controls",
+          "type": "checkbox",
+          "hint": "If checked, the player controls below additional media on the NFT details page will be hidden for this NFT",
+          "default_value": false
+        },
+        {
           "name": "additional_media",
           "type": "list",
           "fields": [
@@ -253,12 +263,16 @@ const NFTTemplateSpec = {
               "name": "media_link",
               "type": "fabric_link",
               "hint": "For video content, select the playable content object",
-              "video_preview": true
+              "video_preview": true,
+              "depends_on": "./media_type",
+              "depends_on_value": ["Video", "Audio"]
             },
             {
               "name": "media_file",
               "type": "file",
-              "hint": "If this media is displayed via file, like an image, Ebook or HTML, select the file to display"
+              "hint": "If this media is displayed via file, like an image, Ebook or HTML, select the file to display",
+              "depends_on": "./media_type",
+              "depends_on_value": ["Image", "Ebook", "HTML"]
             },
             {
               "name": "parameters",
