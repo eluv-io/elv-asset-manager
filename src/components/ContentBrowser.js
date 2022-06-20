@@ -4,7 +4,7 @@ import React from "react";
 import AsyncComponent from "./AsyncComponent";
 import {inject, observer} from "mobx-react";
 import PropTypes from "prop-types";
-import {Action, LoadingElement, Maybe, onEnterPressed} from "elv-components-js";
+import {Action, LoadingElement, onEnterPressed} from "elv-components-js";
 
 @inject("contentStore")
 @observer
@@ -41,19 +41,18 @@ class BrowserList extends React.Component {
 
     return (
       <div className="browser-pagination">
-        {Maybe(
-          this.state.page > 1,
-          <Action className="secondary prev-button" onClick={() => ChangePage(this.state.page - 1)}>
-            Previous
-          </Action>
-        )}
-        Page {this.state.page} of {pages}
-        {Maybe(
-          this.state.page < pages,
-          <Action className="secondary next-button" onClick={() => ChangePage(this.state.page + 1)}>
-            Next
-          </Action>
-        )}
+        <Action className={`secondary prev-button ${this.state.page > 1 ? "visible" : "hidden"}`} onClick={() => ChangePage(this.state.page - 1)}>
+          Previous
+        </Action>
+
+        {
+          this.FilteredList().length > 0 ?
+            `Page ${this.state.page} of ${pages}` : null
+        }
+
+        <Action className={`secondary next-button ${this.state.page < pages ? "visible" : "hidden"}`} onClick={() => ChangePage(this.state.page + 1)}>
+          Next
+        </Action>
       </div>
     );
   }
@@ -112,12 +111,55 @@ class BrowserList extends React.Component {
     );
   }
 
-  render() {
+  FilteredList = () => {
     let list = this.props.list || [];
+
     if(!this.props.paginated) {
       list = list.filter(({name}) => name.toLowerCase().includes(this.state.filter.toLowerCase()));
     }
 
+    return list;
+  };
+
+  ListView = () => {
+    if(this.FilteredList().length === 0) {
+      return <div className="no-results">No results</div>;
+    }
+
+    return (
+      <ul className={`browser ${this.props.hashes ? "mono" : ""}`}>
+        {this.FilteredList().map(({id, name, objectName, objectDescription, assetType, titleType}) => {
+          let disabled =
+            (this.props.assetTypes && this.props.assetTypes.length > 0 && !this.props.assetTypes.includes(assetType)) ||
+            (this.props.titleTypes && this.props.titleTypes.length > 0 && !this.props.titleTypes.includes(titleType));
+
+          let title = objectName ? `${objectName}\n\n${id}${objectDescription ? `\n\n${objectDescription}` : ""}` : id;
+          if(disabled) {
+            title = title + "\n\nTitle type or asset type not allowed for this list:";
+            title = title + `\n\tTitle Type: ${titleType || "<not specified>"}`;
+            title = title + `\n\tAllowed Title Types: ${(this.props.titleTypes || []).join(", ")}`;
+            title = title + `\n\tAsset Type: ${assetType || "<not specified>"}`;
+            title = title + `\n\tAllowed Asset Types: ${(this.props.assetTypes || []).join(", ")}`;
+          }
+
+          return (
+            <li key={`browse-entry-${id}`}>
+              <button
+                disabled={disabled}
+                title={title}
+                onClick={() => this.props.Select({name, id})}
+              >
+                <div>{name}</div>
+                {assetType ? <div className="hint">{assetType} {titleType ? ` | ${titleType}` : ""}</div> : null}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
+
+  render() {
     return (
       <div className="browser-container">
         <h3>{this.props.header}</h3>
@@ -128,37 +170,7 @@ class BrowserList extends React.Component {
         <AsyncComponent
           key={`browser-listing-version-${this.state.version}`}
           Load={() => this.props.Load({page: this.state.page, filter: this.state.filter})}
-          render={() => (
-            <ul className={`browser ${this.props.hashes ? "mono" : ""}`}>
-              {list.map(({id, name, objectName, objectDescription, assetType, titleType}) => {
-                let disabled =
-                  (this.props.assetTypes && this.props.assetTypes.length > 0 && !this.props.assetTypes.includes(assetType)) ||
-                  (this.props.titleTypes && this.props.titleTypes.length > 0 && !this.props.titleTypes.includes(titleType));
-
-                let title = objectName ? `${objectName}\n\n${id}${objectDescription ? `\n\n${objectDescription}` : ""}` : id;
-                if(disabled) {
-                  title = title + "\n\nTitle type or asset type not allowed for this list:";
-                  title = title + `\n\tTitle Type: ${titleType || "<not specified>"}`;
-                  title = title + `\n\tAllowed Title Types: ${(this.props.titleTypes || []).join(", ")}`;
-                  title = title + `\n\tAsset Type: ${assetType || "<not specified>"}`;
-                  title = title + `\n\tAllowed Asset Types: ${(this.props.assetTypes || []).join(", ")}`;
-                }
-
-                return (
-                  <li key={`browse-entry-${id}`}>
-                    <button
-                      disabled={disabled}
-                      title={title}
-                      onClick={() => this.props.Select({name, id})}
-                    >
-                      <div>{name}</div>
-                      {assetType ? <div className="hint">{assetType} {titleType ? ` | ${titleType}` : ""}</div> : null}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+          render={this.ListView}
         />
       </div>
     );

@@ -555,15 +555,30 @@ class FormStore {
   @action.bound
   AddSearchable = flow(function * ({versionHash}) {
     yield this.RetrieveAsset(versionHash);
+    const objectId = this.rootStore.client.utils.DecodeVersionHash(versionHash).objectId;
 
     // Prevent duplicates
-    if(this.currentLocalizedData.searchables.find(clip => clip.versionHash === versionHash)) {
-      return;
-    }
+    const existingClip = this.currentLocalizedData.searchables.find(clip => {
+      return objectId === (this.rootStore.client.utils.DecodeVersionHash(clip.versionHash).objectId);
+    });
+
+    if(existingClip) return;
 
     this.currentLocalizedData.searchables.push({
       versionHash,
       id: this.targets[versionHash].id
+    });
+
+    const metadata = yield this.rootStore.client.ContentObjectMetadata({
+      versionHash,
+      metadataSubtree: "public"
+    });
+
+    yield this.rootStore.client.SendMessage({
+      options: {
+        operation: "Notification",
+        message: `Successfully added searchable: ${metadata.name || versionHash}`
+      }
     });
   });
 
