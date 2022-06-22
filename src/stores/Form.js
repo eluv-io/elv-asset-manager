@@ -558,6 +558,9 @@ class FormStore {
     const objectId = this.rootStore.client.utils.DecodeVersionHash(versionHash).objectId;
 
     // Prevent duplicates
+    if(this.currentLocalizedData.searchables.find(clip => clip.versionHash === versionHash)) {
+      return;
+    }
     const existingClip = this.currentLocalizedData.searchables.find(clip => {
       return objectId === (this.rootStore.client.utils.DecodeVersionHash(clip.versionHash).objectId);
     });
@@ -574,12 +577,7 @@ class FormStore {
       metadataSubtree: "public"
     });
 
-    yield this.rootStore.client.SendMessage({
-      options: {
-        operation: "Notification",
-        message: `Successfully added searchable: ${metadata.name || versionHash}`
-      }
-    });
+    rootStore.SetMessage(`Successfully added searchable: ${metadata.name || versionHash}`);
   });
 
   // Clips/trailers

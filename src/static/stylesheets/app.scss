@@ -353,8 +353,7 @@ button {
   border-bottom: 1px solid $elv-color-lightgray;
   display: flex;
   flex-direction: column;
-  margin-top: $elv-spacing-m;
-  padding: $elv-spacing-m $elv-spacing-m $elv-spacing-xl;
+  padding: 0 $elv-spacing-m $elv-spacing-xl;
 
   .asset-form-separator {
     background: $elv-color-lightgray;
@@ -891,6 +890,33 @@ select {
         font-size: $elv-font-m;
         padding-left: $elv-spacing-xs;
       }
+    }
+  }
+}
+
+@keyframes FadeOut {
+  95% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.notification-container {
+  align-items: center;
+  font-size: 0.8rem;
+
+  .message {
+    animation: FadeOut 5s linear forwards;
+    color: $elv-color-mediumblue;
+    display: flex;
+    height: 2.5rem;
+    justify-content: center;
+
+    &.empty {
+      visibility: hidden;
     }
   }
 }

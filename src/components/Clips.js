@@ -83,6 +83,14 @@ export const Clip = ({
     );
   }
 
+  const TitleText = () => {
+    if(title) {
+      return <div title={title}>{title} {id ? `(${id})` : ""}</div>;
+    } else {
+      return <div title={id}>{id || ""}</div>;
+    }
+  };
+
   return (
     <React.Fragment>
       <div
@@ -106,7 +114,7 @@ export const Clip = ({
           onClick={() => isPlayable ? setShowPreview(!showPreview) : ""}
         />
         <div className="hint">{assetType}</div>
-        <div title={title}>{title} {id ? `(${id})` : ""}</div>
+        {TitleText()}
         <div className="clip-slug-hash" title={`${slug || ""} ${versionHash}`}>{slug || versionHash}</div>
         { defaultButton }
         { orderButtons }

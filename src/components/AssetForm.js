@@ -261,8 +261,22 @@ class AssetForm extends React.Component {
     );
   }
 
+  Notification = () => {
+    const { message, key } = this.props.rootStore.message;
+    let notification;
+
+    if(message) {
+      notification = <div key={`message-${key}`} className="message">{ message }</div>;
+    } else {
+      notification = <div className="message empty"></div>;
+    }
+
+    return notification;
+  }
+
   render() {
     const tabs = this.Tabs();
+
     return (
       <div className="asset-form">
         <div className="sticky app-header">
@@ -332,6 +346,9 @@ class AssetForm extends React.Component {
           )
         }
         <div className="asset-form-container">
+          <div className="notification-container">
+            { this.Notification() }
+          </div>
           { this.CurentForm() }
         </div>
       </div>

@@ -44,6 +44,8 @@ class RootStore {
   @observable updating = false;
   @observable updateStatus;
 
+  @observable message = {};
+
   constructor() {
     this.channelStore = new ChannelStore(this);
     this.contentStore = new ContentStore(this);
@@ -172,6 +174,11 @@ class RootStore {
       yield this.channelStore.Initialize();
     }
   });
+
+  @action.bound
+  SetMessage(message) {
+    this.message = { message, key: Math.random() };
+  }
 
   @action.bound
   LinkStatus = flow(function * () {
