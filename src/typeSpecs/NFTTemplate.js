@@ -113,7 +113,7 @@ const NFTTemplateSpec = {
           "depends_on_value": ["Image", "Ebook", "HTML"]
         },
         {
-          "name": "parameters",
+          "name": "media_parameters",
           "type": "list",
           "depends_on": "./media_type",
           "depends_on_value": "HTML",
