@@ -4,7 +4,7 @@ import React from "react";
 import AsyncComponent from "./AsyncComponent";
 import {inject, observer} from "mobx-react";
 import PropTypes from "prop-types";
-import {Action, LoadingElement, onEnterPressed} from "elv-components-js";
+import {Action, Confirm, LoadingElement, onEnterPressed} from "elv-components-js";
 
 @inject("contentStore")
 @observer
@@ -68,7 +68,13 @@ class BrowserList extends React.Component {
         return;
       }
 
-      this.props.QuickSelect({name, libraryId, objectId, versionHash});
+      this.props.QuickSelect({
+        name,
+        libraryId,
+        objectId,
+        versionHash,
+        confirm: true
+      });
     };
 
     return (
@@ -214,7 +220,7 @@ class ContentBrowser extends React.Component {
     this.Update = this.Update.bind(this);
   }
 
-  async Update({name, libraryId, objectId, versionHash, offering}) {
+  async Update({name, libraryId, objectId, versionHash, offering, confirm=false}) {
     this.setState({loading: true});
 
     try {
@@ -229,7 +235,23 @@ class ContentBrowser extends React.Component {
           name = (await this.props.contentStore.LookupContent(versionHash || objectId)).name;
         }
 
-        await this.props.onComplete({name, libraryId, objectId, versionHash, offering});
+        if(confirm) {
+          await Confirm({
+            message: `Are you sure you want to select ${name}?`,
+            onConfirm: async () => {
+              await this.props.onComplete({name, libraryId, objectId, versionHash, offering});
+            },
+            onCancel: () => {
+              name = undefined;
+              libraryId = undefined;
+              objectId = undefined;
+              versionHash = undefined;
+              offering = undefined;
+            }
+          });
+        } else {
+          await this.props.onComplete({name, libraryId, objectId, versionHash, offering});
+        }
       }
 
       this.setState({

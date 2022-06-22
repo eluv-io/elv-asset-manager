@@ -44,7 +44,6 @@ class Searchables extends React.Component {
         <Modal
           className="asset-form-modal"
           closable={true}
-          OnClickOutside={this.CloseModal}
         >
           <ContentBrowser
             header={"Select Searchables"}
