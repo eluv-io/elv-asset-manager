@@ -113,6 +113,22 @@ const NFTTemplateSpec = {
           "depends_on_value": ["Image", "Ebook", "HTML"]
         },
         {
+          "name": "parameters",
+          "type": "list",
+          "depends_on": "./media_type",
+          "depends_on_value": "HTML",
+          "fields": [
+            {
+              "name": "name",
+              "type": "text"
+            },
+            {
+              "name": "value",
+              "type": "text"
+            }
+          ]
+        },
+        {
           "name": "address",
           "label": "NFT Contract Address",
           "type": "text"
