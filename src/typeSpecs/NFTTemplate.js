@@ -265,6 +265,30 @@ const NFTTemplateSpec = {
               "default_value": false
             },
             {
+              "name": "use_mint_ordinal_in_token_id",
+              "label": "Use Mint Ordinal in Token ID",
+              "type": "checkbox",
+              "default_value": true
+            },
+            {
+              "name": "shuffle_token_id",
+              "label": "Shuffle Token ID",
+              "type": "checkbox",
+              "default_value": true
+            },
+            {
+              "name": "id_format",
+              "label": "ID Format",
+              "type": "select",
+              "default_value": "token_id/cap",
+              "options": [
+                "token_id/cap",
+                "token_id",
+                "ordinal/cap",
+                "ordinal"
+              ]
+            },
+            {
               "name": "media_type",
               "type": "select",
               "options": [
