@@ -280,10 +280,10 @@ const NFTTemplateSpec = {
               "name": "id_format",
               "label": "ID Format",
               "type": "select",
-              "default_value": "token_id/cap",
+              "default_value": "token_id",
               "options": [
-                "token_id/cap",
                 "token_id",
+                "token_id/cap",
                 "ordinal/cap",
                 "ordinal"
               ]
