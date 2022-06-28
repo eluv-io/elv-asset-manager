@@ -312,6 +312,10 @@ class RecursiveField extends React.Component {
           />
         );
       } else if(fieldType === "multiselect" || fieldType === "reference_multiselect") {
+        if(!entry[field.name]) {
+          Update(field.name, []);
+        }
+
         let options = localization.options || field.options;
         if(fieldType === "reference_multiselect") {
           options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || [])
