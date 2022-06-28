@@ -160,11 +160,6 @@ const NFTTemplateSpec = {
           "hint": "Square image recommended"
         },
         {
-          "name": "generative",
-          "type": "checkbox",
-          "default_value": false
-        },
-        {
           "name": "playable",
           "type": "checkbox",
           "default_value": true
@@ -173,6 +168,35 @@ const NFTTemplateSpec = {
           "name": "has_audio",
           "type": "checkbox",
           "default_value": false
+        },
+        {
+          "name": "generative",
+          "type": "checkbox",
+          "default_value": false
+        },
+        {
+          "name": "use_mint_ordinal_in_token_id",
+          "label": "Use Mint Ordinal in Token ID",
+          "type": "checkbox",
+          "default_value": true
+        },
+        {
+          "name": "shuffle_token_id",
+          "label": "Shuffle Token ID",
+          "type": "checkbox",
+          "default_value": true
+        },
+        {
+          "name": "id_format",
+          "label": "ID Format",
+          "type": "select",
+          "default_value": "token_id",
+          "options": [
+            "token_id",
+            "token_id/cap",
+            "ordinal/cap",
+            "ordinal"
+          ]
         },
         {
           "name": "token_uri",
@@ -206,10 +230,7 @@ const NFTTemplateSpec = {
           "autoplay": true,
           "check_has_audio_flag": true
         },
-        {
-          "name": "background_color",
-          "type": "color"
-        },
+
         {
           "name": "style",
           "label": "Style Variant",
@@ -263,30 +284,6 @@ const NFTTemplateSpec = {
               "name": "requires_permissions",
               "type": "checkbox",
               "default_value": false
-            },
-            {
-              "name": "use_mint_ordinal_in_token_id",
-              "label": "Use Mint Ordinal in Token ID",
-              "type": "checkbox",
-              "default_value": true
-            },
-            {
-              "name": "shuffle_token_id",
-              "label": "Shuffle Token ID",
-              "type": "checkbox",
-              "default_value": true
-            },
-            {
-              "name": "id_format",
-              "label": "ID Format",
-              "type": "select",
-              "default_value": "token_id",
-              "options": [
-                "token_id",
-                "token_id/cap",
-                "ordinal/cap",
-                "ordinal"
-              ]
             },
             {
               "name": "media_type",
