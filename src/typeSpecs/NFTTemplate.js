@@ -64,6 +64,18 @@ const NFTTemplateSpec = {
           "label": "Fabric Key ID",
           "type": "text"
         },
+        {
+          "name": "use_mint_ordinal_in_token_id",
+          "label": "Use Mint Ordinal in Token ID",
+          "type": "checkbox",
+          "default_value": true
+        },
+        {
+          "name": "shuffle_token_id",
+          "label": "Shuffle Token ID",
+          "type": "checkbox",
+          "default_value": true
+        }
       ]
     },
     {
@@ -173,18 +185,6 @@ const NFTTemplateSpec = {
           "name": "generative",
           "type": "checkbox",
           "default_value": false
-        },
-        {
-          "name": "use_mint_ordinal_in_token_id",
-          "label": "Use Mint Ordinal in Token ID",
-          "type": "checkbox",
-          "default_value": true
-        },
-        {
-          "name": "shuffle_token_id",
-          "label": "Shuffle Token ID",
-          "type": "checkbox",
-          "default_value": true
         },
         {
           "name": "id_format",
