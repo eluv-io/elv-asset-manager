@@ -428,12 +428,21 @@ const MarketplaceSpec = {
           "name": "show_if_unauthorized",
           "type": "checkbox",
           "default": false,
-          "hint": "If checked, this item will be shown even if permissions and the user doesn't have access."
+          "hint": "If checked, this item will be shown even if permissions and the user doesn't have access.",
+          "depends_on": "./requires_permissions"
+        },
+        {
+          "name": "permission_message",
+          "type": "string",
+          "default_value": "Private Sale",
+          "hint": "If permissions are required but the user does not have permission to purchase, this message will be shown at the bottom of the item.",
+          "depends_on": "./requires_permissions"
         },
         {
           "name": "permission_description",
           "type": "textarea",
-          "hint": "If permissions are required but the user does not have permission to purchase, this description will be shown."
+          "hint": "If permissions are required but the user does not have permission to purchase, this description will be shown on the item instead of the default description.",
+          "depends_on": "./requires_permissions"
         },
         {
           "name": "max_per_checkout",
