@@ -464,7 +464,7 @@ const NFTTemplateSpec = {
                     },
                     {
                       "name": "probability",
-                      "type": "number",
+                      "type": "integer",
                       "default_value": 0
                     }
                   ]
