@@ -170,6 +170,11 @@ class Info extends React.Component {
             onChange={enabled => this.props.specStore.TogglePermissionAssociation(enabled)}
           />
           <Checkbox
+            name="Show Indexer Settings"
+            value={this.props.specStore.showIndexerSettings}
+            onChange={enabled => this.props.specStore.ToggleIndexerSettings(enabled)}
+          />
+          <Checkbox
             name="Playable"
             value={this.props.specStore.playable}
             onChange={enabled => this.props.specStore.TogglePlayable(enabled)}

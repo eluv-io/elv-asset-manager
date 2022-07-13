@@ -90,6 +90,13 @@ const NFTTemplateSpec = {
           "type": "uuid"
         },
         {
+          "name": "test",
+          "label": "Test Mode",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If checked, this NFT will not be listable for sale"
+        },
+        {
           "name": "name",
           "type": "text"
         },

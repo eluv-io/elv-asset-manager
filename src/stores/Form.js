@@ -110,7 +110,7 @@ class FormStore {
   };
 
   @observable hideImageTab = false;
-  @observable associatePermissions = false;
+  @observable showIndexerSettings = false;
   @observable permissionsObject;
 
   @observable controls = [];
