@@ -255,6 +255,13 @@ const NFTTemplateSpec = {
           "default_value": false
         },
         {
+          "name": "test",
+          "label": "Test NFT",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If checked, this NFT will be marked as a test NFT"
+        },
+        {
           "name": "additional_media",
           "type": "list",
           "fields": [
