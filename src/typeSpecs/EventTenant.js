@@ -66,6 +66,12 @@ const eventTenantSpec = {
           "type": "list"
         },
         {
+          "fields": [],
+          "label": "Leaderboard Excluded Addresses",
+          "name": "leaderboard_excludes",
+          "type": "list"
+        },
+        {
           "hint": "Default royalty percentage for NFT transactions",
           "label": "Royalty",
           "name": "royalty",
