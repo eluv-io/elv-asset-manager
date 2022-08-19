@@ -290,8 +290,14 @@ const MarketplaceSpec = {
           "label": "Require Consent for Email Collection",
           "name": "require_consent",
           "type": "checkbox",
+          "default_value": true
+        },
+        {
+          "label": "Consent by Default",
+          "name": "default_consent",
+          "type": "checkbox",
           "default_value": true,
-          "unless": "./custom_consent/enabled"
+          "depends_on": "./require_consent"
         },
         {
           "name": "custom_consent",
