@@ -112,6 +112,7 @@ class FormStore {
   @observable hideImageTab = false;
   @observable showIndexerSettings = false;
   @observable permissionsObject;
+  @observable showMarketplacePreviewLink;
 
   @observable controls = [];
   @observable fileControls = [];
@@ -338,6 +339,7 @@ class FormStore {
       });
     this.controls = controls;
 
+    this.showMarketplacePreviewLink = config.show_marketplace_preview_link;
     this.associatePermissions = config.associate_permissions;
     this.availableAssetTypes = config.asset_types || DefaultSpec.asset_types;
     this.availableTitleTypes = config.title_types || DefaultSpec.title_types;

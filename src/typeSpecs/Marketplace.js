@@ -17,6 +17,7 @@ const MarketplaceSpec = {
   ],
   "controls": [],
   "associated_assets": [],
+  "show_marketplace_preview_link": true,
   "info_fields": [
     {
       "label": "Branding and Customization",
@@ -37,6 +38,12 @@ const MarketplaceSpec = {
       "name": "tenant_name",
       "type": "text",
       "required": true
+    },
+    {
+      "label": "Preview Password",
+      "name": "preview_password_digest",
+      "type": "password",
+      "hint": "Set a password to prevent viewing of unpublished changes by unauthorized users"
     },
     {
       "name": "branding",

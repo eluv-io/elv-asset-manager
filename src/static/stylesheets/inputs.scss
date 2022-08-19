@@ -1,3 +1,5 @@
+// sass-lint:disable class-name-format
+
 .odd {
   background-color: $elv-color-bg-light-dark;
 
@@ -30,6 +32,11 @@
     }
 
     &.-elv-multi-select {
+      max-width: 35rem;
+      min-width: 35rem;
+    }
+
+    & > .password-input__container {
       max-width: 35rem;
       min-width: 35rem;
     }
@@ -151,6 +158,36 @@
     font-size: 14px;
     letter-spacing: 1px;
     padding: 10px 0;
+  }
+}
+
+.password-input {
+  &__container {
+    display: flex;
+  }
+
+  &__input {
+    border: 1px solid $elv-color-gray;
+
+    &:disabled {
+      background: $elv-color-lightestgray;
+      border: 1px solid $elv-color-gray;
+    }
+  }
+
+  &__lock-button {
+    background: $elv-color-white;
+    border: 1px solid $elv-color-gray;
+    cursor: pointer;
+    height: 32px;
+    margin-left: $elv-spacing-xxs;
+    padding: 5px;
+    width: 32px;
+
+    svg {
+      height: 100%;
+      width: 100%;
+    }
   }
 }
 

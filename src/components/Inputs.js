@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {runInAction, toJS} from "mobx";
 import {inject, observer} from "mobx-react";
 import {
@@ -32,6 +32,8 @@ import FileIcon from "../static/icons/file.svg";
 import ObjectSelection from "./ObjectSelection";
 import TextEditor from "./TextEditor";
 import UpdateLinkIcon from "../static/icons/arrow-up-circle.svg";
+import LockIcon from "../static/icons/lock.svg";
+import UnlockIcon from "../static/icons/unlock.svg";
 
 export const ReferencePathElements = (PATH, reference) => {
   if(!reference) { return []; }
@@ -120,6 +122,52 @@ const InitializeField = ({fields, defaultValue}) => {
   return newValue;
 };
 
+const SHA512 = async (str) => {
+  const buf = await crypto.subtle.digest("SHA-512", new TextEncoder("utf-8").encode(str));
+  return Array.prototype.map.call(new Uint8Array(buf), x=>(("00"+x.toString(16)).slice(-2))).join("");
+};
+
+let hashTimeout;
+export const PasswordInput = ({label, name, value, onChange, hidden=false, required=false, className=""}) => {
+  if(hidden) { return null; }
+
+  const [locked, setLocked] = useState(!!value);
+  const [password, setPassword] = useState("");
+
+  return (
+    <div className={`-elv-input password-input ${className}`}>
+      <label htmlFor={name}>{label || FormatName(name)}</label>
+      <div className="password-input__container">
+        <input
+          key={`password-input-${locked}`}
+          type="password"
+          required={required}
+          name={name}
+          value={locked ? password || "**********" : password}
+          disabled={locked}
+          onChange={event => {
+            const newPassword = event.target.value;
+            setPassword(newPassword);
+
+            clearTimeout(hashTimeout);
+            hashTimeout = setTimeout(async () => {
+              onChange(await SHA512(newPassword));
+            }, 500);
+          }}
+          className="-elv-input password-input__input"
+        />
+        <button
+          onClick={() => setLocked(!locked)}
+          className="password-input__lock-button"
+        >
+          <ImageIcon label={locked ? "Unlock Password Field" : "Lock Password Field"} icon={locked ? LockIcon : UnlockIcon} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
 @inject("rootStore")
 @inject("contentStore")
 @observer
@@ -190,6 +238,17 @@ class RecursiveField extends React.Component {
             key={key}
             name={field.name}
             label={hintLabel || field.label}
+            value={entry[field.name] || ""}
+            onChange={newValue => Update(field.name, newValue)}
+          />
+        );
+      } else if(fieldType === "password") {
+        return (
+          <PasswordInput
+            key={key}
+            required
+            name={field.name}
+            label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
             value={entry[field.name] || ""}
             onChange={newValue => Update(field.name, newValue)}
           />
