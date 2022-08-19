@@ -283,7 +283,57 @@ const MarketplaceSpec = {
           "label": "Require Consent for Email Collection",
           "name": "require_consent",
           "type": "checkbox",
-          "default_value": true
+          "default_value": true,
+          "unless": "./custom_consent/enabled"
+        },
+        {
+          "name": "custom_consent",
+          "type": "subsection",
+          "fields": [
+            {
+              "label": "Use Custom Consent Options",
+              "name": "enabled",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "consent_modal_header",
+              "type": "textarea",
+              "depends_on": "./enabled"
+            },
+            {
+              "name": "button_text",
+              "type": "text",
+              "default_value": "I Accept",
+              "depends_on": "./enabled"
+            },
+            {
+              "label": "Custom Consent Options",
+              "name": "options",
+              "type": "list",
+              "depends_on": "./enabled",
+              "fields": [
+                {
+                  "name": "key",
+                  "type": "text",
+                },
+                {
+                  "name": "message",
+                  "type": "rich_text"
+                },
+                {
+                  "name": "initially_checked",
+                  "type": "checkbox",
+                  "default_value": false,
+                },
+                {
+                  "name": "required",
+                  "type": "checkbox",
+                  "default_value": false
+                }
+              ]
+            }
+          ]
         },
         {
           "name": "require_email_verification",
@@ -293,12 +343,6 @@ const MarketplaceSpec = {
         {
           "name": "disable_third_party",
           "label": "Disable third party login providers",
-          "type": "checkbox",
-          "default_value": false
-        },
-        {
-          "name": "disable_private_key",
-          "label": "Disable Private Key Login",
           "type": "checkbox",
           "default_value": false
         }
