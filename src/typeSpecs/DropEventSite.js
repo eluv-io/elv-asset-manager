@@ -248,6 +248,11 @@ const eventSiteSpec = {
               "depends_on": "./show"
             },
             {
+              "name": "button_link",
+              "type": "text",
+              "hint": "If specified, the button will link to the specified URL instead of initiating the login flow"
+            },
+            {
               "name": "post_login",
               "label": "Post Login Modal",
               "type": "subsection",
@@ -271,6 +276,11 @@ const eventSiteSpec = {
                   "name": "button_text",
                   "type": "text",
                   "hint": "Text for the button at the bottom of the modal. By default, it will be 'Go to the Marketplace' if 'Show Marketplace' is checked, otherwise it will be 'Close'"
+                },
+                {
+                  "name": "button_link",
+                  "type": "text",
+                  "hint": "If specified, the button will link to the specified URL instead."
                 },
                 {
                   "name": "show_marketplace",
