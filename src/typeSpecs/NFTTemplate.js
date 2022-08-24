@@ -303,6 +303,33 @@ const NFTTemplateSpec = {
               "type": "text",
               "hint": "If specified, this will be added to the HTML container class when this offer is displayed (e.g. 'redeemable-offer--variant-(style)'"
             },
+            {
+              "name": "visibility",
+              "type": "subsection",
+              "fields": [
+                {
+                  "label": "Hidden",
+                  "name": "hide",
+                  "type": "checkbox",
+                  "default_value": false,
+                  "hint": "If checked, this offer will not be shown"
+                },
+                {
+                  "name": "hide_if_unreleased",
+                  "type": "checkbox",
+                  "unless": "./hide",
+                  "hint": "If checked, this offer will be hidden until the release date",
+                  "default_value": false
+                },
+                {
+                  "name": "hide_if_expired",
+                  "type": "checkbox",
+                  "unless": "./hide",
+                  "hint": "If checked, this offer will be hidden after the expiration date",
+                  "default_value": false
+                }
+              ]
+            }
           ]
         },
         {
