@@ -105,6 +105,12 @@ const MarketplaceSpec = {
           "hint": "If specified, the global navigation to all listings and marketplaces will not be shown when this marketplace is embedded into your site"
         },
         {
+          "label": "Hide Leaderboard",
+          "name": "hide_leaderboard",
+          "type": "checkbox",
+          "default_value": false
+        },
+        {
           "name": "hide_profile_name",
           "type": "checkbox",
           "default_value": false,
