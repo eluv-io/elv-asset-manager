@@ -262,6 +262,77 @@ const NFTTemplateSpec = {
           "hint": "If checked, this NFT will be marked as a test NFT"
         },
         {
+          "name": "redeemable_offers",
+          "type": "list",
+          "fields": [
+            {
+              "label": "Offer ID",
+              "name": "offer_id",
+              "type": "text",
+              "readonly": true
+            },
+            {
+              "name": "name",
+              "type": "text",
+            },
+            {
+              "extensions": imageTypes,
+              "name": "image",
+              "type": "file",
+              "hint": "Square image recommended"
+            },
+            {
+              "name": "description",
+              "type": "rich_text"
+            },
+            {
+              "label": "Release Date",
+              "name": "available_at",
+              "type": "datetime",
+              "hint": "(Optional) - If specified, this offer will not be redeemable until the specified time"
+            },
+            {
+              "label": "End Date",
+              "name": "expires_at",
+              "type": "datetime",
+              "hint": "(Optional) - If specified, this item will no longer be redeemable after the specified time."
+            },
+            {
+              "name": "style",
+              "label": "Style Variant",
+              "type": "text",
+              "hint": "If specified, this will be added to the HTML container class when this offer is displayed (e.g. 'redeemable-offer--variant-(style)'"
+            },
+            {
+              "name": "visibility",
+              "type": "subsection",
+              "fields": [
+                {
+                  "label": "Hidden",
+                  "name": "hide",
+                  "type": "checkbox",
+                  "default_value": false,
+                  "hint": "If checked, this offer will not be shown"
+                },
+                {
+                  "name": "hide_if_unreleased",
+                  "type": "checkbox",
+                  "unless": "./hide",
+                  "hint": "If checked, this offer will be hidden until the release date",
+                  "default_value": false
+                },
+                {
+                  "name": "hide_if_expired",
+                  "type": "checkbox",
+                  "unless": "./hide",
+                  "hint": "If checked, this offer will be hidden after the expiration date",
+                  "default_value": false
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "additional_media",
           "type": "list",
           "fields": [

@@ -29,6 +29,10 @@
       border: 1px solid $elv-color-gray;
       max-width: 35rem;
       min-width: 35rem;
+
+      &:read-only {
+        background: $elv-color-lightestgray;
+      }
     }
 
     &.-elv-multi-select {

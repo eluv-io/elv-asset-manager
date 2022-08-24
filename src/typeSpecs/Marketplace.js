@@ -60,39 +60,9 @@ const MarketplaceSpec = {
           "default_value": false
         },
         {
-          "label": "App Background",
-          "name": "background",
-          "type": "file",
-          "extensions": imageTypes
-        },
-        {
-          "name": "background_mobile",
-          "label": "App Background (Mobile)",
-          "type": "file",
-          "extensions": imageTypes
-        },
-        {
-          "name": "hide_global_navigation",
-          "type": "checkbox",
-          "default_value": false,
-          "hint": "If specified, the global navigation to all listings and marketplaces will not be shown when this marketplace is embedded into your site"
-        },
-        {
-          "name": "hide_profile_name",
-          "type": "checkbox",
-          "default_value": false,
-          "hint": "If specified, the profile info in the top right will not include the user name/email/address, only the balance"
-        },
-        {
-          "label": "Hide Marketplace Name on Store Page",
-          "name": "hide_name",
-          "type": "checkbox",
-          "default_value": false
-        },
-        {
-          "name": "subheader",
+          "name": "external_link",
           "type": "text",
-          "default_value": "Marketplace"
+          "hint": "If specified, the icon for this marketplace in the global marketplace view will link to this URL"
         },
         {
           "name": "description",
@@ -115,6 +85,36 @@ const MarketplaceSpec = {
           "extensions": imageTypes,
           "type": "file",
           "hint": "This banner will be displayed in the list of available marketplaces. It should be roughly 16:10 aspect ratio."
+        },
+        {
+          "label": "App Background",
+          "name": "background",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
+          "label": "App Background (Mobile)",
+          "name": "background_mobile",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
+          "name": "hide_global_navigation",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If specified, the global navigation to all listings and marketplaces will not be shown when this marketplace is embedded into your site"
+        },
+        {
+          "name": "hide_profile_name",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If specified, the profile info in the top right will not include the user name/email/address, only the balance"
+        },
+        {
+          "label": "Hide Marketplace Name on Store Page",
+          "name": "hide_name",
+          "type": "checkbox",
+          "default_value": false
         },
         {
           "name": "tabs",
@@ -467,7 +467,7 @@ const MarketplaceSpec = {
           "label": "End Date",
           "name": "expires_at",
           "type": "datetime",
-          "hint": "(Optional) - If specified, this item will no longer be available for purchase at the specified time. Note: The item will still show in the storefront, if specified, but will not be accessible."
+          "hint": "(Optional) - If specified, this item will no longer be available for purchase after the specified time. Note: The item will still show in the storefront, if specified, but will not be accessible."
         },
         {
           "name": "show_if_unreleased",
