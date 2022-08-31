@@ -78,7 +78,21 @@ const NFTMediaItem = [
       {
         "extensions": imageTypes,
         "name": "image",
-        "type": "file_url",
+        "type": "file",
+      },
+      {
+        "name": "image_aspect_ratio",
+        "type": "select",
+        "options": [
+          "Square",
+          "Wide",
+          "Tall"
+        ]
+      },
+      {
+        "name": "video",
+        "type": "fabric_link",
+        "video_preview": true
       }
     ]
   },
@@ -100,53 +114,74 @@ const NFTMediaItem = [
   }
 ];
 
-const NFTMedia = {
-  "name": "additional_media",
-  "type": "subsection",
-  "fields": [
-    {
-      "name": "featured_media",
-      "type": "list",
-      "fields": NFTMediaItem
-    },
-    {
-      "label": "Media Sections",
-      "name": "sections",
-      "type": "list",
-      "fields": [
-        {
-          "name": "name",
-          "type": "text"
-        },
-        {
-          "label": "ID",
-          "name": "id",
-          "type": "uuid"
-        },
-        {
-          "name": "collections",
-          "type": "list",
-          "fields": [
-            {
-              "name": "name",
-              "type": "text"
-            },
-            {
-              "label": "ID",
-              "name": "id",
-              "type": "uuid"
-            },
-            {
-              "name": "media",
-              "type": "list",
-              "fields": NFTMediaItem
-            }
-          ]
-        }
-      ]
-    }
-  ]
-};
+const NFTMedia = [
+  {
+    "name": "additional_media_type",
+    "type": "select",
+    "hint": "Specify how you want to organize additional media for this NFT - either a simple list of items, or a number of organized sections",
+    "default_value": "List",
+    "options": [
+      "List",
+      "Sections"
+    ]
+  },
+  {
+    "name": "additional_media",
+    "type": "list",
+    "depends_on": "./additional_media_type",
+    "depends_on_value": "List",
+    "fields": NFTMediaItem
+  },
+  {
+    "name": "additional_media_sections",
+    "type": "subsection",
+    "depends_on": "./additional_media_type",
+    "depends_on_value": "Sections",
+    "fields": [
+      {
+        "name": "featured_media",
+        "type": "list",
+        "fields": NFTMediaItem
+      },
+      {
+        "label": "Media Sections",
+        "name": "sections",
+        "type": "list",
+        "fields": [
+          {
+            "name": "name",
+            "type": "text"
+          },
+          {
+            "label": "ID",
+            "name": "id",
+            "type": "uuid"
+          },
+          {
+            "name": "collections",
+            "type": "list",
+            "fields": [
+              {
+                "name": "name",
+                "type": "text"
+              },
+              {
+                "label": "ID",
+                "name": "id",
+                "type": "uuid"
+              },
+              {
+                "name": "media",
+                "type": "list",
+                "fields": NFTMediaItem
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+];
 
 
 export default NFTMedia;

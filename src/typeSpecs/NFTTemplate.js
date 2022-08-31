@@ -478,7 +478,7 @@ const NFTTemplateSpec = {
             }
           ]
         },
-        { ...NFTMedia },
+        ...NFTMedia,
       ]
     }
   ]
