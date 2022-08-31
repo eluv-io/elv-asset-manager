@@ -1,9 +1,11 @@
+import NFTMedia from "./NFTMedia";
+
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 
 const NFTTemplateSpec = {
   "profile": {
     "name": "NFT Template",
-    "version": "0.3",
+    "version": "0.4",
   },
   "playable": true,
   "display_app": "default",
@@ -333,88 +335,6 @@ const NFTTemplateSpec = {
           ]
         },
         {
-          "name": "additional_media",
-          "type": "list",
-          "fields": [
-            {
-              "name": "name",
-              "type": "text"
-            },
-            {
-              "name": "subtitle_1",
-              "type": "text",
-              "hint": "Artist, for example"
-            },
-            {
-              "name": "subtitle_2",
-              "type": "text",
-              "hint": "Album, for example"
-            },
-            {
-              "name": "description",
-              "type": "rich_text"
-            },
-            {
-              "extensions": imageTypes,
-              "name": "image",
-              "type": "file_url",
-              "hint": "Square image recommended"
-            },
-            {
-              "name": "default",
-              "type": "checkbox",
-              "default_value": false
-            },
-            {
-              "name": "requires_permissions",
-              "type": "checkbox",
-              "default_value": false
-            },
-            {
-              "name": "media_type",
-              "type": "select",
-              "options": [
-                "Video",
-                "Audio",
-                "Image",
-                "Ebook",
-                "HTML"
-              ]
-            },
-            {
-              "name": "media_link",
-              "type": "fabric_link",
-              "hint": "For video content, select the playable content object",
-              "video_preview": true,
-              "depends_on": "./media_type",
-              "depends_on_value": ["Video", "Audio"]
-            },
-            {
-              "name": "media_file",
-              "type": "file",
-              "hint": "If this media is displayed via file, like an image, Ebook or HTML, select the file to display",
-              "depends_on": "./media_type",
-              "depends_on_value": ["Image", "Ebook", "HTML"]
-            },
-            {
-              "name": "parameters",
-              "type": "list",
-              "depends_on": "./media_type",
-              "depends_on_value": "HTML",
-              "fields": [
-                {
-                  "name": "name",
-                  "type": "text"
-                },
-                {
-                  "name": "value",
-                  "type": "text"
-                }
-              ]
-            }
-          ]
-        },
-        {
           "name": "marketplace_attributes",
           "type": "subsection",
           "fields": [
@@ -557,7 +477,8 @@ const NFTTemplateSpec = {
               ]
             }
           ]
-        }
+        },
+        ...NFTMedia,
       ]
     }
   ]

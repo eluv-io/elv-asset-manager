@@ -29,7 +29,10 @@
       border: 1px solid $elv-color-gray;
       max-width: 35rem;
       min-width: 35rem;
+    }
 
+    & > input,
+    & > textarea {
       &:read-only {
         background: $elv-color-lightestgray;
       }
