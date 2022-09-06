@@ -76,6 +76,17 @@ const NFTMediaItem = [
     "depends_on_value": "Gallery"
   },
   {
+    "name": "controls",
+    "type": "select",
+    "options": [
+      "Carousel",
+      "Arrows"
+    ],
+    "default_value": "Carousel",
+    "depends_on": "./media_type",
+    "depends_on_value": "Gallery"
+  },
+  {
     "name": "gallery",
     "type": "list",
     "depends_on": "./media_type",
