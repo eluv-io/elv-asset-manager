@@ -251,12 +251,6 @@ const NFTTemplateSpec = {
           "type": "checkbox",
         },
         {
-          "name": "hide_additional_media_player_controls",
-          "type": "checkbox",
-          "hint": "If checked, the player controls below additional media on the NFT details page will be hidden for this NFT",
-          "default_value": false
-        },
-        {
           "name": "test",
           "label": "Test NFT",
           "type": "checkbox",

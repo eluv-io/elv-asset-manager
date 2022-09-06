@@ -75,6 +75,12 @@ const MarketplaceSpec = {
           "hint": "This logo will be displayed in the header when browsing your marketplace"
         },
         {
+          "name": "header_image",
+          "extensions": imageTypes,
+          "type": "file",
+          "hint": "This image will be displayed in the header when browsing your marketplace, in place of the marketplace name"
+        },
+        {
           "name": "round_logo",
           "extensions": imageTypes,
           "type": "file",

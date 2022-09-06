@@ -61,6 +61,21 @@ const NFTMediaItem = [
     "depends_on_value": ["Image", "Ebook", "HTML"]
   },
   {
+    "name": "background_image",
+    "type": "file",
+    "extensions": imageTypes,
+    "depends_on": "./media_type",
+    "depends_on_value": "Gallery"
+  },
+  {
+    "label": "Background Image (Mobile)",
+    "name": "background_image_mobile",
+    "type": "file",
+    "extensions": imageTypes,
+    "depends_on": "./media_type",
+    "depends_on_value": "Gallery"
+  },
+  {
     "name": "gallery",
     "type": "list",
     "depends_on": "./media_type",
@@ -126,6 +141,20 @@ const NFTMedia = [
     ]
   },
   {
+    "name": "hide_additional_media_player_controls",
+    "type": "checkbox",
+    "hint": "If checked, the player controls below additional media on the NFT details page will be hidden for this NFT",
+    "default_value": false,
+    "depends_on": "./additional_media_type",
+    "depends_on_value": "List"
+  },
+  {
+    "label": "Custom CSS",
+    "name": "additional_media_custom_css",
+    "type": "textarea",
+    "hint": "Used for gallery display"
+  },
+  {
     "name": "additional_media",
     "type": "list",
     "depends_on": "./additional_media_type",
@@ -156,6 +185,17 @@ const NFTMedia = [
             "label": "ID",
             "name": "id",
             "type": "uuid"
+          },
+          {
+            "name": "background_image",
+            "type": "file",
+            "extensions": imageTypes
+          },
+          {
+            "label": "Background Image (Mobile)",
+            "name": "background_image_mobile",
+            "type": "file",
+            "extensions": imageTypes
           },
           {
             "name": "collections",
