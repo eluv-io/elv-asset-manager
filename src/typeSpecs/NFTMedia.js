@@ -29,6 +29,15 @@ const NFTMediaItem = [
     "type": "file_url"
   },
   {
+    "name": "image_aspect_ratio",
+    "type": "select",
+    "options": [
+      "Square",
+      "Wide",
+      "Tall"
+    ]
+  },
+  {
     "name": "requires_permissions",
     "type": "checkbox",
     "default_value": false
@@ -160,7 +169,7 @@ const NFTMedia = [
     "depends_on_value": "List"
   },
   {
-    "label": "Custom CSS",
+    "label": "Custom Gallery CSS",
     "name": "additional_media_custom_css",
     "type": "textarea",
     "hint": "Used for gallery display"
