@@ -161,18 +161,15 @@ const NFTMedia = [
     ]
   },
   {
-    "name": "hide_additional_media_player_controls",
-    "type": "checkbox",
-    "hint": "If checked, the player controls below additional media on the NFT details page will be hidden for this NFT",
-    "default_value": false,
+    "name": "additional_media_display",
+    "type": "select",
+    "default_value": "Media",
     "depends_on": "./additional_media_type",
-    "depends_on_value": "List"
-  },
-  {
-    "label": "Custom Gallery CSS",
-    "name": "additional_media_custom_css",
-    "type": "textarea",
-    "hint": "Used for gallery display"
+    "depends_on_value": "List",
+    "options": [
+      "Media",
+      "Album"
+    ]
   },
   {
     "name": "additional_media",
@@ -180,6 +177,12 @@ const NFTMedia = [
     "depends_on": "./additional_media_type",
     "depends_on_value": "List",
     "fields": NFTMediaItem
+  },
+  {
+    "label": "Custom Gallery CSS",
+    "name": "additional_media_custom_css",
+    "type": "textarea",
+    "hint": "Used for gallery display"
   },
   {
     "name": "additional_media_sections",
@@ -229,6 +232,15 @@ const NFTMedia = [
                 "label": "ID",
                 "name": "id",
                 "type": "uuid"
+              },
+              {
+                "name": "display",
+                "type": "select",
+                "default_value": "Media",
+                "options": [
+                  "Media",
+                  "Album"
+                ]
               },
               {
                 "name": "media",
