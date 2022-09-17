@@ -51,7 +51,8 @@ const NFTMediaItem = [
       "Image",
       "Gallery",
       "Ebook",
-      "HTML"
+      "HTML",
+      "Link"
     ]
   },
   {
@@ -68,6 +69,12 @@ const NFTMediaItem = [
     "hint": "If this media is displayed via file, like an image, Ebook or HTML, select the file to display",
     "depends_on": "./media_type",
     "depends_on_value": ["Image", "Ebook", "HTML"]
+  },
+  {
+    "name": "link",
+    "type": "text",
+    "depends_on": "./media_type",
+    "depends_on_value": ["Link"]
   },
   {
     "name": "background_image",
@@ -193,7 +200,52 @@ const NFTMedia = [
       {
         "name": "featured_media",
         "type": "list",
-        "fields": NFTMediaItem
+        "fields": [
+          {
+            "name": "required",
+            "type": "checkbox",
+            "hint": "If checked, all other additional media will be locked until this item is displayed"
+          },
+          {
+            "name": "locked_state",
+            "type": "subsection",
+            "hint": "These fields will be used when the item has not yet been viewed",
+            "depends_on": "./required",
+            "fields": [
+              {
+                "name": "name",
+                "type": "text"
+              },
+              {
+                "name": "subtitle_1",
+                "type": "text",
+              },
+              {
+                "name": "subtitle_2",
+                "type": "text",
+              },
+              {
+                "name": "description",
+                "type": "textarea"
+              },
+              {
+                "name": "button_text",
+                "type": "text"
+              },
+              {
+                "extensions": imageTypes,
+                "name": "image",
+                "type": "file_url"
+              },
+              {
+                "name": "background_image",
+                "type": "file",
+                "extensions": imageTypes
+              },
+            ]
+          },
+          ...NFTMediaItem
+        ]
       },
       {
         "label": "Media Sections",
@@ -208,17 +260,6 @@ const NFTMedia = [
             "label": "ID",
             "name": "id",
             "type": "uuid"
-          },
-          {
-            "name": "background_image",
-            "type": "file",
-            "extensions": imageTypes
-          },
-          {
-            "label": "Background Image (Mobile)",
-            "name": "background_image_mobile",
-            "type": "file",
-            "extensions": imageTypes
           },
           {
             "name": "collections",
