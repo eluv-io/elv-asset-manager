@@ -77,6 +77,12 @@ const eventSiteSpec = {
             "Storefront",
             "Listings"
           ]
+        },
+        {
+          "name": "marketplace_only",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If checked, only the marketplace will be shown"
         }
       ]
     },
