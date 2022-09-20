@@ -20,6 +20,11 @@ const NFTMediaItem = [
     "type": "text",
   },
   {
+    "name": "key",
+    "type": "text",
+    "hint": "Additional key for identifying this media item. Not used in UI"
+  },
+  {
     "name": "description",
     "type": "rich_text"
   },
