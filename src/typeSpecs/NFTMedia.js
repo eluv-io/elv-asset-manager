@@ -82,6 +82,13 @@ const NFTMediaItem = [
     "depends_on_value": ["Link"]
   },
   {
+    "name": "offerings",
+    "type": "list",
+    "hint": "Specify, in order of preference, which offerings should be used when playing this media. If the offering is default or only one offering will be available, specifying the offering is not necessary",
+    "depends_on": "./media_type",
+    "depends_on_value": ["Video", "Audio"]
+  },
+  {
     "name": "background_image",
     "type": "file",
     "extensions": imageTypes,

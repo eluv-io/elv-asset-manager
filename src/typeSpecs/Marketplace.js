@@ -531,11 +531,14 @@ const MarketplaceSpec = {
         },
         {
           "name": "price",
-          "type": "reference_subsection",
+          "type": "subsection",
           "no_localize": true,
-          "reference": "/payment_currencies",
-          "value_type": "number",
-          "hint": "Available price currencies are based on the 'Payment Currencies' field above",
+          "fields": [
+            {
+              "name": "USD",
+              "type": "number"
+            }
+          ]
         },
         {
           "name": "tags",
