@@ -303,7 +303,66 @@ const NFTMedia = [
               {
                 "name": "media",
                 "type": "list",
-                "fields": NFTMediaItem
+                "fields": [
+                  ...NFTMediaItem,
+                  {
+                    "name": "locked",
+                    "type": "checkbox",
+                    "default_value": false
+                  },
+                  {
+                    "name": "locked_state",
+                    "type": "subsection",
+                    "hint": "These fields will be used when the item is locked",
+                    "depends_on": "./locked",
+                    "fields": [
+                      {
+                        "name": "lock_condition",
+                        "type": "select",
+                        "options": [
+                          "View Media"
+                        ]
+                      },
+                      {
+                        "label": "Required Media IDs",
+                        "name": "required_media",
+                        "type": "list",
+                        "depends_on": "./lock_condition",
+                        "depends_on_value": "View Media"
+                      },
+                      {
+                        "name": "name",
+                        "type": "text"
+                      },
+                      {
+                        "name": "subtitle_1",
+                        "type": "text",
+                      },
+                      {
+                        "name": "subtitle_2",
+                        "type": "text",
+                      },
+                      {
+                        "name": "description",
+                        "type": "rich_text"
+                      },
+                      {
+                        "extensions": imageTypes,
+                        "name": "image",
+                        "type": "file_url"
+                      },
+                      {
+                        "name": "image_aspect_ratio",
+                        "type": "select",
+                        "options": [
+                          "Square",
+                          "Wide",
+                          "Tall"
+                        ]
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           }
