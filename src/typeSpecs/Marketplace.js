@@ -459,6 +459,12 @@ const MarketplaceSpec = {
           "hint": "If specified, this video for this NFT will play on the purchase page in the store."
         },
         {
+          "name": "play_on_storefront",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If checked, the video for this item will be played on the storefront page. Note: It is not recommended to have many items with videos visible on the storefront, as it may cause performance issues."
+        },
+        {
           "name": "for_sale",
           "type": "checkbox",
           "default_value": true

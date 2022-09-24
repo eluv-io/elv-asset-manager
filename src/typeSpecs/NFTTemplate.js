@@ -425,6 +425,46 @@ const NFTTemplateSpec = {
               "hint": "If specified, the default text displayed while opening the pack will be hidden and the open animation will be larger"
             },
             {
+              "name": "use_custom_open_text",
+              "type": "checkbox",
+              "default_value": false,
+              "hint": "If specified, you can configure the text that is displayed while opening the pack",
+              "unless": "./hide_text"
+            },
+            {
+              "name": "minting_text",
+              "type": "subsection",
+              "unless": "./hide_text",
+              "depends_on": "./use_custom_open_text",
+              "fields": [
+                {
+                  "name": "minting_header",
+                  "type": "text",
+                  "default_value": "Your pack is opening"
+                },
+                {
+                  "name": "minting_subheader1",
+                  "type": "text",
+                  "default_value": "This may take several minutes"
+                },
+                {
+                  "name": "minting_subheader2",
+                  "type": "text",
+                  "default_value": "You can navigate away from this page if you don't want to wait. Your items will be available in your wallet when the process is complete."
+                },
+                {
+                  "name": "reveal_header",
+                  "type": "text",
+                  "default_value": "Congratulations!"
+                },
+                {
+                  "name": "reveal_subheader",
+                  "type": "text",
+                  "default_value": "You've received the following items:"
+                }
+              ]
+            },
+            {
               "name": "open_animation",
               "type": "fabric_link",
               "hint": "Looping video that will play while pack is opening",
