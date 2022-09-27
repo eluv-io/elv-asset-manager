@@ -115,41 +115,6 @@ const NFTTemplateSpec = {
           "type": "rich_text"
         },
         {
-          "name": "media_type",
-          "type": "select",
-          "options": [
-            "Video",
-            "Audio",
-            "Image",
-            "Ebook",
-            "HTML"
-          ]
-        },
-        {
-          "name": "media",
-          "label": "Media File",
-          "type": "file",
-          "hint": "If this media is displayed via file, like an image, Ebook or HTML, select the file to display",
-          "depends_on": "./media_type",
-          "depends_on_value": ["Image", "Ebook", "HTML"]
-        },
-        {
-          "name": "media_parameters",
-          "type": "list",
-          "depends_on": "./media_type",
-          "depends_on_value": "HTML",
-          "fields": [
-            {
-              "name": "name",
-              "type": "text"
-            },
-            {
-              "name": "value",
-              "type": "text"
-            }
-          ]
-        },
-        {
           "name": "address",
           "label": "NFT Contract Address",
           "type": "text"

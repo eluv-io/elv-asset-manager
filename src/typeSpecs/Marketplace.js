@@ -396,6 +396,17 @@ const MarketplaceSpec = {
           "type": "file",
         },
         {
+          "name": "video",
+          "type": "fabric_link",
+          "video_preview": true
+        },
+        {
+          "name": "video_muted",
+          "type": "checkbox",
+          "default_value": true,
+          "depends_on": "./video"
+        },
+        {
           "name": "link",
           "type": "text",
           "hint": "If specified, the banner will link to this URL"
