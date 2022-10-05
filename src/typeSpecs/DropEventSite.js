@@ -1,4 +1,4 @@
-const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
+const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp", "ico"];
 const languageOptions = require("./LanguageCodes");
 const countryOptions = Object.values(require("country-codes-list").customList("countryNameEn", "{countryCode}: {countryNameEn}")).sort();
 const currencyOptions = [...new Set(Object.values(require("country-codes-list").customList("countryNameEn", "{currencyCode}")))].filter(c => c).sort();
@@ -124,6 +124,11 @@ const eventSiteSpec = {
         "Selawik"
       ],
       "default_value": "Helvetica Neue"
+    },
+    {
+      "name": "favicon",
+      "type": "file",
+      "extensions": imageTypes
     },
     {
       "name": "custom_css",

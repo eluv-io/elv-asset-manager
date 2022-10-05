@@ -495,7 +495,7 @@ class RecursiveField extends React.Component {
       } else if(fieldType === "file" || fieldType === "file_url") {
         const {path, targetHash} = entry[field.name] || {};
         const extension = ((path || "").split(".").pop() || "").toLowerCase();
-        const isImage = ["apng", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
+        const isImage = ["apng", "gif", "ico", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
 
         return (
           <LabelledField
