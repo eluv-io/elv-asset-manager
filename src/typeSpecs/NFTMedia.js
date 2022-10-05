@@ -223,14 +223,7 @@ const NFTMedia = [
             "type": "checkbox",
             "hint": "If checked, all other additional media will be locked until this item is displayed"
           },
-          {
-            "name": "style",
-            "type": "select",
-            "options": [
-              "Default",
-              "Large"
-            ]
-          },
+          ...NFTMediaItem,
           {
             "name": "locked_state",
             "type": "subsection",
@@ -255,9 +248,7 @@ const NFTMedia = [
               },
               {
                 "name": "button_text",
-                "type": "text",
-                "depends_on": "../style",
-                "depends_on_value": "Large"
+                "type": "text"
               },
               {
                 "extensions": imageTypes,
@@ -267,25 +258,18 @@ const NFTMedia = [
               {
                 "name": "background_image",
                 "type": "file",
-                "extensions": imageTypes,
-                "depends_on": "../style",
-                "depends_on_value": "Large"
+                "extensions": imageTypes
               },
             ]
           },
-          ...NFTMediaItem,
           {
             "name": "button_text",
-            "type": "text",
-            "depends_on": "./style",
-            "depends_on_value": "Large"
+            "type": "text"
           },
           {
             "name": "background_image",
             "type": "file",
-            "extensions": imageTypes,
-            "depends_on": "./style",
-            "depends_on_value": "Large"
+            "extensions": imageTypes
           },
         ]
       },

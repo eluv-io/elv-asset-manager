@@ -373,6 +373,24 @@ const MarketplaceSpec = {
       "type": "rich_text"
     },
     {
+      "label": "Terms Document",
+      "name": "terms_document",
+      "type": "subsection",
+      "hint": "If specified, a link to this terms document will be present on the login screen",
+      "fields": [
+        {
+          "name": "link_text",
+          "type": "text",
+          "default_value": "Terms and Conditions"
+        },
+        {
+          "name": "terms_document",
+          "type": "file",
+          "extensions": ["html"]
+        }
+      ]
+    },
+    {
       "name": "banners",
       "label": "Marketplace Banners",
       "type": "list",
