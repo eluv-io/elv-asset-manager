@@ -373,12 +373,6 @@ const MarketplaceSpec = {
       "type": "rich_text"
     },
     {
-      "label": "Terms and Conditions (HTML)",
-      "name": "terms_html",
-      "type": "file",
-      "extensions": ["html"]
-    },
-    {
       "name": "banners",
       "label": "Marketplace Banners",
       "type": "list",

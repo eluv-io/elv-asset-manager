@@ -114,6 +114,23 @@ const eventSiteSpec = {
       "no_localize": true,
     },
     {
+      "name": "font",
+      "type": "select",
+      "options": [
+        "Helvetica Neue",
+        "Inter",
+        "Albertus",
+        "Compacta",
+        "Selawik"
+      ],
+      "default_value": "Helvetica Neue"
+    },
+    {
+      "name": "custom_css",
+      "label": "Custom CSS",
+      "type": "textarea"
+    },
+    {
       "name": "localizations",
       "label": "Localizations",
       "type": "multiselect",
