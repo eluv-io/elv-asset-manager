@@ -386,7 +386,7 @@ const MarketplaceSpec = {
         {
           "name": "terms_document",
           "type": "file",
-          "extensions": ["html"]
+          "extensions": ["html", "pdf"]
         }
       ]
     },

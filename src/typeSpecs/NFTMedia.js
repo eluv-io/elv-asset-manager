@@ -225,6 +225,15 @@ const NFTMedia = [
           },
           ...NFTMediaItem,
           {
+            "name": "button_text",
+            "type": "text"
+          },
+          {
+            "name": "background_image",
+            "type": "file",
+            "extensions": imageTypes
+          },
+          {
             "name": "locked_state",
             "type": "subsection",
             "hint": "These fields will be used when the item has not yet been viewed",
@@ -261,16 +270,7 @@ const NFTMedia = [
                 "extensions": imageTypes
               },
             ]
-          },
-          {
-            "name": "button_text",
-            "type": "text"
-          },
-          {
-            "name": "background_image",
-            "type": "file",
-            "extensions": imageTypes
-          },
+          }
         ]
       },
       {
