@@ -612,6 +612,18 @@ const MarketplaceSpec = {
           "type": "text"
         },
         {
+          "label": "Storefront Background",
+          "name": "background",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
+          "label": "Storefront Background (Mobile)",
+          "name": "background_mobile",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
           "name": "hide_text",
           "label": "Hide Default Text During Animation",
           "default_value": false,
