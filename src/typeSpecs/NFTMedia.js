@@ -229,6 +229,11 @@ const NFTMedia = [
             "type": "text"
           },
           {
+            "name": "button_image",
+            "type": "file",
+            "extensions": imageTypes
+          },
+          {
             "name": "background_image",
             "type": "file",
             "extensions": imageTypes
@@ -258,6 +263,11 @@ const NFTMedia = [
               {
                 "name": "button_text",
                 "type": "text"
+              },
+              {
+                "name": "button_image",
+                "type": "file",
+                "extensions": imageTypes
               },
               {
                 "extensions": imageTypes,

@@ -723,10 +723,14 @@ select {
 }
 
 .asset-form-modal {
+  // sass-lint:disable no-misspelled-properties
+  overscroll-behavior: contain;
+
   .-elv-modal-content {
     max-height: 70%;
     max-width: 70%;
     min-height: 50%;
+    overscroll-behavior: contain;
   }
 }
 

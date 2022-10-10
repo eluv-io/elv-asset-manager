@@ -358,6 +358,17 @@ const eventSiteSpec = {
           "type": "file"
         },
         {
+          "extensions": imageTypes,
+          "name": "hero_banner",
+          "type": "file"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "hero_banner_mobile",
+          "label": "Hero Banner (Mobile)",
+          "type": "file"
+        },
+        {
           "name": "hero_video",
           "type": "fabric_link",
           "video_preview": true
