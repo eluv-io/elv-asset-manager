@@ -670,7 +670,7 @@ const eventSiteSpec = {
     {
       "name": "footer_links",
       "type": "list",
-      "hint": "Specify links to include in the footer of the event, such as privacy or terms policies. Each item can either be specified as a URL, rich text, or an HTML document. The two latter options will be shown in a modal when clicked.",
+      "hint": "Specify links to include in the footer of the event, such as privacy or terms policies. Each item can either be specified as a URL, image, rich text, or an HTML document. The three latter options will be shown in a modal when clicked.",
       "fields": [
         {
           "name": "text",
@@ -680,6 +680,16 @@ const eventSiteSpec = {
           "name": "url",
           "label": "URL Link",
           "type": "text"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "image",
+          "type": "file",
+        },
+        {
+          "name": "image_alt_text",
+          "type": "text",
+          "depends_on": "./image"
         },
         {
           "label": "Content (Rich Text)",

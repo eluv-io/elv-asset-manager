@@ -443,6 +443,43 @@ const MarketplaceSpec = {
         }
       ]
     },
+    {
+      "name": "footer_links",
+      "type": "list",
+      "hint": "Specify links to include in the footer of the marketplace, such as privacy or terms policies. Each item can either be specified as a URL, image, rich text, or an HTML document. The three latter options will be shown in a modal when clicked.",
+      "fields": [
+        {
+          "name": "text",
+          "type": "text"
+        },
+        {
+          "name": "url",
+          "label": "URL Link",
+          "type": "text"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "image",
+          "type": "file",
+        },
+        {
+          "name": "image_alt_text",
+          "type": "text",
+          "depends_on": "./image",
+        },
+        {
+          "label": "Content (Rich Text)",
+          "name": "content_rich_text",
+          "type": "rich_text"
+        },
+        {
+          "label": "Content (HTML)",
+          "name": "content_html",
+          "type": "file",
+          "extensions": ["html"]
+        }
+      ]
+    },
 
     {
       "label": "Item Definitions",

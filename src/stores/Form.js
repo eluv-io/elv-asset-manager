@@ -767,9 +767,7 @@ class FormStore {
         } else if(type === "file" || type === "file_url") {
           let linkInfo = this.LinkComponents(info[name]);
 
-          if(!linkInfo) {
-            linkInfo = {targetHash: this.rootStore.params.versionHash};
-          } else if(!linkInfo.targetHash) {
+          if(!linkInfo.targetHash) {
             linkInfo.targetHash = await this.rootStore.client.LatestVersionHash({objectId: linkInfo.objectId});
           }
 
