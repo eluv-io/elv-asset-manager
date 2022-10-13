@@ -316,15 +316,27 @@ const MarketplaceSpec = {
               "default_value": false
             },
             {
+              "name": "type",
+              "type": "select",
+              "options": [
+                "Modal",
+                "Checkboxes"
+              ]
+            },
+            {
               "name": "consent_modal_header",
               "type": "textarea",
-              "depends_on": "./enabled"
+              "depends_on": "./enabled",
+              "unless": "./type",
+              "unless_value": "Checkboxes"
             },
             {
               "name": "button_text",
               "type": "text",
               "default_value": "I Accept",
-              "depends_on": "./enabled"
+              "depends_on": "./enabled",
+              "unless": "./type",
+              "unless_value": "Checkboxes"
             },
             {
               "label": "Custom Consent Options",

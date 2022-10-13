@@ -724,6 +724,11 @@ const eventSiteSpec = {
               "default_value": {
                 "color": "#d7bb73"
               }
+            },
+            {
+              "name": "button_image",
+              "type": "file",
+              "extensions": imageTypes
             }
           ]
         },
@@ -752,6 +757,11 @@ const eventSiteSpec = {
               "default_value": {
                 "color": "#d7bb73"
               }
+            },
+            {
+              "name": "button_image",
+              "type": "file",
+              "extensions": imageTypes
             }
           ]
         },
@@ -780,6 +790,11 @@ const eventSiteSpec = {
               "default_value": {
                 "color": "#000000"
               }
+            },
+            {
+              "name": "button_image",
+              "type": "file",
+              "extensions": imageTypes
             }
           ]
         },
@@ -808,6 +823,11 @@ const eventSiteSpec = {
               "default_value": {
                 "color": "#d7bb73"
               }
+            },
+            {
+              "name": "button_image",
+              "type": "file",
+              "extensions": imageTypes
             }
           ]
         }
