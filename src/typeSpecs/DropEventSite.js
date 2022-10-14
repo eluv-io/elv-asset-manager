@@ -276,6 +276,11 @@ const eventSiteSpec = {
               "depends_on": "./show"
             },
             {
+              "name": "button_image",
+              "type": "file",
+              "extensions": imageTypes
+            },
+            {
               "name": "button_link",
               "type": "text",
               "hint": "If specified, the button will link to the specified URL instead of initiating the login flow"
@@ -304,6 +309,11 @@ const eventSiteSpec = {
                   "name": "button_text",
                   "type": "text",
                   "hint": "Text for the button at the bottom of the modal. By default, it will be 'Go to the Marketplace' if 'Show Marketplace' is checked, otherwise it will be 'Close'"
+                },
+                {
+                  "name": "button_image",
+                  "type": "file",
+                  "extensions": imageTypes
                 },
                 {
                   "name": "button_link",
@@ -367,6 +377,11 @@ const eventSiteSpec = {
           "name": "hero_banner_mobile",
           "label": "Hero Banner (Mobile)",
           "type": "file"
+        },
+        {
+          "name": "hero_banner_link",
+          "type": "text",
+          "depends_on": "./hero_banner"
         },
         {
           "name": "hero_video",
@@ -560,6 +575,11 @@ const eventSiteSpec = {
           "type": "text"
         },
         {
+          "name": "button_image",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
           "name": "pages",
           "type": "list",
           "fields": [
@@ -703,6 +723,10 @@ const eventSiteSpec = {
           "extensions": ["html"]
         }
       ]
+    },
+    {
+      "name": "footer_text",
+      "type": "rich_text"
     },
     {
       "name": "branding",
@@ -857,12 +881,16 @@ const eventSiteSpec = {
       "depends_on": "./show_faq",
       "fields": [
         {
+          "name": "key",
+          "type": "text"
+        },
+        {
           "name": "question",
           "type": "text"
         },
         {
           "name": "answer",
-          "type": "textarea"
+          "type": "rich_text"
         }
       ]
     },
@@ -1921,6 +1949,7 @@ const eventSiteSpec = {
                 "App Nexus Pixel ID",
                 "TradeDoubler Organization ID",
                 "TradeDoubler Event ID",
+                "Twitter Pixel ID"
               ]
             },
             {

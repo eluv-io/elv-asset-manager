@@ -480,7 +480,10 @@ const MarketplaceSpec = {
         }
       ]
     },
-
+    {
+      "name": "footer_text",
+      "type": "rich_text"
+    },
     {
       "label": "Item Definitions",
       "name": "header_items",
