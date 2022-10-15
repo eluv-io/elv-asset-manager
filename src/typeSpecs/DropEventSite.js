@@ -324,17 +324,6 @@ const eventSiteSpec = {
                   "name": "show_marketplace",
                   "type": "checkbox",
                   "hint": "Show the marketplace after the post login modal"
-                },
-                {
-                  "name": "marketplace_filters",
-                  "type": "list",
-                  "hint": "Use this fields to filter the items shown"
-                },
-                {
-                  "name": "hide_navigation",
-                  "label": "Hide Marketplace Navigation",
-                  "type": "checkbox",
-                  "hint": "If checked, the back button will not be shown in the marketplace."
                 }
               ]
             }
@@ -1228,10 +1217,9 @@ const eventSiteSpec = {
           ]
         },
         {
-          "label": "Marketplace Filters",
-          "name": "store_filters",
-          "type": "list",
-          "hint": "After the drop, the wallet panel will be redirected to the store. Use these fields to filter the items shown for users who voted"
+          "name": "skip_countdown_page",
+          "type": "checkbox",
+          "default_value": false
         },
         {
           "fields": [
