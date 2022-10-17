@@ -895,7 +895,62 @@ const MarketplaceSpec = {
           "video_preview": true
         }
       ]
-    }
+    },
+
+
+    {
+      "label": "Analytics",
+      "name": "header_analytics",
+      "type": "header"
+    },
+    {
+      "name": "analytics_ids",
+      "label": "Analytics IDs",
+      "type": "list",
+      "no_localize": true,
+      "hint": "Specify IDs for your own analytics",
+      "fields": [
+        {
+          "name": "label",
+          "type": "text",
+          "hint": "A label for this collection of analytics"
+        },
+        {
+          "name": "ids",
+          "label": "IDs",
+          "type": "list",
+          "fields": [
+            {
+              "name": "type",
+              "type": "select",
+              "options": [
+                "Google Analytics ID",
+                "Google Tag Manager ID",
+                "Google Conversion ID",
+                "Google Conversion Label",
+                "Facebook Pixel ID",
+                "App Nexus Segment ID",
+                "App Nexus Pixel ID",
+                "TradeDoubler Organization ID",
+                "TradeDoubler Event ID",
+                "Twitter Pixel ID"
+              ]
+            },
+            {
+              "name": "id",
+              "label": "ID",
+              "type": "text"
+            },
+            {
+              "name": "purchase_event_id",
+              "label": "Purchase Event ID",
+              "depends_on": "./type",
+              "depends_on_value": "Twitter Pixel ID"
+            }
+          ]
+        }
+      ]
+    },
   ]
 };
 
