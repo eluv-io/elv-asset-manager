@@ -81,7 +81,7 @@ const eventTenantSpec = {
           "hint": "Optional minimum listing price for secondary sales",
           "label": "Minimum Listing Price",
           "name": "min_list_price",
-          "type": "float"
+          "type": "number"
         },
         {
           "fields": [
