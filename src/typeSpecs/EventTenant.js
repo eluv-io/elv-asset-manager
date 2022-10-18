@@ -78,6 +78,12 @@ const eventTenantSpec = {
           "type": "integer"
         },
         {
+          "hint": "Optional minimum listing price for secondary sales",
+          "label": "Minimum Listing Price",
+          "name": "min_list_price",
+          "type": "float"
+        },
+        {
           "fields": [
             {
               "hint": "Without checking this box token IDs will be assigned arbitrarily.  If checked, token IDs will be ordinals starting at #1",
