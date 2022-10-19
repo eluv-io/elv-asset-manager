@@ -675,7 +675,7 @@ const MarketplaceSpec = {
             },
             {
               "name": "facebook_event_id",
-              "label": "Meta Event ID",
+              "label": "Facebook Event ID",
               "type": "string"
             },
             {
@@ -703,7 +703,7 @@ const MarketplaceSpec = {
             },
             {
               "name": "facebook_event_id",
-              "label": "Meta Event ID",
+              "label": "Facebook Event ID",
               "type": "string"
             },
             {
@@ -1031,7 +1031,7 @@ const MarketplaceSpec = {
         },
         {
           "name": "facebook_event_id",
-          "label": "Meta Event ID",
+          "label": "Facebook Event ID",
           "type": "string"
         },
         {

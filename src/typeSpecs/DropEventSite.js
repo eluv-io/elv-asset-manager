@@ -1949,6 +1949,60 @@ const eventSiteSpec = {
         }
       ]
     },
+    {
+      "name": "landing_page_view_analytics",
+      "type": "subsection",
+      "no_localize": true,
+      "fields": [
+        {
+          "name": "google_conversion_label",
+          "label": "Google Conversion Label",
+          "type": "string"
+        },
+        {
+          "name": "google_conversion_id",
+          "label": "Google Conversion ID",
+          "type": "string"
+        },
+        {
+          "name": "facebook_event_id",
+          "label": "Facebook Event ID",
+          "type": "string"
+        },
+        {
+          "name": "twitter_event_id",
+          "label": "Twitter Event ID",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "marketplace_page_view_analytics",
+      "type": "subsection",
+      "no_localize": true,
+      "fields": [
+        {
+          "name": "google_conversion_label",
+          "label": "Google Conversion Label",
+          "type": "string"
+        },
+        {
+          "name": "google_conversion_id",
+          "label": "Google Conversion ID",
+          "type": "string"
+        },
+        {
+          "name": "facebook_event_id",
+          "label": "Facebook Event ID",
+          "type": "string"
+        },
+        {
+          "name": "twitter_event_id",
+          "label": "Twitter Event ID",
+          "type": "string"
+        }
+      ]
+    },
 
 
 
