@@ -530,6 +530,10 @@ const MarketplaceSpec = {
           "type": "text"
         },
         {
+          "name": "subtitle",
+          "type": "text"
+        },
+        {
           "name": "description",
           "type": "textarea"
         },
