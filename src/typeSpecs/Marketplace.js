@@ -425,10 +425,22 @@ const MarketplaceSpec = {
           "video_preview": true
         },
         {
+          "name": "video",
+          "type": "fabric_link",
+          "video_preview": true,
+        },
+        {
           "name": "video_muted",
           "type": "checkbox",
           "default_value": true,
-          "depends_on": "./video"
+          "depends_on": "./video",
+        },
+        {
+          "name": "modal_video",
+          "type": "fabric_link",
+          "hint": "If specified, this will be displayed in a modal when the banner is clicked",
+          "video_preview": true,
+          "depends_on": "./image"
         },
         {
           "name": "link",
@@ -639,6 +651,67 @@ const MarketplaceSpec = {
           "no_localize": true,
           "version": true,
           "video_preview": true
+        },
+        {
+          "name": "use_analytics",
+          "type": "checkbox",
+          "default_value": false
+        },
+        {
+          "name": "page_view_analytics",
+          "type": "subsection",
+          "no_localize": true,
+          "depends_on": "./use_analytics",
+          "fields": [
+            {
+              "name": "google_conversion_label",
+              "label": "Google Conversion Label",
+              "type": "string"
+            },
+            {
+              "name": "google_conversion_id",
+              "label": "Google Conversion ID",
+              "type": "string"
+            },
+            {
+              "name": "facebook_event_id",
+              "label": "Meta Event ID",
+              "type": "string"
+            },
+            {
+              "name": "twitter_event_id",
+              "label": "Twitter Event ID",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "name": "purchase_analytics",
+          "type": "subsection",
+          "no_localize": true,
+          "depends_on": "./use_analytics",
+          "fields": [
+            {
+              "name": "google_conversion_label",
+              "label": "Google Conversion Label",
+              "type": "string"
+            },
+            {
+              "name": "google_conversion_id",
+              "label": "Google Conversion ID",
+              "type": "string"
+            },
+            {
+              "name": "facebook_event_id",
+              "label": "Meta Event ID",
+              "type": "string"
+            },
+            {
+              "name": "twitter_event_id",
+              "label": "Twitter Event ID",
+              "type": "string"
+            }
+          ]
         }
       ],
       "name": "items",
@@ -926,13 +999,9 @@ const MarketplaceSpec = {
               "options": [
                 "Google Analytics ID",
                 "Google Tag Manager ID",
-                "Google Conversion ID",
-                "Google Conversion Label",
                 "Facebook Pixel ID",
                 "App Nexus Segment ID",
                 "App Nexus Pixel ID",
-                "TradeDoubler Organization ID",
-                "TradeDoubler Event ID",
                 "Twitter Pixel ID"
               ]
             },
@@ -940,14 +1009,35 @@ const MarketplaceSpec = {
               "name": "id",
               "label": "ID",
               "type": "text"
-            },
-            {
-              "name": "purchase_event_id",
-              "label": "Purchase Event ID",
-              "depends_on": "./type",
-              "depends_on_value": "Twitter Pixel ID"
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "storefront_page_view_analytics",
+      "type": "subsection",
+      "no_localize": true,
+      "fields": [
+        {
+          "name": "google_conversion_label",
+          "label": "Google Conversion Label",
+          "type": "string"
+        },
+        {
+          "name": "google_conversion_id",
+          "label": "Google Conversion ID",
+          "type": "string"
+        },
+        {
+          "name": "facebook_event_id",
+          "label": "Meta Event ID",
+          "type": "string"
+        },
+        {
+          "name": "twitter_event_id",
+          "label": "Twitter Event ID",
+          "type": "string"
         }
       ]
     },
