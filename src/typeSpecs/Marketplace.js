@@ -123,6 +123,21 @@ const MarketplaceSpec = {
           "default_value": false
         },
         {
+          "name": "disable_usdc",
+          "label": "Disable USDC Connections",
+          "hint": "If specified, the option to for users to connect their Eluvio wallets to USDC wallets will be hidden in your marketplace",
+          "type": "checkbox",
+          "default_value": false
+        },
+        {
+          "name": "payment_currencies",
+          "type": "multiselect",
+          "no_localize": true,
+          "hint": "List of accepted currencies",
+          "default_value": ["USD"],
+          "options": currencyOptions
+        },
+        {
           "name": "tabs",
           "type": "subsection",
           "hint": "Specify different text to be used for links in the header",
@@ -496,18 +511,14 @@ const MarketplaceSpec = {
       "name": "footer_text",
       "type": "rich_text"
     },
+
+
+
+
     {
       "label": "Item Definitions",
       "name": "header_items",
       "type": "header"
-    },
-    {
-      "name": "payment_currencies",
-      "type": "multiselect",
-      "no_localize": true,
-      "hint": "List of accepted currencies",
-      "default_value": ["USD"],
-      "options": currencyOptions
     },
     {
       "fields": [
