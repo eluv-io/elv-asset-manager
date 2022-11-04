@@ -767,7 +767,7 @@ class FormStore {
         } else if(type === "file" || type === "file_url") {
           let linkInfo = this.LinkComponents(info[name]);
 
-          if(!linkInfo.targetHash) {
+          if(!linkInfo?.targetHash && linkInfo?.objectId) {
             linkInfo.targetHash = await this.rootStore.client.LatestVersionHash({objectId: linkInfo.objectId});
           }
 
@@ -776,7 +776,7 @@ class FormStore {
           info[name] = await this.LoadInfoFields({
             PATH: UrlJoin(BASE_PATH, name),
             infoFields: fields,
-            values: info[name],
+            values: info[name] || {},
             topLevelValues
           });
         } else if(type === "list") {

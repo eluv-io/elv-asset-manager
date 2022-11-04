@@ -107,7 +107,7 @@ const InitializeField = ({fields, defaultValue}) => {
         break;
       case "number":
       case "integer":
-        value = field.default_value || 0;
+        value = field.default_value || null;
         break;
       case "checkbox":
         value = field.default_value || false;
@@ -182,7 +182,7 @@ class RecursiveField extends React.Component {
         required: field.required
       }) : null;
 
-      const key = `input-${name}-${field.name}-${this.props.localizationKey}`;
+      const key = `input-${field.name}-${this.props.localizationKey}`;
 
       if(this.props.localizationKey && (field.no_localize || field.path)) {
         return null;
@@ -352,11 +352,10 @@ class RecursiveField extends React.Component {
       } else if(fieldType === "select" || fieldType === "reference_select") {
         let options = localization.options || field.options;
         if(fieldType === "reference_select") {
-          options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || [])
-            .map(option => [option[field.label_key], option[field.value_key]]);
+          options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || []);
 
           if(field.allow_null) {
-            options = [["<None>", ""], ...options];
+            options = [[field.null_label || "<None>", ""], ...options];
           }
         }
 
@@ -429,6 +428,10 @@ class RecursiveField extends React.Component {
           </LabelledField>
         );
       } else if(fieldType === "subsection" || fieldType === "reference_subsection") {
+        if(!field.fields || field.fields.length === 0) {
+          return null;
+        }
+
         if(typeof entry[field.name] !== "object") {
           Update(field.name, {});
         }

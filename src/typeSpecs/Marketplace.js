@@ -1,6 +1,27 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
-const currencyOptions = [...new Set(Object.values(require("country-codes-list").customList("countryNameEn", "{currencyCode}")))].filter(c => c).sort();
+const currencies = require("country-codes-list").customList("currencyCode", "{currencyNameEn}");
+const currencyOptions = Object.keys(currencies)
+  //.filter((code, index, self) => self.findIndex(otherName => name.toLowerCase() === otherName.toLowerCase()) === index)
+  //.map(name => [name || (currencies[name] === "VES" ? "Venezuelan Bolívar" : currencies[name]), currencies[name]])
+  .filter(code => code && currencies[code])
+  .map(code => [currencies[code], code])
+  .sort((a, b) => a < b ? -1 : 1);
 
+const ebanxSupportedCountries = [
+  ["Argentina", "AR"],
+  ["Bolivia", "BO"],
+  ["Brazil", "BR"],
+  ["Chile", "CL"],
+  ["Colombia", "CO"],
+  ["Ecuador", "EC"],
+  ["El Salvador", "SV"],
+  ["Guatemala", "GT"],
+  ["Mexico", "MX"],
+  ["Panama", "PA"],
+  ["Paraguay", "PY"],
+  ["Peru", "PE"],
+  ["Uruguay", "UY"]
+];
 
 const MarketplaceSpec = {
   "profile": {
@@ -88,9 +109,17 @@ const MarketplaceSpec = {
         },
         {
           "name": "card_banner",
+          "label": "Card Banner (Front)",
           "extensions": imageTypes,
           "type": "file",
-          "hint": "This banner will be displayed in the list of available marketplaces. It should be roughly 16:10 aspect ratio."
+          "hint": "This banner will be displayed in the list of available marketplaces."
+        },
+        {
+          "name": "card_banner_back",
+          "label": "Card Banner (Back)",
+          "extensions": imageTypes,
+          "type": "file",
+          "hint": "This banner will be displayed in the list of available marketplaces."
         },
         {
           "label": "App Background",
@@ -133,14 +162,6 @@ const MarketplaceSpec = {
           "hint": "If specified, the option to for users to connect their Eluvio wallets to USDC wallets will be hidden in your marketplace",
           "type": "checkbox",
           "default_value": false
-        },
-        {
-          "name": "payment_currencies",
-          "type": "multiselect",
-          "no_localize": true,
-          "hint": "List of accepted currencies",
-          "default_value": ["USD"],
-          "options": currencyOptions
         },
         {
           "name": "tabs",
@@ -445,11 +466,6 @@ const MarketplaceSpec = {
           "video_preview": true
         },
         {
-          "name": "video",
-          "type": "fabric_link",
-          "video_preview": true,
-        },
-        {
           "name": "video_muted",
           "type": "checkbox",
           "default_value": true,
@@ -517,7 +533,74 @@ const MarketplaceSpec = {
       "type": "rich_text"
     },
 
-
+    {
+      "label": "Payment and Currency Options",
+      "name": "header_payment",
+      "type": "header"
+    },
+    {
+      "name": "display_currencies",
+      "type": "multiselect",
+      "options": currencyOptions
+    },
+    {
+      "name": "default_display_currency",
+      "type": "reference_select",
+      "allow_null": true,
+      "null_label": "USD",
+      "reference": "./display_currencies",
+      "depends_on": "./display_currencies"
+    },
+    {
+      "name": "payment_options",
+      "type": "subsection",
+      "no_localize": true,
+      "fields": [
+        {
+          "name": "stripe",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "enabled",
+              "type": "checkbox",
+              "default_value": true
+            }
+          ]
+        },
+        {
+          "name": "ebanx",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "enabled",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "allowed_countries",
+              "type": "multiselect",
+              "options": ebanxSupportedCountries
+            },
+            {
+              "name": "pix_enabled",
+              "type": "checkbox",
+              "default_value": false
+            }
+          ]
+        },
+        {
+          "name": "coinbase",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "enabled",
+              "type": "checkbox",
+              "default_value": true
+            }
+          ]
+        }
+      ]
+    },
 
 
     {
