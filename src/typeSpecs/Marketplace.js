@@ -577,6 +577,12 @@ const MarketplaceSpec = {
               "default_value": false
             },
             {
+              "name": "preferred",
+              "type": "checkbox",
+              "default_value": false,
+              "depends_on": "./enabled"
+            },
+            {
               "name": "allowed_countries",
               "type": "multiselect",
               "options": ebanxSupportedCountries
