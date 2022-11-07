@@ -109,6 +109,13 @@ const MarketplaceSpec = {
         },
         {
           "name": "card_banner",
+          "label": "Card Banner",
+          "extensions": imageTypes,
+          "type": "file",
+          "hint": "This banner will be displayed in the list of available marketplaces."
+        },
+        {
+          "name": "card_banner_front",
           "label": "Card Banner (Front)",
           "extensions": imageTypes,
           "type": "file",
