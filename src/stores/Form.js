@@ -115,7 +115,9 @@ class FormStore {
   @observable showSearchablesTab = false;
   @observable hideUpdateLinksButton = false;
   @observable associatePermissions = false;
+  @observable showIndexerSettings = false;
   @observable permissionsObject;
+  @observable showMarketplacePreviewLink;
 
   @observable controls = [];
   @observable fileControls = [];
@@ -344,6 +346,7 @@ class FormStore {
       });
     this.controls = controls;
 
+    this.showMarketplacePreviewLink = config.show_marketplace_preview_link;
     this.associatePermissions = config.associate_permissions;
     this.availableAssetTypes = config.asset_types || DefaultSpec.asset_types;
     this.availableTitleTypes = config.title_types || DefaultSpec.title_types;
@@ -846,9 +849,7 @@ class FormStore {
         } else if(type === "file" || type === "file_url") {
           let linkInfo = this.LinkComponents(info[name]);
 
-          if(!linkInfo) {
-            linkInfo = {targetHash: this.rootStore.params.versionHash};
-          } else if(!linkInfo.targetHash) {
+          if(!linkInfo?.targetHash && linkInfo?.objectId) {
             linkInfo.targetHash = await this.rootStore.client.LatestVersionHash({objectId: linkInfo.objectId});
           }
 
@@ -857,7 +858,7 @@ class FormStore {
           info[name] = await this.LoadInfoFields({
             PATH: UrlJoin(BASE_PATH, name),
             infoFields: fields,
-            values: info[name],
+            values: info[name] || {},
             topLevelValues
           });
         } else if(type === "list") {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {runInAction, toJS} from "mobx";
 import {inject, observer} from "mobx-react";
 import {
@@ -32,6 +32,8 @@ import FileIcon from "../static/icons/file.svg";
 import ObjectSelection from "./ObjectSelection";
 import TextEditor from "./TextEditor";
 import UpdateLinkIcon from "../static/icons/arrow-up-circle.svg";
+import LockIcon from "../static/icons/lock.svg";
+import UnlockIcon from "../static/icons/unlock.svg";
 
 export const ReferencePathElements = (PATH, reference) => {
   if(!reference) { return []; }
@@ -105,7 +107,7 @@ const InitializeField = ({fields, defaultValue}) => {
         break;
       case "number":
       case "integer":
-        value = field.default_value || 0;
+        value = field.default_value || null;
         break;
       case "checkbox":
         value = field.default_value || false;
@@ -119,6 +121,52 @@ const InitializeField = ({fields, defaultValue}) => {
 
   return newValue;
 };
+
+const SHA512 = async (str) => {
+  const buf = await crypto.subtle.digest("SHA-512", new TextEncoder("utf-8").encode(str));
+  return Array.prototype.map.call(new Uint8Array(buf), x=>(("00"+x.toString(16)).slice(-2))).join("");
+};
+
+let hashTimeout;
+export const PasswordInput = ({label, name, value, onChange, hidden=false, required=false, className=""}) => {
+  if(hidden) { return null; }
+
+  const [locked, setLocked] = useState(!!value);
+  const [password, setPassword] = useState("");
+
+  return (
+    <div className={`-elv-input password-input ${className}`}>
+      <label htmlFor={name}>{label || FormatName(name)}</label>
+      <div className="password-input__container">
+        <input
+          key={`password-input-${locked}`}
+          type="password"
+          required={required}
+          name={name}
+          value={locked ? password || "**********" : password}
+          disabled={locked}
+          onChange={event => {
+            const newPassword = event.target.value;
+            setPassword(newPassword);
+
+            clearTimeout(hashTimeout);
+            hashTimeout = setTimeout(async () => {
+              onChange(await SHA512(newPassword));
+            }, 500);
+          }}
+          className="-elv-input password-input__input"
+        />
+        <button
+          onClick={() => setLocked(!locked)}
+          className="password-input__lock-button"
+        >
+          <ImageIcon label={locked ? "Unlock Password Field" : "Lock Password Field"} icon={locked ? LockIcon : UnlockIcon} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
 
 @inject("rootStore")
 @inject("contentStore")
@@ -134,7 +182,7 @@ class RecursiveField extends React.Component {
         required: field.required
       }) : null;
 
-      const key = `input-${name}-${field.name}-${this.props.localizationKey}`;
+      const key = `input-${field.name}-${this.props.localizationKey}`;
 
       if(this.props.localizationKey && (field.no_localize || field.path)) {
         return null;
@@ -149,7 +197,11 @@ class RecursiveField extends React.Component {
         const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.depends_on)));
 
         if(field.depends_on_value) {
-          if(dependent_value !== field.depends_on_value) {
+          if(Array.isArray(field.depends_on_value)) {
+            if(!field.depends_on_value.find(value => value === dependent_value)) {
+              return null;
+            }
+          } else if(dependent_value !== field.depends_on_value) {
             return null;
           }
         } else if(!dependent_value) {
@@ -161,7 +213,11 @@ class RecursiveField extends React.Component {
         const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.unless)));
 
         if(field.unless_value) {
-          if(dependent_value === field.unless_value) {
+          if(Array.isArray(field.unless_value)) {
+            if(field.unless_value.find(value => value === dependent_value)) {
+              return null;
+            }
+          } else if(dependent_value === field.unless_value) {
             return null;
           }
         } else if(dependent_value) {
@@ -182,6 +238,17 @@ class RecursiveField extends React.Component {
             key={key}
             name={field.name}
             label={hintLabel || field.label}
+            value={entry[field.name] || ""}
+            onChange={newValue => Update(field.name, newValue)}
+          />
+        );
+      } else if(fieldType === "password") {
+        return (
+          <PasswordInput
+            key={key}
+            required
+            name={field.name}
+            label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
             value={entry[field.name] || ""}
             onChange={newValue => Update(field.name, newValue)}
           />
@@ -285,11 +352,10 @@ class RecursiveField extends React.Component {
       } else if(fieldType === "select" || fieldType === "reference_select") {
         let options = localization.options || field.options;
         if(fieldType === "reference_select") {
-          options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || [])
-            .map(option => [option[field.label_key], option[field.value_key]]);
+          options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || []);
 
           if(field.allow_null) {
-            options = [["<None>", ""], ...options];
+            options = [[field.null_label || "<None>", ""], ...options];
           }
         }
 
@@ -304,6 +370,10 @@ class RecursiveField extends React.Component {
           />
         );
       } else if(fieldType === "multiselect" || fieldType === "reference_multiselect") {
+        if(!entry[field.name]) {
+          Update(field.name, []);
+        }
+
         let options = localization.options || field.options;
         if(fieldType === "reference_multiselect") {
           options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || [])
@@ -358,6 +428,10 @@ class RecursiveField extends React.Component {
           </LabelledField>
         );
       } else if(fieldType === "subsection" || fieldType === "reference_subsection") {
+        if(!field.fields || field.fields.length === 0) {
+          return null;
+        }
+
         if(typeof entry[field.name] !== "object") {
           Update(field.name, {});
         }
@@ -424,7 +498,7 @@ class RecursiveField extends React.Component {
       } else if(fieldType === "file" || fieldType === "file_url") {
         const {path, targetHash} = entry[field.name] || {};
         const extension = ((path || "").split(".").pop() || "").toLowerCase();
-        const isImage = ["apng", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
+        const isImage = ["apng", "gif", "ico", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
 
         return (
           <LabelledField

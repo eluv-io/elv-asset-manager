@@ -10,7 +10,9 @@ import {
 
 import {RecursiveField} from "./Inputs";
 import ObjectSelection from "./ObjectSelection";
+import UrlJoin from "url-join";
 
+@inject("rootStore")
 @inject("formStore")
 @observer
 class AssetInfo extends React.Component {
@@ -61,6 +63,20 @@ class AssetInfo extends React.Component {
   }
 
   render() {
+    let marketplacePreviewUrl;
+    if(this.props.formStore.showMarketplacePreviewLink) {
+      marketplacePreviewUrl = new URL(
+        this.props.rootStore.networkInfo.name === "main" ?
+          "https://wallet.preview.contentfabric.io" :
+          "https://wallet.demov3.contentfabric.io"
+      );
+
+      marketplacePreviewUrl.searchParams.set("mid", this.props.rootStore.params.objectId);
+      marketplacePreviewUrl.searchParams.set("preview", this.props.rootStore.params.objectId);
+      marketplacePreviewUrl.hash = UrlJoin("/marketplace", this.props.rootStore.params.objectId, "store");
+      marketplacePreviewUrl = marketplacePreviewUrl.toString();
+    }
+
     const assetInfo = this.props.formStore.currentLocalizedData.assetInfo;
     return (
       <div className="asset-form-section-container asset-info-section-container">
@@ -146,6 +162,17 @@ class AssetInfo extends React.Component {
                 Remove={this.props.formStore.RemovePermissionsObject}
               />
             )
+          }
+
+          {
+            marketplacePreviewUrl ?
+              <a
+                className="marketplace-preview-link"
+                target="_blank"
+                href={marketplacePreviewUrl}
+              >
+                Preview Marketplace
+              </a> : null
           }
 
           {

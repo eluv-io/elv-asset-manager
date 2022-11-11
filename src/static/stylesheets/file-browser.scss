@@ -30,6 +30,8 @@ $preview-background: rgba(0, 0, 0, 0.5);
 
   &.file-browser-container {
     overflow-y: auto;
+    // sass-lint:disable no-misspelled-properties
+    overscroll-behavior: contain;
   }
 
   table {

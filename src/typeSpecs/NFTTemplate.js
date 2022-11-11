@@ -1,9 +1,11 @@
+import NFTMedia from "./NFTMedia";
+
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 
 const NFTTemplateSpec = {
   "profile": {
     "name": "NFT Template",
-    "version": "0.3",
+    "version": "0.4",
   },
   "playable": true,
   "display_app": "default",
@@ -64,6 +66,18 @@ const NFTTemplateSpec = {
           "label": "Fabric Key ID",
           "type": "text"
         },
+        {
+          "name": "use_mint_ordinal_in_token_id",
+          "label": "Use Mint Ordinal in Token ID",
+          "type": "checkbox",
+          "default_value": true
+        },
+        {
+          "name": "shuffle_token_id",
+          "label": "Shuffle Token ID",
+          "type": "checkbox",
+          "default_value": true
+        }
       ]
     },
     {
@@ -78,6 +92,13 @@ const NFTTemplateSpec = {
           "type": "uuid"
         },
         {
+          "name": "test",
+          "label": "Test Mode",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If checked, this NFT will not be listable for sale"
+        },
+        {
           "name": "name",
           "type": "text"
         },
@@ -90,8 +111,33 @@ const NFTTemplateSpec = {
           "type": "textarea"
         },
         {
+          "label": "Description (Rich Text)",
+          "name": "description_rich_text",
+          "type": "rich_text",
+          "hint": "NOTE: This will only be used in the featured item and item details view. The description field (above) will be used in the card list view"
+        },
+        {
+          "label": "Additional Info",
           "name": "rich_text",
           "type": "rich_text"
+        },
+        {
+          "label": "Terms Document",
+          "name": "terms_document",
+          "type": "subsection",
+          "hint": "If specified, a link to this terms document will be present on the login screen",
+          "fields": [
+            {
+              "name": "link_text",
+              "type": "text",
+              "default_value": "Terms and Conditions"
+            },
+            {
+              "name": "terms_document",
+              "type": "file",
+              "extensions": ["html", "pdf"]
+            }
+          ]
         },
         {
           "name": "media_type",
@@ -100,13 +146,33 @@ const NFTTemplateSpec = {
             "Video",
             "Audio",
             "Image",
-            "Ebook"
+            "Ebook",
+            "HTML"
           ]
         },
         {
           "name": "media",
+          "label": "Media File",
           "type": "file",
-          "hint": "Additional media for this NFT, for example the Ebook file."
+          "hint": "If this media is displayed via file, like an image, Ebook or HTML, select the file to display",
+          "depends_on": "./media_type",
+          "depends_on_value": ["Image", "Ebook", "HTML"]
+        },
+        {
+          "name": "media_parameters",
+          "type": "list",
+          "depends_on": "./media_type",
+          "depends_on_value": "HTML",
+          "fields": [
+            {
+              "name": "name",
+              "type": "text"
+            },
+            {
+              "name": "value",
+              "type": "text"
+            }
+          ]
         },
         {
           "name": "address",
@@ -140,11 +206,6 @@ const NFTTemplateSpec = {
           "hint": "Square image recommended"
         },
         {
-          "name": "generative",
-          "type": "checkbox",
-          "default_value": false
-        },
-        {
           "name": "playable",
           "type": "checkbox",
           "default_value": true
@@ -153,6 +214,23 @@ const NFTTemplateSpec = {
           "name": "has_audio",
           "type": "checkbox",
           "default_value": false
+        },
+        {
+          "name": "generative",
+          "type": "checkbox",
+          "default_value": false
+        },
+        {
+          "name": "id_format",
+          "label": "ID Format",
+          "type": "select",
+          "default_value": "token_id",
+          "options": [
+            "token_id",
+            "token_id/cap",
+            "ordinal/cap",
+            "ordinal"
+          ]
         },
         {
           "name": "token_uri",
@@ -186,10 +264,7 @@ const NFTTemplateSpec = {
           "autoplay": true,
           "check_has_audio_flag": true
         },
-        {
-          "name": "background_color",
-          "type": "color"
-        },
+
         {
           "name": "style",
           "label": "Style Variant",
@@ -201,78 +276,78 @@ const NFTTemplateSpec = {
           "type": "checkbox",
         },
         {
-          "name": "additional_media",
+          "name": "test",
+          "label": "Test NFT",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If checked, this NFT will be marked as a test NFT"
+        },
+        {
+          "name": "redeemable_offers",
           "type": "list",
           "fields": [
             {
+              "label": "Offer ID",
+              "name": "offer_id",
+              "type": "text",
+              "readonly": true
+            },
+            {
               "name": "name",
-              "type": "text"
+              "type": "text",
             },
             {
-              "name": "subtitle_1",
-              "type": "text",
-              "hint": "Artist, for example"
-            },
-            {
-              "name": "subtitle_2",
-              "type": "text",
-              "hint": "Album, for example"
+              "extensions": imageTypes,
+              "name": "image",
+              "type": "file",
+              "hint": "Square image recommended"
             },
             {
               "name": "description",
               "type": "rich_text"
             },
             {
-              "extensions": imageTypes,
-              "name": "image",
-              "type": "file_url",
-              "hint": "Square image recommended"
+              "label": "Release Date",
+              "name": "available_at",
+              "type": "datetime",
+              "hint": "(Optional) - If specified, this offer will not be redeemable until the specified time"
             },
             {
-              "name": "default",
-              "type": "checkbox",
-              "default_value": false
+              "label": "End Date",
+              "name": "expires_at",
+              "type": "datetime",
+              "hint": "(Optional) - If specified, this item will no longer be redeemable after the specified time."
             },
             {
-              "name": "requires_permissions",
-              "type": "checkbox",
-              "default_value": false
+              "name": "style",
+              "label": "Style Variant",
+              "type": "text",
+              "hint": "If specified, this will be added to the HTML container class when this offer is displayed (e.g. 'redeemable-offer--variant-(style)'"
             },
             {
-              "name": "media_type",
-              "type": "select",
-              "options": [
-                "Video",
-                "Audio",
-                "Image",
-                "Ebook",
-                "HTML"
-              ]
-            },
-            {
-              "name": "media_link",
-              "type": "fabric_link",
-              "hint": "For video content, select the playable content object",
-              "video_preview": true
-            },
-            {
-              "name": "media_file",
-              "type": "file",
-              "hint": "If this media is displayed via file, like an image, Ebook or HTML, select the file to display"
-            },
-            {
-              "name": "parameters",
-              "type": "list",
-              "depends_on": "./media_type",
-              "depends_on_value": "HTML",
+              "name": "visibility",
+              "type": "subsection",
               "fields": [
                 {
-                  "name": "name",
-                  "type": "text"
+                  "label": "Hidden",
+                  "name": "hide",
+                  "type": "checkbox",
+                  "default_value": false,
+                  "hint": "If checked, this offer will not be shown"
                 },
                 {
-                  "name": "value",
-                  "type": "text"
+                  "name": "hide_if_unreleased",
+                  "type": "checkbox",
+                  "unless": "./hide",
+                  "hint": "If checked, this offer will be hidden until the release date",
+                  "default_value": false
+                },
+                {
+                  "name": "hide_if_expired",
+                  "type": "checkbox",
+                  "unless": "./hide",
+                  "hint": "If checked, this offer will be hidden after the expiration date",
+                  "default_value": false
                 }
               ]
             }
@@ -375,6 +450,46 @@ const NFTTemplateSpec = {
               "hint": "If specified, the default text displayed while opening the pack will be hidden and the open animation will be larger"
             },
             {
+              "name": "use_custom_open_text",
+              "type": "checkbox",
+              "default_value": false,
+              "hint": "If specified, you can configure the text that is displayed while opening the pack",
+              "unless": "./hide_text"
+            },
+            {
+              "name": "minting_text",
+              "type": "subsection",
+              "unless": "./hide_text",
+              "depends_on": "./use_custom_open_text",
+              "fields": [
+                {
+                  "name": "minting_header",
+                  "type": "text",
+                  "default_value": "Your pack is opening"
+                },
+                {
+                  "name": "minting_subheader1",
+                  "type": "text",
+                  "default_value": "This may take several minutes"
+                },
+                {
+                  "name": "minting_subheader2",
+                  "type": "text",
+                  "default_value": "You can navigate away from this page if you don't want to wait. Your items will be available in your wallet when the process is complete."
+                },
+                {
+                  "name": "reveal_header",
+                  "type": "text",
+                  "default_value": "Congratulations!"
+                },
+                {
+                  "name": "reveal_subheader",
+                  "type": "text",
+                  "default_value": "You've received the following items:"
+                }
+              ]
+            },
+            {
               "name": "open_animation",
               "type": "fabric_link",
               "hint": "Looping video that will play while pack is opening",
@@ -414,15 +529,15 @@ const NFTTemplateSpec = {
                     {
                       "name": "probability",
                       "type": "integer",
-                      "hint": "Integer percentage from 0 to 100",
-                      "default_value": 100
+                      "default_value": 0
                     }
                   ]
                 }
               ]
             }
           ]
-        }
+        },
+        ...NFTMedia,
       ]
     }
   ]

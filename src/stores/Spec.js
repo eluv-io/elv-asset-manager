@@ -29,6 +29,7 @@ const Duplicates = (values) =>
 class SpecStore {
   @observable profile;
   @observable associatePermissions = false;
+  @observable showIndexerSettings = false;
   @observable playable = false;
   @observable hideImageTab = false;
   @observable showSearchablesTab = false;
@@ -72,6 +73,7 @@ class SpecStore {
     });
 
     this.associatePermissions = config.associate_permissions || false;
+    this.showIndexerSettings = config.show_indexer_settings || false;
     this.playable = config.playable || false;
     this.hideImageTab = config.hide_image_tab || config.hideImageTab || false;
     this.hideUpdateLinksButton = config.hide_update_links_button || config.hideUpdateLinksButton || false;
@@ -263,6 +265,7 @@ class SpecStore {
       let titleConfiguration = {
         ...toJS(this.rootStore.titleConfiguration || {}),
         associate_permissions: this.associatePermissions,
+        show_indexer_settings: this.showIndexerSettings,
         hide_image_tab: this.hideImageTab,
         hide_update_links_button: this.hideUpdateLinksButton,
         show_searchables_tab: this.showSearchablesTab,
@@ -426,6 +429,11 @@ class SpecStore {
   @action.bound
   TogglePermissionAssociation(enabled) {
     this.associatePermissions = enabled;
+  }
+
+  @action.bound
+  ToggleIndexerSettings(enabled) {
+    this.showIndexerSettings = enabled;
   }
 
   @action.bound

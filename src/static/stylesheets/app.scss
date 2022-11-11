@@ -372,6 +372,12 @@ button {
   }
 }
 
+.marketplace-preview-link {
+  display: block;
+  margin-top: 50px;
+  width: max-content;
+}
+
 .section {
   margin-bottom: $elv-spacing-l;
 }
@@ -717,10 +723,14 @@ select {
 }
 
 .asset-form-modal {
+  // sass-lint:disable no-misspelled-properties
+  overscroll-behavior: contain;
+
   .-elv-modal-content {
     max-height: 70%;
     max-width: 70%;
     min-height: 50%;
+    overscroll-behavior: contain;
   }
 }
 

@@ -1,4 +1,4 @@
-const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
+const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp", "ico"];
 const languageOptions = require("./LanguageCodes");
 const countryOptions = Object.values(require("country-codes-list").customList("countryNameEn", "{countryCode}: {countryNameEn}")).sort();
 const currencyOptions = [...new Set(Object.values(require("country-codes-list").customList("countryNameEn", "{currencyCode}")))].filter(c => c).sort();
@@ -77,6 +77,12 @@ const eventSiteSpec = {
             "Storefront",
             "Listings"
           ]
+        },
+        {
+          "name": "marketplace_only",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If checked, only the marketplace will be shown"
         }
       ]
     },
@@ -106,6 +112,28 @@ const eventSiteSpec = {
         "dark"
       ],
       "no_localize": true,
+    },
+    {
+      "name": "font",
+      "type": "select",
+      "options": [
+        "Helvetica Neue",
+        "Inter",
+        "Albertus",
+        "Compacta",
+        "Selawik"
+      ],
+      "default_value": "Helvetica Neue"
+    },
+    {
+      "name": "favicon",
+      "type": "file",
+      "extensions": imageTypes
+    },
+    {
+      "name": "custom_css",
+      "label": "Custom CSS",
+      "type": "textarea"
     },
     {
       "name": "localizations",
@@ -248,6 +276,16 @@ const eventSiteSpec = {
               "depends_on": "./show"
             },
             {
+              "name": "button_image",
+              "type": "file",
+              "extensions": imageTypes
+            },
+            {
+              "name": "button_link",
+              "type": "text",
+              "hint": "If specified, the button will link to the specified URL instead of initiating the login flow"
+            },
+            {
               "name": "post_login",
               "label": "Post Login Modal",
               "type": "subsection",
@@ -273,20 +311,19 @@ const eventSiteSpec = {
                   "hint": "Text for the button at the bottom of the modal. By default, it will be 'Go to the Marketplace' if 'Show Marketplace' is checked, otherwise it will be 'Close'"
                 },
                 {
+                  "name": "button_image",
+                  "type": "file",
+                  "extensions": imageTypes
+                },
+                {
+                  "name": "button_link",
+                  "type": "text",
+                  "hint": "If specified, the button will link to the specified URL instead."
+                },
+                {
                   "name": "show_marketplace",
                   "type": "checkbox",
                   "hint": "Show the marketplace after the post login modal"
-                },
-                {
-                  "name": "marketplace_filters",
-                  "type": "list",
-                  "hint": "Use this fields to filter the items shown"
-                },
-                {
-                  "name": "hide_navigation",
-                  "label": "Hide Marketplace Navigation",
-                  "type": "checkbox",
-                  "hint": "If checked, the back button will not be shown in the marketplace."
                 }
               ]
             }
@@ -318,6 +355,22 @@ const eventSiteSpec = {
           "name": "hero_background_mobile",
           "label": "Hero Background (Mobile)",
           "type": "file"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "hero_banner",
+          "type": "file"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "hero_banner_mobile",
+          "label": "Hero Banner (Mobile)",
+          "type": "file"
+        },
+        {
+          "name": "hero_banner_link",
+          "type": "text",
+          "depends_on": "./hero_banner"
         },
         {
           "name": "hero_video",
@@ -511,6 +564,11 @@ const eventSiteSpec = {
           "type": "text"
         },
         {
+          "name": "button_image",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
           "name": "pages",
           "type": "list",
           "fields": [
@@ -621,7 +679,7 @@ const eventSiteSpec = {
     {
       "name": "footer_links",
       "type": "list",
-      "hint": "Specify links to include in the footer of the event, such as privacy or terms policies. Each item can either be specified as a URL, rich text, or an HTML document. The two latter options will be shown in a modal when clicked.",
+      "hint": "Specify links to include in the footer of the event, such as privacy or terms policies. Each item can either be specified as a URL, image, rich text, or an HTML document. The three latter options will be shown in a modal when clicked.",
       "fields": [
         {
           "name": "text",
@@ -631,6 +689,16 @@ const eventSiteSpec = {
           "name": "url",
           "label": "URL Link",
           "type": "text"
+        },
+        {
+          "extensions": imageTypes,
+          "name": "image",
+          "type": "file",
+        },
+        {
+          "name": "image_alt_text",
+          "type": "text",
+          "depends_on": "./image"
         },
         {
           "label": "Content (Rich Text)",
@@ -644,6 +712,10 @@ const eventSiteSpec = {
           "extensions": ["html"]
         }
       ]
+    },
+    {
+      "name": "footer_text",
+      "type": "rich_text"
     },
     {
       "name": "branding",
@@ -675,6 +747,11 @@ const eventSiteSpec = {
               "default_value": {
                 "color": "#d7bb73"
               }
+            },
+            {
+              "name": "button_image",
+              "type": "file",
+              "extensions": imageTypes
             }
           ]
         },
@@ -703,6 +780,11 @@ const eventSiteSpec = {
               "default_value": {
                 "color": "#d7bb73"
               }
+            },
+            {
+              "name": "button_image",
+              "type": "file",
+              "extensions": imageTypes
             }
           ]
         },
@@ -731,6 +813,11 @@ const eventSiteSpec = {
               "default_value": {
                 "color": "#000000"
               }
+            },
+            {
+              "name": "button_image",
+              "type": "file",
+              "extensions": imageTypes
             }
           ]
         },
@@ -759,6 +846,11 @@ const eventSiteSpec = {
               "default_value": {
                 "color": "#d7bb73"
               }
+            },
+            {
+              "name": "button_image",
+              "type": "file",
+              "extensions": imageTypes
             }
           ]
         }
@@ -778,12 +870,16 @@ const eventSiteSpec = {
       "depends_on": "./show_faq",
       "fields": [
         {
+          "name": "key",
+          "type": "text"
+        },
+        {
           "name": "question",
           "type": "text"
         },
         {
           "name": "answer",
-          "type": "textarea"
+          "type": "rich_text"
         }
       ]
     },
@@ -1121,10 +1217,9 @@ const eventSiteSpec = {
           ]
         },
         {
-          "label": "Marketplace Filters",
-          "name": "store_filters",
-          "type": "list",
-          "hint": "After the drop, the wallet panel will be redirected to the store. Use these fields to filter the items shown for users who voted"
+          "name": "skip_countdown_page",
+          "type": "checkbox",
+          "default_value": false
         },
         {
           "fields": [
@@ -1842,6 +1937,7 @@ const eventSiteSpec = {
                 "App Nexus Pixel ID",
                 "TradeDoubler Organization ID",
                 "TradeDoubler Event ID",
+                "Twitter Pixel ID"
               ]
             },
             {
@@ -1850,6 +1946,60 @@ const eventSiteSpec = {
               "type": "text"
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "landing_page_view_analytics",
+      "type": "subsection",
+      "no_localize": true,
+      "fields": [
+        {
+          "name": "google_conversion_label",
+          "label": "Google Conversion Label",
+          "type": "string"
+        },
+        {
+          "name": "google_conversion_id",
+          "label": "Google Conversion ID",
+          "type": "string"
+        },
+        {
+          "name": "facebook_event_id",
+          "label": "Facebook Event ID",
+          "type": "string"
+        },
+        {
+          "name": "twitter_event_id",
+          "label": "Twitter Event ID",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "marketplace_page_view_analytics",
+      "type": "subsection",
+      "no_localize": true,
+      "fields": [
+        {
+          "name": "google_conversion_label",
+          "label": "Google Conversion Label",
+          "type": "string"
+        },
+        {
+          "name": "google_conversion_id",
+          "label": "Google Conversion ID",
+          "type": "string"
+        },
+        {
+          "name": "facebook_event_id",
+          "label": "Facebook Event ID",
+          "type": "string"
+        },
+        {
+          "name": "twitter_event_id",
+          "label": "Twitter Event ID",
+          "type": "string"
         }
       ]
     },

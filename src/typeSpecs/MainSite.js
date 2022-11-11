@@ -47,6 +47,11 @@ const mainSiteSelectorSpec = {
       "default_value": "test"
     },
     {
+      "name": "marketplace_order",
+      "type": "list",
+      "hint": "Specify marketplace slugs. Any marketplaces not specified will be shown in a non-deterministic order after all specified marketplaces"
+    },
+    {
       "name": "domain_map",
       "label": "Domain Name Mapping",
       "type": "list",

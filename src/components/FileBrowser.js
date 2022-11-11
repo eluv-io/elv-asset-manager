@@ -67,7 +67,7 @@ class FileBrowser extends React.Component {
     const mimeType = (this.props.mimeTypes || {})[extension] || "";
     const isImage =
       mimeType.startsWith("image") ||
-      ["apng", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
+      ["apng", "gif", "ico", "jpg", "jpeg", "png", "svg", "webp"].includes(extension);
 
     if(encrypted) {
       return <ImageIcon icon={EncryptedFileIcon} className={encrypted ? "encrypted-file-icon" : ""} label="Encrypted File"/>;
