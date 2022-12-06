@@ -11,6 +11,7 @@ import RemoveIcon from "../static/icons/trash.svg";
 import PlayIcon from "../static/icons/play-circle.svg";
 import LinkIcon from "../static/icons/external-link.svg";
 import KeyIcon from "../static/icons/key.svg";
+import LockIcon from "../static/icons/lock.svg";
 
 export const Clip = ({
   index,
@@ -90,7 +91,7 @@ export const Clip = ({
 
     signButton = (
       <IconButton
-        icon={KeyIcon}
+        icon={authorizedLink ? LockIcon : KeyIcon}
         title={authorizedLink ? "Unsign link" : "Sign link"}
         onClick={async () => {
           await Confirm({
