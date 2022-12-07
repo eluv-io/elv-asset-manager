@@ -10,6 +10,8 @@ import UpdateIcon from "../static/icons/arrow-up-circle.svg";
 import RemoveIcon from "../static/icons/trash.svg";
 import PlayIcon from "../static/icons/play-circle.svg";
 import LinkIcon from "../static/icons/external-link.svg";
+import KeyIcon from "../static/icons/key.svg";
+import LockIcon from "../static/icons/lock.svg";
 
 export const Clip = ({
   index,
@@ -24,9 +26,10 @@ export const Clip = ({
   Remove,
   Update,
   SetDefault,
-  OpenObjectLink
+  OpenObjectLink,
+  SignLink
 }) => {
-  const {versionHash, title, id, slug, assetType, latestVersionHash} = clip;
+  const {versionHash, title, id, slug, assetType, latestVersionHash, originalLink} = clip;
 
   const [showPreview, setShowPreview] = useState(false);
 
@@ -82,6 +85,24 @@ export const Clip = ({
     );
   }
 
+  let signButton;
+  if(originalLink) {
+    const authorizedLink = originalLink["."].hasOwnProperty("authorization");
+
+    signButton = (
+      <IconButton
+        icon={authorizedLink ? LockIcon : KeyIcon}
+        title={authorizedLink ? "Unsign link" : "Sign link"}
+        onClick={async () => {
+          await Confirm({
+            message: `Are you sure you want to ${authorizedLink ? "unsign" : "sign"} the link for ${name ? name : ""} '${title}'?`,
+            onConfirm: () => SignLink({sign: !authorizedLink})
+          });
+        }}
+      />
+    );
+  }
+
   return (
     <React.Fragment>
       <div
@@ -109,6 +130,7 @@ export const Clip = ({
         { defaultButton }
         { orderButtons }
         <div className="asset-form-clip-actions">
+          { signButton }
           { updateButton }
           { linkButton }
           <IconButton
@@ -220,6 +242,14 @@ class Clips extends React.Component {
                 index
               })}
               OpenObjectLink={this.props.rootStore.OpenObjectLink}
+              SignLink={({sign}) => this.props.formStore.ToggleLinkAuth({
+                sign,
+                versionHash: clip.versionHash,
+                containerId: this.props.rootStore.params.objectId,
+                path: `public/asset_metadata/${this.props.storeKey}/${clip.isDefault ? "default" : index}/${clip.slug}`,
+                key: this.props.storeKey,
+                index
+              })}
             />
           )}
         </div>
