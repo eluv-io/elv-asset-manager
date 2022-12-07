@@ -2353,7 +2353,7 @@ class FormStore {
           writeToken,
           commitMessage: "Sign link"
         });
-      } catch(error) {
+      } catch (error) {
         // eslint-disable-next-line no-console
         console.error("Unable to sign link");
         // eslint-disable-next-line no-console
@@ -2389,7 +2389,7 @@ class FormStore {
             commitMessage: "Unsign link"
           });
         }
-      } catch(error) {
+      } catch (error) {
         // eslint-disable-next-line no-console
         console.error("Unable to unsign link");
         // eslint-disable-next-line no-console
