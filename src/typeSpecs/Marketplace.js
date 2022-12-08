@@ -553,8 +553,6 @@ const MarketplaceSpec = {
     {
       "name": "default_display_currency",
       "type": "reference_select",
-      "allow_null": true,
-      "null_label": "USD",
       "reference": "./display_currencies",
       "depends_on": "./display_currencies"
     },

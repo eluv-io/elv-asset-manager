@@ -353,7 +353,8 @@ button {
   border-bottom: 1px solid $elv-color-lightgray;
   display: flex;
   flex-direction: column;
-  padding: 0 $elv-spacing-m $elv-spacing-xl;
+  margin-top: $elv-spacing-m;
+  padding: $elv-spacing-m $elv-spacing-m $elv-spacing-xl;
 
   .asset-form-separator {
     background: $elv-color-lightgray;
@@ -558,8 +559,8 @@ select {
 }
 
 .asset-form-clip {
+  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 5rem;
   font-size: 0.9rem;
-  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 4rem;
   min-height: $elv-spacing-ml;
 
   .asset-form-clip-actions {
@@ -655,14 +656,14 @@ select {
 }
 
 .asset-form-clip-orderable {
-  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 2rem 4rem;
+  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 2rem 5rem;
 }
 
 .asset-form-clip-defaultable {
-  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 4rem 4rem;
+  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 4rem 5rem;
 
   &.asset-form-clip-orderable {
-    grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 4rem 2rem 4rem;
+    grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 5fr 4rem 2rem 5rem;
   }
 }
 

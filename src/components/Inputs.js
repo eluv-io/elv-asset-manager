@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {runInAction, toJS} from "mobx";
 import {inject, observer} from "mobx-react";
 import {
@@ -6,7 +6,6 @@ import {
   IconButton,
   Input,
   TextArea,
-  Selection,
   MultiSelect,
   Checkbox,
   JsonInput,
@@ -163,6 +162,39 @@ export const PasswordInput = ({label, name, value, onChange, hidden=false, requi
           <ImageIcon label={locked ? "Unlock Password Field" : "Lock Password Field"} icon={locked ? LockIcon : UnlockIcon} />
         </button>
       </div>
+    </div>
+  );
+};
+
+export const Selection = ({label, name, value, onChange, options, className=""}) => {
+  useEffect(() => {
+    try {
+      if(options && options.length > 0 && typeof options.find(option => Array.isArray(option) ? option[1] === value : option === value) === "undefined") {
+        onChange(Array.isArray(options[0]) ? options[0][1] : options[0]);
+      }
+      // eslint-disable-next-line no-empty
+    } catch (error) {}
+  }, [value]);
+
+  return (
+    <div className={`-elv-input -elv-select ${className}`}>
+      <label htmlFor={name}>{label || FormatName(name)}</label>
+      <select
+        name={name}
+        value={value}
+        onChange={event => onChange(event.target.value)}
+      >
+        {options.map(option => {
+          let name = option;
+          let value = option;
+          if(Array.isArray(option)) {
+            name = option[0];
+            value = option[1];
+          }
+
+          return <option value={value} key={`asset-info-${name}-${value}`}>{name}</option>;
+        })}
+      </select>
     </div>
   );
 };

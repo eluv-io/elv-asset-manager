@@ -888,8 +888,8 @@ const eventSiteSpec = {
 
 
     {
-      "label": "Tickets, Products and Coupons",
-      "name": "header_tickets_products_coupons",
+      "label": "Tickets, Products and Offers",
+      "name": "header_tickets_products_offers",
       "type": "header"
     },
     {
@@ -915,34 +915,39 @@ const eventSiteSpec = {
       "hint": "If specified, the event is free for all users and tickets will not be necessary."
     },
     {
+      "name": "offers",
+      "type": "list",
       "fields": [
         {
-          "name": "coupon_mode",
-          "type": "checkbox",
-          "no_localize": true,
-          "hint": "If specified, coupon redemption will be available"
+          "name": "id",
+          "label": "ID",
+          "type": "uuid"
         },
         {
-          "name": "redemption_message",
-          "type": "text",
-          "hint": "Text to be displayed on coupon redemption page",
-          "depends_on": "./coupon_mode"
+          "name": "sku",
+          "label": "Item SKU",
+          "type": "text"
         },
         {
-          "name": "event_page_message_1",
-          "type": "text",
-          "hint": "Text to be displayed on event page after redemption",
-          "depends_on": "./coupon_mode"
+          "name": "tenant_id",
+          "label": "Tenant ID",
+          "hint": "If different from the site",
+          "type": "text"
         },
         {
-          "name": "event_page_message_2",
-          "type": "text",
-          "hint": "Text to be displayed on event page after redemption",
-          "depends_on": "./coupon_mode"
+          "name": "ntp_id",
+          "label": "NTP ID",
+          "type": "text"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "description",
+          "type": "rich_text"
         }
-      ],
-      "name": "coupon_redemption",
-      "type": "subsection"
+      ]
     },
     {
       "fields": [

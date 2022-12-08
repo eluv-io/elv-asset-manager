@@ -135,6 +135,10 @@ class FormStore {
   @observable slugWarning = false;
   @observable siteSelectorInfo = {};
 
+  get client() {
+    return this.rootStore.client;
+  }
+
   @computed get relevantAssociatedAssets() {
     return this.associatedAssets.filter(assetType => (
       !assetType.for_title_types ||
@@ -2430,6 +2434,96 @@ class FormStore {
       console.error(error.body ? JSON.stringify(error, null, 2) : error);
       throw error;
     }
+  });
+
+  @action.bound
+  ToggleLinkAuth = flow(function * ({
+    versionHash,
+    containerId,
+    path,
+    sign=true,
+    key,
+    index
+  }) {
+    const libraryId = yield this.client.ContentObjectLibraryId({objectId: containerId});
+    const {writeToken} = yield this.client.EditContentObject({
+      libraryId,
+      objectId: containerId
+    });
+
+    if(sign) {
+      try {
+        yield this.client.CreateLinks({
+          libraryId,
+          objectId: containerId,
+          writeToken,
+          links: [{
+            autoUpdate: true,
+            type: "meta",
+            path,
+            targetHash: versionHash,
+            target: "public/asset_metadata",
+            authContainer: containerId
+          }]
+        });
+
+        yield this.client.FinalizeContentObject({
+          libraryId,
+          objectId: containerId,
+          writeToken,
+          commitMessage: "Sign link"
+        });
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("Unable to sign link");
+        // eslint-disable-next-line no-console
+        console.error(error);
+      }
+    } else {
+      try {
+        const metadata = yield this.client.ContentObjectMetadata({
+          libraryId,
+          objectId: containerId,
+          metadataSubtree: path
+        });
+
+        if(
+          metadata &&
+          metadata["."] &&
+          metadata["."]["authorization"]
+        ) {
+          delete metadata["."]["authorization"];
+
+          yield this.client.ReplaceMetadata({
+            libraryId,
+            objectId: containerId,
+            writeToken,
+            metadataSubtree: path,
+            metadata
+          });
+
+          yield this.client.FinalizeContentObject({
+            libraryId,
+            objectId: containerId,
+            writeToken,
+            commitMessage: "Unsign link"
+          });
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("Unable to unsign link");
+        // eslint-disable-next-line no-console
+        console.error(error);
+      }
+    }
+
+    const updatedLink = yield this.client.ContentObjectMetadata({
+      libraryId,
+      objectId: containerId,
+      metadataSubtree: path
+    });
+
+    this.currentLocalizedData.assets[key][index].originalLink = updatedLink;
   });
 }
 
