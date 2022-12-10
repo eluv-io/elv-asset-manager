@@ -214,8 +214,22 @@ class FormStore {
     return !!this.controls.find(c => typeof c === "string" ? control === c : c.type === control);
   }
 
-  CreateLink({targetHash, linkTarget="/meta/public/asset_metadata", options={}}) {
+  CreateLink({
+    targetHash,
+    linkTarget="/meta/public/asset_metadata",
+    options={},
+    auth
+  }) {
     const Utils = rootStore.client.utils;
+
+    if(auth) {
+      if(!options.hasOwnProperty(".")) {
+        options["."] = {};
+      }
+
+
+    }
+
     if(!targetHash || Utils.DecodeVersionHash(targetHash).objectId === Utils.DecodeVersionHash(this.rootStore.params.versionHash).objectId) {
       return {
         ...options,
@@ -584,7 +598,7 @@ class FormStore {
       metadataSubtree: "public"
     });
 
-    rootStore.SetMessage(`Successfully added searchable: ${metadata.name || versionHash}`);
+    rootStore.SetMessage("Successfully added");
   });
 
   // Clips/trailers
@@ -1140,6 +1154,13 @@ class FormStore {
             ...this.targets[targetHash]
           };
 
+          if(
+            asset.originalLink["."] &&
+            asset.originalLink["."]["authorization"]
+          ) {
+            asset.isSigned = true;
+          }
+
           if(key === "default") {
             asset.isDefault = true;
             defaultAsset = asset;
@@ -1559,7 +1580,25 @@ class FormStore {
     let index = hasDefault ? 1 : 0;
 
     await Promise.all(
-      (assets || []).map(async ({displayTitle, versionHash, isDefault, slug, originalLink={}}) => {
+      (assets || []).map(async ({displayTitle, versionHash, isDefault, isSigned, slug, authContainerId, originalLink={}}) => {
+        if(isSigned) {
+          if(!originalLink.hasOwnProperty(".")) {
+            originalLink["."] = {};
+          }
+
+          if(!originalLink["."]["authorization"]) {
+            originalLink["."]["authorization"] = await this.client.GenerateSignedLinkToken({
+              containerId: authContainerId,
+              versionHash,
+              link: `./meta/public/asset_metadata`
+            });
+          }
+        } else {
+          if(originalLink["."] && originalLink["."]["authorization"]) {
+            delete originalLink["."]["authorization"];
+          }
+        }
+
         const link = this.CreateLink({targetHash: versionHash, options: originalLink});
 
         let key;
@@ -2437,94 +2476,12 @@ class FormStore {
   });
 
   @action.bound
-  ToggleLinkAuth = flow(function * ({
-    versionHash,
-    containerId,
-    path,
-    sign=true,
-    key,
-    index
-  }) {
-    const libraryId = yield this.client.ContentObjectLibraryId({objectId: containerId});
-    const {writeToken} = yield this.client.EditContentObject({
-      libraryId,
-      objectId: containerId
-    });
+  ToggleLinkAuth = ({key, index, sign, containerId}) => {
+    const clip = this.currentLocalizedData.assets[key][index];
 
-    if(sign) {
-      try {
-        yield this.client.CreateLinks({
-          libraryId,
-          objectId: containerId,
-          writeToken,
-          links: [{
-            autoUpdate: true,
-            type: "meta",
-            path,
-            targetHash: versionHash,
-            target: "public/asset_metadata",
-            authContainer: containerId
-          }]
-        });
-
-        yield this.client.FinalizeContentObject({
-          libraryId,
-          objectId: containerId,
-          writeToken,
-          commitMessage: "Sign link"
-        });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Unable to sign link");
-        // eslint-disable-next-line no-console
-        console.error(error);
-      }
-    } else {
-      try {
-        const metadata = yield this.client.ContentObjectMetadata({
-          libraryId,
-          objectId: containerId,
-          metadataSubtree: path
-        });
-
-        if(
-          metadata &&
-          metadata["."] &&
-          metadata["."]["authorization"]
-        ) {
-          delete metadata["."]["authorization"];
-
-          yield this.client.ReplaceMetadata({
-            libraryId,
-            objectId: containerId,
-            writeToken,
-            metadataSubtree: path,
-            metadata
-          });
-
-          yield this.client.FinalizeContentObject({
-            libraryId,
-            objectId: containerId,
-            writeToken,
-            commitMessage: "Unsign link"
-          });
-        }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Unable to unsign link");
-        // eslint-disable-next-line no-console
-        console.error(error);
-      }
-    }
-
-    const updatedLink = yield this.client.ContentObjectMetadata({
-      libraryId,
-      objectId: containerId,
-      metadataSubtree: path
-    });
-
-    this.currentLocalizedData.assets[key][index].originalLink = updatedLink;
-  });
+    this.currentLocalizedData.assets[key][index].isSigned = sign;
+    this.currentLocalizedData.assets[key][index].authContainerId = sign ? this.rootStore.params.objectId : "";
+  }
 }
 
 export default FormStore;

@@ -18,6 +18,7 @@ export const Clip = ({
   index,
   isDefault,
   isPlayable,
+  isSigned,
   clip,
   name,
   length,
@@ -88,16 +89,14 @@ export const Clip = ({
 
   let signButton;
   if(originalLink) {
-    const authorizedLink = originalLink["."].hasOwnProperty("authorization");
-
     signButton = (
       <IconButton
-        icon={authorizedLink ? LockIcon : KeyIcon}
-        title={authorizedLink ? "Unsign link" : "Sign link"}
+        icon={isSigned ? LockIcon : KeyIcon}
+        title={isSigned ? "Unsign link" : "Sign link"}
         onClick={async () => {
           await Confirm({
-            message: `Are you sure you want to ${authorizedLink ? "unsign" : "sign"} the link for ${name ? name : ""} '${title}'?`,
-            onConfirm: () => SignLink({sign: !authorizedLink})
+            message: `Are you sure you want to ${isSigned ? "unsign" : "sign"} the link for ${name ? name : ""} '${title}'?`,
+            onConfirm: () => SignLink({sign: !isSigned})
           });
         }}
       />
@@ -135,7 +134,7 @@ export const Clip = ({
           onClick={() => isPlayable ? setShowPreview(!showPreview) : ""}
         />
         <div className="hint">{assetType}</div>
-        {TitleText()}
+        { TitleText() }
         <div className="clip-slug-hash" title={`${slug || ""} ${versionHash}`}>{slug || versionHash}</div>
         { defaultButton }
         { orderButtons }
@@ -277,6 +276,7 @@ class Clips extends React.Component {
                 index={index}
                 isPlayable={clip.playable}
                 isDefault={clip.isDefault}
+                isSigned={clip.isSigned}
                 defaultable={this.props.defaultable}
                 orderable={this.props.orderable && !this.state.activeFilter}
                 key={`asset-clip-${this.props.storeKey || this.props.playlistIndex}-${index}`}
@@ -305,12 +305,10 @@ class Clips extends React.Component {
                 })}
                 OpenObjectLink={this.props.rootStore.OpenObjectLink}
                 SignLink={({sign}) => this.props.formStore.ToggleLinkAuth({
-                  sign,
-                  versionHash: clip.versionHash,
-                  containerId: this.props.rootStore.params.objectId,
-                  path: `public/asset_metadata/${this.props.storeKey}/${clip.isDefault ? "default" : index}/${clip.slug}`,
                   key: this.props.storeKey,
-                  index
+                  sign,
+                  index,
+                  versionHash: clip.versionHash
                 })}
               />
             )

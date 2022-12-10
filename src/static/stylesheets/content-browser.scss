@@ -149,6 +149,17 @@
         font-size: $elv-font-s;
       }
     }
+
+    .list-entry {
+      &.selected {
+        background-color: $elv-color-mediumblue;
+
+        button,
+        button div {
+          color: white;
+        }
+      }
+    }
   }
 
   .no-results {

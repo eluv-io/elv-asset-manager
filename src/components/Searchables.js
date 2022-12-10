@@ -31,10 +31,13 @@ class Searchables extends React.Component {
     });
   }
 
-  AddClip({versionHash}) {
-    this.props.formStore.AddSearchable(({
-      versionHash
-    }));
+  AddClip({versionHashes}) {
+    versionHashes.forEach(versionHash => {
+      this.props.formStore.AddSearchable(({
+        versionHash
+      }));
+    });
+
     this.CloseModal();
   }
 
@@ -44,12 +47,15 @@ class Searchables extends React.Component {
         <Modal
           className="asset-form-modal"
           closable={true}
+          OnClickOutside={this.CloseModal}
         >
           <ContentBrowser
             header={"Select Searchables"}
             objectOnly={true}
             onComplete={this.AddClip}
             onCancel={this.CloseModal}
+            multiple={true}
+            SetDisabled={props => !props.ipTitleId}
           />
         </Modal>
       )
