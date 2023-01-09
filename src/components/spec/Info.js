@@ -170,7 +170,7 @@ class Info extends React.Component {
             onChange={enabled => this.props.specStore.TogglePermissionAssociation(enabled)}
           />
           <Checkbox
-            name="Show Indexer Settings"
+            name="Show Search Settings"
             value={this.props.specStore.showIndexerSettings}
             onChange={enabled => this.props.specStore.ToggleIndexerSettings(enabled)}
           />
