@@ -2,7 +2,7 @@ const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 
 const mainSiteSelectorSpec = {
   "profile": {
-    name: "Eluvio LIVE Main Site",
+    name: "Main Site",
     version: "0.1",
   },
   manageApp: "default",
@@ -17,35 +17,18 @@ const mainSiteSelectorSpec = {
   ],
   "associated_assets": [
     {
-      "name": "promo_videos",
-      "indexed": true,
-      "orderable": true,
-      "slugged": false,
-    },
-    {
       "name": "featured_events",
       "indexed": true,
       "slugged": true,
       "orderable": true
     },
     {
-      "name": "carousel_events",
-      "indexed": true,
-      "slugged": true
-    },
-    {
       "name": "tenants",
       "indexed": false,
-      "slugged": true,
-    },
+      "slugged": true
+    }
   ],
   "info_fields": [
-    {
-      "name": "mode",
-      "type": "select",
-      "options": ["test", "production"],
-      "default_value": "test"
-    },
     {
       "name": "marketplace_order",
       "type": "list",
@@ -71,174 +54,27 @@ const mainSiteSelectorSpec = {
       ]
     },
     {
-      "name": "site_images",
+      "name": "notification",
       "type": "subsection",
       "fields": [
         {
-          "extensions": imageTypes,
-          "label": "Eluvio Live Logo (Light)",
-          "name": "eluvio_live_logo_light",
-          "type": "file"
+          "name": "active",
+          "type": "checkbox",
         },
         {
-          "extensions": imageTypes,
-          "label": "Eluvio Live Logo (Dark)",
-          "name": "eluvio_live_logo_dark",
-          "type": "file"
+          "name": "header",
+          "type": "text"
+        },
+        {
+          "name": "text",
+          "type": "rich_text"
         }
       ]
     },
     {
-      "fields": [
-        {
-          "fields": [
-            {
-              "extensions": imageTypes,
-              "name": "main_image",
-              "type": "file"
-            },
-            {
-              "type": "list",
-              "name": "card_images",
-              "fields": [
-                {
-                  "extensions": imageTypes,
-                  "name": "card_image",
-                  "type": "file"
-                },
-                {
-                  "name": "title"
-                }
-              ]
-            }
-          ],
-          "name": "beautiful_quality",
-          "type": "subsection"
-        },
-        {
-          "fields": [
-            {
-              "extensions": imageTypes,
-              "name": "main_image",
-              "type": "file"
-            },
-            {
-              "type": "list",
-              "name": "card_images",
-              "fields": [
-                {
-                  "extensions": imageTypes,
-                  "name": "card_image",
-                  "type": "file"
-                },
-                {
-                  "name": "title"
-                }
-              ]
-            }
-          ],
-          "name": "directly_to_fans",
-          "type": "subsection"
-        },
-        {
-          "fields": [
-            {
-              "extensions": imageTypes,
-              "name": "main_image",
-              "type": "file"
-            },
-            {
-              "type": "list",
-              "name": "card_images",
-              "fields": [
-                {
-                  "extensions": imageTypes,
-                  "name": "card_image",
-                  "type": "file"
-                },
-                {
-                  "name": "title"
-                }
-              ]
-            }
-          ],
-          "name": "retain_control",
-          "type": "subsection"
-        },
-        {
-          "fields": [
-            {
-              "extensions": imageTypes,
-              "name": "main_image",
-              "type": "file"
-            },
-            {
-              "type": "list",
-              "name": "card_images",
-              "fields": [
-                {
-                  "extensions": imageTypes,
-                  "name": "card_image",
-                  "type": "file"
-                },
-                {
-                  "name": "title"
-                }
-              ]
-            }
-          ],
-          "name": "push_boundaries",
-          "type": "subsection"
-        },
-        {
-          "fields": [
-            {
-              "extensions": imageTypes,
-              "name": "main_image",
-              "type": "file"
-            },
-            {
-              "type": "list",
-              "name": "card_images",
-              "fields": [
-                {
-                  "extensions": imageTypes,
-                  "name": "card_image",
-                  "type": "file"
-                },
-                {
-                  "name": "title"
-                }
-              ]
-            }
-          ],
-          "name": "remonetize_endlessly",
-          "type": "subsection"
-        },
-        {
-          "fields": [
-            {
-              "type": "list",
-              "name": "card_images",
-              "fields": [
-                {
-                  "extensions": imageTypes,
-                  "name": "card_image",
-                  "type": "file"
-                },
-                {
-                  "name": "title"
-                }
-              ]
-            }
-          ],
-          "name": "nft_collections",
-          "label": "NFT Collections",
-          "type": "subsection"
-        },
-      ],
-      "name": "images",
-      "type": "subsection"
+      "label": "Partners & Ecosystem",
+      "name": "header_partners",
+      "type": "header"
     },
     {
       "fields": [
@@ -247,16 +83,24 @@ const mainSiteSelectorSpec = {
           "type": "text"
         },
         {
-          "name": "text",
-          "type": "textarea"
-        },
-        {
-          "name": "image",
+          "name": "logo",
           "type": "file",
           "extensions": imageTypes
+        },
+        {
+          "name": "is_validator",
+          "type": "checkbox"
+        },
+        {
+          "name": "is_provider",
+          "type": "checkbox"
+        },
+        {
+          "name": "info",
+          "type": "rich_text"
         }
       ],
-      "name": "production_partners",
+      "name": "partners",
       "type": "list"
     },
     {
@@ -266,18 +110,14 @@ const mainSiteSelectorSpec = {
           "type": "text"
         },
         {
-          "name": "text",
-          "type": "textarea"
-        },
-        {
-          "name": "image",
+          "name": "logo",
           "type": "file",
           "extensions": imageTypes
         }
       ],
-      "name": "merchandise_partners",
+      "name": "ecosystem",
       "type": "list"
-    }
+    },
   ]
 };
 
