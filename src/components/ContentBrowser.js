@@ -4,7 +4,7 @@ import React from "react";
 import AsyncComponent from "./AsyncComponent";
 import {inject, observer} from "mobx-react";
 import PropTypes from "prop-types";
-import {Action, Confirm, LoadingElement} from "elv-components-js";
+import {Action, Confirm, LoadingElement, onEnterPressed} from "elv-components-js";
 
 @inject("contentStore")
 @observer
@@ -58,11 +58,49 @@ class BrowserList extends React.Component {
     );
   }
 
+  Lookup() {
+    const Lookup = async () => {
+      this.setState({lookupError: ""});
+
+      const { name, libraryId, objectId, versionHash, error } = await this.props.contentStore.LookupContent(this.state.lookup);
+
+      if(error) {
+        this.setState({lookupError: error});
+        return;
+      }
+
+      this.props.QuickSelect({
+        name,
+        libraryId,
+        objectId,
+        versionHash,
+        confirm: true
+      });
+    };
+
+    return (
+      <div className="lookup-container">
+        <div className="lookup-error">{ this.state.lookupError }</div>
+        <input
+          name="lookup"
+          placeholder="Find content by ID, version hash or address"
+          className="browser-filter"
+          onChange={event => {
+            this.setState({lookup: event.target.value});
+          }}
+          value={this.state.lookup}
+          onKeyPress={onEnterPressed(Lookup)}
+        />
+        <Action onClick={Lookup}>Search</Action>
+      </div>
+    );
+  }
+
   Filter() {
     return (
       <input
         name="filter"
-        placeholder="Search"
+        placeholder="Filter..."
         className="browser-filter"
         onChange={event => {
           this.setState({filter: event.target.value});
@@ -169,11 +207,12 @@ class BrowserList extends React.Component {
   render() {
     return (
       <div className="browser-container">
+        { this.Lookup() }
+        { this.Filter() }
         <h3>{this.props.header}</h3>
         <h4>{this.props.subHeader}</h4>
         { this.Pagination() }
         { this.Submit() }
-        { this.Filter() }
         <AsyncComponent
           key={`browser-listing-version-${this.state.version}`}
           Load={() => this.props.Load({page: this.state.page, filter: this.state.filter})}
