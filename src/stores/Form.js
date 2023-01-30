@@ -1959,7 +1959,7 @@ class FormStore {
           metadata: mergedMetadata
         });
 
-        if(Object.keys(searchables || {}).length > 0) {
+        if(this.showSearchablesTab) {
           yield client.ReplaceMetadata({
             libraryId,
             objectId,
