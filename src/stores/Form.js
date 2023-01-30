@@ -1959,13 +1959,15 @@ class FormStore {
           metadata: mergedMetadata
         });
 
-        yield client.ReplaceMetadata({
-          libraryId,
-          objectId,
-          writeToken,
-          metadataSubtree: "site_map/searchables",
-          metadata: searchables
-        });
+        if(Object.keys(searchables || {}).length > 0) {
+          yield client.ReplaceMetadata({
+            libraryId,
+            objectId,
+            writeToken,
+            metadataSubtree: "site_map/searchables",
+            metadata: searchables
+          });
+        }
 
         yield Promise.all(
           Object.values(nonStandardInfo).map(async ({path, value}) => {
