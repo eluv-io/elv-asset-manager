@@ -204,7 +204,7 @@ export const Selection = ({label, name, value, onChange, options, className=""})
 @inject("contentStore")
 @observer
 class RecursiveField extends React.Component {
-  InfoField({PATH="", field, entry, Update, localization={}, textAddButton=false}) {
+  InfoField({PATH="", field, entry={}, Update, localization={}, textAddButton=false}) {
     try {
       const hintLabel = field.hint ? HintLabel({
         label: field.label,
@@ -384,10 +384,11 @@ class RecursiveField extends React.Component {
       } else if(fieldType === "select" || fieldType === "reference_select") {
         let options = localization.options || field.options;
         if(fieldType === "reference_select") {
-          options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || []);
+          options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || [])
+            .map(option => field.label_key ? [option[field.label_key], option[field.value_key]] : option);
 
           if(field.allow_null) {
-            options = [[field.null_label || "<None>", ""], ...options];
+            options = [["<None>", ""], ...options];
           }
         }
 
@@ -520,6 +521,7 @@ class RecursiveField extends React.Component {
             name: field.name,
             label: field.label,
             hint: field.hint,
+            field,
             values: entry[field.name] || [],
             buttonText: field.buttonText,
             fields,
@@ -582,7 +584,7 @@ class RecursiveField extends React.Component {
         );
       } else if(fieldType === "color") {
         if(!(entry[field.name] || {}).color) {
-          Update(field.name, {...(entry[field.name] || {label: ""}), color: "#000000"});
+          Update(field.name, {...(entry && entry[field.name] || {label: ""}), color: "#000000"});
         }
 
         return (
@@ -681,6 +683,7 @@ class RecursiveField extends React.Component {
     label,
     values,
     buttonText,
+    field,
     fields,
     defaultValue,
     hint,
@@ -690,6 +693,10 @@ class RecursiveField extends React.Component {
     textAddButton=false
   }) {
     try {
+      if(this.props.localizationKey && field.no_localize) {
+        return null;
+      }
+
       if(fields && fields.length === 0) {
         fields = undefined;
       }

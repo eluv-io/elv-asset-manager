@@ -5,7 +5,8 @@ const NFTMediaItem = [
   {
     "label": "ID",
     "name": "id",
-    "type": "uuid"
+    "type": "uuid",
+    "no_localize": true,
   },
   {
     "name": "name",
@@ -22,7 +23,8 @@ const NFTMediaItem = [
   {
     "name": "key",
     "type": "text",
-    "hint": "Additional key for identifying this media item. Not used in UI"
+    "hint": "Additional key for identifying this media item. Not used in UI",
+    "no_localize": true,
   },
   {
     "name": "description",
@@ -45,11 +47,13 @@ const NFTMediaItem = [
   {
     "name": "requires_permissions",
     "type": "checkbox",
-    "default_value": false
+    "default_value": false,
+    "no_localize": true,
   },
   {
     "name": "media_type",
     "type": "select",
+    "no_localize": true,
     "options": [
       "Video",
       "Audio",
@@ -112,7 +116,8 @@ const NFTMediaItem = [
     ],
     "default_value": "Carousel",
     "depends_on": "./media_type",
-    "depends_on_value": "Gallery"
+    "depends_on_value": "Gallery",
+    "no_localize": true,
   },
   {
     "name": "gallery",
@@ -128,7 +133,8 @@ const NFTMediaItem = [
       {
         "name": "key",
         "type": "text",
-        "hint": "Additional key for identifying this media item. Not used in UI"
+        "hint": "Additional key for identifying this media item. Not used in UI",
+        "no_localize": true,
       },
       {
         "name": "description",
@@ -179,6 +185,7 @@ const NFTMedia = [
     "type": "select",
     "hint": "Specify how you want to organize additional media for this NFT - either a simple list of items, or a number of organized sections",
     "default_value": "List",
+    "no_localize": true,
     "options": [
       "List",
       "Sections"
@@ -190,6 +197,7 @@ const NFTMedia = [
     "default_value": "Media",
     "depends_on": "./additional_media_type",
     "depends_on_value": "List",
+    "no_localize": true,
     "options": [
       "Media",
       "Album"
@@ -206,7 +214,8 @@ const NFTMedia = [
     "label": "Custom Gallery CSS",
     "name": "additional_media_custom_css",
     "type": "textarea",
-    "hint": "Used for gallery display"
+    "hint": "Used for gallery display",
+    "no_localize": true,
   },
   {
     "name": "additional_media_sections",
@@ -221,7 +230,8 @@ const NFTMedia = [
           {
             "name": "required",
             "type": "checkbox",
-            "hint": "If checked, all other additional media will be locked until this item is displayed"
+            "hint": "If checked, all other additional media will be locked until this item is displayed",
+            "no_localize": true,
           },
           ...NFTMediaItem,
           {
@@ -295,7 +305,8 @@ const NFTMedia = [
           {
             "label": "ID",
             "name": "id",
-            "type": "uuid"
+            "type": "uuid",
+            "no_localize": true,
           },
           {
             "name": "collections",
@@ -308,12 +319,14 @@ const NFTMedia = [
               {
                 "label": "ID",
                 "name": "id",
-                "type": "uuid"
+                "type": "uuid",
+                "no_localize": true,
               },
               {
                 "name": "display",
                 "type": "select",
                 "default_value": "Media",
+                "no_localize": true,
                 "options": [
                   "Media",
                   "Album"
@@ -327,7 +340,8 @@ const NFTMedia = [
                   {
                     "name": "locked",
                     "type": "checkbox",
-                    "default_value": false
+                    "default_value": false,
+                    "no_localize": true,
                   },
                   {
                     "name": "locked_state",
@@ -338,6 +352,7 @@ const NFTMedia = [
                       {
                         "name": "lock_condition",
                         "type": "select",
+                        "no_localize": true,
                         "options": [
                           "View Media"
                         ]
@@ -347,7 +362,8 @@ const NFTMedia = [
                         "name": "required_media",
                         "type": "list",
                         "depends_on": "./lock_condition",
-                        "depends_on_value": "View Media"
+                        "depends_on_value": "View Media",
+                        "no_localize": true,
                       },
                       {
                         "name": "name",

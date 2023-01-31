@@ -1,5 +1,5 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp", "ico"];
-const languageOptions = require("./LanguageCodes");
+const languageOptions = require("./LanguageCodes").default;
 const countryOptions = Object.values(require("country-codes-list").customList("countryNameEn", "{countryCode}: {countryNameEn}")).sort();
 const currencyOptions = [...new Set(Object.values(require("country-codes-list").customList("countryNameEn", "{currencyCode}")))].filter(c => c).sort();
 
@@ -48,16 +48,19 @@ const eventSiteSpec = {
       "name": "tenant_id",
       "label": "Tenant ID",
       "type": "Text",
-      "required": true
+      "required": true,
+      "no_localize": true
     },
     {
       "name": "tenant_slug",
       "type": "text",
-      "required": true
+      "required": true,
+      "no_localize": true
     },
     {
       "name": "marketplace_info",
       "type": "subsection",
+      "no_localize": true,
       "fields": [
         {
           "name": "tenant_slug",
@@ -96,12 +99,13 @@ const eventSiteSpec = {
         "Ended"
       ],
       "default_value": "Inaccessible",
-      "hint": "Specify the current state of the event. Inaccessible and ended events will not be visible to users."
+      "hint": "Specify the current state of the event. Inaccessible and ended events will not be visible to users.",
     },
     {
       "label": "Accessible (Apple TV)",
       "name": "accessible",
-      "type": "checkbox"
+      "type": "checkbox",
+      "no_localize": true
     },
     {
       "name": "theme",
@@ -123,7 +127,8 @@ const eventSiteSpec = {
         "Compacta",
         "Selawik"
       ],
-      "default_value": "Helvetica Neue"
+      "default_value": "Helvetica Neue",
+      "no_localize": true
     },
     {
       "name": "favicon",
@@ -133,7 +138,8 @@ const eventSiteSpec = {
     {
       "name": "custom_css",
       "label": "Custom CSS",
-      "type": "textarea"
+      "type": "textarea",
+      "no_localize": true
     },
     {
       "name": "localizations",
@@ -141,7 +147,7 @@ const eventSiteSpec = {
       "type": "multiselect",
       "no_localize": true,
       "hint": "Additional languages to support",
-      "options": Object.keys(languageOptions)
+      "options": Object.keys(languageOptions),
     },
 
 

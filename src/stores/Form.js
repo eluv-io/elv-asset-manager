@@ -50,7 +50,8 @@ const AssetMetadataFields =(level) => {
 const LocalizationUnmerge = (localized, main) => {
   if(Array.isArray(main)) {
     return main.map((item, index) => LocalizationUnmerge((localized || [])[index], item)).filter(item => item);
-  } else if(typeof main === "object") {
+  // Note: typeof null === "object"
+  } else if(main && typeof main === "object") {
     let item = {};
     Object.keys(main).map(key =>
       item[key] = LocalizationUnmerge((localized || {})[key], main[key])
@@ -65,16 +66,16 @@ const LocalizationUnmerge = (localized, main) => {
 const LocalizationMerge = (localized, main) => {
   if(Array.isArray(main)) {
     return main.map((item, index) => LocalizationMerge((localized || [])[index], item)).filter(item => item);
-  } else if(typeof main === "object") {
+  } else if(main && typeof main === "object") {
     let item = {};
     Object.keys(main).map(key =>
       item[key] = LocalizationMerge((localized || {})[key], main[key])
     );
 
     return item;
-  } else {
-    return localized || main;
   }
+
+  return localized || main;
 };
 
 class FormStore {
@@ -259,7 +260,7 @@ class FormStore {
     }
 
     if(!target._loaded) {
-      target.assetInfo = yield this.LoadAssetInfo(assetMetadata);
+      target.assetInfo = yield this.LoadAssetInfo(assetMetadata, !!l1);
       target.credits = this.LoadCredits((assetMetadata.info || {}).talent);
 
       target.images = [];
@@ -293,7 +294,7 @@ class FormStore {
       target._loaded = true;
     }
 
-    target.assetInfo = LocalizationMerge(target.assetInfo, this.assetInfo);
+    target.assetInfo = LocalizationMerge(target.assetInfo, this.assetInfo, this.infoFields, !!l1);
 
     if(l2) {
       this.localizedData[l0][l1][l2] = target;
@@ -728,12 +729,16 @@ class FormStore {
     this.currentLocalizedData.playlists[i2] = playlist;
   }
 
-  async LoadInfoFields({PATH="", infoFields, values, isTopLevel=false, topLevelValues}) {
+  async LoadInfoFields({PATH="", infoFields, values, isTopLevel=false, topLevelValues, localized=false}) {
     let info = {};
 
     for(const infoField of infoFields) {
       try {
-        let {name, type, path, reference, default_value, top_level, fields} = infoField;
+        let {name, type, path, reference, default_value, top_level, fields, no_localize} = infoField;
+
+        if(localized && no_localize) {
+          continue;
+        }
 
         if(isTopLevel && path) {
           // Non-standard metadata path - values should be root of path
@@ -781,7 +786,8 @@ class FormStore {
             PATH: UrlJoin(BASE_PATH, name),
             infoFields: fields,
             values: info[name] || {},
-            topLevelValues
+            topLevelValues,
+            localized
           });
         } else if(type === "list") {
           if(!Array.isArray(info[name])) {
@@ -799,7 +805,8 @@ class FormStore {
                   PATH: UrlJoin(BASE_PATH, name, i.toString()),
                   infoFields: fields,
                   values: listValues,
-                  topLevelValues
+                  topLevelValues,
+                  localized
                 });
               } catch (error) {
                 // eslint-disable-next-line no-console
@@ -865,7 +872,7 @@ class FormStore {
   }
 
   // Load methods
-  LoadAssetInfo = flow(function * (metadata) {
+  LoadAssetInfo = flow(function * (metadata, localized=false) {
     metadata = metadata || {};
 
     const info = (metadata.info || {});
@@ -887,7 +894,8 @@ class FormStore {
       infoFields: this.infoFields,
       values: info,
       isTopLevel: true,
-      topLevelValues: metadata
+      topLevelValues: metadata,
+      localized
     });
 
     assetInfo = {
@@ -1543,7 +1551,9 @@ class FormStore {
         value = parseFloat(values[name]);
       } else if(type === "json") {
         try {
-          value = JSON.parse(values[name]);
+          if(values[name]) {
+            value = JSON.parse(values[name]);
+          }
         } catch (error) {
           throw Error(`Failed to parse JSON field ${name}`);
         }
@@ -1590,12 +1600,14 @@ class FormStore {
           return (this.FormatFields({HEAD, PATH: UrlJoin(PATH, name, i.toString()), infoFields: field.fields, values: entry, titleType})).info || [];
         });
       } else if(type === "fabric_link") {
-        if(values[name]) {
+        if(values[name] && (values[name].versionHash || values[name].objectId)) {
           if(field.hash_only) {
             value = values[name].versionHash;
-          } else {
+          } else if(values[name].versionHash) {
             value = this.CreateLink({targetHash: values[name].versionHash});
           }
+        } else {
+          value = null;
         }
       } else if(type === "metadata_link") {
         if(values[name]) {
@@ -1866,7 +1878,6 @@ class FormStore {
           });
         }
       }
-
 
       if(this.HasControl("site_customization")) {
         let siteCustomization = {...toJS(this.siteCustomization)};
