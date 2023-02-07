@@ -418,6 +418,65 @@ const eventSiteSpec = {
       "type": "subsection"
     },
     {
+      "name": "main_page_banner_cards",
+      "type": "subsection",
+      "fields": [
+        {
+          "name": "header",
+          "type": "text"
+        },
+        {
+          "name": "background_image",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
+          "name": "background_image_mobile",
+          "label": "Background Image (Mobile)",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
+          "name": "cards",
+          "type": "list",
+          "fields": [
+            {
+              "extensions": imageTypes,
+              "name": "image",
+              "type": "file",
+            },
+            {
+              "name": "type",
+              "type": "select",
+              "options": [
+                "drop",
+                "marketplace",
+                "link"
+              ],
+              "default_value": "marketplace",
+              "hint": "Specify what happens when clicking on the banner. The banner can link to a URL or a drop, or it can open the marketplace view.",
+            },
+            {
+              "name": "marketplace_filters",
+              "type": "list",
+              "hint": "If the banner links to the marketplace, you can specify filters to apply when the marketplace is opened via the banner.",
+            },
+            {
+              "name": "link",
+              "type": "text",
+              "hint": "If the banner is a link, specify the URL to link to.",
+            },
+            {
+              "label": "Drop UUID",
+              "name": "drop_uuid",
+              "type": "text",
+              "hint": "If the banner links to a drop, you can specify a specific drop to link to. If not specified, the banner will link to the next upcoming drop.",
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "main_page_banners",
       "type": "list",
       "fields": [
