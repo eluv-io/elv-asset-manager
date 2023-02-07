@@ -72,6 +72,18 @@ const eventTenantSpec = {
           "type": "list"
         },
         {
+          "hint": "Wallet or contract address for receiving store revenue",
+          "label": "Sales Revenue Address",
+          "name": "revenue_addr",
+          "type": "text"
+        },
+        {
+          "hint": "Wallet or contract address for receiving royalties revenue",
+          "label": "Royalty Revenue Address",
+          "name": "royalty_addr",
+          "type": "text"
+        },
+        {
           "hint": "Default royalty percentage for NFT transactions",
           "label": "Royalty",
           "name": "royalty",
