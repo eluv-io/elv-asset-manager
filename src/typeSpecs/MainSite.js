@@ -118,6 +118,73 @@ const mainSiteSelectorSpec = {
       "name": "ecosystem",
       "type": "list"
     },
+    {
+      "label": "News",
+      "name": "header_news",
+      "type": "header"
+    },
+    {
+      "name": "news",
+      "type": "list",
+      "fields": [
+        {
+          "name": "date",
+          "type": "date"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "full_title",
+          "type": "textarea",
+          "hint": "Replaces title in news item view, in case the full title is too long for the list view."
+        },
+        {
+          "name": "slug",
+          "label": "URL Slug",
+          "type": "text"
+        },
+        {
+          "name": "external_link",
+          "type": "text"
+        },
+        {
+          "name": "text",
+          "type": "rich_text"
+        },
+        {
+          "name": "images",
+          "type": "list",
+          "fields": [
+            {
+              "name": "image",
+              "type": "file",
+              "extensions": imageTypes,
+            },
+            {
+              "name": "caption",
+              "type": "text"
+            }
+          ]
+        },
+        {
+          "name": "videos",
+          "type": "list",
+          "fields": [
+            {
+              "name": "video",
+              "type": "fabric_link",
+              "video_preview": true
+            },
+            {
+              "name": "caption",
+              "type": "text"
+            }
+          ]
+        }
+      ]
+    }
   ]
 };
 
