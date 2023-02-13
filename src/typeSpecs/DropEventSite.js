@@ -254,10 +254,18 @@ const eventSiteSpec = {
           "default_value": false
         },
         {
+          "name": "event_button_opens_marketplace",
+          "label": "Event Button Opens Marketplace",
+          "type": "checkbox",
+          "hint": "If checked, the Get Started/Join the Drop button will open the marketplace overlay instead. The 'Get Started' options will be used for this button.",
+          "default_value": false
+        },
+        {
           "name": "modal_message_get_started",
           "label": "Modal Message (Get Started)",
           "type": "subsection",
           "hint": "If specified, this message will be displayed in a popup modal the 'Get Started' button is pressed. You can use this to communicate event info before they create or sign in to their wallet.",
+          "unless": "./event_button_opens_marketplace",
           "fields": [
             {
               "name": "show",
