@@ -72,6 +72,16 @@ const mainSiteSelectorSpec = {
       ]
     },
     {
+      "name": "header_loop",
+      "type": "file",
+      "extensions": ["mp4"]
+    },
+    {
+      "name": "header_loop_poster",
+      "type": "file",
+      "extensions": imageTypes
+    },
+    {
       "label": "Partners & Ecosystem",
       "name": "header_partners",
       "type": "header"
