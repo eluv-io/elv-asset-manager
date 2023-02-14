@@ -994,23 +994,27 @@ const eventSiteSpec = {
         {
           "name": "id",
           "label": "ID",
-          "type": "uuid"
+          "type": "uuid",
+          "no_localize": true
         },
         {
           "name": "sku",
           "label": "Item SKU",
-          "type": "text"
+          "type": "text",
+          "no_localize": true
         },
         {
           "name": "tenant_id",
           "label": "Tenant ID",
           "hint": "If different from the site",
-          "type": "text"
+          "type": "text",
+          "no_localize": true
         },
         {
           "name": "ntp_id",
           "label": "NTP ID",
-          "type": "text"
+          "type": "text",
+          "no_localize": true
         },
         {
           "name": "title",
