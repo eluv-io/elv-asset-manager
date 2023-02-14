@@ -187,22 +187,19 @@ const MarketplaceSpec = {
         {
           "name": "tabs",
           "type": "subsection",
-          "hint": "Specify different text to be used for links in the header",
+          "hint": "Specify different text to be used for links in the header. If blank, default values will be used",
           "fields": [
             {
               "name": "store",
-              "type": "text",
-              "default_value": "Store"
+              "type": "text"
             },
             {
               "name": "listings",
-              "type": "text",
-              "default_value": "Listings"
+              "type": "text"
             },
             {
               "name": "my_items",
-              "type": "text",
-              "default_value": "My Items"
+              "type": "text"
             }
           ]
         },
@@ -400,7 +397,7 @@ const MarketplaceSpec = {
             {
               "name": "button_text",
               "type": "text",
-              "default_value": "I Accept",
+              "hint": "Default: 'I Accept'",
               "depends_on": "./enabled",
               "unless": "./type",
               "unless_value": "Checkboxes"
@@ -460,7 +457,7 @@ const MarketplaceSpec = {
         {
           "name": "link_text",
           "type": "text",
-          "default_value": "Terms and Conditions"
+          "hint": "Default: 'Terms and Conditions'"
         },
         {
           "name": "terms_document",
@@ -744,8 +741,7 @@ const MarketplaceSpec = {
         {
           "name": "permission_message",
           "type": "string",
-          "default_value": "Private Sale",
-          "hint": "If permissions are required but the user does not have permission to purchase, this message will be shown at the bottom of the item.",
+          "hint": "If permissions are required but the user does not have permission to purchase, this message will be shown at the bottom of the item. Default: 'Private Offering'",
           "depends_on": "./requires_permissions"
         },
         {
@@ -995,7 +991,7 @@ const MarketplaceSpec = {
         {
           "name": "header",
           "type": "text",
-          "default_value": "Explore Collections"
+          "hint": "Default: 'Collections'"
         },
         {
           "name": "subheader",
