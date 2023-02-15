@@ -84,9 +84,18 @@ const eventSiteSpec = {
         {
           "name": "marketplace_only",
           "type": "checkbox",
+          "unless": "./disable_marketplace",
           "default_value": false,
           "hint": "If checked, only the marketplace will be shown"
-        }
+        },
+        {
+          "name": "disable_marketplace",
+          "type": "checkbox",
+          "unless": "./marketplace_only",
+          "hint": "If enabled, the top wallet navigation and event buttons will be hidden",
+          "default_value": false,
+          "no_localize": true
+        },
       ]
     },
     {
