@@ -2308,7 +2308,7 @@ class FormStore {
       return {
         accessCode,
         address: newSigner.address,
-        privateKey: newSigner.signingKey.privateKey,
+        privateKey: newSigner._signingKey().privateKey,
         existingGroup: {
           existingGroupName,
           existingGroupAddress,
