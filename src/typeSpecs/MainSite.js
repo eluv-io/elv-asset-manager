@@ -32,7 +32,8 @@ const mainSiteSelectorSpec = {
     {
       "name": "marketplace_order",
       "type": "list",
-      "hint": "Specify marketplace slugs. Any marketplaces not specified will be shown in a non-deterministic order after all specified marketplaces"
+      "hint": "Specify marketplace slugs. Any marketplaces not specified will be shown in a non-deterministic order after all specified marketplaces",
+      "buttonText": "Add Marketplace Slug"
     },
     {
       "name": "domain_map",
@@ -75,11 +76,6 @@ const mainSiteSelectorSpec = {
       "name": "header_loop",
       "type": "file",
       "extensions": ["mp4"]
-    },
-    {
-      "name": "header_loop_poster",
-      "type": "file",
-      "extensions": imageTypes
     },
     {
       "label": "Partners & Ecosystem",
