@@ -111,19 +111,6 @@ const MarketplaceSpec = {
           "hint": "This image will be displayed in the header when browsing your marketplace, in place of the marketplace name"
         },
         {
-          "name": "round_logo",
-          "extensions": imageTypes,
-          "type": "file",
-          "hint": "This logo will be displayed in the list of available marketplaces"
-        },
-        {
-          "name": "card_banner",
-          "label": "Card Banner",
-          "extensions": imageTypes,
-          "type": "file",
-          "hint": "This banner will be displayed in the list of available marketplaces."
-        },
-        {
           "name": "card_banner_front",
           "label": "Card Banner (Front)",
           "extensions": imageTypes,
@@ -150,16 +137,23 @@ const MarketplaceSpec = {
           "extensions": imageTypes
         },
         {
-          "name": "hide_global_navigation",
+          "name": "disable_secondary_market",
           "type": "checkbox",
           "default_value": false,
-          "hint": "If specified, the global navigation to all listings and marketplaces will not be shown when this marketplace is embedded into your site",
           "no_localize": true,
+          "hint": "If specified, listings, activity and other secondary market pages will not be accessible in your marketplace"
         },
         {
           "name": "hide_leaderboard",
           "type": "checkbox",
           "default_value": false,
+          "no_localize": true,
+        },
+        {
+          "name": "hide_global_navigation",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If specified, the global navigation to all listings and marketplaces will not be shown when this marketplace is embedded into your site",
           "no_localize": true,
         },
         {
@@ -898,8 +892,15 @@ const MarketplaceSpec = {
         {
           "name": "hide_text",
           "label": "Hide Default Text During Animation",
+          "type": "checkbox",
           "default_value": false,
           "hint": "If specified, the default text displayed while awaiting minting will be hidden and the purchase animation will be larger"
+        },
+        {
+          "name": "skip_reveal",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If specified, the page will navigate directly to the first item purchased/claimed after minting has finished"
         },
         {
           "name": "purchase_animation",
