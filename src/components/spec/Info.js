@@ -134,6 +134,7 @@ class Info extends React.Component {
           {name: "label_key", only: entry => ["reference_select", "reference_multiselect"].includes(entry.type)},
           {name: "value_key", only: entry => ["reference_select", "reference_multiselect"].includes(entry.type)},
           {name: "allow_null", type: "checkbox", default: false, only: entry => ["reference_select", "reference_multiselect"].includes(entry.type)},
+          {name: "null_label", type: "text", default: false, only: entry => ["reference_select", "reference_multiselect"].includes(entry.type) && entry.allow_null},
           {name: "version", label: "Allow Version Selection", type: "checkbox", default: false, only: entry => ["fabric_link"].includes(entry.type)},
           {name: "version", label: "Use Version Hash", type: "checkbox", default: false, only: entry => ["self_embed_url", "embed_url"].includes(entry.type)},
           {name: "hash_only", label: "Version Hash Only (No link)", type: "checkbox", default: false, only: entry => ["fabric_link"].includes(entry.type)},

@@ -371,11 +371,13 @@ const MarketplaceSpec = {
               "label": "Use Custom Consent Options",
               "name": "enabled",
               "type": "checkbox",
-              "default_value": false
+              "default_value": false,
+              "no_localize": true
             },
             {
               "name": "type",
               "type": "select",
+              "no_localize": true,
               "options": [
                 "Modal",
                 "Checkboxes"
@@ -1122,6 +1124,68 @@ const MarketplaceSpec = {
       ]
     },
 
+
+    {
+      "label": "Voting Events",
+      "name": "header_voting",
+      "type": "header"
+    },
+    {
+      "name": "voting_events",
+      "type": "list",
+      "fields": [
+        {
+          "label": "ID",
+          "name": "id",
+          "type": "uuid",
+          "no_localize": true
+        },
+        {
+          "name": "title",
+          "type": "string"
+        },
+        {
+          "name": "description",
+          "type": "rich_text"
+        },
+        {
+          "name": "exclusive",
+          "type": "checkbox",
+          "default_value": false,
+          "no_localize": true
+        },
+        {
+          "name": "start_date",
+          "type": "datetime",
+          "no_localize": true
+        },
+        {
+          "name": "end_date",
+          "type": "datetime",
+          "no_localize": true
+        },
+        {
+          "name": "type",
+          "type": "select",
+          "no_localize": true,
+          "options": [
+            ["All Items", "all"],
+            ["Specified Items", "specified"]
+          ]
+        },
+        {
+          "label": "Votable Items",
+          "name": "items",
+          "type": "reference_multiselect",
+          "reference": "/items",
+          "label_key": "name",
+          "value_key": "sku",
+          "depends_on": "./type",
+          "depends_on_value": "specified",
+          "no_localize": true
+        }
+      ]
+    },
 
     {
       "label": "Analytics",

@@ -388,7 +388,7 @@ class RecursiveField extends React.Component {
             .map(option => field.label_key ? [option[field.label_key], option[field.value_key]] : option);
 
           if(field.allow_null) {
-            options = [["<None>", ""], ...options];
+            options = [[field.null_label || "<None>", ""], ...options];
           }
         }
 
@@ -413,7 +413,7 @@ class RecursiveField extends React.Component {
             .map(option => [option[field.label_key], option[field.value_key]]);
 
           if(field.allow_null) {
-            options = [["<None>", ""], ...options];
+            options = [[field.null_label || "<None>", ""], ...options];
           }
         }
 

@@ -99,6 +99,32 @@ const eventSiteSpec = {
       ]
     },
     {
+      "name": "additional_marketplaces",
+      "type": "list",
+      "no_localize": true,
+      "fields": [
+        {
+          "name": "tenant_slug",
+          "type": "text",
+          "hint": "The slug of the tenant in which the marketplace is defined"
+        },
+        {
+          "name": "marketplace_slug",
+          "type": "text",
+          "hint": "The slug of the marketplace"
+        },
+        {
+          "name": "default_store_page",
+          "type": "select",
+          "default_value": "Storefront",
+          "options": [
+            "Storefront",
+            "Listings"
+          ]
+        }
+      ]
+    },
+    {
       "name": "state",
       "type": "select",
       "no_localize": true,
@@ -456,6 +482,7 @@ const eventSiteSpec = {
         {
           "name": "cards",
           "type": "list",
+          "no_localize": true,
           "fields": [
             {
               "extensions": imageTypes,
@@ -466,28 +493,55 @@ const eventSiteSpec = {
               "name": "type",
               "type": "select",
               "options": [
+                "image",
                 "drop",
                 "marketplace",
-                "link"
+                "link",
+                "video"
               ],
-              "default_value": "marketplace",
+              "default_value": "image",
               "hint": "Specify what happens when clicking on the banner. The banner can link to a URL or a drop, or it can open the marketplace view.",
             },
             {
-              "name": "marketplace_filters",
-              "type": "list",
-              "hint": "If the banner links to the marketplace, you can specify filters to apply when the marketplace is opened via the banner.",
+              "name": "video",
+              "type": "fabric_link",
+              "video_preview": true,
+              "depends_on": "./type",
+              "depends_on_value": "video",
+            },
+            {
+              "name": "marketplace",
+              "type": "reference_select",
+              "depends_on": "./type",
+              "depends_on_value": "marketplace",
+              "reference": "/additional_marketplaces",
+              "label_key": "marketplace_slug",
+              "value_key": "marketplace_slug",
+              "allow_null": true,
+              "null_label": "Default"
+            },
+            {
+              "name": "sku",
+              "label": "SKU",
+              "type": "text",
+              "hint": "If the banner opens the marketplace, optionally specify the SKU of an item page to open",
+              "depends_on": "./type",
+              "depends_on_value": "marketplace",
             },
             {
               "name": "link",
               "type": "text",
               "hint": "If the banner is a link, specify the URL to link to.",
+              "depends_on": "./type",
+              "depends_on_value": "link",
             },
             {
               "label": "Drop UUID",
               "name": "drop_uuid",
               "type": "text",
               "hint": "If the banner links to a drop, you can specify a specific drop to link to. If not specified, the banner will link to the next upcoming drop.",
+              "depends_on": "./type",
+              "depends_on_value": "drop",
             }
           ]
         }
@@ -512,28 +566,47 @@ const eventSiteSpec = {
           "name": "type",
           "type": "select",
           "options": [
+            "image",
             "drop",
             "marketplace",
             "link"
           ],
-          "default_value": "marketplace",
+          "default_value": "image",
           "hint": "Specify what happens when clicking on the banner. The banner can link to a URL or a drop, or it can open the marketplace view.",
         },
         {
-          "name": "marketplace_filters",
-          "type": "list",
-          "hint": "If the banner links to the marketplace, you can specify filters to apply when the marketplace is opened via the banner.",
+          "name": "marketplace",
+          "type": "reference_select",
+          "depends_on": "./type",
+          "depends_on_value": "marketplace",
+          "reference": "/additional_marketplaces",
+          "label_key": "marketplace_slug",
+          "value_key": "marketplace_slug",
+          "allow_null": true,
+          "null_label": "Default"
+        },
+        {
+          "name": "sku",
+          "label": "SKU",
+          "type": "text",
+          "hint": "If the banner opens the marketplace, optionally specify the SKU of an item page to open",
+          "depends_on": "./type",
+          "depends_on_value": "marketplace",
         },
         {
           "name": "link",
           "type": "text",
           "hint": "If the banner is a link, specify the URL to link to.",
+          "depends_on": "./type",
+          "depends_on_value": "link",
         },
         {
           "label": "Drop UUID",
           "name": "drop_uuid",
           "type": "text",
           "hint": "If the banner links to a drop, you can specify a specific drop to link to. If not specified, the banner will link to the next upcoming drop.",
+          "depends_on": "./type",
+          "depends_on_value": "drop",
         }
       ]
     },
