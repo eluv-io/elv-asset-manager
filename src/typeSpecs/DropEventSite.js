@@ -289,16 +289,39 @@ const eventSiteSpec = {
           "default_value": false
         },
         {
-          "name": "event_button_opens_marketplace",
-          "label": "Event Button Opens Marketplace",
-          "type": "checkbox",
-          "hint": "If checked, the Get Started/Join the Drop button will open the marketplace overlay instead. The 'Get Started' options will be used for this button.",
-          "default_value": false
+          "name": "event_button_action",
+          "type": "select",
+          "options": [
+            ["Get Started Modal", "modal"],
+            ["Open Marketplace", "marketplace"],
+            ["Link", "link"],
+            ["Hidden", "hidden"]
+          ],
+          "default_value": "modal",
+        },
+        {
+          "name": "event_button_marketplace",
+          "type": "reference_select",
+          "depends_on": "./event_button_action",
+          "depends_on_value": "marketplace",
+          "reference": "/additional_marketplaces",
+          "label_key": "marketplace_slug",
+          "value_key": "marketplace_slug",
+          "allow_null": true,
+          "null_label": "Default"
+        },
+        {
+          "name": "event_button_link",
+          "type": "string",
+          "depends_on": "./event_button_action",
+          "depends_on_value": "link"
         },
         {
           "name": "modal_message_get_started",
           "label": "Modal Message (Get Started)",
           "type": "subsection",
+          "depends_on": "./event_button_action",
+          "depends_on_value": "modal",
           "hint": "If specified, this message will be displayed in a popup modal the 'Get Started' button is pressed. You can use this to communicate event info before they create or sign in to their wallet.",
           "unless": "./event_button_opens_marketplace",
           "fields": [

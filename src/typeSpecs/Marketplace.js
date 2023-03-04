@@ -377,7 +377,6 @@ const MarketplaceSpec = {
             {
               "name": "type",
               "type": "select",
-              "no_localize": true,
               "options": [
                 "Modal",
                 "Checkboxes"
