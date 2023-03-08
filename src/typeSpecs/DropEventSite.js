@@ -291,18 +291,32 @@ const eventSiteSpec = {
         {
           "name": "event_button_action",
           "type": "select",
+          "default_value": "modal",
           "options": [
             ["Get Started Modal", "modal"],
             ["Open Marketplace", "marketplace"],
             ["Link", "link"],
             ["Hidden", "hidden"]
+          ]
+        },
+        {
+          "name": "event_button_action_post_login",
+          "label": "Event Button Action (Post Login)",
+          "hint": "If specified, the behavior of the event button can be different after the user is logged in",
+          "type": "select",
+          "default_value": "",
+          "options": [
+            ["Same as Pre-login", ""],
+            ["Get Started Modal", "modal"],
+            ["Open Marketplace", "marketplace"],
+            ["Link", "link"],
+            ["Hidden", "hidden"]
           ],
-          "default_value": "modal",
         },
         {
           "name": "event_button_marketplace",
           "type": "reference_select",
-          "depends_on": "./event_button_action",
+          "depends_on": ["./event_button_action", "./event_button_action_post_login"],
           "depends_on_value": "marketplace",
           "reference": "/additional_marketplaces",
           "label_key": "marketplace_slug",
@@ -313,17 +327,16 @@ const eventSiteSpec = {
         {
           "name": "event_button_link",
           "type": "string",
-          "depends_on": "./event_button_action",
+          "depends_on": ["./event_button_action", "./event_button_action_post_login"],
           "depends_on_value": "link"
         },
         {
           "name": "modal_message_get_started",
           "label": "Modal Message (Get Started)",
           "type": "subsection",
-          "depends_on": "./event_button_action",
+          "depends_on": ["./event_button_action", "./event_button_action_post_login"],
           "depends_on_value": "modal",
           "hint": "If specified, this message will be displayed in a popup modal the 'Get Started' button is pressed. You can use this to communicate event info before they create or sign in to their wallet.",
-          "unless": "./event_button_opens_marketplace",
           "fields": [
             {
               "name": "show",

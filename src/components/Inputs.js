@@ -226,33 +226,39 @@ class RecursiveField extends React.Component {
       }
 
       if(field.depends_on) {
-        const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.depends_on)));
+        const dependentValues = (Array.isArray(field.depends_on) ? field.depends_on : [field.depends_on])
+          .map(depends_on => Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, depends_on))))
+          .filter(value => value);
 
         if(field.depends_on_value) {
-          if(Array.isArray(field.depends_on_value)) {
-            if(!field.depends_on_value.find(value => value === dependent_value)) {
-              return null;
-            }
-          } else if(dependent_value !== field.depends_on_value) {
+          const requiredValues = (Array.isArray(field.depends_on_value) ? field.depends_on_value : [field.depends_on_value])
+            .filter(value => value);
+
+          if(!requiredValues.find(value => dependentValues.find(dependentValue => dependentValue === value))) {
+            // No matching values
             return null;
           }
-        } else if(!dependent_value) {
+        } else if(dependentValues.length === 0) {
+          // No existing values
           return null;
         }
       }
 
       if(field.unless) {
-        const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.unless)));
+        const dependentValues = (Array.isArray(field.unless) ? field.unless : [field.unless])
+          .map(depends_on => Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, depends_on))))
+          .filter(value => value);
 
-        if(field.unless_value) {
-          if(Array.isArray(field.unless_value)) {
-            if(field.unless_value.find(value => value === dependent_value)) {
-              return null;
-            }
-          } else if(dependent_value === field.unless_value) {
+        if(field.depends_on_value) {
+          const forbiddenValues = (Array.isArray(field.unless_value) ? field.unless_value : [field.unless_value])
+            .filter(value => value);
+
+          if(forbiddenValues.find(value => dependentValues.find(dependentValue => dependentValue === value))) {
+            // Matching values
             return null;
           }
-        } else if(dependent_value) {
+        } else if(dependentValues.length > 0) {
+          // Existing value
           return null;
         }
       }
