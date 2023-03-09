@@ -240,6 +240,7 @@ const eventSiteSpec = {
               "name": "text_color",
               "type": "color",
               "no_label": true,
+              "no_localize": true,
               "default_value": {
                 "color": "#000000"
               }
@@ -248,6 +249,7 @@ const eventSiteSpec = {
               "name": "background_color",
               "type": "color",
               "no_label": true,
+              "no_localize": true,
               "default_value": {
                 "color": "#d7bb73"
               }
@@ -292,6 +294,7 @@ const eventSiteSpec = {
           "name": "event_button_action",
           "type": "select",
           "default_value": "modal",
+          "no_localize": true,
           "options": [
             ["Get Started Modal", "modal"],
             ["Open Marketplace", "marketplace"],
@@ -305,6 +308,7 @@ const eventSiteSpec = {
           "hint": "If specified, the behavior of the event button can be different after the user is logged in",
           "type": "select",
           "default_value": "",
+          "no_localize": true,
           "options": [
             ["Same as Pre-login", ""],
             ["Get Started Modal", "modal"],
@@ -316,6 +320,7 @@ const eventSiteSpec = {
         {
           "name": "event_button_marketplace",
           "type": "reference_select",
+          "no_localize": true,
           "depends_on": ["./event_button_action", "./event_button_action_post_login"],
           "depends_on_value": "marketplace",
           "reference": "/additional_marketplaces",
@@ -926,6 +931,7 @@ const eventSiteSpec = {
             {
               "name": "text_color",
               "type": "color",
+              "no_localize": true,
               "no_label": true,
               "default_value": {
                 "color": "#000000"
@@ -934,6 +940,7 @@ const eventSiteSpec = {
             {
               "name": "background_color",
               "type": "color",
+              "no_localize": true,
               "no_label": true,
               "default_value": {
                 "color": "#d7bb73"
@@ -959,6 +966,7 @@ const eventSiteSpec = {
             {
               "name": "text_color",
               "type": "color",
+              "no_localize": true,
               "no_label": true,
               "default_value": {
                 "color": "#000000"
@@ -968,6 +976,7 @@ const eventSiteSpec = {
               "name": "background_color",
               "type": "color",
               "no_label": true,
+              "no_localize": true,
               "default_value": {
                 "color": "#d7bb73"
               }
@@ -993,6 +1002,7 @@ const eventSiteSpec = {
               "name": "text_color",
               "type": "color",
               "no_label": true,
+              "no_localize": true,
               "default_value": {
                 "color": "#FFFFFF"
               }
@@ -1001,6 +1011,7 @@ const eventSiteSpec = {
               "name": "background_color",
               "type": "color",
               "no_label": true,
+              "no_localize": true,
               "default_value": {
                 "color": "#000000"
               }
@@ -1025,6 +1036,7 @@ const eventSiteSpec = {
             {
               "name": "text_color",
               "type": "color",
+              "no_localize": true,
               "no_label": true,
               "default_value": {
                 "color": "#000000"
@@ -1033,6 +1045,7 @@ const eventSiteSpec = {
             {
               "name": "background_color",
               "type": "color",
+              "no_localize": true,
               "no_label": true,
               "default_value": {
                 "color": "#d7bb73"
