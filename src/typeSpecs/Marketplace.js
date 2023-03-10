@@ -1188,9 +1188,10 @@ const MarketplaceSpec = {
           "name": "type",
           "type": "select",
           "no_localize": true,
+          "default_value": "specified",
           "options": [
-            ["All Items", "all"],
-            ["Specified Items", "specified"]
+            ["Specified Items", "specified"],
+            ["All Items", "all"]
           ]
         },
         {
