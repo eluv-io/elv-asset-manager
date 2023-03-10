@@ -698,6 +698,14 @@ const MarketplaceSpec = {
           "no_localize": true
         },
         {
+          "name": "viewable",
+          "type": "checkbox",
+          "default_value": false,
+          "unless": "./for_sale",
+          "hint": "Allows navigating to the item detail page from the storefront if 'For Sale' is unchecked",
+          "no_localize": true
+        },
+        {
           "label": "Release Date",
           "name": "available_at",
           "type": "datetime",
