@@ -686,6 +686,11 @@ const MarketplaceSpec = {
           "hint": "If specified, this video for this NFT will play on the purchase page in the store."
         },
         {
+          "name": "video_has_audio",
+          "type": "checkbox",
+          "default_value": false
+        },
+        {
           "name": "play_on_storefront",
           "type": "checkbox",
           "default_value": false,
@@ -724,6 +729,14 @@ const MarketplaceSpec = {
           "type": "checkbox",
           "default": false,
           "hint": "If checked, this item will be shown even if it has not yet released or if sale has ended.",
+          "no_localize": true
+        },
+        {
+          "name": "viewable_if_unreleased",
+          "type": "checkbox",
+          "depends_on": "./show_if_unreleased",
+          "default": false,
+          "hint": "If checked, the link to this items details will be present even if it has not yet released or if sale has ended.",
           "no_localize": true
         },
         {
