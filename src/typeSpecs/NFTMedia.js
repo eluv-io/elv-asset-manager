@@ -86,6 +86,14 @@ const NFTMediaItem = [
     "depends_on_value": ["Link"]
   },
   {
+    "name": "authorized_link",
+    "type": "checkbox",
+    "hint": "If checked, will add the user's fabric auth token to the link specified above",
+    "default_value": false,
+    "depends_on": "./media_type",
+    "depends_on_value": ["Link"]
+  },
+  {
     "name": "offerings",
     "type": "list",
     "hint": "Specify, in order of preference, which offerings should be used when playing this media. If the offering is default or only one offering will be available, specifying the offering is not necessary",
