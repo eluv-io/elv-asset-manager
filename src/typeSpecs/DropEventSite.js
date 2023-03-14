@@ -338,13 +338,12 @@ const eventSiteSpec = {
         {
           "name": "post_login",
           "type": "subsection",
-          "unless": "./event_button_action",
-          "unless_value": "modal",
+          "hint": "Specify what should happen after the user logs in via the main 'Sign In' link",
           "fields": [
             {
               "name": "action",
               "type": "select",
-              "default_value": "modal",
+              "default_value": "",
               "no_localize": true,
               "options": [
                 ["None", ""],
