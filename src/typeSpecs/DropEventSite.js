@@ -351,18 +351,6 @@ const eventSiteSpec = {
               ]
             },
             {
-              "name": "marketplace",
-              "type": "reference_select",
-              "no_localize": true,
-              "depends_on": "./action",
-              "depends_on_value": "marketplace",
-              "reference": "/additional_marketplaces",
-              "label_key": "marketplace_slug",
-              "value_key": "marketplace_slug",
-              "allow_null": true,
-              "null_label": "Default"
-            },
-            {
               "label": "SKU",
               "name": "sku",
               "type": "text",
