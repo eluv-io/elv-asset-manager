@@ -336,6 +336,44 @@ const eventSiteSpec = {
           "depends_on_value": "link"
         },
         {
+          "name": "post_login",
+          "type": "subsection",
+          "unless": "./event_button_action",
+          "unless_value": "modal",
+          "fields": [
+            {
+              "name": "action",
+              "type": "select",
+              "default_value": "modal",
+              "no_localize": true,
+              "options": [
+                ["None", ""],
+                ["Open Marketplace", "marketplace"],
+              ]
+            },
+            {
+              "name": "marketplace",
+              "type": "reference_select",
+              "no_localize": true,
+              "depends_on": "./action",
+              "depends_on_value": "marketplace",
+              "reference": "/additional_marketplaces",
+              "label_key": "marketplace_slug",
+              "value_key": "marketplace_slug",
+              "allow_null": true,
+              "null_label": "Default"
+            },
+            {
+              "label": "SKU",
+              "name": "sku",
+              "type": "text",
+              "no_localize": true,
+              "depends_on": "./action",
+              "depends_on_value": "marketplace"
+            },
+          ]
+        },
+        {
           "name": "modal_message_get_started",
           "label": "Modal Message (Get Started)",
           "type": "subsection",

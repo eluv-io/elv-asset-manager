@@ -249,7 +249,7 @@ class RecursiveField extends React.Component {
           .map(depends_on => Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, depends_on))))
           .filter(value => value);
 
-        if(field.depends_on_value) {
+        if(field.unless_value) {
           const forbiddenValues = (Array.isArray(field.unless_value) ? field.unless_value : [field.unless_value])
             .filter(value => value);
 
