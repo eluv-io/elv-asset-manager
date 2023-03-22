@@ -299,6 +299,7 @@ const eventSiteSpec = {
             ["Get Started Modal", "modal"],
             ["Open Marketplace", "marketplace"],
             ["Link", "link"],
+            ["Sign In", "sign_in"],
             ["Hidden", "hidden"]
           ]
         },
@@ -355,7 +356,7 @@ const eventSiteSpec = {
         {
           "name": "post_login",
           "type": "subsection",
-          "hint": "Specify what should happen after the user logs in via the main 'Sign In' link",
+          "hint": "Specify what should happen after the user logs in via the main 'Sign In' link, or logging in via the event button if the action is 'Sign In'",
           "fields": [
             {
               "name": "action",
@@ -375,6 +376,13 @@ const eventSiteSpec = {
               "depends_on": "./action",
               "depends_on_value": "marketplace"
             },
+            {
+              "name": "redirect_to_owned_item",
+              "type": "checkbox",
+              "default_value": false,
+              "depends_on": "./action",
+              "depends_on_value": "marketplace"
+            }
           ]
         },
         {
