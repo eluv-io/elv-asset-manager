@@ -330,6 +330,23 @@ const eventSiteSpec = {
           "null_label": "Default"
         },
         {
+          "name": "event_button_marketplace_sku",
+          "label": "Event Button Marketplace SKU",
+          "type": "string",
+          "no_localize": true,
+          "depends_on": ["./event_button_action", "./event_button_action_post_login"],
+          "depends_on_value": "marketplace"
+        },
+        {
+          "name": "event_button_marketplace_redirect_to_owned_item",
+          "type": "checkbox",
+          "default_value": false,
+          "no_localize": true,
+          "hint": "If SKU is specified, will redirect from the store page to the owned item in the user's wallet if available",
+          "depends_on": ["./event_button_action", "./event_button_action_post_login"],
+          "depends_on_value": "marketplace"
+        },
+        {
           "name": "event_button_link",
           "type": "string",
           "depends_on": ["./event_button_action", "./event_button_action_post_login"],

@@ -921,7 +921,7 @@ const MarketplaceSpec = {
         {
           "name": "skip_reveal",
           "type": "checkbox",
-          "default_value": false,
+          "default_value": true,
           "hint": "If specified, the page will navigate directly to the first item purchased/claimed after minting has finished"
         },
         {
