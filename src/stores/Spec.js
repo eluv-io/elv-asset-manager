@@ -218,6 +218,7 @@ class SpecStore {
         formattedField.label_key = field.label_key;
         formattedField.value_key = field.value_key;
         formattedField.allow_null = field.allow_null;
+        formattedField.null_label = field.null_label;
       }
 
       if(field.type === "color") {

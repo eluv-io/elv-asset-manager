@@ -1,5 +1,6 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 const currencies = require("country-codes-list").customList("currencyCode", "{currencyNameEn}");
+const languageOptions = require("./LanguageCodes").default;
 const currencyOptions = Object.keys(currencies)
   //.filter((code, index, self) => self.findIndex(otherName => name.toLowerCase() === otherName.toLowerCase()) === index)
   //.map(name => [name || (currencies[name] === "VES" ? "Venezuelan Bolívar" : currencies[name]), currencies[name]])
@@ -36,6 +37,9 @@ const MarketplaceSpec = {
   "title_types": [
     "marketplace"
   ],
+  localization: {
+    localizations: Object.keys(languageOptions)
+  },
   "controls": [],
   "associated_assets": [],
   "show_marketplace_preview_link": true,
@@ -48,23 +52,27 @@ const MarketplaceSpec = {
     {
       "name": "tenant_id",
       "label": "Tenant ID",
-      "type": "text"
+      "type": "text",
+      "no_localize": true,
     },
     {
       "name": "tenant_slug",
       "type": "text",
-      "required": true
+      "required": true,
+      "no_localize": true,
     },
     {
       "name": "tenant_name",
       "type": "text",
-      "required": true
+      "required": true,
+      "no_localize": true,
     },
     {
       "label": "Preview Password",
       "name": "preview_password_digest",
       "type": "password",
-      "hint": "Set a password to prevent viewing of unpublished changes by unauthorized users"
+      "hint": "Set a password to prevent viewing of unpublished changes by unauthorized users",
+      "no_localize": true,
     },
     {
       "name": "branding",
@@ -78,7 +86,8 @@ const MarketplaceSpec = {
           "name": "show",
           "label": "Show in Global Marketplace",
           "type": "checkbox",
-          "default_value": false
+          "default_value": false,
+          "no_localize": true,
         },
         {
           "name": "external_link",
@@ -100,19 +109,6 @@ const MarketplaceSpec = {
           "extensions": imageTypes,
           "type": "file",
           "hint": "This image will be displayed in the header when browsing your marketplace, in place of the marketplace name"
-        },
-        {
-          "name": "round_logo",
-          "extensions": imageTypes,
-          "type": "file",
-          "hint": "This logo will be displayed in the list of available marketplaces"
-        },
-        {
-          "name": "card_banner",
-          "label": "Card Banner",
-          "extensions": imageTypes,
-          "type": "file",
-          "hint": "This banner will be displayed in the list of available marketplaces."
         },
         {
           "name": "card_banner_front",
@@ -141,54 +137,63 @@ const MarketplaceSpec = {
           "extensions": imageTypes
         },
         {
-          "name": "hide_global_navigation",
+          "name": "disable_secondary_market",
           "type": "checkbox",
           "default_value": false,
-          "hint": "If specified, the global navigation to all listings and marketplaces will not be shown when this marketplace is embedded into your site"
+          "no_localize": true,
+          "hint": "If specified, listings, activity and other secondary market pages will not be accessible in your marketplace"
         },
         {
           "name": "hide_leaderboard",
           "type": "checkbox",
-          "default_value": false
+          "default_value": false,
+          "no_localize": true,
+        },
+        {
+          "name": "hide_global_navigation",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If specified, the global navigation to all listings and marketplaces will not be shown when this marketplace is embedded into your site",
+          "no_localize": true,
         },
         {
           "label": "Hide Marketplace Name on Store Page",
           "name": "hide_name",
           "type": "checkbox",
-          "default_value": false
+          "default_value": false,
+          "no_localize": true,
         },
         {
           "name": "hide_secondary_in_store",
           "label": "Hide Secondary Sales Stats in Store",
           "type": "checkbox",
-          "default_value": false
+          "default_value": false,
+          "no_localize": true,
         },
         {
           "name": "disable_usdc",
           "label": "Disable USDC Connections",
           "hint": "If specified, the option to for users to connect their Eluvio wallets to USDC wallets will be hidden in your marketplace",
           "type": "checkbox",
-          "default_value": false
+          "default_value": false,
+          "no_localize": true,
         },
         {
           "name": "tabs",
           "type": "subsection",
-          "hint": "Specify different text to be used for links in the header",
+          "hint": "Specify different text to be used for links in the header. If blank, default values will be used",
           "fields": [
             {
               "name": "store",
-              "type": "text",
-              "default_value": "Store"
+              "type": "text"
             },
             {
               "name": "listings",
-              "type": "text",
-              "default_value": "Listings"
+              "type": "text"
             },
             {
               "name": "my_items",
-              "type": "text",
-              "default_value": "My Items"
+              "type": "text"
             }
           ]
         },
@@ -196,6 +201,7 @@ const MarketplaceSpec = {
           "name": "tags",
           "type": "multiselect",
           "hint": "These tags will be used to help users discover your marketplace based on their interests.",
+          "no_localize": true,
           "options": [
             "Film",
             "Music",
@@ -207,6 +213,7 @@ const MarketplaceSpec = {
           "name": "text_justification",
           "type": "select",
           "default_value": "Left",
+          "no_localize": true,
           "options": [
             "Left",
             "Center"
@@ -216,6 +223,7 @@ const MarketplaceSpec = {
           "name": "item_text_justification",
           "type": "select",
           "default_value": "Left",
+          "no_localize": true,
           "options": [
             "Left",
             "Center"
@@ -226,6 +234,7 @@ const MarketplaceSpec = {
           "name": "color_scheme",
           "type": "select",
           "default_value": "Light",
+          "no_localize": true,
           "options": [
             "Light",
             "Dark",
@@ -235,6 +244,7 @@ const MarketplaceSpec = {
         {
           "label": "Custom CSS",
           "name": "custom_css",
+          "no_localize": true,
           "type": "textarea",
           "depends_on": "./color_scheme",
           "depends_on_value": "Custom",
@@ -361,7 +371,8 @@ const MarketplaceSpec = {
               "label": "Use Custom Consent Options",
               "name": "enabled",
               "type": "checkbox",
-              "default_value": false
+              "default_value": false,
+              "no_localize": true
             },
             {
               "name": "type",
@@ -381,7 +392,7 @@ const MarketplaceSpec = {
             {
               "name": "button_text",
               "type": "text",
-              "default_value": "I Accept",
+              "hint": "Default: 'I Accept'",
               "depends_on": "./enabled",
               "unless": "./type",
               "unless_value": "Checkboxes"
@@ -441,7 +452,7 @@ const MarketplaceSpec = {
         {
           "name": "link_text",
           "type": "text",
-          "default_value": "Terms and Conditions"
+          "hint": "Default: 'Terms and Conditions'"
         },
         {
           "name": "terms_document",
@@ -541,9 +552,14 @@ const MarketplaceSpec = {
     },
 
     {
-      "label": "Payment and Currency Options",
+      "label": "Payment, Currency and Localization Options",
       "name": "header_payment",
       "type": "header"
+    },
+    {
+      "name": "localizations",
+      "type": "multiselect",
+      "options": Object.keys(languageOptions).map(key => [languageOptions[key], key])
     },
     {
       "name": "display_currencies",
@@ -620,11 +636,14 @@ const MarketplaceSpec = {
       "type": "header"
     },
     {
+      "name": "items",
+      "type": "list",
       "fields": [
         {
           "label": "SKU",
           "name": "sku",
-          "type": "uuid"
+          "type": "uuid",
+          "no_localize": true
         },
         {
           "name": "type",
@@ -633,7 +652,8 @@ const MarketplaceSpec = {
             "nft",
             "ticket",
             "other"
-          ]
+          ],
+          "no_localize": true
         },
         {
           "name": "name",
@@ -666,6 +686,11 @@ const MarketplaceSpec = {
           "hint": "If specified, this video for this NFT will play on the purchase page in the store."
         },
         {
+          "name": "video_has_audio",
+          "type": "checkbox",
+          "default_value": false
+        },
+        {
           "name": "play_on_storefront",
           "type": "checkbox",
           "default_value": false,
@@ -674,44 +699,65 @@ const MarketplaceSpec = {
         {
           "name": "for_sale",
           "type": "checkbox",
-          "default_value": true
+          "default_value": true,
+          "no_localize": true
+        },
+        {
+          "name": "viewable",
+          "type": "checkbox",
+          "default_value": false,
+          "unless": "./for_sale",
+          "hint": "Allows navigating to the item detail page from the storefront if 'For Sale' is unchecked",
+          "no_localize": true
         },
         {
           "label": "Release Date",
           "name": "available_at",
           "type": "datetime",
-          "hint": "(Optional) - If specified, this item will not be available for purchase until the specified time"
+          "hint": "(Optional) - If specified, this item will not be available for purchase until the specified time",
+          "no_localize": true
         },
         {
           "label": "End Date",
           "name": "expires_at",
           "type": "datetime",
-          "hint": "(Optional) - If specified, this item will no longer be available for purchase after the specified time. Note: The item will still show in the storefront, if specified, but will not be accessible."
+          "hint": "(Optional) - If specified, this item will no longer be available for purchase after the specified time. Note: The item will still show in the storefront, if specified, but will not be accessible.",
+          "no_localize": true
         },
         {
           "name": "show_if_unreleased",
           "type": "checkbox",
           "default": false,
-          "hint": "If checked, this item will be shown even if it has not yet released or if sale has ended."
+          "hint": "If checked, this item will be shown even if it has not yet released or if sale has ended.",
+          "no_localize": true
+        },
+        {
+          "name": "viewable_if_unreleased",
+          "type": "checkbox",
+          "depends_on": "./show_if_unreleased",
+          "default": false,
+          "hint": "If checked, the link to this items details will be present even if it has not yet released or if sale has ended.",
+          "no_localize": true
         },
         {
           "name": "requires_permissions",
           "type": "checkbox",
           "default_value": false,
-          "hint": "If checked, users must have special permissions to the NFT template in order to view and buy the NFT in the marketplace"
+          "hint": "If checked, users must have special permissions to the NFT template in order to view and buy the NFT in the marketplace",
+          "no_localize": true
         },
         {
           "name": "show_if_unauthorized",
           "type": "checkbox",
           "default": false,
           "hint": "If checked, this item will be shown even if permissions and the user doesn't have access.",
-          "depends_on": "./requires_permissions"
+          "depends_on": "./requires_permissions",
+          "no_localize": true
         },
         {
           "name": "permission_message",
           "type": "string",
-          "default_value": "Private Sale",
-          "hint": "If permissions are required but the user does not have permission to purchase, this message will be shown at the bottom of the item.",
+          "hint": "If permissions are required but the user does not have permission to purchase, this message will be shown at the bottom of the item. Default: 'Private Offering'",
           "depends_on": "./requires_permissions"
         },
         {
@@ -723,24 +769,28 @@ const MarketplaceSpec = {
         {
           "name": "max_per_checkout",
           "label": "Max Purchasable per Checkout",
-          "type": "integer"
+          "type": "integer",
+          "no_localize": true
         },
         {
           "name": "max_per_user",
           "label": "Max Purchasable per User",
-          "type": "integer"
+          "type": "integer",
+          "no_localize": true
         },
         {
           "name": "free",
           "type": "checkbox",
           "hint": "If checked, this NFT will be free to claim. WARNING: This option will override any price value set below",
-          "default_value": false
+          "default_value": false,
+          "no_localize": true
         },
         {
           "name": "hide_available",
           "label": "Hide Number Available",
           "type": "checkbox",
-          "default_value": false
+          "default_value": false,
+          "no_localize": true
         },
         {
           "name": "price",
@@ -769,7 +819,8 @@ const MarketplaceSpec = {
         {
           "name": "use_analytics",
           "type": "checkbox",
-          "default_value": false
+          "default_value": false,
+          "no_localize": true
         },
         {
           "name": "page_view_analytics",
@@ -827,9 +878,7 @@ const MarketplaceSpec = {
             }
           ]
         }
-      ],
-      "name": "items",
-      "type": "list"
+      ]
     },
 
 
@@ -865,8 +914,15 @@ const MarketplaceSpec = {
         {
           "name": "hide_text",
           "label": "Hide Default Text During Animation",
+          "type": "checkbox",
           "default_value": false,
           "hint": "If specified, the default text displayed while awaiting minting will be hidden and the purchase animation will be larger"
+        },
+        {
+          "name": "skip_reveal",
+          "type": "checkbox",
+          "default_value": true,
+          "hint": "If specified, the page will navigate directly to the first item purchased/claimed after minting has finished"
         },
         {
           "name": "purchase_animation",
@@ -905,6 +961,7 @@ const MarketplaceSpec = {
             {
               "name": "type",
               "type": "select",
+              "no_localize": true,
               "options": [
                 "Standard",
                 "Featured"
@@ -915,6 +972,7 @@ const MarketplaceSpec = {
               "type": "select",
               "depends_on": "./type",
               "depends_on_value": "Featured",
+              "no_localize": true,
               "options": [
                 "Left",
                 "Right"
@@ -926,7 +984,8 @@ const MarketplaceSpec = {
               "hint": "If checked, selectable icons of items in the list will be displayed below the featured view. Will not be displayed when only one item is in the list",
               "depends_on": "./type",
               "depends_on_value": "Featured",
-              "default_value": false
+              "default_value": false,
+              "no_localize": true,
             },
             {
               "name": "items",
@@ -955,7 +1014,7 @@ const MarketplaceSpec = {
         {
           "name": "header",
           "type": "text",
-          "default_value": "Explore Collections"
+          "hint": "Default: 'Collections'"
         },
         {
           "name": "subheader",
@@ -1004,6 +1063,7 @@ const MarketplaceSpec = {
     {
       "name": "collections",
       "type": "list",
+      "no_localize": true,
       "fields": [
         {
           "label": "SKU",
@@ -1084,6 +1144,69 @@ const MarketplaceSpec = {
       ]
     },
 
+
+    {
+      "label": "Voting Events",
+      "name": "header_voting",
+      "type": "header"
+    },
+    {
+      "name": "voting_events",
+      "type": "list",
+      "fields": [
+        {
+          "label": "ID",
+          "name": "id",
+          "type": "uuid",
+          "no_localize": true
+        },
+        {
+          "name": "title",
+          "type": "string"
+        },
+        {
+          "name": "description",
+          "type": "rich_text"
+        },
+        {
+          "name": "exclusive",
+          "type": "checkbox",
+          "default_value": false,
+          "no_localize": true
+        },
+        {
+          "name": "start_date",
+          "type": "datetime",
+          "no_localize": true
+        },
+        {
+          "name": "end_date",
+          "type": "datetime",
+          "no_localize": true
+        },
+        {
+          "name": "type",
+          "type": "select",
+          "no_localize": true,
+          "default_value": "specified",
+          "options": [
+            ["Specified Items", "specified"],
+            ["All Items", "all"]
+          ]
+        },
+        {
+          "label": "Votable Items",
+          "name": "items",
+          "type": "reference_multiselect",
+          "reference": "/items",
+          "label_key": "name",
+          "value_key": "sku",
+          "depends_on": "./type",
+          "depends_on_value": "specified",
+          "no_localize": true
+        }
+      ]
+    },
 
     {
       "label": "Analytics",

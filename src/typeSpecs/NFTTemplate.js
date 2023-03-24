@@ -1,11 +1,14 @@
 import NFTMedia from "./NFTMedia";
-
+const languageOptions = require("./LanguageCodes").default;
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 
 const NFTTemplateSpec = {
   "profile": {
     "name": "NFT Template",
     "version": "0.4",
+  },
+  localization: {
+    localizations: Object.keys(languageOptions)
   },
   "playable": true,
   "display_app": "default",
@@ -26,13 +29,15 @@ const NFTTemplateSpec = {
       "name": "permission",
       "type": "metadata_link",
       "default_value": "/permissioned",
-      "readonly": true
+      "readonly": true,
+      "no_localize": true
     },
     {
       "name": "mint_private",
       "label": "Minting Info (Private)",
       "type": "subsection",
       "path": "/permissioned",
+      "no_localize": true,
       "fields": [
         {
           "name": "address",
@@ -45,6 +50,7 @@ const NFTTemplateSpec = {
       "label": "Minting Info",
       "type": "subsection",
       "top_level": true,
+      "no_localize": true,
       "fields": [
         {
           "name": "merge_meta",
@@ -89,14 +95,16 @@ const NFTTemplateSpec = {
         {
           "name": "template_id",
           "label": "Template ID",
-          "type": "uuid"
+          "type": "uuid",
+          "no_localize": true
         },
         {
           "name": "test",
           "label": "Test Mode",
           "type": "checkbox",
           "default_value": false,
-          "hint": "If checked, this NFT will not be listable for sale"
+          "hint": "If checked, this NFT will not be listable for sale",
+          "no_localize": true
         },
         {
           "name": "name",
@@ -177,7 +185,8 @@ const NFTTemplateSpec = {
         {
           "name": "address",
           "label": "NFT Contract Address",
-          "type": "text"
+          "type": "text",
+          "no_localize": true
         },
         {
           "name": "edition_name",
@@ -185,7 +194,8 @@ const NFTTemplateSpec = {
         },
         {
           "name": "total_supply",
-          "type": "integer"
+          "type": "integer",
+          "no_localize": true
         },
         {
           "name": "creator",
@@ -197,7 +207,8 @@ const NFTTemplateSpec = {
         },
         {
           "name": "created_at",
-          "type": "datetime"
+          "type": "datetime",
+          "no_localize": true
         },
         {
           "extensions": imageTypes,
@@ -218,13 +229,15 @@ const NFTTemplateSpec = {
         {
           "name": "generative",
           "type": "checkbox",
-          "default_value": false
+          "default_value": false,
+          "no_localize": true
         },
         {
           "name": "id_format",
           "label": "ID Format",
           "type": "select",
           "default_value": "token_id",
+          "no_localize": true,
           "options": [
             "token_id",
             "token_id/cap",
@@ -236,12 +249,14 @@ const NFTTemplateSpec = {
           "name": "token_uri",
           "label": "Token URI",
           "type": "self_metadata_url",
-          "path": "public/asset_metadata/nft"
+          "path": "public/asset_metadata/nft",
+          "no_localize": true
         },
         {
           "name": "embed_url",
           "label": "Embed URL",
           "type": "self_embed_url",
+          "no_localize": true,
           "version": true,
           "auto_update": true,
           // Player options
@@ -255,6 +270,7 @@ const NFTTemplateSpec = {
           "name": "external_url",
           "label": "External URL",
           "type": "self_embed_url",
+          "no_localize": true,
           "version": true,
           "auto_update": true,
           // Player options
@@ -274,13 +290,15 @@ const NFTTemplateSpec = {
         {
           "name": "enable_watermark",
           "type": "checkbox",
+          "no_localize": true
         },
         {
           "name": "test",
           "label": "Test NFT",
           "type": "checkbox",
           "default_value": false,
-          "hint": "If checked, this NFT will be marked as a test NFT"
+          "hint": "If checked, this NFT will be marked as a test NFT",
+          "no_localize": true
         },
         {
           "name": "redeemable_offers",
@@ -290,7 +308,8 @@ const NFTTemplateSpec = {
               "label": "Offer ID",
               "name": "offer_id",
               "type": "text",
-              "readonly": true
+              "readonly": true,
+              "no_localize": true
             },
             {
               "name": "name",
@@ -310,13 +329,15 @@ const NFTTemplateSpec = {
               "label": "Release Date",
               "name": "available_at",
               "type": "datetime",
-              "hint": "(Optional) - If specified, this offer will not be redeemable until the specified time"
+              "hint": "(Optional) - If specified, this offer will not be redeemable until the specified time",
+              "no_localize": true
             },
             {
               "label": "End Date",
               "name": "expires_at",
               "type": "datetime",
-              "hint": "(Optional) - If specified, this item will no longer be redeemable after the specified time."
+              "hint": "(Optional) - If specified, this item will no longer be redeemable after the specified time.",
+              "no_localize": true
             },
             {
               "name": "style",
@@ -327,6 +348,7 @@ const NFTTemplateSpec = {
             {
               "name": "visibility",
               "type": "subsection",
+              "no_localize": true,
               "fields": [
                 {
                   "label": "Hidden",
@@ -356,6 +378,7 @@ const NFTTemplateSpec = {
         {
           "name": "marketplace_attributes",
           "type": "subsection",
+          "no_localize": true,
           "fields": [
             {
               "name": "opensea",
@@ -397,6 +420,7 @@ const NFTTemplateSpec = {
         {
           "name": "attributes",
           "label": "Custom Attributes",
+          "no_localize": true,
           "type": "list",
           "fields": [
             {
@@ -435,7 +459,8 @@ const NFTTemplateSpec = {
           "fields": [
             {
               "name": "is_openable",
-              "type": "checkbox"
+              "type": "checkbox",
+              "no_localize": true
             },
             {
               "name": "open_button_text",
@@ -516,6 +541,7 @@ const NFTTemplateSpec = {
             {
               "name": "item_slots",
               "type": "list",
+              "no_localize": true,
               "fields": [
                 {
                   "name": "possible_items",

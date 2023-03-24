@@ -1,5 +1,5 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp", "ico"];
-const languageOptions = require("./LanguageCodes");
+const languageOptions = require("./LanguageCodes").default;
 const countryOptions = Object.values(require("country-codes-list").customList("countryNameEn", "{countryCode}: {countryNameEn}")).sort();
 const currencyOptions = [...new Set(Object.values(require("country-codes-list").customList("countryNameEn", "{currencyCode}")))].filter(c => c).sort();
 
@@ -48,16 +48,19 @@ const eventSiteSpec = {
       "name": "tenant_id",
       "label": "Tenant ID",
       "type": "Text",
-      "required": true
+      "required": true,
+      "no_localize": true
     },
     {
       "name": "tenant_slug",
       "type": "text",
-      "required": true
+      "required": true,
+      "no_localize": true
     },
     {
       "name": "marketplace_info",
       "type": "subsection",
+      "no_localize": true,
       "fields": [
         {
           "name": "tenant_slug",
@@ -81,8 +84,43 @@ const eventSiteSpec = {
         {
           "name": "marketplace_only",
           "type": "checkbox",
+          "unless": "./disable_marketplace",
           "default_value": false,
           "hint": "If checked, only the marketplace will be shown"
+        },
+        {
+          "name": "disable_marketplace",
+          "type": "checkbox",
+          "unless": "./marketplace_only",
+          "hint": "If enabled, the top wallet navigation and event buttons will be hidden",
+          "default_value": false,
+          "no_localize": true
+        },
+      ]
+    },
+    {
+      "name": "additional_marketplaces",
+      "type": "list",
+      "no_localize": true,
+      "fields": [
+        {
+          "name": "tenant_slug",
+          "type": "text",
+          "hint": "The slug of the tenant in which the marketplace is defined"
+        },
+        {
+          "name": "marketplace_slug",
+          "type": "text",
+          "hint": "The slug of the marketplace"
+        },
+        {
+          "name": "default_store_page",
+          "type": "select",
+          "default_value": "Storefront",
+          "options": [
+            "Storefront",
+            "Listings"
+          ]
         }
       ]
     },
@@ -96,12 +134,13 @@ const eventSiteSpec = {
         "Ended"
       ],
       "default_value": "Inaccessible",
-      "hint": "Specify the current state of the event. Inaccessible and ended events will not be visible to users."
+      "hint": "Specify the current state of the event. Inaccessible and ended events will not be visible to users.",
     },
     {
       "label": "Accessible (Apple TV)",
       "name": "accessible",
-      "type": "checkbox"
+      "type": "checkbox",
+      "no_localize": true
     },
     {
       "name": "theme",
@@ -123,7 +162,8 @@ const eventSiteSpec = {
         "Compacta",
         "Selawik"
       ],
-      "default_value": "Helvetica Neue"
+      "default_value": "Helvetica Neue",
+      "no_localize": true
     },
     {
       "name": "favicon",
@@ -133,7 +173,8 @@ const eventSiteSpec = {
     {
       "name": "custom_css",
       "label": "Custom CSS",
-      "type": "textarea"
+      "type": "textarea",
+      "no_localize": true
     },
     {
       "name": "localizations",
@@ -141,7 +182,7 @@ const eventSiteSpec = {
       "type": "multiselect",
       "no_localize": true,
       "hint": "Additional languages to support",
-      "options": Object.keys(languageOptions)
+      "options": Object.keys(languageOptions),
     },
 
 
@@ -199,6 +240,7 @@ const eventSiteSpec = {
               "name": "text_color",
               "type": "color",
               "no_label": true,
+              "no_localize": true,
               "default_value": {
                 "color": "#000000"
               }
@@ -207,6 +249,7 @@ const eventSiteSpec = {
               "name": "background_color",
               "type": "color",
               "no_label": true,
+              "no_localize": true,
               "default_value": {
                 "color": "#d7bb73"
               }
@@ -248,9 +291,106 @@ const eventSiteSpec = {
           "default_value": false
         },
         {
+          "name": "event_button_action",
+          "type": "select",
+          "default_value": "modal",
+          "no_localize": true,
+          "options": [
+            ["Get Started Modal", "modal"],
+            ["Open Marketplace", "marketplace"],
+            ["Link", "link"],
+            ["Sign In", "sign_in"],
+            ["Hidden", "hidden"]
+          ]
+        },
+        {
+          "name": "event_button_action_post_login",
+          "label": "Event Button Action (Post Login)",
+          "hint": "If specified, the behavior of the event button can be different after the user is logged in",
+          "type": "select",
+          "default_value": "",
+          "no_localize": true,
+          "options": [
+            ["Same as Pre-login", ""],
+            ["Get Started Modal", "modal"],
+            ["Open Marketplace", "marketplace"],
+            ["Link", "link"],
+            ["Hidden", "hidden"]
+          ],
+        },
+        {
+          "name": "event_button_marketplace",
+          "type": "reference_select",
+          "no_localize": true,
+          "depends_on": ["./event_button_action", "./event_button_action_post_login"],
+          "depends_on_value": "marketplace",
+          "reference": "/additional_marketplaces",
+          "label_key": "marketplace_slug",
+          "value_key": "marketplace_slug",
+          "allow_null": true,
+          "null_label": "Default"
+        },
+        {
+          "name": "event_button_marketplace_sku",
+          "label": "Event Button Marketplace SKU",
+          "type": "string",
+          "no_localize": true,
+          "depends_on": ["./event_button_action", "./event_button_action_post_login"],
+          "depends_on_value": "marketplace"
+        },
+        {
+          "name": "event_button_marketplace_redirect_to_owned_item",
+          "type": "checkbox",
+          "default_value": false,
+          "no_localize": true,
+          "hint": "If SKU is specified, will redirect from the store page to the owned item in the user's wallet if available",
+          "depends_on": ["./event_button_action", "./event_button_action_post_login"],
+          "depends_on_value": "marketplace"
+        },
+        {
+          "name": "event_button_link",
+          "type": "string",
+          "depends_on": ["./event_button_action", "./event_button_action_post_login"],
+          "depends_on_value": "link"
+        },
+        {
+          "name": "post_login",
+          "type": "subsection",
+          "hint": "Specify what should happen after the user logs in via the main 'Sign In' link, or logging in via the event button if the action is 'Sign In'",
+          "fields": [
+            {
+              "name": "action",
+              "type": "select",
+              "default_value": "",
+              "no_localize": true,
+              "options": [
+                ["None", ""],
+                ["Open Marketplace", "marketplace"],
+              ]
+            },
+            {
+              "label": "SKU",
+              "name": "sku",
+              "type": "text",
+              "no_localize": true,
+              "depends_on": "./action",
+              "depends_on_value": "marketplace"
+            },
+            {
+              "name": "redirect_to_owned_item",
+              "type": "checkbox",
+              "default_value": false,
+              "depends_on": "./action",
+              "depends_on_value": "marketplace"
+            }
+          ]
+        },
+        {
           "name": "modal_message_get_started",
           "label": "Modal Message (Get Started)",
           "type": "subsection",
+          "depends_on": ["./event_button_action", "./event_button_action_post_login"],
+          "depends_on_value": "modal",
           "hint": "If specified, this message will be displayed in a popup modal the 'Get Started' button is pressed. You can use this to communicate event info before they create or sign in to their wallet.",
           "fields": [
             {
@@ -412,6 +552,93 @@ const eventSiteSpec = {
       "type": "subsection"
     },
     {
+      "name": "main_page_banner_cards",
+      "type": "subsection",
+      "fields": [
+        {
+          "name": "header",
+          "type": "text"
+        },
+        {
+          "name": "background_image",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
+          "name": "background_image_mobile",
+          "label": "Background Image (Mobile)",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
+          "name": "cards",
+          "type": "list",
+          "no_localize": true,
+          "fields": [
+            {
+              "extensions": imageTypes,
+              "name": "image",
+              "type": "file",
+            },
+            {
+              "name": "type",
+              "type": "select",
+              "options": [
+                "image",
+                "drop",
+                "marketplace",
+                "link",
+                "video"
+              ],
+              "default_value": "image",
+              "hint": "Specify what happens when clicking on the banner. The banner can link to a URL or a drop, or it can open the marketplace view.",
+            },
+            {
+              "name": "video",
+              "type": "fabric_link",
+              "video_preview": true,
+              "depends_on": "./type",
+              "depends_on_value": "video",
+            },
+            {
+              "name": "marketplace",
+              "type": "reference_select",
+              "depends_on": "./type",
+              "depends_on_value": "marketplace",
+              "reference": "/additional_marketplaces",
+              "label_key": "marketplace_slug",
+              "value_key": "marketplace_slug",
+              "allow_null": true,
+              "null_label": "Default"
+            },
+            {
+              "name": "sku",
+              "label": "SKU",
+              "type": "text",
+              "hint": "If the banner opens the marketplace, optionally specify the SKU of an item page to open",
+              "depends_on": "./type",
+              "depends_on_value": "marketplace",
+            },
+            {
+              "name": "link",
+              "type": "text",
+              "hint": "If the banner is a link, specify the URL to link to.",
+              "depends_on": "./type",
+              "depends_on_value": "link",
+            },
+            {
+              "label": "Drop UUID",
+              "name": "drop_uuid",
+              "type": "text",
+              "hint": "If the banner links to a drop, you can specify a specific drop to link to. If not specified, the banner will link to the next upcoming drop.",
+              "depends_on": "./type",
+              "depends_on_value": "drop",
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "main_page_banners",
       "type": "list",
       "fields": [
@@ -430,28 +657,47 @@ const eventSiteSpec = {
           "name": "type",
           "type": "select",
           "options": [
+            "image",
             "drop",
             "marketplace",
             "link"
           ],
-          "default_value": "marketplace",
+          "default_value": "image",
           "hint": "Specify what happens when clicking on the banner. The banner can link to a URL or a drop, or it can open the marketplace view.",
         },
         {
-          "name": "marketplace_filters",
-          "type": "list",
-          "hint": "If the banner links to the marketplace, you can specify filters to apply when the marketplace is opened via the banner.",
+          "name": "marketplace",
+          "type": "reference_select",
+          "depends_on": "./type",
+          "depends_on_value": "marketplace",
+          "reference": "/additional_marketplaces",
+          "label_key": "marketplace_slug",
+          "value_key": "marketplace_slug",
+          "allow_null": true,
+          "null_label": "Default"
+        },
+        {
+          "name": "sku",
+          "label": "SKU",
+          "type": "text",
+          "hint": "If the banner opens the marketplace, optionally specify the SKU of an item page to open",
+          "depends_on": "./type",
+          "depends_on_value": "marketplace",
         },
         {
           "name": "link",
           "type": "text",
           "hint": "If the banner is a link, specify the URL to link to.",
+          "depends_on": "./type",
+          "depends_on_value": "link",
         },
         {
           "label": "Drop UUID",
           "name": "drop_uuid",
           "type": "text",
           "hint": "If the banner links to a drop, you can specify a specific drop to link to. If not specified, the banner will link to the next upcoming drop.",
+          "depends_on": "./type",
+          "depends_on_value": "drop",
         }
       ]
     },
@@ -735,6 +981,7 @@ const eventSiteSpec = {
             {
               "name": "text_color",
               "type": "color",
+              "no_localize": true,
               "no_label": true,
               "default_value": {
                 "color": "#000000"
@@ -743,6 +990,7 @@ const eventSiteSpec = {
             {
               "name": "background_color",
               "type": "color",
+              "no_localize": true,
               "no_label": true,
               "default_value": {
                 "color": "#d7bb73"
@@ -768,6 +1016,7 @@ const eventSiteSpec = {
             {
               "name": "text_color",
               "type": "color",
+              "no_localize": true,
               "no_label": true,
               "default_value": {
                 "color": "#000000"
@@ -777,6 +1026,7 @@ const eventSiteSpec = {
               "name": "background_color",
               "type": "color",
               "no_label": true,
+              "no_localize": true,
               "default_value": {
                 "color": "#d7bb73"
               }
@@ -802,6 +1052,7 @@ const eventSiteSpec = {
               "name": "text_color",
               "type": "color",
               "no_label": true,
+              "no_localize": true,
               "default_value": {
                 "color": "#FFFFFF"
               }
@@ -810,6 +1061,7 @@ const eventSiteSpec = {
               "name": "background_color",
               "type": "color",
               "no_label": true,
+              "no_localize": true,
               "default_value": {
                 "color": "#000000"
               }
@@ -834,6 +1086,7 @@ const eventSiteSpec = {
             {
               "name": "text_color",
               "type": "color",
+              "no_localize": true,
               "no_label": true,
               "default_value": {
                 "color": "#000000"
@@ -842,6 +1095,7 @@ const eventSiteSpec = {
             {
               "name": "background_color",
               "type": "color",
+              "no_localize": true,
               "no_label": true,
               "default_value": {
                 "color": "#d7bb73"
@@ -921,23 +1175,27 @@ const eventSiteSpec = {
         {
           "name": "id",
           "label": "ID",
-          "type": "uuid"
+          "type": "uuid",
+          "no_localize": true
         },
         {
           "name": "sku",
           "label": "Item SKU",
-          "type": "text"
+          "type": "text",
+          "no_localize": true
         },
         {
           "name": "tenant_id",
           "label": "Tenant ID",
           "hint": "If different from the site",
-          "type": "text"
+          "type": "text",
+          "no_localize": true
         },
         {
           "name": "ntp_id",
           "label": "NTP ID",
-          "type": "text"
+          "type": "text",
+          "no_localize": true
         },
         {
           "name": "title",

@@ -204,7 +204,7 @@ export const Selection = ({label, name, value, onChange, options, className=""})
 @inject("contentStore")
 @observer
 class RecursiveField extends React.Component {
-  InfoField({PATH="", field, entry, Update, localization={}, textAddButton=false}) {
+  InfoField({PATH="", field, entry={}, Update, localization={}, textAddButton=false}) {
     try {
       const hintLabel = field.hint ? HintLabel({
         label: field.label,
@@ -226,33 +226,39 @@ class RecursiveField extends React.Component {
       }
 
       if(field.depends_on) {
-        const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.depends_on)));
+        const dependentValues = (Array.isArray(field.depends_on) ? field.depends_on : [field.depends_on])
+          .map(depends_on => Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, depends_on))))
+          .filter(value => value);
 
         if(field.depends_on_value) {
-          if(Array.isArray(field.depends_on_value)) {
-            if(!field.depends_on_value.find(value => value === dependent_value)) {
-              return null;
-            }
-          } else if(dependent_value !== field.depends_on_value) {
+          const requiredValues = (Array.isArray(field.depends_on_value) ? field.depends_on_value : [field.depends_on_value])
+            .filter(value => value);
+
+          if(!requiredValues.find(value => dependentValues.find(dependentValue => dependentValue === value))) {
+            // No matching values
             return null;
           }
-        } else if(!dependent_value) {
+        } else if(dependentValues.length === 0) {
+          // No existing values
           return null;
         }
       }
 
       if(field.unless) {
-        const dependent_value = Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.unless)));
+        const dependentValues = (Array.isArray(field.unless) ? field.unless : [field.unless])
+          .map(depends_on => Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, depends_on))))
+          .filter(value => value);
 
         if(field.unless_value) {
-          if(Array.isArray(field.unless_value)) {
-            if(field.unless_value.find(value => value === dependent_value)) {
-              return null;
-            }
-          } else if(dependent_value === field.unless_value) {
+          const forbiddenValues = (Array.isArray(field.unless_value) ? field.unless_value : [field.unless_value])
+            .filter(value => value);
+
+          if(forbiddenValues.find(value => dependentValues.find(dependentValue => dependentValue === value))) {
+            // Matching values
             return null;
           }
-        } else if(dependent_value) {
+        } else if(dependentValues.length > 0) {
+          // Existing value
           return null;
         }
       }
@@ -384,7 +390,8 @@ class RecursiveField extends React.Component {
       } else if(fieldType === "select" || fieldType === "reference_select") {
         let options = localization.options || field.options;
         if(fieldType === "reference_select") {
-          options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || []);
+          options = (Utils.SafeTraverse(this.props.HEAD || {}, ...(ReferencePathElements(PATH, field.reference))) || [])
+            .map(option => field.label_key ? [option[field.label_key], option[field.value_key]] : option);
 
           if(field.allow_null) {
             options = [[field.null_label || "<None>", ""], ...options];
@@ -412,7 +419,7 @@ class RecursiveField extends React.Component {
             .map(option => [option[field.label_key], option[field.value_key]]);
 
           if(field.allow_null) {
-            options = [["<None>", ""], ...options];
+            options = [[field.null_label || "<None>", ""], ...options];
           }
         }
 
@@ -520,6 +527,7 @@ class RecursiveField extends React.Component {
             name: field.name,
             label: field.label,
             hint: field.hint,
+            field,
             values: entry[field.name] || [],
             buttonText: field.buttonText,
             fields,
@@ -582,7 +590,7 @@ class RecursiveField extends React.Component {
         );
       } else if(fieldType === "color") {
         if(!(entry[field.name] || {}).color) {
-          Update(field.name, {...(entry[field.name] || {label: ""}), color: "#000000"});
+          Update(field.name, {...(entry && entry[field.name] || {label: ""}), color: "#000000"});
         }
 
         return (
@@ -681,6 +689,7 @@ class RecursiveField extends React.Component {
     label,
     values,
     buttonText,
+    field,
     fields,
     defaultValue,
     hint,
@@ -690,6 +699,10 @@ class RecursiveField extends React.Component {
     textAddButton=false
   }) {
     try {
+      if(this.props.localizationKey && field.no_localize) {
+        return null;
+      }
+
       if(fields && fields.length === 0) {
         fields = undefined;
       }
