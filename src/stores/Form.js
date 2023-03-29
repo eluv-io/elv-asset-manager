@@ -227,8 +227,6 @@ class FormStore {
       if(!options.hasOwnProperty(".")) {
         options["."] = {};
       }
-
-
     }
 
     if(!targetHash || Utils.DecodeVersionHash(targetHash).objectId === Utils.DecodeVersionHash(this.rootStore.params.versionHash).objectId) {
@@ -1080,6 +1078,11 @@ class FormStore {
   RetrieveAsset = flow(function * (versionHash, assetMetadata) {
     if(this.targets[versionHash]) { return; }
 
+    const canEdit = yield this.rootStore.client.CallContractMethod({
+      contractAddress: this.rootStore.client.utils.HashToAddress(this.rootStore.client.utils.DecodeVersionHash(versionHash).objectId),
+      methodName: "canEdit"
+    });
+
     if(!assetMetadata) {
       assetMetadata = (yield this.rootStore.client.ContentObjectMetadata({
         versionHash,
@@ -1095,7 +1098,8 @@ class FormStore {
       displayTitle: assetMetadata.display_title || assetMetadata.title,
       slug: assetMetadata.slug,
       playable: !!(assetMetadata.sources || {}).default,
-      versionHash
+      versionHash,
+      canEdit
     };
   });
 
@@ -1586,20 +1590,25 @@ class FormStore {
     let formattedAssets = assetType.indexed || assetType.slugged ? {} : [];
     const hasDefault = assets.find(({isDefault}) => isDefault);
     let index = hasDefault ? 1 : 0;
+    const promises = [];
 
-    await Promise.all(
-      (assets || []).map(async ({displayTitle, versionHash, isDefault, isSigned, slug, authContainerId, originalLink={}}) => {
+    for(let asset of assets || []) {
+      const {displayTitle, versionHash, isDefault, isSigned, slug, authContainerId, originalLink={}} = asset;
         if(isSigned) {
           if(!originalLink.hasOwnProperty(".")) {
             originalLink["."] = {};
           }
 
           if(!originalLink["."]["authorization"]) {
-            originalLink["."]["authorization"] = await this.client.GenerateSignedLinkToken({
-              containerId: authContainerId,
-              versionHash,
-              link: `./meta/public/asset_metadata`
-            });
+            try {
+              originalLink["."]["authorization"] = await this.client.GenerateSignedLinkToken({
+                containerId: authContainerId,
+                versionHash,
+                link: `./meta/public/asset_metadata`
+              });
+            } catch(error) {
+              console.error(`Unable to create authorization token for ${versionHash}`, error);
+            }
           }
         } else {
           if(originalLink["."] && originalLink["."]["authorization"]) {
@@ -1649,8 +1658,7 @@ class FormStore {
         } else {
           formattedAssets.push(link);
         }
-      })
-    );
+      };
 
     return formattedAssets;
   }

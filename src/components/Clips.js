@@ -11,7 +11,7 @@ import RemoveIcon from "../static/icons/trash.svg";
 import PlayIcon from "../static/icons/play-circle.svg";
 import LinkIcon from "../static/icons/external-link.svg";
 import KeyIcon from "../static/icons/key.svg";
-import LockIcon from "../static/icons/lock.svg";
+import KeyCrossedOutIcon from "../static/icons/key-crossed-out.svg";
 import {InitPSF} from "./Misc";
 
 export const Clip = ({
@@ -31,7 +31,7 @@ export const Clip = ({
   OpenObjectLink,
   SignLink
 }) => {
-  const {versionHash, title, id, slug, assetType, latestVersionHash, originalLink} = clip;
+  const {versionHash, title, id, slug, assetType, latestVersionHash, originalLink, canEdit} = clip;
 
   const [showPreview, setShowPreview] = useState(false);
 
@@ -91,8 +91,9 @@ export const Clip = ({
   if(originalLink) {
     signButton = (
       <IconButton
-        icon={isSigned ? LockIcon : KeyIcon}
-        title={isSigned ? "Unsign link" : "Sign link"}
+        icon={isSigned ? KeyIcon : KeyCrossedOutIcon}
+        title={!canEdit ? "No edit permission" : isSigned ? "Unsign link" : "Sign link"}
+        disabled={!canEdit}
         onClick={async () => {
           await Confirm({
             message: `Are you sure you want to ${isSigned ? "unsign" : "sign"} the link for ${name ? name : ""} '${title}'?`,
