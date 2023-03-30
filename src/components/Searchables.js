@@ -31,7 +31,10 @@ class Searchables extends React.Component {
     });
   }
 
-  AddClip({versionHashes}) {
+  AddClip(props) {
+    let {versionHashes=[], versionHash} = props;
+    if(versionHash) { versionHashes = [versionHash]; }
+
     versionHashes.forEach(versionHash => {
       this.props.formStore.AddSearchable(({
         versionHash
