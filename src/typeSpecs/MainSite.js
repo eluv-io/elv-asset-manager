@@ -3,12 +3,12 @@ const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 const mainSiteSelectorSpec = {
   "profile": {
     name: "Main Site",
-    version: "0.1",
+    version: "1.0",
   },
   manageApp: "default",
-  controls: [
-    "images",
-  ],
+  hide_image_tab: true,
+  associate_permissions: false,
+  controls: [],
   asset_types: [
     "primary",
   ],
@@ -29,6 +29,15 @@ const mainSiteSelectorSpec = {
     }
   ],
   "info_fields": [
+    {
+      "default_value": "test",
+      "name": "mode",
+      "options": [
+        "test",
+        "production"
+      ],
+      "type": "select"
+    },
     {
       "name": "marketplace_order",
       "type": "list",

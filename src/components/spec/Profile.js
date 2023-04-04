@@ -2,22 +2,22 @@ import React from "react";
 import {Action, Confirm, LabelledField, Selection} from "elv-components-js";
 import {inject, observer} from "mobx-react";
 
-import DefaultSpec from "@eluvio/elv-client-js/typeSpecs/Default";
-import DropEventSiteSpec from "@eluvio/elv-client-js/typeSpecs/DropEventSite";
-import EventSiteExtrasSpec from "@eluvio/elv-client-js/typeSpecs/EventSiteExtras";
-import EventTenantSpec from "@eluvio/elv-client-js/typeSpecs/EventTenant";
-import MainSiteSpec from "@eluvio/elv-client-js/typeSpecs/MainSite";
-import NFTCollectionSpec from "@eluvio/elv-client-js/typeSpecs/NFTCollection";
-import NFTTemplateSpec from "@eluvio/elv-client-js/typeSpecs/NFTTemplate";
-import MarketplaceSpec from "@eluvio/elv-client-js/typeSpecs/Marketplace";
+import DefaultSpec from "../../typeSpecs/Default";
+import DropEventSiteSpec from "../../typeSpecs/DropEventSite";
+import EventSiteExtrasSpec from "../../typeSpecs/EventSiteExtras";
+import EventTenantSpec from "../../typeSpecs/EventTenant";
+import MainSiteSpec from "../../typeSpecs/MainSite";
+import NFTCollectionSpec from "../../typeSpecs/NFTCollection";
+import NFTTemplateSpec from "../../typeSpecs/NFTTemplate";
+import MarketplaceSpec from "../../typeSpecs/Marketplace";
 
 const specs = {
   "Default": DefaultSpec,
-  "Eluvio LIVE Drop Event Site": DropEventSiteSpec,
-  "Eluvio LIVE Event Site Extras": EventSiteExtrasSpec,
-  "Eluvio LIVE Main Site": MainSiteSpec,
-  "Eluvio LIVE Marketplace": MarketplaceSpec,
-  "Eluvio LIVE Tenant": EventTenantSpec,
+  "Eluvio Drop Event Site": DropEventSiteSpec,
+  "Eluvio Event Site Extras": EventSiteExtrasSpec,
+  "Eluvio Main Site": MainSiteSpec,
+  "Eluvio Marketplace": MarketplaceSpec,
+  "Eluvio Tenant": EventTenantSpec,
   "NFT Collection": NFTCollectionSpec,
   "NFT Template": NFTTemplateSpec
 };
