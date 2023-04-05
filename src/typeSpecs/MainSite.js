@@ -82,9 +82,20 @@ const mainSiteSelectorSpec = {
       ]
     },
     {
-      "name": "header_loop",
-      "type": "file",
-      "extensions": ["mp4"]
+      "name": "videos",
+      "type": "subsection",
+      "fields": [
+        {
+          "name": "main_page_video",
+          "type": "fabric_link",
+          "video_preview": true
+        },
+        {
+          "name": "creators_page_video",
+          "type": "fabric_link",
+          "video_preview": true
+        },
+      ]
     },
     {
       "label": "Partners & Ecosystem",
