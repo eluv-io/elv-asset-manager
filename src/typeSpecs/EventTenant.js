@@ -94,32 +94,6 @@ const eventTenantSpec = {
           "label": "Minimum Listing Price",
           "name": "min_list_price",
           "type": "number"
-        },
-        {
-          "fields": [
-            {
-              "hint": "Without checking this box token IDs will be assigned arbitrarily.  If checked, token IDs will be ordinals starting at #1",
-              "label": "Use mint ordinal as token ID",
-              "name": "use_mint_ordinal_in_token_id",
-              "type": "checkbox"
-            },
-            {
-              "hint": "If checked, token IDs will be shuffled using a specified 'seed', instead of being minted in order #1, #2, ...",
-              "label": "Shuffle token ID when minting",
-              "name": "shuffle_token_id",
-              "type": "checkbox"
-            },
-            {
-              "hint": "Used to personalize the deterministic random shuffle of mint token IDs",
-              "label": "Shuffle seed phrase",
-              "name": "shuffle_seed",
-              "type": "text"
-            }
-          ],
-          "hint": "Default minting parameters (can be overridden per token)",
-          "label": "Mint Parameters",
-          "name": "minter",
-          "type": "subsection"
         }
       ],
       "hint": "Tenant-level settings for fungible/non-fungible tokens",
