@@ -143,6 +143,10 @@ const mainSiteSelectorSpec = {
           "name": "logo",
           "type": "file",
           "extensions": imageTypes
+        },
+        {
+          "name": "link",
+          "type": "text"
         }
       ],
       "name": "ecosystem",
