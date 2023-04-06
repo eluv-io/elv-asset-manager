@@ -122,6 +122,10 @@ const mainSiteSelectorSpec = {
           "type": "checkbox"
         },
         {
+          "name": "link",
+          "type": "text"
+        },
+        {
           "name": "info",
           "type": "rich_text"
         }
