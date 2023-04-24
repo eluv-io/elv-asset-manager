@@ -625,6 +625,17 @@ const MarketplaceSpec = {
               "default_value": true
             }
           ]
+        },
+        {
+          "name": "circle",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "enabled",
+              "type": "checkbox",
+              "default_value": false
+            }
+          ]
         }
       ]
     },
