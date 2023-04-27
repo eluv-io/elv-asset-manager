@@ -41,7 +41,8 @@ const NFTTemplateSpec = {
       "fields": [
         {
           "name": "address",
-          "type": "text"
+          "type": "text",
+          "readonly": true
         }
       ]
     },
@@ -53,37 +54,26 @@ const NFTTemplateSpec = {
       "no_localize": true,
       "fields": [
         {
-          "name": "merge_meta",
-          "label": "Merge Metadata",
-          "type": "json"
-        },
-        {
-          "name": "token_template",
-          "label": "Token ID Template",
-          "type": "text"
-        },
-        {
-          "name": "cauth_id",
-          "label": "Mint Key ID",
-          "type": "text"
-        },
-        {
-          "name": "fauth_id",
-          "label": "Fabric Key ID",
-          "type": "text"
-        },
-        {
           "name": "use_mint_ordinal_in_token_id",
           "label": "Use Mint Ordinal in Token ID",
           "type": "checkbox",
+          "hint": "Generate numeric token IDs: #1, #2, #3, ... (initial mint order may be randomized)",
           "default_value": true
         },
         {
           "name": "shuffle_token_id",
           "label": "Shuffle Token ID",
           "type": "checkbox",
+          "hint": "When using ordinal token IDs, randomize the initial mint order",
           "default_value": true
-        }
+        },
+        {
+          "name": "token_template",
+          "label": "Token ID Template",
+          "type": "text",
+          "hint": "Create vanity token IDs based on this template (only valid if not using ordinal token IDs)"
+        },
+
       ]
     },
     {
@@ -186,16 +176,20 @@ const NFTTemplateSpec = {
           "name": "address",
           "label": "NFT Contract Address",
           "type": "text",
-          "no_localize": true
-        },
-        {
-          "name": "edition_name",
-          "type": "text"
+          "no_localize": true,
+          "hint": "Address of the NFT contract associated with this NFT template (read-only - set by the NFT build)",
+          "readonly": true
         },
         {
           "name": "total_supply",
           "type": "integer",
-          "no_localize": true
+          "no_localize": true,
+          "hint": "Maximum number of tokens that can be generated for this NFT contract (read-only - this number is read from the contract)",
+          "readonly": true
+        },
+        {
+          "name": "edition_name",
+          "type": "text"
         },
         {
           "name": "creator",
@@ -461,6 +455,17 @@ const NFTTemplateSpec = {
               "name": "is_openable",
               "type": "checkbox",
               "no_localize": true
+            },
+            {
+              "name": "pack_generator",
+              "type": "select",
+              "default_value": "random",
+              "options": [
+                "random",
+                "preset"
+              ],
+              "no_localize": true,
+              "hint": "Choose the way pack content will be generated.  Use 'preset' if content supply is limited to the number of packs and distribution needs to be precise."
             },
             {
               "name": "open_button_text",
