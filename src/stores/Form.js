@@ -1628,10 +1628,14 @@ class FormStore {
 
         if(assetType.slugged) {
           if(!slug) {
-            slug = (await this.rootStore.client.ContentObjectMetadata({
-              versionHash,
-              metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
-            })) || Slugify(displayTitle);
+            try {
+              slug = (await this.rootStore.client.ContentObjectMetadata({
+                versionHash,
+                metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
+              })) || Slugify(displayTitle);
+            } catch(error) {
+              console.error(error);
+            }
           }
 
           if(assetType.indexed) {
