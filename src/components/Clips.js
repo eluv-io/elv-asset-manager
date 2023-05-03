@@ -250,6 +250,32 @@ class Clips extends React.Component {
           <Action onClick={this.ActivateModal}>
             Add {this.props.name}
           </Action>
+          {
+            clips.length > 0 && <Action
+              className="secondary"
+              onClick={async () => {
+                const brokenLinks = await this.props.formStore.FindBrokenLinks({assetName: this.props.storeKey});
+                let message = "";
+
+                if(Object.keys(brokenLinks).length > 0) {
+                  message = `Are you sure you want to remove the following links?\n${Object.keys(brokenLinks).join("\n")}`;
+                } else {
+                  message = "No broken links were found.";
+                }
+
+                await Confirm({
+                  message,
+                  onConfirm: () => this.props.formStore.BulkRemoveClips({
+                    key: this.props.storeKey,
+                    indexes: Object.values(brokenLinks).map(({index}) => index)
+                  })
+                });
+              }}
+            >
+              Remove Broken Links
+            </Action>
+          }
+
           { this.Filter("Filter Titles...") }
         </div>
         { this.PageControls(clips.length) }

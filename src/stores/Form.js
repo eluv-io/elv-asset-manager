@@ -678,6 +678,13 @@ class FormStore {
   }
 
   @action.bound
+  BulkRemoveClips({key, indexes=[]}) {
+    this.currentLocalizedData.assets[key] = this.currentLocalizedData.assets[key].filter((_, i) => {
+      return !indexes.includes(i);
+    });
+  }
+
+  @action.bound
   ClipOriginalIndex({versionHash, key}) {
     let originalIndex;
     let objectId;
@@ -1634,6 +1641,7 @@ class FormStore {
                 metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
               })) || Slugify(displayTitle);
             } catch(error) {
+              // eslint-disable-next-line no-console
               console.error(error);
             }
           }
@@ -1801,6 +1809,37 @@ class FormStore {
 
     return { info, topInfo, nonStandardInfo, listFields };
   }
+
+  @action.bound
+  FindBrokenLinks = flow(function * ({assetName}) {
+    const assets = toJS(this.currentLocalizedData.assets[assetName]);
+    const deletedObjects = {};
+    console.log("assets", assets)
+
+    for(let [index, asset] of assets.entries()) {
+      const {versionHash, originalLink} = asset;
+      const objectId = this.rootStore.client.utils.DecodeVersionHash(versionHash).objectId;
+      const address = this.rootStore.client.utils.HashToAddress(objectId);
+
+      // Explicitly check contract call. If it fails,
+      // assume contract has been destroyed
+      try {
+        yield this.rootStore.client.CallContractMethod({
+          contractAddress: address,
+          methodName: "version"
+        });
+      } catch(error) {
+        if(!deletedObjects[versionHash]) {
+          deletedObjects[versionHash] = {index};
+        }
+
+        // eslint-disable-next-line no-console
+        console.error(error)
+      }
+    };
+
+    return deletedObjects;
+  });
 
   @action.bound
   SaveAsset = flow(function * (commit=true, commitMessage="") {
