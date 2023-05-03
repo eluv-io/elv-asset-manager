@@ -1814,7 +1814,6 @@ class FormStore {
   FindBrokenLinks = flow(function * ({assetName}) {
     const assets = toJS(this.currentLocalizedData.assets[assetName]);
     const deletedObjects = {};
-    console.log("assets", assets)
 
     for(let [index, asset] of assets.entries()) {
       const {versionHash, originalLink} = asset;
