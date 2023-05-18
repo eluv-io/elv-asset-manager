@@ -257,6 +257,12 @@ const NFTMedia = [
             "extensions": imageTypes
           },
           {
+            "name": "background_image_tv",
+            "label": "Background Image (TV)",
+            "type": "file",
+            "extensions": imageTypes
+          },
+          {
             "name": "locked_state",
             "type": "subsection",
             "hint": "These fields will be used when the item has not yet been viewed",
