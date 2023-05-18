@@ -211,6 +211,11 @@ const NFTTemplateSpec = {
           "hint": "Square image recommended"
         },
         {
+          "extensions": imageTypes,
+          "name": "background_image",
+          "type": "file"
+        },
+        {
           "name": "playable",
           "type": "checkbox",
           "default_value": true
