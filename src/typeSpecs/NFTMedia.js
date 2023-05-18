@@ -252,6 +252,11 @@ const NFTMedia = [
             "extensions": imageTypes
           },
           {
+            "name": "poster_image",
+            "type": "file",
+            "extensions": imageTypes
+          },
+          {
             "name": "background_image",
             "type": "file",
             "extensions": imageTypes
