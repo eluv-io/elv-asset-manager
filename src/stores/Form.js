@@ -890,7 +890,6 @@ class FormStore {
     this.originalSlug = metadata.slug;
 
     const loadedInfo = yield this.LoadInfoFields({
-      HEAD: info,
       infoFields: this.infoFields,
       values: info,
       isTopLevel: true,
@@ -1648,6 +1647,28 @@ class FormStore {
     return { info, topInfo, nonStandardInfo, listFields };
   }
 
+  MergeExistingMetadata(existingMetadata={}, newMetadata={}) {
+    Object.keys(existingMetadata || {}).forEach(key => {
+      const existingValue = existingMetadata[key];
+      const newValue = newMetadata[key];
+
+      // Do not merge lists
+      if(Array.isArray(newValue)) {
+        return;
+      }
+
+      if(!newValue) {
+        newMetadata[key] = existingValue;
+      }
+
+      if(typeof newValue === "object" && typeof existingValue === "object") {
+        newMetadata[key] = this.MergeExistingMetadata(existingValue, newValue);
+      }
+    });
+
+    return newMetadata;
+  }
+
   @action.bound
   SaveAsset = flow(function * (commit=true, commitMessage="") {
     try {
@@ -1800,17 +1821,18 @@ class FormStore {
         }
 
         const mergedMetadata = {
-          ...existingMetadata,
           ...topInfo,
           ...assetData,
           images,
           playlists,
           info: {
-            ...(existingMetadata.info || {}),
             ...info,
             talent: credits
           }
         };
+
+        // Merge existing metadata
+        this.MergeExistingMetadata(existingMetadata, mergedMetadata);
 
         yield client.ReplaceMetadata({
           libraryId,
