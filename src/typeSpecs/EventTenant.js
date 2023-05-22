@@ -33,29 +33,29 @@ const eventTenantSpec = {
       "type": "file"
     },
     {
-      "name": "copyright",
-      "type": "text"
+      "fields": [
+        {
+          "hint": "A short, unique ID used to namespace custodial wallet keys.  If this ID changes, all private keys assigned to users previously will change!",
+          "label": "Issuer ID",
+          "name": "issuer_id",
+          "type": "text"
+        },
+        {
+          "hint": "The exact issuer URL.  This URL may change as long as the issuer unique ID remains unchanged.",
+          "label": "Issuer URL",
+          "name": "issuer_url",
+          "type": "text"
+        }
+      ],
+      "hint": "Specify a custom OpenID provider for use with the Eluvio Custodial Wallet",
+      "label": "Custom OpenID",
+      "name": "openid",
+      "type": "subsection"
     },
     {
-      "name": "privacy_policy",
-      "type": "rich_text"
-    },
-    {
-      "label": "Privacy Policy (HTML)",
-      "name": "privacy_policy_html",
-      "type": "file",
-      "extensions": ["html"]
-    },
-    {
-      "label": "Terms and Conditions",
-      "name": "terms",
-      "type": "rich_text"
-    },
-    {
-      "label": "Terms and Conditions (HTML)",
-      "name": "terms_html",
-      "type": "file",
-      "extensions": ["html"]
+      "label": "Token Settings",
+      "name": "header_token_settings",
+      "type": "header"
     },
     {
       "fields": [
@@ -102,24 +102,104 @@ const eventTenantSpec = {
       "type": "subsection"
     },
     {
+      "label": "Tenant Properties",
+      "name": "header_properties",
+      "type": "header"
+    },
+    {
+      "name": "properties",
+      "type": "list",
       "fields": [
         {
-          "hint": "A short, unique ID used to namespace custodial wallet keys.  If this ID changes, all private keys assigned to users previously will change!",
-          "label": "Issuer ID",
-          "name": "issuer_id",
+          "name": "id",
+          "label": "ID",
+          "type": "uuid"
+        },
+        {
+          "name": "name",
           "type": "text"
         },
         {
-          "hint": "The exact issuer URL.  This URL may change as long as the issuer unique ID remains unchanged.",
-          "label": "Issuer URL",
-          "name": "issuer_url",
-          "type": "text"
+          "name": "description",
+          "type": "textarea"
+        },
+        {
+          "name": "image",
+          "extensions": imageTypes,
+          "type": "file"
+        },
+        {
+          "name": "background_image",
+          "extensions": imageTypes,
+          "type": "file"
+        },
+        {
+          "name": "background_image_mobile",
+          "label": "Background Image (Mobile)",
+          "extensions": imageTypes,
+          "type": "file"
+        },
+        {
+          "name": "projects",
+          "type": "list",
+          "fields": [
+            {
+              "name": "id",
+              "label": "ID",
+              "type": "uuid"
+            },
+            {
+              "name": "name",
+              "type": "text"
+            },
+            {
+              "name": "description",
+              "type": "textarea"
+            },
+            {
+              "name": "image",
+              "extensions": imageTypes,
+              "type": "file"
+            },
+            {
+              "name": "background_image",
+              "extensions": imageTypes,
+              "type": "file"
+            },
+            {
+              "name": "background_image_mobile",
+              "label": "Background Image (Mobile)",
+              "extensions": imageTypes,
+              "type": "file"
+            },
+            {
+              "name": "marketplace_slug",
+              "type": "text"
+            },
+            {
+              "name": "media_site",
+              "type": "fabric_link"
+            },
+            {
+              "name": "associated_items",
+              "type": "list",
+              "fields": [
+                {
+                  "name": "nft_address",
+                  "label": "NFT Address",
+                  "type": "text",
+                  "required": true
+                },
+                {
+                  "name": "item_sku",
+                  "label": "Item SKU",
+                  "type": "text"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "hint": "Specify a custom OpenID provider for use with the Eluvio Custodial Wallet",
-      "label": "Custom OpenID",
-      "name": "openid",
-      "type": "subsection"
+      ]
     }
   ],
   localizations: [],
@@ -140,15 +220,6 @@ const eventTenantSpec = {
       defaultable: false,
       orderable: false,
       title_types: ["marketplace"]
-    },
-    {
-      name: "collections",
-      label: "Collections",
-      indexed: false,
-      slugged: true,
-      defaultable: false,
-      orderable: false,
-      title_types: ["collection"]
     }
   ]
 };
