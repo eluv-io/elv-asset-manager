@@ -212,6 +212,16 @@ const NFTMedia = [
     ]
   },
   {
+    "name": "show_autoplay",
+    "type": "checkbox",
+    "default_value": false,
+    "depends_on": "./additional_media_display",
+    "depends_on_value": "Media",
+    "unless": "./additional_media_type",
+    "unless_value": "Sections",
+    "no_localize": true
+  },
+  {
     "name": "additional_media",
     "type": "list",
     "depends_on": "./additional_media_type",
@@ -350,6 +360,14 @@ const NFTMedia = [
                   "Media",
                   "Album"
                 ]
+              },
+              {
+                "name": "show_autoplay",
+                "type": "checkbox",
+                "default_value": false,
+                "depends_on": "./display",
+                "depends_on_value": "Media",
+                "no_localize": true
               },
               {
                 "name": "media",

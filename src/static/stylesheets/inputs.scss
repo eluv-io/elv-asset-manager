@@ -166,6 +166,10 @@
     letter-spacing: 1px;
     padding: 10px 0;
   }
+
+  .asset-form-header-navigation + & {
+    padding-top: 0;
+  }
 }
 
 .password-input {
