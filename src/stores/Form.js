@@ -999,12 +999,30 @@ class FormStore {
       localized
     });
 
+    if(loadedInfo && loadedInfo.searchables) {
+      loadedInfo.searchables = yield this.LoadSearchablePaths(loadedInfo.searchables);
+    }
+
     assetInfo = {
       ...assetInfo,
       ...loadedInfo
     };
 
     return assetInfo;
+  });
+
+  LoadSearchablePaths = flow(function * (searchables) {
+    const metadata = yield this.rootStore.client.ContentObjectMetadata({
+      versionHash: this.rootStore.params.versionHash,
+      metadataSubtree: "searchables",
+      select: Object.keys(searchables)
+    });
+
+    Object.keys(searchables).forEach(searchableKey => {
+      searchables[searchableKey] = !!metadata[searchableKey] && Object.keys(metadata[searchableKey]).length > 0;
+    });
+
+    return searchables;
   });
 
   LoadCredits(metadata) {
@@ -1777,6 +1795,15 @@ class FormStore {
             targetHash: this.rootStore.params.versionHash,
             linkTarget: UrlJoin("/meta", values[name])
           });
+        }
+      } else if(type === "metadata_link_checkbox") {
+        if(values[name]) {
+          value = this.CreateLink({
+            targetHash: this.rootStore.params.versionHash,
+            linkTarget: UrlJoin("/meta", field.target_link)
+          });
+        } else {
+          value = {};
         }
       } else if(type === "self_embed_url") {
         if(field.auto_update) {

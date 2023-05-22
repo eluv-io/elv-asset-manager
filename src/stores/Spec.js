@@ -179,6 +179,10 @@ class SpecStore {
         formattedField.check_has_audio_flag = field.check_has_audio_flag;
       }
 
+      if(field.target_link) {
+        formattedField.target_link = field.target_link;
+      }
+
       if(["select", "multiselect"].includes(field.type)) {
         formattedField.options = FormatOptions(field.options);
       }

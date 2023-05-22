@@ -327,6 +327,20 @@ class RecursiveField extends React.Component {
             onChange={newValue => Update(field.name, newValue)}
           />
         );
+      } else if(fieldType === "metadata_link_checkbox") {
+        if(typeof entry[field.name] !== "boolean") {
+          Update(field.name, !!entry[field.name]);
+        }
+
+        return (
+          <Checkbox
+            key={key}
+            name={field.name}
+            label={hintLabel || field.label}
+            value={entry[field.name] || ""}
+            onChange={newValue => Update(field.name, newValue)}
+          />
+        );
       } else if(fieldType === "date" || fieldType === "datetime") {
         return (
           <DateSelection
