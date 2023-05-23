@@ -219,7 +219,8 @@ class FormStore {
     targetHash,
     linkTarget="/meta/public/asset_metadata",
     options={},
-    auth
+    auth,
+    autoUpdate=true
   }) {
     const Utils = rootStore.client.utils;
 
@@ -234,7 +235,7 @@ class FormStore {
         ...options,
         ".": {
           ...(options["."] || {}),
-          "auto_update":{"tag":"latest"}
+          ...autoUpdate ? {"auto_update": {"tag": "latest"}} : undefined
         },
         "/": UrlJoin("./", linkTarget)
       };
@@ -243,7 +244,7 @@ class FormStore {
         ...options,
         ".": {
           ...(options["."] || {}),
-          "auto_update":{"tag":"latest"}
+          ...autoUpdate ? {"auto_update": {"tag": "latest"}} : undefined
         },
         "/": UrlJoin("/qfab", targetHash, linkTarget)
       };
@@ -1800,7 +1801,8 @@ class FormStore {
         if(values[name]) {
           value = this.CreateLink({
             targetHash: this.rootStore.params.versionHash,
-            linkTarget: UrlJoin("/meta", field.target_link)
+            linkTarget: UrlJoin("/meta", field.target_link),
+            autoUpdate: false
           });
         } else {
           value = {};
