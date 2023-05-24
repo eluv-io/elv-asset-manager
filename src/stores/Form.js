@@ -1657,7 +1657,7 @@ class FormStore {
         return;
       }
 
-      if(!newValue) {
+      if(newValue === undefined) {
         newMetadata[key] = existingValue;
       }
 

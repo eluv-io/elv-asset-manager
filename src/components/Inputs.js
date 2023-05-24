@@ -122,6 +122,8 @@ const InitializeField = ({fields, defaultValue}) => {
 };
 
 const SHA512 = async (str) => {
+  if(!str) { return ""; }
+
   const buf = await crypto.subtle.digest("SHA-512", new TextEncoder("utf-8").encode(str));
   return Array.prototype.map.call(new Uint8Array(buf), x=>(("00"+x.toString(16)).slice(-2))).join("");
 };
@@ -131,7 +133,7 @@ export const PasswordInput = ({label, name, value, onChange, hidden=false, requi
   if(hidden) { return null; }
 
   const [locked, setLocked] = useState(!!value);
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState(value || "");
 
   return (
     <div className={`-elv-input password-input ${className}`}>
@@ -156,7 +158,13 @@ export const PasswordInput = ({label, name, value, onChange, hidden=false, requi
           className="-elv-input password-input__input"
         />
         <button
-          onClick={() => setLocked(!locked)}
+          onClick={() => {
+            setLocked(!locked);
+            if(locked) {
+              setPassword("");
+              onChange("");
+            }
+          }}
           className="password-input__lock-button"
         >
           <ImageIcon label={locked ? "Unlock Password Field" : "Lock Password Field"} icon={locked ? LockIcon : UnlockIcon} />
