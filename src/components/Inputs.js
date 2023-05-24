@@ -158,7 +158,13 @@ export const PasswordInput = ({label, name, value, onChange, hidden=false, requi
           className="-elv-input password-input__input"
         />
         <button
-          onClick={() => setLocked(!locked)}
+          onClick={() => {
+            setLocked(!locked);
+            if(locked) {
+              setPassword("");
+              onChange("");
+            }
+          }}
           className="password-input__lock-button"
         >
           <ImageIcon label={locked ? "Unlock Password Field" : "Lock Password Field"} icon={locked ? LockIcon : UnlockIcon} />
