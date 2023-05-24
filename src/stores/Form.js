@@ -1657,11 +1657,12 @@ class FormStore {
         return;
       }
 
+      if(newValue === undefined) {
+        newMetadata[key] = existingValue;
+      }
 
       if(typeof newValue === "object" && typeof existingValue === "object") {
         newMetadata[key] = this.MergeExistingMetadata(existingValue, newValue);
-      } else {
-        newMetadata[key] = newValue;
       }
     });
 
