@@ -375,6 +375,7 @@ class FormStore {
     this.hideImageTab = config.hide_image_tab;
     this.showSearchablesTab = config.show_searchables_tab;
     this.hideUpdateLinksButton = config.hide_update_links_button;
+    this.searchableLinks = config.searchable_links;
 
     this.localization = config.localization;
   }
@@ -999,30 +1000,12 @@ class FormStore {
       localized
     });
 
-    if(loadedInfo && loadedInfo.searchables) {
-      loadedInfo.searchables = yield this.LoadSearchablePaths(loadedInfo.searchables);
-    }
-
     assetInfo = {
       ...assetInfo,
       ...loadedInfo
     };
 
     return assetInfo;
-  });
-
-  LoadSearchablePaths = flow(function * (searchables) {
-    const metadata = yield this.rootStore.client.ContentObjectMetadata({
-      versionHash: this.rootStore.params.versionHash,
-      metadataSubtree: "searchables",
-      select: Object.keys(searchables)
-    });
-
-    Object.keys(searchables).forEach(searchableKey => {
-      searchables[searchableKey] = !!metadata[searchableKey] && Object.keys(metadata[searchableKey]).length > 0;
-    });
-
-    return searchables;
   });
 
   LoadCredits(metadata) {
@@ -1796,16 +1779,6 @@ class FormStore {
             linkTarget: UrlJoin("/meta", values[name])
           });
         }
-      } else if(type === "metadata_link_checkbox") {
-        if(values[name]) {
-          value = this.CreateLink({
-            targetHash: this.rootStore.params.versionHash,
-            linkTarget: UrlJoin("/meta", field.target_link),
-            autoUpdate: false
-          });
-        } else {
-          value = {};
-        }
       } else if(type === "self_embed_url") {
         if(field.auto_update) {
           info[name] = this.rootStore.SelfEmbedUrl(field.version, field);
@@ -1992,6 +1965,16 @@ class FormStore {
           });
         });
 
+        // Local Searchable Links
+        let searchableLinks = {};
+        toJS(this.searchableLinks).forEach(({link_key, target}) => {
+          searchableLinks[link_key] = this.CreateLink({
+            targetHash: this.rootStore.params.versionHash,
+            linkTarget: UrlJoin("meta", target),
+            autoUpdate: false
+          });
+        });
+
         // Images
         let images = {};
         toJS(localizedData.images).forEach(({imageKey, imagePath, targetHash}) => {
@@ -2081,6 +2064,14 @@ class FormStore {
             metadata: searchables
           });
         }
+
+        yield client.ReplaceMetadata({
+          libraryId,
+          objectId,
+          writeToken,
+          metadataSubtree: "searchables",
+          metadata: searchableLinks
+        });
 
         yield Promise.all(
           Object.values(nonStandardInfo).map(async ({path, value}) => {

@@ -1,5 +1,5 @@
 import React from "react";
-import {Checkbox} from "elv-components-js";
+import {Action, Checkbox} from "elv-components-js";
 import {inject, observer} from "mobx-react";
 import {RecursiveField} from "../Inputs";
 
@@ -69,7 +69,26 @@ Enabled:
       </code>
     </React.Fragment>
   ),
-  extensions: "Allowed file extensions (e.g. jpg, png, txt, pdf). If none are specified, all file types will be allowed"
+  extensions: "Allowed file extensions (e.g. jpg, png, txt, pdf). If none are specified, all file types will be allowed",
+  searchables_link_key: (
+    <React.Fragment>
+      {`
+What the link to the file will be called in the metadata.
+
+Example:      
+      `}
+      <code>
+        {`
+"searchables": {
+  "<link key>": { 
+    "/": "<target link>"
+  }
+}
+      `}
+      </code>
+    </React.Fragment>
+  ),
+  searchables_target: "The path to store as the local link. This will be prepended with ./meta"
 };
 
 @inject("specStore")
@@ -157,6 +176,46 @@ class Controls extends React.Component {
     );
   }
 
+  SearchableLinks() {
+    const hasLinks = (
+      this.props.specStore.searchableLinks &&
+      Array.isArray(this.props.specStore.searchableLinks) &&
+      this.props.specStore.searchableLinks.length === 0
+    );
+
+    return (
+      <div className="control simple-control">
+        <Checkbox name="Enable Local Searchable Links" value={this.props.specStore.enableSearchableLinks} onChange={value => this.props.specStore.ToggleSearchableLinksVisibility(value)} />
+        {
+          this.props.specStore.enableSearchableLinks &&
+          <div className="indented">
+            {
+              hasLinks &&
+              <Action className="secondary searchable-links-button" onClick={() => this.props.specStore.LoadDefaultSearchableLinks()}>Load Default Links</Action>
+            }
+            <RecursiveField
+              list
+              orderable
+              name="Local Searchable Links"
+              values={this.props.specStore.searchableLinks}
+              fields={[
+                {name: "link_key", label: "Link Key", default: "assets", hint: hints.searchables_link_key, required: true},
+                {
+                  name: "target",
+                  label: "Link Target",
+                  default: "/public/asset_metadata/assets",
+                  hint: hints.searchables_target,
+                  required: true
+                }
+              ]}
+              Update={(_, newValues) => this.props.specStore.UpdateSearchableLinks(newValues)}
+            />
+          </div>
+        }
+      </div>
+    );
+  }
+
   render() {
     return (
       <div className="asset-form-section-container">
@@ -169,6 +228,7 @@ class Controls extends React.Component {
           { this.SimpleControl("vod_channel") }
           { this.SimpleControl("live_stream") }
           { this.SimpleControl("site_codes", "Access Codes") }
+          { this.SearchableLinks() }
         </div>
 
         <h3>Additional File Controls</h3>

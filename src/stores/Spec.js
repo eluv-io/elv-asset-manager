@@ -45,6 +45,8 @@ class SpecStore {
   @observable infoFields = [];
   @observable infoFieldLocalizations = [];
   @observable localizations = [];
+  @observable searchableLinks = [];
+  @observable enableSearchableLinks = false;
 
   @observable errors = [];
 
@@ -85,6 +87,8 @@ class SpecStore {
     this.infoFields = config.info_fields || config.infoFields || DefaultSpec.info_fields;
     this.associatedAssets = config.associated_assets || config.associatedAssets || DefaultSpec.associated_assets;
     this.defaultImageKeys = config.default_image_keys || config.defaultImageKeys || DefaultSpec.default_image_keys;
+    this.searchableLinks = config.searchable_links || config.searchableLinks || DefaultSpec.searchable_links;
+    this.enableSearchableLinks = config.enable_searchable_links || false;
 
     this.localizations = this.FormatLocalizations(config.localization || DefaultSpec.localization);
   }
@@ -177,10 +181,6 @@ class SpecStore {
 
       if(field.check_has_audio_flag) {
         formattedField.check_has_audio_flag = field.check_has_audio_flag;
-      }
-
-      if(field.target_link) {
-        formattedField.target_link = field.target_link;
       }
 
       if(["select", "multiselect"].includes(field.type)) {
@@ -282,7 +282,9 @@ class SpecStore {
         title_types: toJS(FormatOptions(this.availableTitleTypes)),
         associated_assets: toJS(this.associatedAssets),
         info_fields: toJS(infoFields),
-        default_image_keys: toJS(FormatOptions(this.defaultImageKeys))
+        default_image_keys: toJS(FormatOptions(this.defaultImageKeys)),
+        searchable_links: this.enableSearchableLinks ? toJS(this.searchableLinks) : [],
+        enable_searchable_links: this.enableSearchableLinks
       };
 
       // Validation
@@ -452,6 +454,11 @@ class SpecStore {
   }
 
   @action.bound
+  ToggleSearchableLinksVisibility(enabled) {
+    this.enableSearchableLinks = enabled;
+  }
+
+  @action.bound
   ToggleSearchablesTabVisibility(enabled) {
     this.showSearchablesTab = enabled;
   }
@@ -459,6 +466,11 @@ class SpecStore {
   @action.bound
   ToggleUpdateLinksVisibility(hidden) {
     this.hideUpdateLinksButton = hidden;
+  }
+
+  @action.bound
+  LoadDefaultSearchableLinks() {
+    this.searchableLinks = DefaultSpec.searchable_links;
   }
 
   @action.bound
@@ -499,6 +511,11 @@ class SpecStore {
         delete this.controls[id];
       }
     });
+  }
+
+  @action.bound
+  UpdateSearchableLinks(updatedLinks) {
+    this.searchableLinks = updatedLinks;
   }
 
   @action.bound
