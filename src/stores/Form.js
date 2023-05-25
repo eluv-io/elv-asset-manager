@@ -375,7 +375,7 @@ class FormStore {
     this.hideImageTab = config.hide_image_tab;
     this.showSearchablesTab = config.show_searchables_tab;
     this.hideUpdateLinksButton = config.hide_update_links_button;
-    this.searchableLinks = config.searchable_links;
+    this.searchableLinks = config.searchable_links || DefaultSpec.searchable_links;
 
     this.localization = config.localization;
   }

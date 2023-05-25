@@ -184,7 +184,6 @@ class Controls extends React.Component {
         {
           this.props.specStore.enableSearchableLinks &&
           <div className="indented">
-            <Action className="secondary searchable-links-button" onClick={() => this.props.specStore.LoadDefaultSearchableLinks()}>Load Default Links</Action>
             <RecursiveField
               list
               orderable
