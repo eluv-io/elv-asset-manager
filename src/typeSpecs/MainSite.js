@@ -8,6 +8,7 @@ const mainSiteSelectorSpec = {
   manageApp: "default",
   hide_image_tab: true,
   associate_permissions: false,
+  show_searchables_tab: true,
   controls: [],
   asset_types: [
     "primary",
