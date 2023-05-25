@@ -659,6 +659,32 @@ class RecursiveField extends React.Component {
             onChange={newValue => Update(field.name, newValue)}
           />
         );
+      } else if (fieldType === "simple-input") {
+        return (
+          <div className="-elv-input" key={key}>
+            <label htmlFor={field.name}>
+              { hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}` }
+            </label>
+            <input
+              name={field.name}
+              value={(entry || {})[field.name] || ""}
+              required={field.required}
+              readOnly={field.readonly}
+              placeholder={field.placeholder || ""}
+              onChange={event => {
+                let input = event.target.value.toString();
+
+                if(fieldType === "integer") {
+                  input = input.replace(/[^0-9]/g, "");
+                } else if(fieldType === "number") {
+                  input = input.replace(/[^0-9.]/g, "").replace(/\.{2,}/g, ".");
+                }
+
+                Update(field.name, input);
+              }}
+            />
+          </div>
+        );
       } else {
         return (
           <Input

@@ -88,7 +88,8 @@ Example:
       </code>
     </React.Fragment>
   ),
-  searchables_target: "The path to store as the local link. This will be prepended with ./meta"
+  searchables_target: "The path to store as the local link. This will be prepended with ./meta",
+  searchables_links: "These link targets will be available to the search index"
 };
 
 @inject("specStore")
@@ -177,35 +178,35 @@ class Controls extends React.Component {
   }
 
   SearchableLinks() {
-    const hasLinks = (
-      this.props.specStore.searchableLinks &&
-      Array.isArray(this.props.specStore.searchableLinks) &&
-      this.props.specStore.searchableLinks.length === 0
-    );
-
     return (
       <div className="control simple-control">
-        <Checkbox name="Enable Local Searchable Links" value={this.props.specStore.enableSearchableLinks} onChange={value => this.props.specStore.ToggleSearchableLinksVisibility(value)} />
+        <Checkbox name="Searchable Links" value={this.props.specStore.enableSearchableLinks} onChange={value => this.props.specStore.ToggleSearchableLinksVisibility(value)} />
         {
           this.props.specStore.enableSearchableLinks &&
           <div className="indented">
-            {
-              hasLinks &&
-              <Action className="secondary searchable-links-button" onClick={() => this.props.specStore.LoadDefaultSearchableLinks()}>Load Default Links</Action>
-            }
+            <Action className="secondary searchable-links-button" onClick={() => this.props.specStore.LoadDefaultSearchableLinks()}>Load Default Links</Action>
             <RecursiveField
               list
               orderable
-              name="Local Searchable Links"
+              name="Links"
+              hint={hints.searchables_links}
               values={this.props.specStore.searchableLinks}
               fields={[
-                {name: "link_key", label: "Link Key", default: "assets", hint: hints.searchables_link_key, required: true},
+                {
+                  name: "link_key",
+                  label: "Link Key",
+                  placeholder: "asset_metadata",
+                  hint: hints.searchables_link_key,
+                  required: true,
+                  type: "simple-input"
+                },
                 {
                   name: "target",
                   label: "Link Target",
-                  default: "/public/asset_metadata/assets",
+                  placeholder: "/public/asset_metadata",
                   hint: hints.searchables_target,
-                  required: true
+                  required: true,
+                  type: "simple-input"
                 }
               ]}
               Update={(_, newValues) => this.props.specStore.UpdateSearchableLinks(newValues)}

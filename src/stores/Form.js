@@ -1967,13 +1967,30 @@ class FormStore {
 
         // Local Searchable Links
         let searchableLinks = {};
-        toJS(this.searchableLinks).forEach(({link_key, target}) => {
+        for(let i = 0; i < this.searchableLinks.length; i++) {
+          const {link_key, target} = this.searchableLinks[i];
+          const metadata = yield client.ContentObjectMetadata({
+            libraryId,
+            objectId,
+            metadataSubtree: target
+          });
+
+          if(!metadata) {
+            yield client.ReplaceMetadata({
+              libraryId,
+              objectId,
+              writeToken,
+              metadataSubtree: target,
+              metadata: {}
+            });
+          }
+
           searchableLinks[link_key] = this.CreateLink({
             targetHash: this.rootStore.params.versionHash,
             linkTarget: UrlJoin("meta", target),
             autoUpdate: false
           });
-        });
+        }
 
         // Images
         let images = {};

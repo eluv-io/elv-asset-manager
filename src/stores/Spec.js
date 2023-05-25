@@ -470,7 +470,9 @@ class SpecStore {
 
   @action.bound
   LoadDefaultSearchableLinks() {
-    this.searchableLinks = DefaultSpec.searchable_links;
+    const collection = this.availableTitleTypes.includes("collection");
+
+    this.searchableLinks = collection ? DefaultSpec.searchable_links_title_collection : DefaultSpec.searchable_links_title;
   }
 
   @action.bound
