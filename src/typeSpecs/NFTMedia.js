@@ -56,6 +56,7 @@ const NFTMediaItem = [
     "no_localize": true,
     "options": [
       "Video",
+      "Live Video",
       "Audio",
       "Image",
       "Gallery",
@@ -63,6 +64,20 @@ const NFTMediaItem = [
       "HTML",
       "Link"
     ]
+  },
+  {
+    "name": "start_time",
+    "type": "datetime",
+    "no_localize": true,
+    "depends_on": "./media_type",
+    "depends_on_value": "Live Video"
+  },
+  {
+    "name": "end_time",
+    "type": "datetime",
+    "no_localize": true,
+    "depends_on": "./media_type",
+    "depends_on_value": "Live Video"
   },
   {
     "name": "media_link",
