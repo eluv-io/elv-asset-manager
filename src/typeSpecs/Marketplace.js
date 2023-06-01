@@ -970,6 +970,35 @@ const MarketplaceSpec = {
               "type": "text"
             },
             {
+              "name": "section_header_rich_text",
+              "label": "Section Header (Rich Text)",
+              "type": "rich_text"
+            },
+            {
+              "name": "section_footer",
+              "type": "rich_text"
+            },
+            {
+              "name": "show_countdown",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "countdown",
+              "type": "subsection",
+              "depends_on": "./show_countdown",
+              "fields": [
+                {
+                  "name": "header",
+                  "type": "text"
+                },
+                {
+                  "name": "date",
+                  "type": "datetime"
+                }
+              ]
+            },
+            {
               "name": "type",
               "type": "select",
               "no_localize": true,
