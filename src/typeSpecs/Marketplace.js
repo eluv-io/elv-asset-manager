@@ -930,6 +930,13 @@ const MarketplaceSpec = {
           "hint": "If specified, the default text displayed while awaiting minting will be hidden and the purchase animation will be larger"
         },
         {
+          "name": "show_card_cta",
+          "label": "Show Item Card CTA",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If specified, a CTA (button) will be shown on item cards on the storefront"
+        },
+        {
           "name": "skip_reveal",
           "type": "checkbox",
           "default_value": true,
