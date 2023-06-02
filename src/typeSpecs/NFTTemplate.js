@@ -342,6 +342,11 @@ const NFTTemplateSpec = {
               "hint": "Square image recommended"
             },
             {
+              "name": "animation",
+              "type": "fabric_link",
+              "video_preview": true
+            },
+            {
               "name": "description",
               "type": "rich_text"
             },
