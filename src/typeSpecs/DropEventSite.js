@@ -1179,17 +1179,12 @@ const eventSiteSpec = {
           "no_localize": true
         },
         {
-          "name": "sku",
-          "label": "Item SKU",
-          "type": "text",
-          "no_localize": true
+          "name": "title",
+          "type": "text"
         },
         {
-          "name": "tenant_id",
-          "label": "Tenant ID",
-          "hint": "If different from the site",
-          "type": "text",
-          "no_localize": true
+          "name": "description",
+          "type": "rich_text"
         },
         {
           "name": "ntp_id",
@@ -1198,12 +1193,26 @@ const eventSiteSpec = {
           "no_localize": true
         },
         {
-          "name": "title",
-          "type": "text"
+          "name": "tenant_id",
+          "label": "Tenant ID",
+          "hint": "Tenant ID associated with NTP, if different from the site",
+          "type": "text",
+          "no_localize": true
         },
         {
-          "name": "description",
-          "type": "rich_text"
+          "name": "marketplace",
+          "type": "reference_select",
+          "reference": "/additional_marketplaces",
+          "label_key": "marketplace_slug",
+          "value_key": "marketplace_slug",
+          "allow_null": true,
+          "null_label": "Default"
+        },
+        {
+          "name": "sku",
+          "label": "Item SKU",
+          "type": "text",
+          "no_localize": true
         }
       ]
     },

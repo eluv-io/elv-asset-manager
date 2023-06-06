@@ -268,6 +268,11 @@ const NFTMedia = [
           },
           ...NFTMediaItem,
           {
+            "name": "animation",
+            "type": "fabric_link",
+            "video_preview": true
+          },
+          {
             "name": "button_text",
             "type": "text"
           },
@@ -327,6 +332,11 @@ const NFTMedia = [
                 "extensions": imageTypes,
                 "name": "image",
                 "type": "file_url"
+              },
+              {
+                "name": "animation",
+                "type": "fabric_link",
+                "video_preview": true
               },
               {
                 "name": "background_image",
