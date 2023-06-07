@@ -121,6 +121,11 @@ const eventSiteSpec = {
             "Storefront",
             "Listings"
           ]
+        },
+        {
+          "name": "hidden",
+          "type": "checkbox",
+          "default_value": false
         }
       ]
     },
