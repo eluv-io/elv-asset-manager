@@ -348,8 +348,11 @@
 }
 
 .text-editor-component {
-  max-width: 800px;
-  min-width: 800px;
+
+  &--active {
+    max-width: 800px;
+    min-width: 800px;
+  }
 
   .show-hide-button {
     padding: $elv-spacing-s 0;

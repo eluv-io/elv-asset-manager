@@ -1122,6 +1122,12 @@ const eventSiteSpec = {
       "default_value": true
     },
     {
+      "name": "faq_title",
+      "label": "FAQ Title",
+      "type": "text",
+      "depends_on": "./show_faq"
+    },
+    {
       "name": "faq",
       "label": "FAQ",
       "hint": "Specify a custom FAQ. If blank, the default FAQ will be displayed",
@@ -1133,12 +1139,27 @@ const eventSiteSpec = {
           "type": "text"
         },
         {
+          "name": "type",
+          "type": "select",
+          "options": [
+            ["Question", ""],
+            ["Header", "header"]
+          ]
+        },
+        {
           "name": "question",
-          "type": "text"
+          "type": "text",
+          "unless": "./type"
         },
         {
           "name": "answer",
-          "type": "rich_text"
+          "type": "rich_text",
+          "unless": "./type"
+        },
+        {
+          "name": "header",
+          "type": "text",
+          "depends_on": "./type"
         }
       ]
     },
