@@ -188,12 +188,34 @@ const MarketplaceSpec = {
               "type": "text"
             },
             {
+              "name": "stores",
+              "type": "text"
+            },
+            {
               "name": "listings",
               "type": "text"
             },
             {
               "name": "my_items",
               "type": "text"
+            }
+          ]
+        },
+        {
+          "name": "additional_marketplaces",
+          "type": "list",
+          "hint": "Additional marketplaces to associate with this one. These marketplaces will show as a dropdown list in the main store navigation link.",
+          "no_localize": true,
+          "fields": [
+            {
+              "name": "tenant_slug",
+              "type": "text",
+              "hint": "The slug of the tenant in which the marketplace is defined"
+            },
+            {
+              "name": "marketplace_slug",
+              "type": "text",
+              "hint": "The slug of the marketplace"
             }
           ]
         },
