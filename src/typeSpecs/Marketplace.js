@@ -188,12 +188,34 @@ const MarketplaceSpec = {
               "type": "text"
             },
             {
+              "name": "stores",
+              "type": "text"
+            },
+            {
               "name": "listings",
               "type": "text"
             },
             {
               "name": "my_items",
               "type": "text"
+            }
+          ]
+        },
+        {
+          "name": "additional_marketplaces",
+          "type": "list",
+          "hint": "Additional marketplaces to associate with this one. These marketplaces will show as a dropdown list in the main store navigation link.",
+          "no_localize": true,
+          "fields": [
+            {
+              "name": "tenant_slug",
+              "type": "text",
+              "hint": "The slug of the tenant in which the marketplace is defined"
+            },
+            {
+              "name": "marketplace_slug",
+              "type": "text",
+              "hint": "The slug of the marketplace"
             }
           ]
         },
@@ -930,6 +952,13 @@ const MarketplaceSpec = {
           "hint": "If specified, the default text displayed while awaiting minting will be hidden and the purchase animation will be larger"
         },
         {
+          "name": "show_card_cta",
+          "label": "Show Item Card CTA",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If specified, a CTA (button) will be shown on item cards on the storefront"
+        },
+        {
           "name": "skip_reveal",
           "type": "checkbox",
           "default_value": true,
@@ -968,6 +997,35 @@ const MarketplaceSpec = {
             {
               "name": "section_subheader",
               "type": "text"
+            },
+            {
+              "name": "section_header_rich_text",
+              "label": "Section Header (Rich Text)",
+              "type": "rich_text"
+            },
+            {
+              "name": "section_footer",
+              "type": "rich_text"
+            },
+            {
+              "name": "show_countdown",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "countdown",
+              "type": "subsection",
+              "depends_on": "./show_countdown",
+              "fields": [
+                {
+                  "name": "header",
+                  "type": "text"
+                },
+                {
+                  "name": "date",
+                  "type": "datetime"
+                }
+              ]
             },
             {
               "name": "type",

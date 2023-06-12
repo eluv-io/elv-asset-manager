@@ -406,6 +406,10 @@ class RecursiveField extends React.Component {
           }
         }
 
+        if(entry[field.name] === undefined && !field.allow_null && options[0]) {
+          Update(field.name, Array.isArray(options[0]) ? options[0][1] : options[0]);
+        }
+
         return (
           <Selection
             key={key}

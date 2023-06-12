@@ -54,7 +54,7 @@ class TextEditor extends React.Component {
 
   render () {
     return (
-      <div className="text-editor-component">
+      <div className={`text-editor-component ${this.state.show ? "text-editor-component--active" : "text-editor-component--inactive"}`}>
         <div className="show-hide-button">
           <Action
             className={this.state.show ? "" : "secondary"}

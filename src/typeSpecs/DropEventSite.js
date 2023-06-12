@@ -121,6 +121,11 @@ const eventSiteSpec = {
             "Storefront",
             "Listings"
           ]
+        },
+        {
+          "name": "hidden",
+          "type": "checkbox",
+          "default_value": false
         }
       ]
     },
@@ -1117,6 +1122,12 @@ const eventSiteSpec = {
       "default_value": true
     },
     {
+      "name": "faq_title",
+      "label": "FAQ Title",
+      "type": "text",
+      "depends_on": "./show_faq"
+    },
+    {
       "name": "faq",
       "label": "FAQ",
       "hint": "Specify a custom FAQ. If blank, the default FAQ will be displayed",
@@ -1128,12 +1139,27 @@ const eventSiteSpec = {
           "type": "text"
         },
         {
+          "name": "type",
+          "type": "select",
+          "options": [
+            ["Question", ""],
+            ["Header", "header"]
+          ]
+        },
+        {
           "name": "question",
-          "type": "text"
+          "type": "text",
+          "unless": "./type"
         },
         {
           "name": "answer",
-          "type": "rich_text"
+          "type": "rich_text",
+          "unless": "./type"
+        },
+        {
+          "name": "header",
+          "type": "text",
+          "depends_on": "./type"
         }
       ]
     },
@@ -1179,17 +1205,12 @@ const eventSiteSpec = {
           "no_localize": true
         },
         {
-          "name": "sku",
-          "label": "Item SKU",
-          "type": "text",
-          "no_localize": true
+          "name": "title",
+          "type": "text"
         },
         {
-          "name": "tenant_id",
-          "label": "Tenant ID",
-          "hint": "If different from the site",
-          "type": "text",
-          "no_localize": true
+          "name": "description",
+          "type": "rich_text"
         },
         {
           "name": "ntp_id",
@@ -1198,12 +1219,26 @@ const eventSiteSpec = {
           "no_localize": true
         },
         {
-          "name": "title",
-          "type": "text"
+          "name": "tenant_id",
+          "label": "Tenant ID",
+          "hint": "Tenant ID associated with NTP, if different from the site",
+          "type": "text",
+          "no_localize": true
         },
         {
-          "name": "description",
-          "type": "rich_text"
+          "name": "marketplace",
+          "type": "reference_select",
+          "reference": "/additional_marketplaces",
+          "label_key": "marketplace_slug",
+          "value_key": "marketplace_slug",
+          "allow_null": true,
+          "null_label": "Default"
+        },
+        {
+          "name": "sku",
+          "label": "Item SKU",
+          "type": "text",
+          "no_localize": true
         }
       ]
     },
