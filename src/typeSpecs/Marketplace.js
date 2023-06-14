@@ -276,6 +276,13 @@ const MarketplaceSpec = {
 `:root {
 
 }`
+        },
+        {
+          "name": "use_tenant_styling",
+          "label": "Use Tenant Styling",
+          "hint": "If specified, the custom CSS from the tenant object will be used on non-marketplace specific pages such as listings and in the user's profile",
+          "type": "checkbox",
+          "default_value": false
         }
       ]
     },
