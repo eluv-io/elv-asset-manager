@@ -28,34 +28,29 @@ const eventTenantSpec = {
       "type": "text"
     },
     {
-      "extensions": imageTypes,
-      "name": "logo",
-      "type": "file"
-    },
-    {
-      "name": "copyright",
-      "type": "text"
-    },
-    {
-      "name": "privacy_policy",
-      "type": "rich_text"
-    },
-    {
-      "label": "Privacy Policy (HTML)",
-      "name": "privacy_policy_html",
-      "type": "file",
-      "extensions": ["html"]
-    },
-    {
-      "label": "Terms and Conditions",
-      "name": "terms",
-      "type": "rich_text"
-    },
-    {
-      "label": "Terms and Conditions (HTML)",
-      "name": "terms_html",
-      "type": "file",
-      "extensions": ["html"]
+      "name": "branding",
+      "label": "Wallet Branding",
+      "type": "subsection",
+      "hint": "These options will be used for participating marketplaces in this tenant instead of the marketplace's settings on non-marketplace pages, such as listings and within the user's profile.",
+      "fields": [
+        {
+          "label": "App Background",
+          "name": "background",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
+          "label": "App Background (Mobile)",
+          "name": "background_mobile",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
+          "name": "wallet_css",
+          "label": "Wallet CSS",
+          "type": "textarea"
+        }
+      ]
     },
     {
       "fields": [
