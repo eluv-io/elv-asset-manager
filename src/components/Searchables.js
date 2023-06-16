@@ -59,6 +59,8 @@ class Searchables extends React.Component {
             onCancel={this.CloseModal}
             multiple={true}
             SetDisabled={props => !props.ipTitleId}
+            disabledText="Title must have an IP Title ID"
+            hideDefaultDisabledText={true}
           />
         </Modal>
       )

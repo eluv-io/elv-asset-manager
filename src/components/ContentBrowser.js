@@ -152,7 +152,7 @@ class BrowserList extends React.Component {
     return (
       <ul className={`browser ${this.props.hashes ? "mono" : ""}`}>
         {this.FilteredList().map(props => {
-          const {id, name, objectName, objectDescription, assetType, titleType, ipTitleId} = props;
+          const {id, name, objectName, objectDescription, assetType, titleType} = props;
           let disabled =
             (this.props.assetTypes && this.props.assetTypes.length > 0 && !this.props.assetTypes.includes(assetType)) ||
             (this.props.titleTypes && this.props.titleTypes.length > 0 && !this.props.titleTypes.includes(titleType)) ||
@@ -160,18 +160,25 @@ class BrowserList extends React.Component {
 
           let title = objectName ? `${objectName}\n\n${id}${objectDescription ? `\n\n${objectDescription}` : ""}` : id;
           if(disabled) {
-            title = title + "\n\nTitle type or asset type not allowed for this list:";
-            title = title + `\n\tTitle Type: ${titleType || "<not specified>"}`;
-
-            if(this.props.titleTypes && this.props.titleTypes.length > 0) {
-              title = title + `\n\tAllowed Title Types: ${this.props.titleTypes.join(", ")}`;
+            if(this.props.disabledText) {
+              title = title + `\n\n${this.props.disabledText}`;
             }
 
-            title = title + `\n\tAsset Type: ${assetType || "<not specified>"}`;
+            if(!this.props.hideDefaultDisabledText) {
+              title = title + "\n\nTitle type or asset type not allowed for this list:";
+              title = title + `\n\tTitle Type: ${titleType || "<not specified>"}`;
 
-            if(this.props.assetTypes && this.props.assetTypes.length > 0) {
-              title = title + `\n\tAllowed Asset Types: ${this.props.assetTypes.join(", ")}`;
+              if(this.props.titleTypes && this.props.titleTypes.length > 0) {
+                title = title + `\n\tAllowed Title Types: ${this.props.titleTypes.join(", ")}`;
+              }
+
+              title = title + `\n\tAsset Type: ${assetType || "<not specified>"}`;
+
+              if(this.props.assetTypes && this.props.assetTypes.length > 0) {
+                title = title + `\n\tAllowed Asset Types: ${this.props.assetTypes.join(", ")}`;
+              }
             }
+
           }
 
           const selected = (this.state.selected || []).includes(id);
@@ -244,7 +251,9 @@ BrowserList.propTypes = {
   QuickSelect: PropTypes.func.isRequired,
   paginated: PropTypes.bool,
   paginationInfo: PropTypes.object,
-  SetDisabled: PropTypes.func
+  SetDisabled: PropTypes.func,
+  disabledText: PropTypes.string,
+  hideDefaultDisabledText: PropTypes.bool
 };
 
 @inject("contentStore")
@@ -393,6 +402,8 @@ class ContentBrowser extends React.Component {
           QuickSelect={this.Update}
           multiple={this.props.multiple}
           SetDisabled={this.props.SetDisabled}
+          disabledText={this.props.disabledText}
+          hideDefaultDisabledText={this.props.hideDefaultDisabledText}
         />
       </React.Fragment>
     );
@@ -505,7 +516,9 @@ ContentBrowser.propTypes = {
   onComplete: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   multiple: PropTypes.bool,
-  SetDisabled: PropTypes.func
+  SetDisabled: PropTypes.func,
+  disabledText: PropTypes.string,
+  hideDefaultDisabledText: PropTypes.bool
 };
 
 export default ContentBrowser;

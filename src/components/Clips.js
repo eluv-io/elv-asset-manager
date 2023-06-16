@@ -210,6 +210,8 @@ class Clips extends React.Component {
             assetTypes={this.props.assetTypes}
             onComplete={this.AddClip}
             onCancel={this.CloseModal}
+            SetDisabled={props => !props.slug}
+            disabledText="Title must have a slug"
           />
         </Modal>
       )
