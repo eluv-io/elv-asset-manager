@@ -1899,7 +1899,7 @@ class FormStore {
         // Move built-in fields to top level info
         ["title", "display_title", "ip_title_id", "slug", "title_type", "asset_type"]
           .forEach(attr => {
-            if(localizedData.assetInfo[attr]) {
+            if((localizedData.assetInfo || {}).hasOwnProperty(attr)) {
               topInfo[attr] = localizedData.assetInfo[attr];
             }
           });
