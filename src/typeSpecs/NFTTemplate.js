@@ -342,9 +342,35 @@ const NFTTemplateSpec = {
               "hint": "Square image recommended"
             },
             {
+              "extensions": imageTypes,
+              "name": "poster_image",
+              "type": "file"
+            },
+            {
               "name": "animation",
               "type": "fabric_link",
+              "hint": "Shows in place of the image when viewing the offer",
               "video_preview": true
+            },
+            {
+              "name": "redeem_animation",
+              "type": "fabric_link",
+              "hint": "Shows while waiting for the redemption process to complete",
+              "video_preview": true
+            },
+            {
+              "name": "redeem_animation_loop",
+              "label": "Loop Redeem Animation",
+              "type": "checkbox",
+              "default_value": true,
+              "depends_on": "./redeem_animation"
+            },
+            {
+              "name": "require_redeem_animation",
+              "type": "checkbox",
+              "default_value": true,
+              "hint": "If specified, the redeem animation will play through at least once before showing results",
+              "depends_on": "./redeem_animation"
             },
             {
               "name": "description",
