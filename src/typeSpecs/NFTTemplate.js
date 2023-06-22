@@ -336,6 +336,24 @@ const NFTTemplateSpec = {
               "type": "text",
             },
             {
+              "name": "description",
+              "type": "rich_text"
+            },
+            {
+              "name": "tags",
+              "type": "list",
+              "fields": [
+                {
+                  "name": "key",
+                  "type": "text"
+                },
+                {
+                  "name": "value",
+                  "type": "text"
+                }
+              ]
+            },
+            {
               "extensions": imageTypes,
               "name": "image",
               "type": "file",
@@ -371,10 +389,6 @@ const NFTTemplateSpec = {
               "default_value": true,
               "hint": "If specified, the redeem animation will play through at least once before showing results",
               "depends_on": "./redeem_animation"
-            },
-            {
-              "name": "description",
-              "type": "rich_text"
             },
             {
               "label": "Release Date",

@@ -45,6 +45,20 @@ const NFTMediaItem = [
     ]
   },
   {
+    "name": "tags",
+    "type": "list",
+    "fields": [
+      {
+        "name": "key",
+        "type": "text"
+      },
+      {
+        "name": "value",
+        "type": "text"
+      }
+    ]
+  },
+  {
     "name": "requires_permissions",
     "type": "checkbox",
     "default_value": false,
