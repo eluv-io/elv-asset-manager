@@ -76,7 +76,8 @@ const NFTMediaItem = [
       "Gallery",
       "Ebook",
       "HTML",
-      "Link"
+      "Link",
+      "Embedded Webpage"
     ]
   },
   {
@@ -112,7 +113,7 @@ const NFTMediaItem = [
     "name": "link",
     "type": "text",
     "depends_on": "./media_type",
-    "depends_on_value": ["Link"]
+    "depends_on_value": ["Link", "Embedded Webpage"]
   },
   {
     "name": "authorized_link",
