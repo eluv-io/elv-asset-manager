@@ -271,7 +271,9 @@ class RecursiveField extends React.Component {
         }
       }
 
-      if(fieldType === "header") {
+      if(fieldType === "hidden") {
+        return null;
+      } else if(fieldType === "header") {
         return (
           <h2 className="input-header" id={`header-${field.name}`}>
             {field.label || FormatName(field.name)}
