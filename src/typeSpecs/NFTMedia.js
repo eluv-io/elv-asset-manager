@@ -350,9 +350,7 @@ const NFTMedia = [
           {
             "name": "background_image_logo_tv",
             "type": "file",
-            "extensions": imageTypes,
-            "depends_on": "./media_type",
-            "depends_on_value": "Gallery"
+            "extensions": imageTypes
           },
           {
             "name": "locked_state",
