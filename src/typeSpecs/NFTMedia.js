@@ -42,7 +42,9 @@ const NFTMediaItem = [
       "Square",
       "Wide",
       "Tall"
-    ]
+    ],
+    "unless": "./container",
+    "unless_value": "featured"
   },
   {
     "name": "tags",
@@ -76,7 +78,9 @@ const NFTMediaItem = [
       "Gallery",
       "Ebook",
       "HTML",
-      "Link"
+      "Link",
+      "Embedded Webpage",
+      "Media Reference"
     ]
   },
   {
@@ -112,7 +116,7 @@ const NFTMediaItem = [
     "name": "link",
     "type": "text",
     "depends_on": "./media_type",
-    "depends_on_value": ["Link"]
+    "depends_on_value": ["Link", "Embedded Webpage"]
   },
   {
     "name": "authorized_link",
@@ -121,6 +125,24 @@ const NFTMediaItem = [
     "default_value": false,
     "depends_on": "./media_type",
     "depends_on_value": ["Link"]
+  },
+  {
+    "name": "media_reference",
+    "type": "subsection",
+    "depends_on": "./media_type",
+    "depends_on_value": ["Media Reference"],
+    "fields": [
+      {
+        "name": "section_id",
+        "label": "Section ID",
+        "type": "text"
+      },
+      {
+        "name": "collection_id",
+        "label": "Collection ID",
+        "type": "text"
+      }
+    ]
   },
   {
     "name": "offerings",
@@ -255,7 +277,15 @@ const NFTMedia = [
     "type": "list",
     "depends_on": "./additional_media_type",
     "depends_on_value": "List",
-    "fields": NFTMediaItem
+    "fields": [
+      {
+        "name": "container",
+        "type": "hidden",
+        "hidden": true,
+        "default_value": "list"
+      },
+      ...NFTMediaItem
+    ]
   },
   {
     "label": "Custom Gallery CSS",
@@ -274,6 +304,12 @@ const NFTMedia = [
         "name": "featured_media",
         "type": "list",
         "fields": [
+          {
+            "name": "container",
+            "type": "hidden",
+            "hidden": true,
+            "default_value": "featured"
+          },
           {
             "name": "required",
             "type": "checkbox",
@@ -308,6 +344,11 @@ const NFTMedia = [
           {
             "name": "background_image_tv",
             "label": "Background Image (TV)",
+            "type": "file",
+            "extensions": imageTypes
+          },
+          {
+            "name": "background_image_logo_tv",
             "type": "file",
             "extensions": imageTypes
           },
@@ -412,6 +453,12 @@ const NFTMedia = [
                 "name": "media",
                 "type": "list",
                 "fields": [
+                  {
+                    "name": "container",
+                    "type": "hidden",
+                    "hidden": true,
+                    "default_value": "collection"
+                  },
                   ...NFTMediaItem,
                   {
                     "name": "locked",
