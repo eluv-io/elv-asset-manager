@@ -17,6 +17,7 @@ import FileControl from "./FileControl";
 import LocalizationIcon from "../static/icons/world.svg";
 import CloseIcon from "../static/icons/x-circle.svg";
 import SettingsIcon from "../static/icons/settings.svg";
+import Searchables from "./Searchables";
 
 @inject("rootStore")
 @inject("formStore")
@@ -191,6 +192,10 @@ class AssetForm extends React.Component {
       this.props.formStore.fileControls.forEach(control => tabs.push([control.name, control.name]));
     }
 
+    if(this.props.formStore.showSearchablesTab) {
+      tabs.push(["Searchables", "SEARCHABLES"]);
+    }
+
     return tabs;
   }
 
@@ -214,6 +219,8 @@ class AssetForm extends React.Component {
         return <SiteCustomization />;
       case "SITE_CODES":
         return <SiteAccessCode />;
+      case "SEARCHABLES":
+        return <Searchables />;
       default:
         const control = this.props.formStore.fileControls
           .find(control => control.name === this.state.form);
@@ -254,8 +261,22 @@ class AssetForm extends React.Component {
     );
   }
 
+  Notification = () => {
+    const { message, key } = this.props.rootStore.message;
+    let notification;
+
+    if(message) {
+      notification = <div key={`message-${key}`} className="message">{ message }</div>;
+    } else {
+      notification = <div className="message empty"></div>;
+    }
+
+    return notification;
+  }
+
   render() {
     const tabs = this.Tabs();
+
     return (
       <div className="asset-form">
         <div className="sticky app-header">
@@ -325,6 +346,9 @@ class AssetForm extends React.Component {
           )
         }
         <div className="asset-form-container">
+          <div className="notification-container">
+            { this.Notification() }
+          </div>
           { this.CurentForm() }
         </div>
       </div>

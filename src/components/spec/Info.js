@@ -171,7 +171,7 @@ class Info extends React.Component {
             onChange={enabled => this.props.specStore.TogglePermissionAssociation(enabled)}
           />
           <Checkbox
-            name="Show Indexer Settings"
+            name="Show Search Settings"
             value={this.props.specStore.showIndexerSettings}
             onChange={enabled => this.props.specStore.ToggleIndexerSettings(enabled)}
           />
@@ -184,6 +184,16 @@ class Info extends React.Component {
             name="Hide Images Tab"
             value={this.props.specStore.hideImageTab}
             onChange={hidden => this.props.specStore.ToggleImageTabHidden(hidden)}
+          />
+          <Checkbox
+            name="Show Searchables Tab"
+            value={this.props.specStore.showSearchablesTab}
+            onChange={enabled => this.props.specStore.ToggleSearchablesTabVisibility(enabled)}
+          />
+          <Checkbox
+            name="Hide Update Links Button"
+            value={this.props.specStore.hideUpdateLinksButton}
+            onChange={hidden => this.props.specStore.ToggleUpdateLinksVisibility(hidden)}
           />
           <Selection
             name="displayApp"

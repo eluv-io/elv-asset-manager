@@ -74,7 +74,9 @@ class ContentStore {
             "public/asset_metadata/title",
             "public/asset_metadata/display_title",
             "public/asset_metadata/asset_type",
-            "public/asset_metadata/title_type"
+            "public/asset_metadata/title_type",
+            "public/asset_metadata/ip_title_id",
+            "public/asset_metadata/slug"
           ],
           sort: "public/asset_metadata/title",
           start,
@@ -112,6 +114,8 @@ class ContentStore {
           id,
           objectId: id,
           name,
+          slug: metadata.public.asset_metadata.slug,
+          ipTitleId: metadata.public.asset_metadata.ip_title_id,
           objectName: metadata.public.name,
           objectDescription: metadata.public.description,
           assetType: metadata.public.asset_metadata.asset_type,

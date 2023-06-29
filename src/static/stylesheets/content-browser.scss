@@ -64,12 +64,21 @@
     position: relative;
 
     button {
-      position: absolute;
-      right: 0;
+      &.visible {
+        visibility: visible;
+      }
+
+      &.hidden {
+        visibility: hidden;
+      }
     }
 
     .prev-button {
-      left: 0;
+      margin-right: auto;
+    }
+
+    .next-button {
+      margin-left: auto;
     }
   }
 
@@ -140,5 +149,21 @@
         font-size: $elv-font-s;
       }
     }
+
+    .list-entry {
+      &.selected {
+        background-color: $elv-color-mediumblue;
+
+        button,
+        button div {
+          color: white;
+        }
+      }
+    }
+  }
+
+  .no-results {
+    margin-top: 16px;
+    text-align: center;
   }
 }

@@ -345,7 +345,6 @@ button {
   border-bottom: 1px solid $elv-color-lightgray;
   display: flex;
   flex-direction: column;
-  margin-top: $elv-spacing-m;
   padding: $elv-spacing-m $elv-spacing-m $elv-spacing-xl;
 
   .asset-form-separator {
@@ -552,6 +551,7 @@ select {
 
 .asset-form-clip {
   grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 5rem;
+  font-size: 0.9rem;
   min-height: $elv-spacing-ml;
 
   .asset-form-clip-actions {
@@ -828,5 +828,105 @@ select {
     color: $elv-color-text-light;
     margin: 0 0 $elv-spacing-l;
     text-align: center;
+  }
+}
+
+.controls {
+  align-items: center;
+  display: flex;
+  margin-bottom: $elv-spacing-s;
+  max-height: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0.25rem 0;
+  position: relative;
+  width: 100%;
+
+  .filter {
+    font-size: $elv-font-l;
+    position: absolute;
+    right: 0;
+    width: 20rem;
+  }
+
+  button,
+  .-elv-button {
+    height: 2rem;
+    min-width: 10rem;
+
+    &:not(:last-child) {
+      margin-right: $elv-spacing-xs;
+    }
+  }
+}
+
+.page-controls {
+  justify-content: center;
+
+  button {
+    margin: 0 1rem;
+    max-width: 6rem;
+    min-width: 6rem;
+
+    &:disabled {
+      visibility: hidden;
+    }
+  }
+}
+
+.sortable-header {
+  @include elv-no-select;
+  cursor: pointer;
+
+  &.active {
+    &.asc {
+      &::after {
+        content: "▲";
+        font-size: $elv-font-m;
+        padding-left: $elv-spacing-xs;
+      }
+    }
+
+    &.desc {
+      &::after {
+        content: "▼";
+        font-size: $elv-font-m;
+        padding-left: $elv-spacing-xs;
+      }
+    }
+  }
+}
+
+@keyframes FadeOut {
+  95% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.notification-container {
+  align-items: center;
+  font-size: 0.8rem;
+
+  .message {
+    animation: FadeOut 5s linear forwards;
+    color: $elv-color-mediumblue;
+    display: flex;
+    height: 2.5rem;
+    justify-content: center;
+
+    &.empty {
+      visibility: hidden;
+    }
+  }
+}
+
+#-elv-confirm-target {
+  .-elv-modal {
+    form {
+      width: 750px;
+    }
   }
 }

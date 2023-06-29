@@ -32,6 +32,8 @@ class SpecStore {
   @observable showIndexerSettings = false;
   @observable playable = false;
   @observable hideImageTab = false;
+  @observable showSearchablesTab = false;
+  @observable hideUpdateLinksButton = false;
   @observable displayApp = "";
   @observable manageApp = "";
   @observable controls = {};
@@ -43,6 +45,8 @@ class SpecStore {
   @observable infoFields = [];
   @observable infoFieldLocalizations = [];
   @observable localizations = [];
+  @observable searchableLinks = [];
+  @observable enableSearchableLinks = false;
 
   @observable errors = [];
 
@@ -74,6 +78,8 @@ class SpecStore {
     this.showIndexerSettings = config.show_indexer_settings || false;
     this.playable = config.playable || false;
     this.hideImageTab = config.hide_image_tab || config.hideImageTab || false;
+    this.hideUpdateLinksButton = config.hide_update_links_button || config.hideUpdateLinksButton || false;
+    this.showSearchablesTab = config.show_searchables_tab || config.showSearchablesTab || false;
     this.displayApp = config.display_app || config.displayApp || "";
     this.manageApp = config.manage_app || config.manageApp || "";
     this.availableAssetTypes = config.asset_types || config.availableAssetTypes || DefaultSpec.asset_types;
@@ -81,6 +87,8 @@ class SpecStore {
     this.infoFields = config.info_fields || config.infoFields || DefaultSpec.info_fields;
     this.associatedAssets = config.associated_assets || config.associatedAssets || DefaultSpec.associated_assets;
     this.defaultImageKeys = config.default_image_keys || config.defaultImageKeys || DefaultSpec.default_image_keys;
+    this.searchableLinks = config.searchable_links || config.searchableLinks || DefaultSpec.searchable_links;
+    this.enableSearchableLinks = config.enable_searchable_links || false;
 
     this.localizations = this.FormatLocalizations(config.localization || DefaultSpec.localization);
   }
@@ -264,6 +272,8 @@ class SpecStore {
         associate_permissions: this.associatePermissions,
         show_indexer_settings: this.showIndexerSettings,
         hide_image_tab: this.hideImageTab,
+        hide_update_links_button: this.hideUpdateLinksButton,
+        show_searchables_tab: this.showSearchablesTab,
         playable: this.playable,
         display_app: this.display_app,
         manage_app: this.manage_app,
@@ -272,7 +282,9 @@ class SpecStore {
         title_types: toJS(FormatOptions(this.availableTitleTypes)),
         associated_assets: toJS(this.associatedAssets),
         info_fields: toJS(infoFields),
-        default_image_keys: toJS(FormatOptions(this.defaultImageKeys))
+        default_image_keys: toJS(FormatOptions(this.defaultImageKeys)),
+        searchable_links: this.enableSearchableLinks ? toJS(this.searchableLinks) : [],
+        enable_searchable_links: this.enableSearchableLinks
       };
 
       // Validation
@@ -442,6 +454,21 @@ class SpecStore {
   }
 
   @action.bound
+  ToggleSearchableLinksVisibility(enabled) {
+    this.enableSearchableLinks = enabled;
+  }
+
+  @action.bound
+  ToggleSearchablesTabVisibility(enabled) {
+    this.showSearchablesTab = enabled;
+  }
+
+  @action.bound
+  ToggleUpdateLinksVisibility(hidden) {
+    this.hideUpdateLinksButton = hidden;
+  }
+
+  @action.bound
   UpdateApp(type, app) {
     this[`${type}App`] = app;
   }
@@ -479,6 +506,11 @@ class SpecStore {
         delete this.controls[id];
       }
     });
+  }
+
+  @action.bound
+  UpdateSearchableLinks(updatedLinks) {
+    this.searchableLinks = updatedLinks;
   }
 
   @action.bound

@@ -4,7 +4,7 @@ import React from "react";
 import AsyncComponent from "./AsyncComponent";
 import {inject, observer} from "mobx-react";
 import PropTypes from "prop-types";
-import {Action, LoadingElement, Maybe, onEnterPressed} from "elv-components-js";
+import {Action, Confirm, LoadingElement, onEnterPressed} from "elv-components-js";
 
 @inject("contentStore")
 @observer
@@ -17,7 +17,8 @@ class BrowserList extends React.Component {
       version: 1,
       filter: "",
       lookup: "",
-      lookupError: ""
+      lookupError: "",
+      selected: []
     };
   }
 
@@ -41,19 +42,18 @@ class BrowserList extends React.Component {
 
     return (
       <div className="browser-pagination">
-        {Maybe(
-          this.state.page > 1,
-          <Action className="secondary prev-button" onClick={() => ChangePage(this.state.page - 1)}>
-            Previous
-          </Action>
-        )}
-        Page {this.state.page} of {pages}
-        {Maybe(
-          this.state.page < pages,
-          <Action className="secondary next-button" onClick={() => ChangePage(this.state.page + 1)}>
-            Next
-          </Action>
-        )}
+        <Action className={`secondary prev-button ${this.state.page > 1 ? "visible" : "hidden"}`} onClick={() => ChangePage(this.state.page - 1)}>
+          Previous
+        </Action>
+
+        {
+          this.FilteredList().length > 0 ?
+            `Page ${this.state.page} of ${pages}` : null
+        }
+
+        <Action className={`secondary next-button ${this.state.page < pages ? "visible" : "hidden"}`} onClick={() => ChangePage(this.state.page + 1)}>
+          Next
+        </Action>
       </div>
     );
   }
@@ -69,7 +69,13 @@ class BrowserList extends React.Component {
         return;
       }
 
-      this.props.QuickSelect({name, libraryId, objectId, versionHash});
+      this.props.QuickSelect({
+        name,
+        libraryId,
+        objectId,
+        versionHash,
+        confirm: true
+      });
     };
 
     return (
@@ -112,53 +118,112 @@ class BrowserList extends React.Component {
     );
   }
 
-  render() {
+  FilteredList = () => {
     let list = this.props.list || [];
+
     if(!this.props.paginated) {
       list = list.filter(({name}) => name.toLowerCase().includes(this.state.filter.toLowerCase()));
     }
 
+    return list;
+  };
+
+  Submit = () => {
+    if(!this.props.multiple) { return; }
+
+    return (
+      <div className="actions-container">
+        <Action
+          onClick={async () => {
+            await this.props.Select({
+              selected: this.state.selected
+            });
+          }}
+        >Submit</Action>
+      </div>
+    );
+  };
+
+  ListView = () => {
+    if(this.FilteredList().length === 0) {
+      return <div className="no-results">No results</div>;
+    }
+
+    return (
+      <ul className={`browser ${this.props.hashes ? "mono" : ""}`}>
+        {this.FilteredList().map(props => {
+          const {id, name, objectName, objectDescription, assetType, titleType} = props;
+          let disabled =
+            (this.props.assetTypes && this.props.assetTypes.length > 0 && !this.props.assetTypes.includes(assetType)) ||
+            (this.props.titleTypes && this.props.titleTypes.length > 0 && !this.props.titleTypes.includes(titleType)) ||
+            (this.props.SetDisabled && typeof this.props.SetDisabled === "function" && this.props.SetDisabled(props));
+
+          let title = objectName ? `${objectName}\n\n${id}${objectDescription ? `\n\n${objectDescription}` : ""}` : id;
+          if(disabled) {
+            if(this.props.disabledText) {
+              title = title + `\n\n${this.props.disabledText}`;
+            }
+
+            if(!this.props.hideDefaultDisabledText) {
+              title = title + "\n\nTitle type or asset type not allowed for this list:";
+              title = title + `\n\tTitle Type: ${titleType || "<not specified>"}`;
+
+              if(this.props.titleTypes && this.props.titleTypes.length > 0) {
+                title = title + `\n\tAllowed Title Types: ${this.props.titleTypes.join(", ")}`;
+              }
+
+              title = title + `\n\tAsset Type: ${assetType || "<not specified>"}`;
+
+              if(this.props.assetTypes && this.props.assetTypes.length > 0) {
+                title = title + `\n\tAllowed Asset Types: ${this.props.assetTypes.join(", ")}`;
+              }
+            }
+
+          }
+
+          const selected = (this.state.selected || []).includes(id);
+          const isLibraryObject = id.startsWith("ilib");
+
+          return (
+            <li className={`list-entry${selected ? " selected" : ""}`} key={`browse-entry-${id}`}>
+              <button
+                disabled={disabled}
+                title={title}
+                onClick={() => {
+                  if(this.props.multiple && !isLibraryObject) {
+                    if(!selected) {
+                      this.setState({selected: this.state.selected.concat([id])});
+                    } else {
+                      this.setState({selected: this.state.selected.filter(otherId => otherId !== id)});
+                    }
+                  } else {
+                    this.props.Select({name, id});
+                  }
+                }}
+              >
+                <div>{name}</div>
+                {assetType ? <div className="hint">{assetType} {titleType ? ` | ${titleType}` : ""}</div> : null}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
+
+  render() {
     return (
       <div className="browser-container">
+        { this.Lookup() }
+        { this.Filter() }
         <h3>{this.props.header}</h3>
         <h4>{this.props.subHeader}</h4>
-        { this.Lookup() }
         { this.Pagination() }
-        { this.Filter() }
+        { this.Submit() }
         <AsyncComponent
           key={`browser-listing-version-${this.state.version}`}
           Load={() => this.props.Load({page: this.state.page, filter: this.state.filter})}
-          render={() => (
-            <ul className={`browser ${this.props.hashes ? "mono" : ""}`}>
-              {list.map(({id, name, objectName, objectDescription, assetType, titleType}) => {
-                let disabled =
-                  (this.props.assetTypes && this.props.assetTypes.length > 0 && !this.props.assetTypes.includes(assetType)) ||
-                  (this.props.titleTypes && this.props.titleTypes.length > 0 && !this.props.titleTypes.includes(titleType));
-
-                let title = objectName ? `${objectName}\n\n${id}${objectDescription ? `\n\n${objectDescription}` : ""}` : id;
-                if(disabled) {
-                  title = title + "\n\nTitle type or asset type not allowed for this list:";
-                  title = title + `\n\tTitle Type: ${titleType || "<not specified>"}`;
-                  title = title + `\n\tAllowed Title Types: ${(this.props.titleTypes || []).join(", ")}`;
-                  title = title + `\n\tAsset Type: ${assetType || "<not specified>"}`;
-                  title = title + `\n\tAllowed Asset Types: ${(this.props.assetTypes || []).join(", ")}`;
-                }
-
-                return (
-                  <li key={`browse-entry-${id}`}>
-                    <button
-                      disabled={disabled}
-                      title={title}
-                      onClick={() => this.props.Select({name, id})}
-                    >
-                      <div>{name}</div>
-                      {assetType ? <div className="hint">{assetType} {titleType ? ` | ${titleType}` : ""}</div> : null}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+          render={this.ListView}
         />
       </div>
     );
@@ -177,6 +242,7 @@ BrowserList.propTypes = {
       id: PropTypes.string
     })
   ),
+  multiple: PropTypes.bool,
   hashes: PropTypes.bool,
   assetTypes: PropTypes.arrayOf(PropTypes.string),
   titleTypes: PropTypes.arrayOf(PropTypes.string),
@@ -184,7 +250,10 @@ BrowserList.propTypes = {
   Select: PropTypes.func.isRequired,
   QuickSelect: PropTypes.func.isRequired,
   paginated: PropTypes.bool,
-  paginationInfo: PropTypes.object
+  paginationInfo: PropTypes.object,
+  SetDisabled: PropTypes.func,
+  disabledText: PropTypes.string,
+  hideDefaultDisabledText: PropTypes.bool
 };
 
 @inject("contentStore")
@@ -202,7 +271,7 @@ class ContentBrowser extends React.Component {
     this.Update = this.Update.bind(this);
   }
 
-  async Update({name, libraryId, objectId, versionHash, offering}) {
+  async Update({name, libraryId, objectId, versionHash, offering, confirm=false}) {
     this.setState({loading: true});
 
     try {
@@ -217,7 +286,23 @@ class ContentBrowser extends React.Component {
           name = (await this.props.contentStore.LookupContent(versionHash || objectId)).name;
         }
 
-        await this.props.onComplete({name, libraryId, objectId, versionHash, offering});
+        if(confirm) {
+          await Confirm({
+            message: `Are you sure you want to select ${name}?`,
+            onConfirm: async () => {
+              await this.props.onComplete({name, libraryId, objectId, versionHash, offering});
+            },
+            onCancel: () => {
+              name = undefined;
+              libraryId = undefined;
+              objectId = undefined;
+              versionHash = undefined;
+              offering = undefined;
+            }
+          });
+        } else {
+          await this.props.onComplete({name, libraryId, objectId, versionHash, offering});
+        }
       }
 
       this.setState({
@@ -251,6 +336,7 @@ class ContentBrowser extends React.Component {
           Select={async ({id}) => await this.Update({libraryId: id})}
           QuickSelect={this.Update}
           paginated={false}
+          multiple={this.props.multiple}
         />
       </React.Fragment>
     );
@@ -293,15 +379,31 @@ class ContentBrowser extends React.Component {
             assetTypes: this.props.assetTypes,
             titleTypes: this.props.titleTypes
           })}
-          Select={async ({id}) => {
-            let versionHash;
-            if(this.props.objectOnly) {
-              versionHash = await this.props.contentStore.LatestVersionHash({objectId: id});
-            }
+          Select={async ({id, selected}) => {
+            if(this.props.multiple) {
+              const versionHashes = await Promise.all(
+                selected.map(async objectId => this.props.contentStore.LatestVersionHash(({objectId})))
+              );
+              await this.props.onComplete({
+                libraryId: this.state.libraryId,
+                objectIds: selected,
+                versionHashes
+              });
+            } else {
+              let versionHash;
+              if(this.props.objectOnly) {
+                versionHash = await this.props.contentStore.LatestVersionHash({objectId: id});
+              }
 
-            await this.Update({libraryId: this.state.libraryId, objectId: id, versionHash});
-          }}
+              await this.Update({libraryId: this.state.libraryId, objectId: id, versionHash});
+            }}
+          }
+
           QuickSelect={this.Update}
+          multiple={this.props.multiple}
+          SetDisabled={this.props.SetDisabled}
+          disabledText={this.props.disabledText}
+          hideDefaultDisabledText={this.props.hideDefaultDisabledText}
         />
       </React.Fragment>
     );
@@ -338,6 +440,7 @@ class ContentBrowser extends React.Component {
           Load={async () => await this.props.contentStore.LoadVersions(this.state.libraryId, this.state.objectId)}
           Select={async ({id}) => await this.Update({libraryId: this.state.libraryId, objectId: this.state.objectId, versionHash: id})}
           QuickSelect={this.Update}
+          multiple={this.props.multiple}
           paginated={false}
         />
       </React.Fragment>
@@ -411,7 +514,11 @@ ContentBrowser.propTypes = {
   objectOnly: PropTypes.bool,
   offering: PropTypes.bool,
   onComplete: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired
+  onCancel: PropTypes.func.isRequired,
+  multiple: PropTypes.bool,
+  SetDisabled: PropTypes.func,
+  disabledText: PropTypes.string,
+  hideDefaultDisabledText: PropTypes.bool
 };
 
 export default ContentBrowser;

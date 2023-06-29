@@ -11,12 +11,14 @@ import RemoveIcon from "../static/icons/trash.svg";
 import PlayIcon from "../static/icons/play-circle.svg";
 import LinkIcon from "../static/icons/external-link.svg";
 import KeyIcon from "../static/icons/key.svg";
-import LockIcon from "../static/icons/lock.svg";
+import KeyCrossedOutIcon from "../static/icons/key-crossed-out.svg";
+import {InitPSF} from "./Misc";
 
 export const Clip = ({
   index,
   isDefault,
   isPlayable,
+  isSigned,
   clip,
   name,
   length,
@@ -29,7 +31,7 @@ export const Clip = ({
   OpenObjectLink,
   SignLink
 }) => {
-  const {versionHash, title, id, slug, assetType, latestVersionHash, originalLink} = clip;
+  const {versionHash, title, id, slug, assetType, latestVersionHash, originalLink, canEdit} = clip;
 
   const [showPreview, setShowPreview] = useState(false);
 
@@ -77,7 +79,7 @@ export const Clip = ({
         label={`Update ${title} to the latest version`}
         onClick={async () => {
           await Confirm({
-            message: `Are you sure you want to update ${name ? `the ${name}` : ""} '${title}'?`,
+            message: `Are you sure you want to update ${name ? `the ${name}` : ""} '${title || id}'?`,
             onConfirm: Update
           });
         }}
@@ -87,21 +89,28 @@ export const Clip = ({
 
   let signButton;
   if(originalLink) {
-    const authorizedLink = originalLink["."].hasOwnProperty("authorization");
-
     signButton = (
       <IconButton
-        icon={authorizedLink ? LockIcon : KeyIcon}
-        title={authorizedLink ? "Unsign link" : "Sign link"}
+        icon={isSigned ? KeyIcon : KeyCrossedOutIcon}
+        title={!canEdit ? "No edit permission" : isSigned ? "Unsign link" : "Sign link"}
+        disabled={!canEdit}
         onClick={async () => {
           await Confirm({
-            message: `Are you sure you want to ${authorizedLink ? "unsign" : "sign"} the link for ${name ? name : ""} '${title}'?`,
-            onConfirm: () => SignLink({sign: !authorizedLink})
+            message: `Are you sure you want to ${isSigned ? "unsign" : "sign"} the link for ${name ? name : ""} '${title}'?`,
+            onConfirm: () => SignLink({sign: !isSigned})
           });
         }}
       />
     );
   }
+
+  const TitleText = () => {
+    if(title) {
+      return <div title={title}>{title} {id ? `(${id})` : ""}</div>;
+    } else {
+      return <div title={id}>{id || ""}</div>;
+    }
+  };
 
   return (
     <React.Fragment>
@@ -109,6 +118,7 @@ export const Clip = ({
         key={`clip-${versionHash}-${index}`}
         className={`
           asset-form-clip 
+          ${index % 2 === 0 ? "even" : "odd"}
           ${orderable   ? "asset-form-clip-orderable" : ""}
           ${defaultable ? "asset-form-clip-defaultable" : ""}
           ${showPreview ? "asset-form-clip-with-preview" : ""}
@@ -125,7 +135,7 @@ export const Clip = ({
           onClick={() => isPlayable ? setShowPreview(!showPreview) : ""}
         />
         <div className="hint">{assetType}</div>
-        <div title={title}>{title} {id ? `(${id})` : ""}</div>
+        { TitleText() }
         <div className="clip-slug-hash" title={`${slug || ""} ${versionHash}`}>{slug || versionHash}</div>
         { defaultButton }
         { orderButtons }
@@ -139,7 +149,7 @@ export const Clip = ({
             label={`Remove ${title}`}
             onClick={async () => {
               await Confirm({
-                message: `Are you sure you want to remove ${name ? `the ${name}` : ""} '${title}'?`,
+                message: `Are you sure you want to remove ${name ? `the ${name}` : ""} '${title || id}'?`,
                 onConfirm: Remove
               });
             }}
@@ -166,6 +176,15 @@ class Clips extends React.Component {
     this.AddClip = this.AddClip.bind(this);
     this.CloseModal = this.CloseModal.bind(this);
     this.ActivateModal = this.ActivateModal.bind(this);
+
+    this.InitPSF = InitPSF.bind(this);
+    this.InitPSF({
+      sortKey: "displayTitle",
+      perPage: 100,
+      additionalState: {
+        key: this.props.storeKey
+      }
+    });
   }
 
   AddClip({versionHash}) {
@@ -191,6 +210,8 @@ class Clips extends React.Component {
             assetTypes={this.props.assetTypes}
             onComplete={this.AddClip}
             onCancel={this.CloseModal}
+            SetDisabled={props => !props.slug}
+            disabledText="Title must have a slug"
           />
         </Modal>
       )
@@ -201,61 +222,127 @@ class Clips extends React.Component {
     this.setState({modal: null});
   }
 
+  ClipsList() {
+    let clips;
+    if(this.props.playlistIndex !== undefined) {
+      clips = this.props.formStore.currentLocalizedData.playlists[this.props.playlistIndex].clips;
+    } else {
+      clips = this.props.formStore.currentLocalizedData.assets[this.props.storeKey];
+    }
+
+    if(this.state.activeFilter) {
+      clips = clips.filter(clip => {
+        const searchTerms = ["assetType", "displayTitle", "slug", "title"];
+
+        return searchTerms.some(term => (clip[term] || "").toLowerCase().includes(this.state.activeFilter));
+      });
+    }
+
+    return clips;
+  }
+
   render() {
-    const clips = this.props.playlistIndex !== undefined ?
-      this.props.formStore.currentLocalizedData.playlists[this.props.playlistIndex].clips :
-      this.props.formStore.currentLocalizedData.assets[this.props.storeKey];
+    const clips = this.ClipsList();
+    const startIndex = (this.state.page - 1) * this.state.perPage;
 
     return (
       <div className="asset-form-section-container">
         <h3>{this.props.header}</h3>
-        <div className="asset-form-clips-container">
-          {(clips || []).map((clip, index) =>
-            <Clip
-              index={index}
-              isPlayable={clip.playable}
-              isDefault={clip.isDefault}
-              defaultable={this.props.defaultable}
-              orderable={this.props.orderable}
-              key={`asset-clip-${this.props.storeKey || this.props.playlistIndex}-${index}`}
-              clip={clip}
-              length={clips.length}
-              Swap={(i1, i2) => this.props.formStore.SwapClip({
-                key: this.props.storeKey,
-                playlistIndex: this.props.playlistIndex,
-                i1,
-                i2
-              })}
-              SetDefault={index => this.props.formStore.SetDefaultClip({
-                key: this.props.storeKey,
-                playlistIndex: this.props.playlistIndex,
-                index
-              })}
-              Update={() => this.props.formStore.UpdateClip({
-                key: this.props.storeKey,
-                playlistIndex: this.props.playlistIndex,
-                index
-              })}
-              Remove={() => this.props.formStore.RemoveClip({
-                key: this.props.storeKey,
-                playlistIndex: this.props.playlistIndex,
-                index
-              })}
-              OpenObjectLink={this.props.rootStore.OpenObjectLink}
-              SignLink={({sign}) => this.props.formStore.ToggleLinkAuth({
-                sign,
-                versionHash: clip.versionHash,
-                containerId: this.props.rootStore.params.objectId,
-                path: `public/asset_metadata/${this.props.storeKey}/${clip.isDefault ? "default" : index}/${clip.slug}`,
-                key: this.props.storeKey,
-                index
-              })}
-            />
-          )}
+        <div className="controls">
+          <Action onClick={this.ActivateModal}>
+            Add {this.props.name}
+          </Action>
+          {
+            clips.length > 0 && <Action
+              className="secondary"
+              onClick={async () => {
+                const brokenLinks = await this.props.formStore.FindBrokenLinks({assetName: this.props.storeKey});
+                let message = "";
+
+                if(Object.keys(brokenLinks).length > 0) {
+                  message = `Are you sure you want to remove the following links?\n${Object.keys(brokenLinks).join("\n")}`;
+                } else {
+                  message = "No broken links were found.";
+                }
+
+                await Confirm({
+                  message,
+                  onConfirm: () => this.props.formStore.BulkRemoveClips({
+                    key: this.props.storeKey,
+                    indexes: Object.values(brokenLinks).map(({index}) => index)
+                  })
+                });
+              }}
+            >
+              Remove Broken Links
+            </Action>
+          }
+
+          { this.Filter("Filter Titles...") }
         </div>
-        <Action onClick={this.ActivateModal}>
-          Add {this.props.name}
-        </Action>
+        { this.PageControls(clips.length) }
+        <div className="asset-form-clips-container">
+          {
+            clips.length ? <div
+              className={`
+            asset-form-clip 
+            ${this.props.orderable   ? "asset-form-clip-orderable" : ""}
+            ${this.props.defaultable ? "asset-form-clip-defaultable" : ""}
+            ${this.props.showPreview ? "asset-form-clip-with-preview" : ""}
+          `}>
+              <div></div>
+              { this.SortableHeader("assetType", "Type", this.props.name) }
+              { this.SortableHeader("displayTitle", "Title", this.props.name) }
+              { this.SortableHeader("slug", "Slug", this.props.name) }
+              { this.props.defaultable ? this.SortableHeader("isDefault", "Default", this.props.name) : null }
+              <div></div>
+              <div></div>
+            </div> : null
+          }
+          {
+            this.Paged(clips || []).map((clip, index) =>
+              <Clip
+                index={index}
+                isPlayable={clip.playable}
+                isDefault={clip.isDefault}
+                isSigned={clip.isSigned}
+                defaultable={this.props.defaultable}
+                orderable={this.props.orderable && !this.state.activeFilter}
+                key={`asset-clip-${this.props.storeKey || this.props.playlistIndex}-${index}`}
+                clip={clip}
+                length={clips.length}
+                Swap={(i1, i2) => this.props.formStore.SwapClip({
+                  key: this.props.storeKey,
+                  playlistIndex: this.props.playlistIndex,
+                  i1: i1 + startIndex,
+                  i2: i2 + startIndex
+                })}
+                SetDefault={index => this.props.formStore.SetDefaultClip({
+                  key: this.props.storeKey,
+                  playlistIndex: this.props.playlistIndex,
+                  index
+                })}
+                Update={() => this.props.formStore.UpdateClip({
+                  key: this.props.storeKey,
+                  playlistIndex: this.props.playlistIndex,
+                  index: this.props.formStore.ClipOriginalIndex({versionHash: clip.versionHash, key: this.props.storeKey})
+                })}
+                Remove={() => this.props.formStore.RemoveClip({
+                  key: this.props.storeKey,
+                  playlistIndex: this.props.playlistIndex,
+                  index: this.props.formStore.ClipOriginalIndex({versionHash: clip.versionHash, key: this.props.storeKey})
+                })}
+                OpenObjectLink={this.props.rootStore.OpenObjectLink}
+                SignLink={({sign}) => this.props.formStore.ToggleLinkAuth({
+                  key: this.props.storeKey,
+                  sign,
+                  index,
+                  versionHash: clip.versionHash
+                })}
+              />
+            )
+          }
+        </div>
         { this.state.modal }
       </div>
     );
