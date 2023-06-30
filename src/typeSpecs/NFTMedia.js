@@ -36,6 +36,14 @@ const NFTMediaItem = [
     "type": "file_url"
   },
   {
+    "extensions": imageTypes,
+    "name": "image_tv",
+    "label": "Image (TV)",
+    "type": "file_url",
+    "depends_on": "./container",
+    "depends_on_value": "featured"
+  },
+  {
     "name": "image_aspect_ratio",
     "type": "select",
     "options": [
@@ -349,6 +357,7 @@ const NFTMedia = [
           },
           {
             "name": "background_image_logo_tv",
+            "label": "Background Image Logo (TV)",
             "type": "file",
             "extensions": imageTypes
           },
