@@ -125,11 +125,16 @@ const NFTTemplateSpec = {
           "type": "text"
         },
         {
-          "name": "description",
+          "name": "short_description",
           "type": "textarea"
         },
         {
-          "label": "Description (Rich Text)",
+          "name": "description",
+          "label": "Full Description",
+          "type": "textarea"
+        },
+        {
+          "label": "Full Description (Rich Text)",
           "name": "description_rich_text",
           "type": "rich_text",
           "hint": "NOTE: This will only be used in the featured item and item details view. The description field (above) will be used in the card list view"
@@ -336,7 +341,12 @@ const NFTTemplateSpec = {
               "type": "text",
             },
             {
+              "name": "short_description",
+              "type": "textarea"
+            },
+            {
               "name": "description",
+              "label": "Full Description",
               "type": "rich_text"
             },
             {

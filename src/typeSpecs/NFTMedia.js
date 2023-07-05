@@ -27,6 +27,11 @@ const NFTMediaItem = [
     "no_localize": true,
   },
   {
+    "name": "short_description",
+    "type": "textarea"
+  },
+  {
+    "label": "Full Description",
     "name": "description",
     "type": "rich_text"
   },
@@ -380,6 +385,11 @@ const NFTMedia = [
                 "type": "text",
               },
               {
+                "name": "short_description",
+                "type": "textarea"
+              },
+              {
+                "label": "Full Description",
                 "name": "description",
                 "type": "rich_text"
               },
@@ -510,6 +520,11 @@ const NFTMedia = [
                         "type": "text",
                       },
                       {
+                        "name": "short_description",
+                        "type": "textarea"
+                      },
+                      {
+                        "label": "Full Description",
                         "name": "description",
                         "type": "rich_text"
                       },
