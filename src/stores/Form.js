@@ -1945,29 +1945,39 @@ class FormStore {
         });
 
         // Local Searchable Links
-        let searchableLinks = {};
-        for(let i = 0; i < this.searchableLinks.length; i++) {
-          const {link_key, target} = this.searchableLinks[i];
-          const metadata = yield client.ContentObjectMetadata({
-            libraryId,
-            objectId,
-            metadataSubtree: target
-          });
-
-          if(!metadata) {
-            yield client.ReplaceMetadata({
+        if(this.rootStore.specStore.enableSearchableLinks) {
+          let searchableLinks = {};
+          for(let i = 0; i < this.searchableLinks.length; i++) {
+            const {link_key, target} = this.searchableLinks[i];
+            const metadata = yield client.ContentObjectMetadata({
               libraryId,
               objectId,
-              writeToken,
-              metadataSubtree: target,
-              metadata: {}
+              metadataSubtree: target
+            });
+
+            if(!metadata) {
+              yield client.ReplaceMetadata({
+                libraryId,
+                objectId,
+                writeToken,
+                metadataSubtree: target,
+                metadata: {}
+              });
+            }
+
+            searchableLinks[link_key] = this.CreateLink({
+              targetHash: this.rootStore.params.versionHash,
+              linkTarget: UrlJoin("meta", target),
+              autoUpdate: false
             });
           }
 
-          searchableLinks[link_key] = this.CreateLink({
-            targetHash: this.rootStore.params.versionHash,
-            linkTarget: UrlJoin("meta", target),
-            autoUpdate: false
+          yield client.ReplaceMetadata({
+            libraryId,
+            objectId,
+            writeToken,
+            metadataSubtree: "searchables",
+            metadata: searchableLinks
           });
         }
 
@@ -2059,14 +2069,6 @@ class FormStore {
             metadata: searchables
           });
         }
-
-        yield client.ReplaceMetadata({
-          libraryId,
-          objectId,
-          writeToken,
-          metadataSubtree: "searchables",
-          metadata: searchableLinks
-        });
 
         yield Promise.all(
           Object.values(nonStandardInfo).map(async ({path, value}) => {
