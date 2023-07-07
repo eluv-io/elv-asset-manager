@@ -700,12 +700,11 @@ const MarketplaceSpec = {
           "type": "text"
         },
         {
-          "label": "Edition",
           "name": "subtitle",
           "type": "text"
         },
         {
-          "label": "Subtitle",
+          "label": "Subtitle 2",
           "name": "subtitle2",
           "type": "text"
         },
@@ -718,6 +717,11 @@ const MarketplaceSpec = {
           "name": "description_rich_text",
           "type": "rich_text",
           "hint": "NOTE: This will only be used in the featured item and item details view. The description field (above) will be used in the card list view"
+        },
+        {
+          "name": "hide_description_on_card_face",
+          "type": "checkbox",
+          "default_value": false
         },
         {
           "extensions": imageTypes,

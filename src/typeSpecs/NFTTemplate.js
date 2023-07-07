@@ -140,6 +140,11 @@ const NFTTemplateSpec = {
           "hint": "NOTE: This will only be used in the featured item and item details view. The description field (above) will be used in the card list view"
         },
         {
+          "name": "hide_description_on_card_face",
+          "type": "checkbox",
+          "default_value": false
+        },
+        {
           "label": "Additional Info",
           "name": "rich_text",
           "type": "rich_text"
