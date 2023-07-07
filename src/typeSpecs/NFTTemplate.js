@@ -125,16 +125,16 @@ const NFTTemplateSpec = {
           "type": "text"
         },
         {
-          "name": "short_description",
-          "type": "textarea"
+          "name": "subtitle",
+          "type": "text"
         },
         {
           "name": "description",
-          "label": "Full Description",
+          "label": "Description",
           "type": "textarea"
         },
         {
-          "label": "Full Description (Rich Text)",
+          "label": "Description (Rich Text)",
           "name": "description_rich_text",
           "type": "rich_text",
           "hint": "NOTE: This will only be used in the featured item and item details view. The description field (above) will be used in the card list view"
@@ -228,6 +228,16 @@ const NFTTemplateSpec = {
           "name": "created_at",
           "type": "datetime",
           "no_localize": true
+        },
+        {
+          "name": "secondary_resale_available_at",
+          "type": "datetime",
+          "hint": "If specified, this item will not be listable on secondary marketplaces until this date"
+        },
+        {
+          "name": "secondary_resale_expires_at",
+          "type": "datetime",
+          "hint": "If specified, this item will not be listable on secondary marketplaces after this date"
         },
         {
           "extensions": imageTypes,
@@ -341,12 +351,13 @@ const NFTTemplateSpec = {
               "type": "text",
             },
             {
-              "name": "short_description",
+              "label": "Description",
+              "name": "description_text",
               "type": "textarea"
             },
             {
               "name": "description",
-              "label": "Full Description",
+              "label": "Description (Rich Text)",
               "type": "rich_text"
             },
             {

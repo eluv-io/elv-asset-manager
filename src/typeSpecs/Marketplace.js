@@ -700,7 +700,13 @@ const MarketplaceSpec = {
           "type": "text"
         },
         {
+          "label": "Edition",
           "name": "subtitle",
+          "type": "text"
+        },
+        {
+          "label": "Subtitle",
+          "name": "subtitle2",
           "type": "text"
         },
         {
