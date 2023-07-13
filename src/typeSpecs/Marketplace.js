@@ -1117,6 +1117,11 @@ const MarketplaceSpec = {
           "type": "file"
         },
         {
+          "name": "show_on_storefront",
+          "type": "checkbox",
+          "default_value": false
+        },
+        {
           "name": "hide_text",
           "label": "Hide Default Text During Animation",
           "default_value": false,
