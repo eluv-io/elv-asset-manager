@@ -1,5 +1,49 @@
 const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
 
+const LockConditions = [
+  {
+    "name": "hide_when_locked",
+    "type": "checkbox",
+    "depends_on": "../locked",
+    "default_value": false,
+  },
+  {
+    "name": "lock_condition",
+    "type": "select",
+    "no_localize": true,
+    "depends_on": "../locked",
+    "options": [
+      "View Media",
+      "Has Attributes"
+    ]
+  },
+  {
+    "name": "required_attributes",
+    "type": "list",
+    "depends_on": "./lock_condition",
+    "depends_on_value": "Has Attributes",
+    "fields": [
+      {
+        "name": "attribute",
+        "type": "text"
+      },
+      {
+        "name": "value",
+        "type": "text",
+        "hint": "Note: If this field is left blank, any NFTs with the specified attribute type will satisfy the condition"
+      }
+    ]
+  },
+  {
+    "label": "Required Media IDs",
+    "name": "required_media",
+    "type": "list",
+    "depends_on": "./lock_condition",
+    "depends_on_value": "View Media",
+    "no_localize": true,
+  }
+];
+
 // For the additional_media section of NFTTemplate
 const NFTMediaItem = [
   {
@@ -329,6 +373,7 @@ const NFTMedia = [
             "type": "checkbox",
             "hint": "If checked, all other additional media will be locked until this item is displayed",
             "no_localize": true,
+            "unless": "./locked"
           },
           ...NFTMediaItem,
           {
@@ -368,10 +413,23 @@ const NFTMedia = [
             "extensions": imageTypes
           },
           {
+            "name": "locked",
+            "type": "checkbox",
+            "default_value": false,
+            "no_localize": true,
+            "unless": "./required"
+          },
+          {
+            "name": "lock_conditions",
+            "type": "subsection",
+            "depends_on": "./locked",
+            "fields": LockConditions
+          },
+          {
             "name": "locked_state",
             "type": "subsection",
-            "hint": "These fields will be used when the item has not yet been viewed",
-            "depends_on": "./required",
+            "hint": "These fields will be used when either the item is locked or the item is required but not yet viewed",
+            "depends_on": ["./required", "./locked"],
             "fields": [
               {
                 "name": "name",
@@ -493,22 +551,7 @@ const NFTMedia = [
                     "hint": "These fields will be used when the item is locked",
                     "depends_on": "./locked",
                     "fields": [
-                      {
-                        "name": "lock_condition",
-                        "type": "select",
-                        "no_localize": true,
-                        "options": [
-                          "View Media"
-                        ]
-                      },
-                      {
-                        "label": "Required Media IDs",
-                        "name": "required_media",
-                        "type": "list",
-                        "depends_on": "./lock_condition",
-                        "depends_on_value": "View Media",
-                        "no_localize": true,
-                      },
+                      ...LockConditions,
                       {
                         "name": "name",
                         "type": "text"
