@@ -502,6 +502,10 @@ const eventSiteSpec = {
           "type": "file"
         },
         {
+          "name": "hero_alt_text",
+          "type": "textarea"
+        },
+        {
           "extensions": imageTypes,
           "name": "hero_banner",
           "type": "file"
@@ -516,6 +520,10 @@ const eventSiteSpec = {
           "name": "hero_banner_link",
           "type": "text",
           "depends_on": "./hero_banner"
+        },
+        {
+          "name": "hero_banner_alt_text",
+          "type": "textarea"
         },
         {
           "name": "hero_video",
