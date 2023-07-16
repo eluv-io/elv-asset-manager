@@ -1054,6 +1054,14 @@ const MarketplaceSpec = {
               ]
             },
             {
+              "name": "show_rich_text_descriptions",
+              "type": "text",
+              "hint": "If specified, the full rich text description of the item will be shown on the card face",
+              "default_value": false,
+              "depends_on": "./type",
+              "depends_on_value": "Standard"
+            },
+            {
               "name": "featured_view_justification",
               "type": "select",
               "depends_on": "./type",
@@ -1061,7 +1069,8 @@ const MarketplaceSpec = {
               "no_localize": true,
               "options": [
                 "Left",
-                "Right"
+                "Right",
+                "Center"
               ]
             },
             {
