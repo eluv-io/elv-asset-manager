@@ -969,6 +969,12 @@ const MarketplaceSpec = {
           "hint": "If specified, the default text displayed while awaiting minting will be hidden and the purchase animation will be larger"
         },
         {
+          "name": "show_rich_text_descriptions",
+          "type": "checkbox",
+          "default_value": false,
+          "hint": "If specified, the full rich text description of the item will be shown on the card face"
+        },
+        {
           "name": "show_card_cta",
           "label": "Show Item Card CTA",
           "type": "checkbox",
@@ -1052,14 +1058,6 @@ const MarketplaceSpec = {
                 "Standard",
                 "Featured"
               ]
-            },
-            {
-              "name": "show_rich_text_descriptions",
-              "type": "text",
-              "hint": "If specified, the full rich text description of the item will be shown on the card face",
-              "default_value": false,
-              "depends_on": "./type",
-              "depends_on_value": "Standard"
             },
             {
               "name": "featured_view_justification",
