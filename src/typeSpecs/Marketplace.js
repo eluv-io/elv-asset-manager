@@ -95,6 +95,24 @@ const MarketplaceSpec = {
           "hint": "If specified, the icon for this marketplace in the global marketplace view will link to this URL"
         },
         {
+          "name": "notification",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "active",
+              "type": "checkbox",
+            },
+            {
+              "name": "header",
+              "type": "text"
+            },
+            {
+              "name": "text",
+              "type": "rich_text"
+            }
+          ]
+        },
+        {
           "name": "description",
           "type": "textarea"
         },
@@ -937,6 +955,7 @@ const MarketplaceSpec = {
       "name": "header_storefront",
       "type": "header"
     },
+
     {
       "name": "storefront",
       "type": "subsection",
