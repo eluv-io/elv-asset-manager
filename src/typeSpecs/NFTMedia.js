@@ -161,7 +161,7 @@ const NFTMediaItem = [
     "hint": "For video content, select the playable content object",
     "video_preview": true,
     "depends_on": "./media_type",
-    "depends_on_value": ["Video", "Audio"]
+    "depends_on_value": ["Live Video", "Video", "Audio"]
   },
   {
     "name": "media_file",
@@ -207,7 +207,7 @@ const NFTMediaItem = [
     "type": "list",
     "hint": "Specify, in order of preference, which offerings should be used when playing this media. If the offering is default or only one offering will be available, specifying the offering is not necessary",
     "depends_on": "./media_type",
-    "depends_on_value": ["Video", "Audio"]
+    "depends_on_value": ["Live Video", "Video", "Audio"]
   },
   {
     "name": "background_image",

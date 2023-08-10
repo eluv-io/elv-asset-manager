@@ -31,7 +31,6 @@ class AssetInfo extends React.Component {
       .filter(field => !("localize" in field && !field.localize && this.props.formStore.localizationActive))
       .map((field, index) =>
         <RecursiveField
-          localizationKey={this.props.formStore.localizationKey}
           HEAD={assetInfo}
           key={`info-field-${index}`}
           field={field}
