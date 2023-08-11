@@ -872,6 +872,18 @@ const MarketplaceSpec = {
           ]
         },
         {
+          "name": "min_secondary_price",
+          "label": "Minimum Secondary Market Listing Price",
+          "type": "subsection",
+          "no_localize": true,
+          "fields": [
+            {
+              "name": "USD",
+              "type": "number"
+            }
+          ]
+        },
+        {
           "name": "tags",
           "type": "list"
         },
