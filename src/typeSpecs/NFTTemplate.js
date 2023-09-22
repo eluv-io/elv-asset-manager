@@ -93,7 +93,6 @@ const NFTTemplateSpec = {
           "type": "text",
           "hint": "Create vanity token IDs based on this template (only valid if not using ordinal token IDs)"
         },
-
       ]
     },
     {
@@ -140,11 +139,6 @@ const NFTTemplateSpec = {
           "hint": "NOTE: This will only be used in the featured item and item details view. The description field (above) will be used in the card list view"
         },
         {
-          "name": "hide_description_on_card_face",
-          "type": "checkbox",
-          "default_value": false
-        },
-        {
           "label": "Additional Info",
           "name": "rich_text",
           "type": "rich_text"
@@ -153,7 +147,7 @@ const NFTTemplateSpec = {
           "label": "Terms Document",
           "name": "terms_document",
           "type": "subsection",
-          "hint": "If specified, a link to this terms document will be present on the login screen",
+          "hint": "If specified, a link to this terms document will be present in the item details",
           "fields": [
             {
               "name": "link_text",
@@ -327,11 +321,6 @@ const NFTTemplateSpec = {
           "hint": "If specified, this will be added to the HTML container class when this NFT is displayed (e.g. 'card-container--variant-(style)', 'featured-item__icon-container--variant-(style)' 'feature-gallery__icon-container--variant-(style)')"
         },
         {
-          "name": "enable_watermark",
-          "type": "checkbox",
-          "no_localize": true
-        },
-        {
           "name": "test",
           "label": "Test NFT",
           "type": "checkbox",
@@ -429,6 +418,16 @@ const NFTTemplateSpec = {
               "type": "datetime",
               "hint": "(Optional) - If specified, this item will no longer be redeemable after the specified time.",
               "no_localize": true
+            },
+            {
+              "name": "results_header",
+              "type": "text",
+              "hint": "Displayed on the redemption results page. Default: 'Successfully Redeemed'"
+            },
+            {
+              "name": "results_message",
+              "type": "textarea",
+              "hint": "Displayed on the redemption results page, Default: 'To access your reward, scan the QR code below or visit the URL and enter the code.'"
             },
             {
               "name": "style",
