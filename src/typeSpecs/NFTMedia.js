@@ -210,6 +210,14 @@ const NFTMediaItem = [
     "depends_on_value": ["Live Video", "Video", "Audio"]
   },
   {
+    "name": "embed_url_parameters",
+    "label": "Embed URL Parameters",
+    "type": "json",
+    "hint": "Specify additional parameters to be added to or modified in embed URL for playout, such as control or autoplay settings or HLS parameters",
+    "depends_on": "./media_type",
+    "depends_on_value": ["Live Video", "Video", "Audio"]
+  },
+  {
     "name": "background_image",
     "type": "file",
     "extensions": imageTypes,
