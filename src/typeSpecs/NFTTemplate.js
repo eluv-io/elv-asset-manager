@@ -54,26 +54,6 @@ const NFTTemplateSpec = {
       "no_localize": true,
       "fields": [
         {
-          "name": "merge_meta",
-          "label": "Merge Metadata",
-          "type": "json"
-        },
-        {
-          "name": "token_template",
-          "label": "Token ID Template",
-          "type": "text"
-        },
-        {
-          "name": "cauth_id",
-          "label": "Mint Key ID",
-          "type": "text"
-        },
-        {
-          "name": "fauth_id",
-          "label": "Fabric Key ID",
-          "type": "text"
-        },
-        {
           "name": "use_mint_ordinal_in_token_id",
           "label": "Use Mint Ordinal in Token ID",
           "type": "checkbox",
