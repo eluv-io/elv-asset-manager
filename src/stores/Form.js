@@ -1602,7 +1602,8 @@ class FormStore {
     const promises = [];
 
     for(let asset of assets || []) {
-      const {displayTitle, versionHash, isDefault, isSigned, slug, authContainerId, originalLink={}} = asset;
+      const {displayTitle, versionHash, isDefault, isSigned, authContainerId, originalLink={}} = asset;
+      let {slug} = asset;
         if(isSigned) {
           if(!originalLink.hasOwnProperty(".")) {
             originalLink["."] = {};
