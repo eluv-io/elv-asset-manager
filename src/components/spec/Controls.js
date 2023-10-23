@@ -1,5 +1,5 @@
 import React from "react";
-import {Action, Checkbox} from "elv-components-js";
+import {Checkbox} from "elv-components-js";
 import {inject, observer} from "mobx-react";
 import {RecursiveField} from "../Inputs";
 

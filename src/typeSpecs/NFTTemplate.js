@@ -293,7 +293,12 @@ const NFTTemplateSpec = {
           "autoplay": true,
           "check_has_audio_flag": true
         },
-
+        {
+          "name": "hide_share",
+          "label": "Hide Share Options",
+          "type": "checkbox",
+          "default_value": false
+        },
         {
           "name": "style",
           "label": "Style Variant",

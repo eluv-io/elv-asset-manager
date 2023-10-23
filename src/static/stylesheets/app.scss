@@ -550,8 +550,8 @@ select {
 }
 
 .asset-form-clip {
-  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 5rem;
   font-size: 0.9rem;
+  grid-template-columns: 2rem minmax(4rem, 1fr) 6fr 6fr 5rem;
   min-height: $elv-spacing-ml;
 
   .asset-form-clip-actions {

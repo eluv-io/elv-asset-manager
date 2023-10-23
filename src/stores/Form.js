@@ -594,12 +594,7 @@ class FormStore {
       id: this.targets[versionHash].id
     });
 
-    const metadata = yield this.rootStore.client.ContentObjectMetadata({
-      versionHash,
-      metadataSubtree: "public"
-    });
-
-    rootStore.SetMessage("Successfully added");
+    this.rootStore.SetMessage("Successfully added");
   });
 
   // Clips/trailers
@@ -1599,80 +1594,80 @@ class FormStore {
     let formattedAssets = assetType.indexed || assetType.slugged ? {} : [];
     const hasDefault = assets.find(({isDefault}) => isDefault);
     let index = hasDefault ? 1 : 0;
-    const promises = [];
 
     for(let asset of assets || []) {
-      const {displayTitle, versionHash, isDefault, isSigned, slug, authContainerId, originalLink={}} = asset;
-        if(isSigned) {
-          if(!originalLink.hasOwnProperty(".")) {
-            originalLink["."] = {};
-          }
+      let {displayTitle, versionHash, isDefault, isSigned, slug, authContainerId, originalLink={}} = asset;
+      if(isSigned) {
+        if(!originalLink.hasOwnProperty(".")) {
+          originalLink["."] = {};
+        }
 
-          if(!originalLink["."]["authorization"]) {
-            try {
-              originalLink["."]["authorization"] = await this.client.GenerateSignedLinkToken({
-                containerId: authContainerId,
-                versionHash,
-                link: `./meta/public/asset_metadata`
-              });
-            } catch(error) {
-              console.error(`Unable to create authorization token for ${versionHash}`, error);
-            }
+        if(!originalLink["."]["authorization"]) {
+          try {
+            originalLink["."]["authorization"] = await this.client.GenerateSignedLinkToken({
+              containerId: authContainerId,
+              versionHash,
+              link: "./meta/public/asset_metadata"
+            });
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error(`Unable to create authorization token for ${versionHash}`, error);
           }
-        } else {
-          if(originalLink["."] && originalLink["."]["authorization"]) {
-            delete originalLink["."]["authorization"];
+        }
+      } else {
+        if(originalLink["."] && originalLink["."]["authorization"]) {
+          delete originalLink["."]["authorization"];
+        }
+      }
+
+      const link = this.CreateLink({targetHash: versionHash, options: originalLink});
+
+      let key;
+      if(isDefault) {
+        key = "default";
+      } else {
+        key = index;
+        index += 1;
+      }
+
+      if(assetType.slugged) {
+        if(!slug) {
+          try {
+            slug = (await this.rootStore.client.ContentObjectMetadata({
+              versionHash,
+              metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
+            })) || Slugify(displayTitle);
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error(error);
           }
         }
 
-        const link = this.CreateLink({targetHash: versionHash, options: originalLink});
-
-        let key;
-        if(isDefault) {
-          key = "default";
+        if(assetType.indexed) {
+          formattedAssets[key] = {
+            [slug]: link
+          };
         } else {
-          key = index;
-          index += 1;
-        }
-
-        if(assetType.slugged) {
-          if(!slug) {
-            try {
-              slug = (await this.rootStore.client.ContentObjectMetadata({
-                versionHash,
-                metadataSubtree: UrlJoin("public", "asset_metadata", "slug")
-              })) || Slugify(displayTitle);
-            } catch(error) {
-              // eslint-disable-next-line no-console
-              console.error(error);
-            }
-          }
-
-          if(assetType.indexed) {
-            formattedAssets[key] = {
-              [slug]: link
-            };
+          if(key === "default") {
+            formattedAssets.default = this.CreateLink({
+              targetHash: this.rootStore.params.versionHash,
+              linkTarget: `/meta/public/asset_metadata/${assetType.name}/${slug}`,
+              options: { order: 0 },
+            });
+            link.order = 0;
           } else {
-            if(key === "default") {
-              formattedAssets.default = this.CreateLink({
-                targetHash: this.rootStore.params.versionHash,
-                linkTarget: `/meta/public/asset_metadata/${assetType.name}/${slug}`,
-                options: { order: 0 },
-              });
-              link.order = 0;
-            } else {
-              link.order = key;
-            }
-
-            // If slugged but not indexed, 'default' is link to regular slug
-            formattedAssets[slug] = link;
+            link.order = key;
           }
-        } else if(assetType.indexed) {
-          formattedAssets[key] = link;
-        } else {
-          formattedAssets.push(link);
+
+          // If slugged but not indexed, 'default' is link to regular slug
+          formattedAssets[slug] = link;
         }
-      };
+      } else if(assetType.indexed) {
+        formattedAssets[key] = link;
+      } else {
+        formattedAssets.push(link);
+      }
+    }
 
     return formattedAssets;
   }
@@ -1818,7 +1813,7 @@ class FormStore {
     const deletedObjects = {};
 
     for(let [index, asset] of assets.entries()) {
-      const {versionHash, originalLink} = asset;
+      const {versionHash} = asset;
       const objectId = this.rootStore.client.utils.DecodeVersionHash(versionHash).objectId;
       const address = this.rootStore.client.utils.HashToAddress(objectId);
 
@@ -1829,15 +1824,15 @@ class FormStore {
           contractAddress: address,
           methodName: "version"
         });
-      } catch(error) {
+      } catch (error) {
         if(!deletedObjects[versionHash]) {
           deletedObjects[versionHash] = {index};
         }
 
         // eslint-disable-next-line no-console
-        console.error(error)
+        console.error(error);
       }
-    };
+    }
 
     return deletedObjects;
   });
@@ -2578,9 +2573,7 @@ class FormStore {
   });
 
   @action.bound
-  ToggleLinkAuth = ({key, index, sign, containerId}) => {
-    const clip = this.currentLocalizedData.assets[key][index];
-
+  ToggleLinkAuth = ({key, index, sign}) => {
     this.currentLocalizedData.assets[key][index].isSigned = sign;
     this.currentLocalizedData.assets[key][index].authContainerId = sign ? this.rootStore.params.objectId : "";
   }

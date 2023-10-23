@@ -676,7 +676,7 @@ const InfoField = observer(({
           onChange={newValue => Update(field.name, newValue)}
         />
       );
-    } else if (fieldType === "simple-input") {
+    } else if(fieldType === "simple-input") {
       return (
         <div className="-elv-input" key={key}>
           <label htmlFor={field.name}>
