@@ -230,6 +230,12 @@ const NFTTemplateSpec = {
           "type": "file"
         },
         {
+          "name": "background_image_tv",
+          "label": "Background Image (TV)",
+          "type": "file",
+          "extensions": imageTypes
+        },
+        {
           "name": "playable",
           "type": "checkbox",
           "default_value": true

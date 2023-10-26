@@ -129,7 +129,8 @@ const NFTMediaItem = [
     "label": "Hide Share Options",
     "type": "checkbox",
     "default_value": false,
-    "no_localize": true
+    "no_localize": true,
+    "unless": "./requires_permissions"
   },
   {
     "name": "media_type",
