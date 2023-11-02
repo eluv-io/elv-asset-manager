@@ -155,6 +155,28 @@ const MarketplaceSpec = {
           "extensions": imageTypes
         },
         {
+          "label": "TV Assets",
+          "name": "tv",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "logo",
+              "type": "file",
+              "extensions": imageTypes
+            },
+            {
+              "name": "image",
+              "type": "file",
+              "extensions": imageTypes
+            },
+            {
+              "name": "header_image",
+              "type": "file",
+              "extensions": imageTypes
+            }
+          ]
+        },
+        {
           "name": "disable_secondary_market",
           "type": "checkbox",
           "default_value": false,

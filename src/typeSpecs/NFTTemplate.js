@@ -306,18 +306,21 @@ const NFTTemplateSpec = {
           "default_value": false
         },
         {
+          "name": "minting_results_page",
+          "type": "select",
+          "default_value": "item_details",
+          "options": [
+            ["Item Details", "item_details"],
+            ["Media", "media"]
+          ],
+          "no_localize": true,
+          "hint": "Specify which page the user should be directed to after receiving their item"
+        },
+        {
           "name": "style",
           "label": "Style Variant",
           "type": "text",
           "hint": "If specified, this will be added to the HTML container class when this NFT is displayed (e.g. 'card-container--variant-(style)', 'featured-item__icon-container--variant-(style)' 'feature-gallery__icon-container--variant-(style)')"
-        },
-        {
-          "name": "test",
-          "label": "Test NFT",
-          "type": "checkbox",
-          "default_value": false,
-          "hint": "If checked, this NFT will be marked as a test NFT",
-          "no_localize": true
         },
         {
           "name": "redeemable_offers",
