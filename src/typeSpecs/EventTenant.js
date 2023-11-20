@@ -113,7 +113,7 @@ const eventTenantSpec = {
       ],
       "hint": "Specify a custom OpenID provider for use with the Eluvio Custodial Wallet",
       "label": "Custom OpenID",
-      "name": "openid",
+      "name": "open_id",
       "type": "subsection"
     }
   ],
