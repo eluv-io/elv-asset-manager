@@ -82,6 +82,11 @@ const eventSiteSpec = {
           ]
         },
         {
+          "name": "link_text",
+          "label": "Header Link Text",
+          "hint": "Customize the text shown in the link to open the marketplace in the site header"
+        },
+        {
           "name": "marketplace_only",
           "type": "checkbox",
           "unless": "./disable_marketplace",
