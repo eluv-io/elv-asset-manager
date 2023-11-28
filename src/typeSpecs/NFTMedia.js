@@ -54,7 +54,13 @@ const NFTMediaItem = [
   },
   {
     "name": "name",
+    "label": "Title",
     "type": "text"
+  },
+  {
+    "name": "annotated_title",
+    "label": "Annotated Title",
+    "hint": "This title overrides the default title and allows for including reference images by specifying the reference image ID in brackets, e.g. {my_reference_image_id}. Images referenced in this field will be rendered as small icons with a maximum height and width of 30px"
   },
   {
     "name": "subtitle_1",
@@ -359,6 +365,35 @@ const NFTMedia = [
         "default_value": "list"
       },
       ...NFTMediaItem
+    ]
+  },
+  {
+    "name": "reference_images",
+    "label": "Reference Images",
+    "hint": "Reference images can be inserted inline in 'annotated' fields by specifying the image ID within brackets, e.g. {my_image_id}",
+    "type": "list",
+    "buttonText": "Add Reference Image",
+    "fields": [
+      {
+        "name": "id",
+        "label": "UUID",
+        "type": "uuid"
+      },
+      {
+        "name": "image_id",
+        "label": "Image ID",
+        "type": "text",
+      },
+      {
+        "name": "alt_text",
+        "type": "text",
+        "hint": "Text describing the image"
+      },
+      {
+        "name": "image",
+        "type": "file",
+        "extensions": imageTypes
+      }
     ]
   },
   {
