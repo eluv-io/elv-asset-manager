@@ -5,7 +5,6 @@ import {rootStore, formStore, contentStore} from "../stores";
 import {
   Confirm,
   IconButton,
-  Input,
   TextArea,
   MultiSelect,
   Checkbox,
@@ -127,6 +126,34 @@ const SHA512 = async (str) => {
 
   const buf = await crypto.subtle.digest("SHA-512", new TextEncoder("utf-8").encode(str));
   return Array.prototype.map.call(new Uint8Array(buf), x=>(("00"+x.toString(16)).slice(-2))).join("");
+};
+
+const Input = ({type, label, name, value, placeholder, readonly=false, onChange, hidden=false, required=false, className=""}) => {
+  if(hidden) { return null; }
+
+  return (
+    <div className={`-elv-input ${className}`}>
+      <label htmlFor={name}>{label || FormatName(name)}</label>
+      <input
+        required={required}
+        name={name}
+        value={value}
+        placeholder={placeholder}
+        readOnly={readonly}
+        onChange={event => {
+          let input = event.target.value.toString();
+
+          if(type === "integer") {
+            input = input.replace(/[^0-9]/g, "");
+          } else if(type === "number") {
+            input = input.replace(/[^0-9.]/g, "").replace(/\.{2,}/g, ".");
+          }
+
+          onChange(input);
+        }}
+      />
+    </div>
+  );
 };
 
 let hashTimeout;
@@ -710,6 +737,7 @@ const InfoField = observer(({
           label={hintLabel || `${field.label || FormatName(field.name)} ${field.required ? "*" : ""}`}
           type={fieldType}
           value={(entry || {})[field.name] || ""}
+          placeholder={field.placeholder}
           required={field.required}
           readonly={field.readonly}
           onChange={newValue => Update(field.name, newValue)}

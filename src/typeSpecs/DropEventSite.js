@@ -82,11 +82,6 @@ const eventSiteSpec = {
           ]
         },
         {
-          "name": "link_text",
-          "label": "Header Link Text",
-          "hint": "Customize the text shown in the link to open the marketplace in the site header"
-        },
-        {
           "name": "marketplace_only",
           "type": "checkbox",
           "unless": "./disable_marketplace",
@@ -131,6 +126,100 @@ const eventSiteSpec = {
           "name": "hidden",
           "type": "checkbox",
           "default_value": false
+        }
+      ]
+    },
+    {
+      "name": "header_links",
+      "type": "subsection",
+      "fields": [
+        {
+          "name": "sign_in",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "link_text",
+              "type": "text",
+              "placeholder": "Sign In"
+            },
+            {
+              "name": "hide_icon",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "icon",
+              "type": "file",
+              "extensions": imageTypes,
+              "unless": "./hide_icon"
+            }
+          ]
+        },
+        {
+          "name": "store",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "link_text",
+              "type": "text",
+              "placeholder": "Store"
+            },
+            {
+              "name": "hide_icon",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "icon",
+              "type": "file",
+              "extensions": imageTypes,
+              "unless": "./hide_icon"
+            }
+          ]
+        },
+        {
+          "name": "discover_projects",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "link_text",
+              "type": "text",
+              "placeholder": "Discover Projects"
+            },
+            {
+              "name": "hide_icon",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "icon",
+              "type": "file",
+              "extensions": imageTypes,
+              "unless": "./hide_icon"
+            }
+          ]
+        },
+        {
+          "name": "wallet",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "link_text",
+              "type": "text",
+              "placeholder": "My Wallet"
+            },
+            {
+              "name": "hide_icon",
+              "type": "checkbox",
+              "default_value": false
+            },
+            {
+              "name": "icon",
+              "type": "file",
+              "extensions": imageTypes,
+              "unless": "./hide_icon"
+            }
+          ]
         }
       ]
     },
@@ -358,6 +447,18 @@ const eventSiteSpec = {
           "depends_on_value": "marketplace"
         },
         {
+          "name": "event_button_marketplace_redirect_page",
+          "type": "select",
+          "default_value": "item_details",
+          "options": [
+            ["Item Details", "item_details"],
+            ["Media", "media"]
+          ],
+          "no_localize": true,
+          "hint": "Specify which page the user should be directed to if they own the item",
+          "depends_on": "./event_button_marketplace_redirect_to_owned_item"
+        },
+        {
           "name": "event_button_link",
           "type": "string",
           "depends_on": ["./event_button_action", "./event_button_action_post_login"],
@@ -392,6 +493,18 @@ const eventSiteSpec = {
               "default_value": false,
               "depends_on": "./action",
               "depends_on_value": "marketplace"
+            },
+            {
+              "name": "redirect_page",
+              "type": "select",
+              "default_value": "item_details",
+              "options": [
+                ["Item Details", "item_details"],
+                ["Media", "media"]
+              ],
+              "no_localize": true,
+              "hint": "Specify which page the user should be directed to if they own the item",
+              "depends_on": "./redirect_to_owned_item"
             }
           ]
         },

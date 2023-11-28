@@ -159,6 +159,10 @@ class SpecStore {
         formattedField.readonly = true;
       }
 
+      if(field.placeholder) {
+        formattedField.placeholder = true;
+      }
+
       if(field.path) {
         formattedField.path = field.path;
       }
