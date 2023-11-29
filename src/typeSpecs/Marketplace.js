@@ -344,6 +344,14 @@ const MarketplaceSpec = {
           "extensions": imageTypes
         },
         {
+          "label": "'Powered By' Logo",
+          "name": "powered_by_logo",
+          "type": "file",
+          "hint": "Customize the 'Powered By' logo at the bottom of the login box",
+          "extensions": imageTypes,
+          "depends_on": "./logo"
+        },
+        {
           "name": "background_mobile",
           "label": "Login Page Background (Mobile)",
           "type": "file",

@@ -138,6 +138,12 @@ const eventSiteSpec = {
           "type": "subsection",
           "fields": [
             {
+              "name": "hide",
+              "label": "Hide Link",
+              "type": "checkbox",
+              "hint": "If checked, this link will not be shown"
+            },
+            {
               "name": "link_text",
               "type": "text",
               "placeholder": "Sign In"
@@ -159,6 +165,12 @@ const eventSiteSpec = {
           "name": "store",
           "type": "subsection",
           "fields": [
+            {
+              "name": "hide",
+              "label": "Hide Link",
+              "type": "checkbox",
+              "hint": "If checked, this link will not be shown"
+            },
             {
               "name": "link_text",
               "type": "text",
@@ -182,6 +194,12 @@ const eventSiteSpec = {
           "type": "subsection",
           "fields": [
             {
+              "name": "hide",
+              "label": "Hide Link",
+              "type": "checkbox",
+              "hint": "If checked, this link will not be shown"
+            },
+            {
               "name": "link_text",
               "type": "text",
               "placeholder": "Discover Projects"
@@ -203,6 +221,12 @@ const eventSiteSpec = {
           "name": "wallet",
           "type": "subsection",
           "fields": [
+            {
+              "name": "hide",
+              "label": "Hide Link",
+              "type": "checkbox",
+              "hint": "If checked, this link will not be shown"
+            },
             {
               "name": "link_text",
               "type": "text",
@@ -751,6 +775,25 @@ const eventSiteSpec = {
               "depends_on_value": "marketplace",
             },
             {
+              "name": "redirect_to_owned_item",
+              "type": "checkbox",
+              "default_value": false,
+              "depends_on": "./type",
+              "depends_on_value": "marketplace"
+            },
+            {
+              "name": "redirect_page",
+              "type": "select",
+              "default_value": "item_details",
+              "options": [
+                ["Item Details", "item_details"],
+                ["Media", "media"]
+              ],
+              "no_localize": true,
+              "hint": "Specify which page the user should be directed to if they own the item",
+              "depends_on": "./redirect_to_owned_item"
+            },
+            {
               "name": "link",
               "type": "text",
               "hint": "If the banner is a link, specify the URL to link to.",
@@ -814,6 +857,25 @@ const eventSiteSpec = {
           "hint": "If the banner opens the marketplace, optionally specify the SKU of an item page to open",
           "depends_on": "./type",
           "depends_on_value": "marketplace",
+        },
+        {
+          "name": "redirect_to_owned_item",
+          "type": "checkbox",
+          "default_value": false,
+          "depends_on": "./type",
+          "depends_on_value": "marketplace"
+        },
+        {
+          "name": "redirect_page",
+          "type": "select",
+          "default_value": "item_details",
+          "options": [
+            ["Item Details", "item_details"],
+            ["Media", "media"]
+          ],
+          "no_localize": true,
+          "hint": "Specify which page the user should be directed to if they own the item",
+          "depends_on": "./redirect_to_owned_item"
         },
         {
           "name": "link",
