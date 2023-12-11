@@ -105,19 +105,58 @@ class RootStore {
     if(this.typeHash) {
       this.typeId = this.client.utils.DecodeVersionHash(this.typeHash).objectId;
       const libraryId = (yield this.client.ContentSpaceId()).replace("ispc", "ilib");
+      const contentSpaceId = yield this.client.ContentSpaceId();
 
-      let typeMetadata = (yield this.client.ContentObjectMetadata({
-        libraryId,
-        objectId: this.typeId,
-        select: [
-          "bitcode_flags",
-          "bitcode_format",
-          "public/eluv.displayApp",
-          "public/eluv.manageApp",
-          "public/name",
-          "public/title_configuration"
+      // Check user content type access
+      let hasContentTypeAccess = false;
+      const walletAddress = yield this.client.CallContractMethod({
+        contractAddress: this.client.utils.HashToAddress(contentSpaceId),
+        methodName: "userWallets",
+        methodArgs: [yield this.client.CurrentAccountAddress()]
+      });
+
+      hasContentTypeAccess = yield this.client.CallContractMethod({
+        contractAddress: walletAddress,
+        methodName: "checkRights",
+        methodArgs: [
+          4, // CATEGORY_CONTENT_TYPE = 4
+          this.client.utils.HashToAddress(this.client.utils.DecodeVersionHash(this.typeHash).objectId),
+          1 // TYPE_SEE = 0; TYPE_ACCESS = 1; TYPE_EDIT = 2
         ]
-      })) || {};
+      });
+
+      let typeMetadata;
+      if(hasContentTypeAccess) {
+        typeMetadata = (yield this.client.ContentObjectMetadata({
+          libraryId,
+          objectId: this.typeId,
+          select: [
+            "bitcode_flags",
+            "bitcode_format",
+            "public/eluv.displayApp",
+            "public/eluv.manageApp",
+            "public/name",
+            "public/title_configuration"
+          ]
+        })) || {};
+      } else {
+        const publicMetadata = (yield this.client.ContentObjectMetadata({
+          libraryId,
+          objectId: this.typeId,
+          publicOnly: true,
+          metadataSubtree: "public",
+          select: [
+            "eluv.displayApp",
+            "eluv.manageApp",
+            "name",
+            "title_configuration"
+          ]
+        })) || {};
+
+        typeMetadata = {
+          public: publicMetadata
+        };
+      }
 
       typeMetadata.public = typeMetadata.public || {};
 
