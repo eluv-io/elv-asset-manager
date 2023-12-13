@@ -804,6 +804,78 @@ const MarketplaceSpec = {
           "no_localize": true
         },
         {
+          "name": "allow_gift_purchase",
+          "type": "checkbox",
+          "hint": "If checked, this item may be purchased as a gift for another user"
+        },
+        {
+          "name": "gift_sku",
+          "label": "Gift SKU",
+          "type": "text",
+          "depends_on": "./allow_gift_purchase",
+          "hint": "When this item is purchased as a gift, this item will be purchased instead. NOTE: Presentation, gift options and price will be based on the settings of the gift item, not this item"
+        },
+        {
+          "name": "use_custom_gift_presentation",
+          "type": "checkbox",
+          "depends_on": "./allow_gift_purchase",
+          "unless": "./gift_sku",
+          "hint": "Override the presentation of the item when it is a gift"
+        },
+        {
+          "name": "gift_presentation",
+          "type": "subsection",
+          "depends_on": "./use_custom_gift_presentation",
+          "unless": "./gift_sku",
+          "fields": [
+            {
+              "name": "open_on_claim",
+              "hint": "If specified, the receiving user will be presented with the gift item visual, and must click to 'open' the gift. Otherwise, the item will be minted directly to the user upon claim with no action required.",
+              "type": "checkbox"
+            },
+            {
+              "name": "name",
+              "type": "text"
+            },
+            {
+              "name": "subtitle",
+              "type": "text"
+            },
+            {
+              "label": "Subtitle 2",
+              "name": "subtitle2",
+              "type": "text"
+            },
+            {
+              "name": "description",
+              "type": "textarea"
+            },
+            {
+              "label": "Description (Rich Text)",
+              "name": "description_rich_text",
+              "type": "rich_text",
+              "hint": "NOTE: This will only be used in the featured item and item details view. The description field (above) will be used in the card list view"
+            },
+            {
+              "extensions": imageTypes,
+              "name": "image",
+              "type": "file",
+              "hint": "For type 'nft', the image from the NFT template will be used if this field is not specified"
+            },
+            {
+              "name": "video",
+              "type": "fabric_link",
+              "video_preview": true,
+              "hint": "If specified, this video for this NFT will play on the purchase page in the store."
+            },
+            {
+              "name": "video_has_audio",
+              "type": "checkbox",
+              "default_value": false
+            },
+          ]
+        },
+        {
           "label": "Release Date",
           "name": "available_at",
           "type": "datetime",
@@ -1064,6 +1136,52 @@ const MarketplaceSpec = {
           "name": "reveal_animation_mobile",
           "type": "fabric_link",
           "video_preview": true
+        },
+        {
+          "name": "gift_options",
+          "type": "subsection",
+          "fields": [
+            {
+              "name": "custom_redemption_settings",
+              "label": "Custom Gift Redemption Settings",
+              "type": "checkbox",
+              "default_value": false,
+              "hint": "Unless specified, the same options for item purchases will be used upon gift redemption"
+            },
+            {
+              "name": "skip_reveal",
+              "type": "checkbox",
+              "default_value": true,
+              "depends_on": "./custom_redemption_settings",
+              "hint": "If specified, the page will navigate directly to the first item purchased/claimed after minting has finished"
+            },
+            {
+              "name": "redeem_animation",
+              "type": "fabric_link",
+              "video_preview": true,
+              "depends_on": "./custom_redemption_settings",
+              "hint": "If specified, this video will play on the status screen after a gift is redeemed until minting is complete"
+            },
+            {
+              "name": "redeem_animation_mobile",
+              "type": "fabric_link",
+              "video_preview": true,
+              "depends_on": "./custom_redemption_settings",
+            },
+            {
+              "name": "reveal_animation",
+              "type": "fabric_link",
+              "video_preview": true,
+              "depends_on": "./custom_redemption_settings",
+              "hint": "If specified, this video will play after minting has finished and before displaying results"
+            },
+            {
+              "name": "reveal_animation_mobile",
+              "type": "fabric_link",
+              "video_preview": true,
+              "depends_on": "./custom_redemption_settings",
+            },
+          ]
         },
         {
           "name": "sections",
