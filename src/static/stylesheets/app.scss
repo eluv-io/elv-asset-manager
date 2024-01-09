@@ -106,7 +106,7 @@ button {
 }
 
 .video-preview {
-  max-width: 100%;
+  max-width: 35rem;
 
   video {
     background-color: $elv-color-black;
@@ -674,7 +674,7 @@ select {
   margin: $elv-spacing-m 0;
 
   .asset-form-object-selection-contents {
-    width: 35rem;
+    width: 100%;
 
     label {
       align-items: flex-start;
@@ -688,7 +688,6 @@ select {
     display: flex;
     justify-content: space-between;
     margin-bottom: $elv-spacing-xs;
-    margin-right: $elv-spacing-s;
     padding: $elv-spacing-xs;
     word-break: break-all;
 
@@ -701,6 +700,7 @@ select {
   .asset-form-object-selection-actions {
     align-items: center;
     display: flex;
+    margin-left: 10px;
 
     button {
       &:not(:last-child) {

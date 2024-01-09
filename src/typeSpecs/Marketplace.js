@@ -806,7 +806,7 @@ const MarketplaceSpec = {
         {
           "name": "allow_gift_purchase",
           "type": "checkbox",
-          "hint": "If checked, this item may be purchased as a gift for another user"
+          "hint": "If checked, this item may be purchased as a gift for another user. IMPORTANT NOTE: If an item is purchasable as gift, it *must not* have a trading hold period"
         },
         {
           "name": "gift_sku",

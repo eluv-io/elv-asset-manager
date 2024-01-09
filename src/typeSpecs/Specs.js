@@ -4,6 +4,7 @@ import NFTCollectionSpec from "./NFTCollection";
 import NFTTemplateSpec from "./NFTTemplate";
 import MarketplaceSpec from "./Marketplace";
 import MainSiteSpec from "./MainSite";
+import MediaLibrarySpec from "./MediaLibrary";
 
 const Specs = {
   "Main Site": MainSiteSpec,
@@ -11,7 +12,8 @@ const Specs = {
   "Tenant": TenantSpec,
   "NFT Collection": NFTCollectionSpec,
   "NFT Template": NFTTemplateSpec,
-  "Marketplace": MarketplaceSpec
+  "Marketplace": MarketplaceSpec,
+  "Media Library": MediaLibrarySpec
 };
 
 export default Specs;

@@ -112,6 +112,7 @@ class FormStore {
     arrangement: []
   };
 
+  @observable contentSpec;
   @observable hideImageTab = false;
   @observable showSearchablesTab = false;
   @observable hideUpdateLinksButton = false;
@@ -349,6 +350,8 @@ class FormStore {
           ...this.rootStore.titleConfiguration,
           ...Specs[configKey]
         };
+
+        this.contentSpec = configKey;
       } else {
         // eslint-disable-next-line no-console
         console.error("Non-default type:", config.profile.name);
@@ -2196,6 +2199,24 @@ class FormStore {
 
       if(this.HasControl("vod_channel")) {
         yield this.rootStore.vodChannelStore.SaveChannelInfo({writeToken});
+      }
+
+      // Record built-in spec type, if present
+      if(this.contentSpec) {
+        yield client.ReplaceMetadata({
+          libraryId,
+          objectId,
+          writeToken,
+          metadataSubtree: "public/content_spec",
+          metadata: this.contentSpec
+        });
+      } else {
+        yield client.DeleteMetadata({
+          libraryId,
+          objectId,
+          writeToken,
+          metadataSubtree: "public/content_spec",
+        });
       }
 
       if(!commit) {
