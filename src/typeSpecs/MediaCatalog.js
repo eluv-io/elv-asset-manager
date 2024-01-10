@@ -1,13 +1,13 @@
-const MediaLibrarySpec = {
+const MediaCatalogSpec = {
   "profile": {
-    "name": "Eluvio Media Library",
+    "name": "Eluvio Media Catalog",
     "version": "0.1",
   },
   "manage_app": "default",
   "hide_image_tab": true,
   "associate_permissions": true,
   "associated_assets": [],
-  "title_types": ["media_library"],
+  "title_types": ["media_catalog"],
   "asset_types": ["primary"],
   "controls": [],
   "default_image_keys": [],
@@ -59,4 +59,4 @@ const MediaLibrarySpec = {
   ]
 };
 
-export default MediaLibrarySpec;
+export default MediaCatalogSpec;
