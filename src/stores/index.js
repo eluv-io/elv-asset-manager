@@ -105,41 +105,24 @@ class RootStore {
     if(this.typeHash) {
       this.typeId = this.client.utils.DecodeVersionHash(this.typeHash).objectId;
       const libraryId = (yield this.client.ContentSpaceId()).replace("ispc", "ilib");
-      const contentSpaceId = yield this.client.ContentSpaceId();
-
-      // Check user content type access
-      let hasContentTypeAccess = false;
-      const walletAddress = yield this.client.CallContractMethod({
-        contractAddress: this.client.utils.HashToAddress(contentSpaceId),
-        methodName: "userWallets",
-        methodArgs: [yield this.client.CurrentAccountAddress()]
-      });
-
-      hasContentTypeAccess = yield this.client.CallContractMethod({
-        contractAddress: walletAddress,
-        methodName: "checkRights",
-        methodArgs: [
-          4, // CATEGORY_CONTENT_TYPE = 4
-          this.client.utils.HashToAddress(this.client.utils.DecodeVersionHash(this.typeHash).objectId),
-          1 // TYPE_SEE = 0; TYPE_ACCESS = 1; TYPE_EDIT = 2
-        ]
-      });
 
       let typeMetadata;
-      if(hasContentTypeAccess) {
+      try {
         typeMetadata = (yield this.client.ContentObjectMetadata({
-          libraryId,
-          objectId: this.typeId,
-          select: [
-            "bitcode_flags",
-            "bitcode_format",
-            "public/eluv.displayApp",
-            "public/eluv.manageApp",
-            "public/name",
-            "public/title_configuration"
-          ]
-        })) || {};
-      } else {
+            libraryId,
+            objectId: this.typeId,
+            select: [
+              "bitcode_flags",
+              "bitcode_format",
+              "public/eluv.displayApp",
+              "public/eluv.manageApp",
+              "public/name",
+              "public/title_configuration"
+            ]
+          })) || {};
+      } catch(error) {
+        // eslint-disable-next-line no-console
+        console.error(`Unable to load private metadata for type: ${this.typeId}. Loading public metadata.`);
         const publicMetadata = (yield this.client.ContentObjectMetadata({
           libraryId,
           objectId: this.typeId,
