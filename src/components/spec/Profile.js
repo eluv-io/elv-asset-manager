@@ -10,7 +10,7 @@ import MainSiteSpec from "../../typeSpecs/MainSite";
 import NFTCollectionSpec from "../../typeSpecs/NFTCollection";
 import NFTTemplateSpec from "../../typeSpecs/NFTTemplate";
 import MarketplaceSpec from "../../typeSpecs/Marketplace";
-import MediaLibrarySpec from "../../typeSpecs/MediaLibrary";
+import MediaCatalogSpec from "../../typeSpecs/MediaCatalog";
 
 const specs = {
   "Default": DefaultSpec,
@@ -21,7 +21,7 @@ const specs = {
   "Eluvio Tenant": EventTenantSpec,
   "NFT Collection": NFTCollectionSpec,
   "NFT Template": NFTTemplateSpec,
-  "Media Library": MediaLibrarySpec
+  "Media Catalog": MediaCatalogSpec
 };
 
 @inject("rootStore")
