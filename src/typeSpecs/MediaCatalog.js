@@ -5,7 +5,7 @@ const MediaCatalogSpec = {
   },
   "manage_app": "default",
   "hide_image_tab": true,
-  "associate_permissions": true,
+  "associate_permissions": false,
   "associated_assets": [],
   "title_types": ["media_catalog"],
   "asset_types": ["primary"],
