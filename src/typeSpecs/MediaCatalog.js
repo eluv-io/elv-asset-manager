@@ -5,7 +5,7 @@ const MediaCatalogSpec = {
   },
   "manage_app": "default",
   "hide_image_tab": true,
-  "associate_permissions": true,
+  "associate_permissions": false,
   "associated_assets": [],
   "title_types": ["media_catalog"],
   "asset_types": ["primary"],
@@ -13,17 +13,27 @@ const MediaCatalogSpec = {
   "default_image_keys": [],
   "info_fields": [
     {
-      "name": "playlists",
+      "name": "collections",
+      "label": "Media Collections",
       "type": "list",
-      "buttonText": "Add Playlist",
+      "buttonText": "Add Collection",
       "fields": [
         {
           "name": "id",
-          "label": "Playlist ID",
+          "label": "Collection ID",
           "type": "uuid"
         },
         {
-          "name": "name",
+          "name": "type",
+          "type": "select",
+          "default_value": "collection",
+          "options": [
+            ["Media Collection", "collection"],
+            ["Sequential Playlist", "playlist"]
+          ]
+        },
+        {
+          "name": "title",
           "type": "text"
         },
         {
@@ -40,7 +50,7 @@ const MediaCatalogSpec = {
               "type": "uuid"
             },
             {
-              "name": "name",
+              "name": "title",
               "type": "text"
             },
             {
