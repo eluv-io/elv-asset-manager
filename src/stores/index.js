@@ -106,18 +106,40 @@ class RootStore {
       this.typeId = this.client.utils.DecodeVersionHash(this.typeHash).objectId;
       const libraryId = (yield this.client.ContentSpaceId()).replace("ispc", "ilib");
 
-      let typeMetadata = (yield this.client.ContentObjectMetadata({
-        libraryId,
-        objectId: this.typeId,
-        select: [
-          "bitcode_flags",
-          "bitcode_format",
-          "public/eluv.displayApp",
-          "public/eluv.manageApp",
-          "public/name",
-          "public/title_configuration"
-        ]
-      })) || {};
+      let typeMetadata;
+      try {
+        typeMetadata = (yield this.client.ContentObjectMetadata({
+            libraryId,
+            objectId: this.typeId,
+            select: [
+              "bitcode_flags",
+              "bitcode_format",
+              "public/eluv.displayApp",
+              "public/eluv.manageApp",
+              "public/name",
+              "public/title_configuration"
+            ]
+          })) || {};
+      } catch(error) {
+        // eslint-disable-next-line no-console
+        console.error(`Unable to load private metadata for type: ${this.typeId}. Loading public metadata.`);
+        const publicMetadata = (yield this.client.ContentObjectMetadata({
+          libraryId,
+          objectId: this.typeId,
+          publicOnly: true,
+          metadataSubtree: "public",
+          select: [
+            "eluv.displayApp",
+            "eluv.manageApp",
+            "name",
+            "title_configuration"
+          ]
+        })) || {};
+
+        typeMetadata = {
+          public: publicMetadata
+        };
+      }
 
       typeMetadata.public = typeMetadata.public || {};
 
