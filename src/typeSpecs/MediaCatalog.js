@@ -1,3 +1,5 @@
+const imageTypes = ["gif", "jpg", "jpeg", "png", "svg", "webp"];
+
 const MediaCatalogSpec = {
   "profile": {
     "name": "Eluvio Media Catalog",
@@ -56,6 +58,18 @@ const MediaCatalogSpec = {
             {
               "name": "description",
               "type": "textarea"
+            },
+            {
+              "extensions": imageTypes,
+              "name": "image",
+              "type": "file",
+              "hint": "Square image recommended"
+            },
+            {
+              "name": "headers",
+              "label": "Content Info",
+              "type": "list",
+              "hint": "(optional) A list of text fields to display with the content info, such as year released, content rating, etc."
             },
             {
               "name": "media",
