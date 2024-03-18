@@ -648,6 +648,11 @@ const eventSiteSpec = {
           "type": "textarea"
         },
         {
+          "name": "hero_background_link",
+          "type": "text",
+          "hint": "This field will specify a custom URL for the hero background to link to."
+        },
+        {
           "extensions": imageTypes,
           "name": "hero_banner",
           "type": "file"
