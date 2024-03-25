@@ -62,6 +62,12 @@ const eventTenantSpec = {
         },
         {
           "fields": [],
+          "label": "Authorized Entitlement Signers",
+          "name": "authorized_entitlement_signers",
+          "type": "list"
+        },
+        {
+          "fields": [],
           "label": "Leaderboard Excluded Addresses",
           "name": "leaderboard_excludes",
           "type": "list"
