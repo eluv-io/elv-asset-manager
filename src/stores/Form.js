@@ -413,10 +413,6 @@ class FormStore {
       );
     }
 
-    if(this.HasControl("site_customization")) {
-      yield this.LoadSiteCustomization(assetMetadata.site_customization);
-    }
-
     if(this.HasControl("vod_channel")) {
       yield this.rootStore.vodChannelStore.LoadChannelInfo();
     }
@@ -1492,106 +1488,6 @@ class FormStore {
     ];
   });
 
-  LoadSiteCustomization = flow(function * (metadata) {
-    if(!metadata) { return; }
-
-    this.siteCustomization.header = metadata.header || "";
-    this.siteCustomization.subheader = metadata.subheader || "";
-
-    if(metadata.logo) {
-      this.siteCustomization.logo = this.LinkComponents(metadata.logo);
-    }
-
-    if(metadata.dark_logo) {
-      this.siteCustomization.dark_logo = this.LinkComponents(metadata.dark_logo);
-    }
-
-    if(metadata.background_image) {
-      this.siteCustomization.background_image = this.LinkComponents(metadata.background_image);
-    }
-
-    if(metadata.colors) {
-      this.siteCustomization.colors = {
-        ...this.siteCustomization.colors,
-        ...metadata.colors
-      };
-    }
-
-    // Site arrangement
-    if(!metadata) {
-      this.DefaultArrangement();
-    } else {
-      let arrangement = toJS(metadata.arrangement || []);
-      arrangement = (yield Promise.all(
-        arrangement.map(async (entry, index) => {
-          if(entry.title) {
-            const target = await this.rootStore.client.LinkTarget({
-              versionHash: this.rootStore.params.versionHash,
-              linkPath: `public/asset_metadata/site_customization/arrangement/${index}/title`
-            });
-
-            await this.RetrieveAsset(target);
-
-            entry.title = this.targets[target];
-          }
-
-          if(entry.type !== "playlist") {
-            return entry;
-          }
-
-          const playlist = this.playlists.find(playlist => playlist.playlistSlug === entry.playlist_slug);
-
-          if(!playlist) {
-            return;
-          }
-
-          entry = {
-            ...entry,
-            playlistId: playlist.playlistId,
-            name: `playlist--${playlist.playlistId}`
-          };
-
-          delete entry.playlist_slug;
-
-          return entry;
-        })
-      ))
-        .filter(entry => entry);
-
-
-      this.siteCustomization.arrangement = arrangement;
-    }
-
-    if(this.HasControl("premiere")) {
-      if(metadata.premiere && metadata.premiere.title) {
-        try {
-          const target = yield this.rootStore.client.LinkTarget({
-            versionHash: this.rootStore.params.versionHash,
-            linkPath: "public/asset_metadata/site_customization/premiere/title"
-          });
-
-          let price = parseFloat(metadata.premiere.price);
-          price = isNaN(price) ? "0.00" : price.toFixed(2);
-
-          yield this.RetrieveAsset(target);
-          this.siteCustomization.premiere = {
-            title: this.targets[target],
-            premieresAt:  DateTime.fromISO(metadata.premiere.premieresAt),
-            price: price,
-            enabled: true
-          };
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.error("Failed to load premiere title");
-          // eslint-disable-next-line no-console
-          console.error(error);
-        }
-      } else {
-        delete this.siteCustomization.premiere;
-      }
-    }
-  });
-
   async FormatAssets({assetType, assets}) {
     // If not slugged or indexed, asset is saved as array
     let formattedAssets = assetType.indexed || assetType.slugged ? {} : [];
@@ -2037,6 +1933,7 @@ class FormStore {
           })) || {};
         }
 
+        // Note: public/asset_metadata and public/asset_metadata/info will be merged, anything below that will be replaced
         const mergedMetadata = {
           ...existingMetadata,
           ...topInfo,
@@ -2125,68 +2022,6 @@ class FormStore {
             metadata: items
           });
         }
-      }
-
-      if(this.HasControl("site_customization")) {
-        let siteCustomization = {...toJS(this.siteCustomization)};
-
-        if(siteCustomization.logo && siteCustomization.logo.targetHash && siteCustomization.logo.imagePath) {
-          siteCustomization.logo = this.CreateLink({
-            targetHash: siteCustomization.logo.targetHash,
-            linkTarget: UrlJoin("files", siteCustomization.logo.imagePath)
-          });
-        }
-
-        if(siteCustomization.dark_logo && siteCustomization.dark_logo.targetHash && siteCustomization.dark_logo.imagePath) {
-          siteCustomization.dark_logo = this.CreateLink({
-            targetHash: siteCustomization.dark_logo.targetHash,
-            linkTarget: UrlJoin("files", siteCustomization.dark_logo.imagePath)
-          });
-        }
-
-        if(siteCustomization.background_image && siteCustomization.background_image.targetHash && siteCustomization.background_image.imagePath) {
-          siteCustomization.background_image = this.CreateLink({
-            targetHash: siteCustomization.background_image.targetHash,
-            linkTarget: UrlJoin("files", siteCustomization.background_image.imagePath)
-          });
-        }
-
-        siteCustomization.arrangement = this.siteCustomization.arrangement.map(entry => {
-          entry = {...toJS(entry)};
-          if(entry.type === "playlist") {
-            const playlist = this.playlists.find(playlist => playlist.playlistId === entry.playlistId);
-            entry.playlist_slug = playlist.playlistSlug;
-            entry.name = "playlist";
-            delete entry.playlistId;
-          } else if(entry.title) {
-            entry.title = this.CreateLink({targetHash: entry.title.versionHash});
-          }
-
-          return entry;
-        });
-
-        if(this.HasControl("premiere")) {
-          if(!siteCustomization.premiere || !siteCustomization.premiere.enabled || !siteCustomization.premiere.title) {
-            delete siteCustomization.premiere;
-          } else {
-            delete siteCustomization.premiere.enabled;
-
-            let price = parseFloat(this.siteCustomization.premiere.price);
-            price = isNaN(price) ? "0.00" : price.toFixed(2);
-
-            siteCustomization.premiere.title = this.CreateLink({targetHash: siteCustomization.premiere.title.versionHash});
-            siteCustomization.premiere.premieresAt = this.FormatDate(siteCustomization.premiere.premieresAt || Date.now(), true);
-            siteCustomization.premiere.price = price;
-          }
-        }
-
-        yield client.ReplaceMetadata({
-          libraryId,
-          objectId,
-          writeToken,
-          metadataSubtree: "public/asset_metadata/site_customization",
-          metadata: siteCustomization
-        });
       }
 
       if(this.HasControl("live_stream")) {

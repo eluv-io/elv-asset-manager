@@ -11,7 +11,6 @@ import LiveStream from "./channels/LiveStream";
 import Channel from "./channels/Channel";
 import VoDChannel from "./vod_channels/VoDChannel";
 import SiteAccessCode from "./SiteAccessCode";
-import SiteCustomization from "./SiteCustomization";
 import FileControl from "./FileControl";
 
 import LocalizationIcon from "../static/icons/world.svg";
@@ -178,10 +177,6 @@ class AssetForm extends React.Component {
       tabs.push(["Playlists", "PLAYLISTS"]);
     }
 
-    if(this.props.formStore.HasControl("site_customization")) {
-      tabs.push(["Site Customization", "SITE_CUSTOMIZATION"]);
-    }
-
     if(this.props.formStore.HasControl("site_codes")) {
       tabs.push(["Access Codes", "SITE_CODES"]);
     }
@@ -215,8 +210,6 @@ class AssetForm extends React.Component {
         return <Images />;
       case "PLAYLISTS":
         return <Playlists />;
-      case "SITE_CUSTOMIZATION":
-        return <SiteCustomization />;
       case "SITE_CODES":
         return <SiteAccessCode />;
       case "SEARCHABLES":

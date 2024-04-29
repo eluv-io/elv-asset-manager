@@ -144,10 +144,11 @@ const NFTTemplateSpec = {
         {
           "name": "media_type",
           "type": "select",
+          "default_value": "Image",
           "options": [
+            "Image",
             "Video",
             "Audio",
-            "Image",
             "Ebook",
             "HTML"
           ]
@@ -237,13 +238,15 @@ const NFTTemplateSpec = {
         },
         {
           "name": "playable",
+          "description": "If this template is a playable video, use its animation as the video for this item",
           "type": "checkbox",
-          "default_value": true
+          "default_value": false
         },
         {
           "name": "has_audio",
           "type": "checkbox",
-          "default_value": false
+          "default_value": false,
+          "depends_on": "./playable"
         },
         {
           "name": "generative",

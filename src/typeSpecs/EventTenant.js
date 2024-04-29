@@ -111,7 +111,7 @@ const eventTenantSpec = {
           "type": "text"
         },
         {
-          "hint": "The exact issuer URL.  This URL may change as long as the issuer unique ID remains unchanged.",
+          "hint": "The exact issuer URL. This URL may change as long as the issuer unique ID remains unchanged.",
           "label": "Issuer URL",
           "name": "issuer_url",
           "type": "text"

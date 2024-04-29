@@ -62,6 +62,10 @@ const mainSiteSelectorSpec = {
           "name": "event_slug",
           "type": "text"
         },
+        {
+          "name": "property_slug",
+          "type": "text"
+        }
       ]
     },
     {
