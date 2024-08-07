@@ -40,6 +40,12 @@ const mainSiteSelectorSpec = {
       "type": "select"
     },
     {
+      "name": "media_property_order",
+      "type": "list",
+      "hint": "Specify media property slugs or object IDs. Any property not specified will be shown in a non-deterministic order after all specified properties",
+      "buttonText": "Add Property Slug or Id"
+    },
+    {
       "name": "marketplace_order",
       "type": "list",
       "hint": "Specify marketplace slugs. Any marketplaces not specified will be shown in a non-deterministic order after all specified marketplaces",
