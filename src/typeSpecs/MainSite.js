@@ -71,6 +71,11 @@ const mainSiteSelectorSpec = {
         {
           "name": "property_slug",
           "type": "text"
+        },
+        {
+          "name": "google_site_verification_id",
+          "label": "Google Site Verification ID",
+          "type": "text"
         }
       ]
     },
