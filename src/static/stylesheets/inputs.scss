@@ -443,11 +443,12 @@
       }
 
       ul {
-        display: unset;
-        list-style-type: circle;
+        display: block;
       }
 
       li {
+        display: flex;
+        align-items: center;
         font-size: 16px;
         padding-left: 5px;
       }

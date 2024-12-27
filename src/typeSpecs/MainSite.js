@@ -234,6 +234,29 @@ const mainSiteSelectorSpec = {
           ]
         }
       ]
+    },
+    {
+      "label": "Release Notes",
+      "name": "header_release_notes",
+      "type": "header"
+    },
+    {
+      "fields": [
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "date",
+          "type": "date"
+        },
+        {
+          "name": "text",
+          "type": "rich_text"
+        }
+      ],
+      "name": "release_notes",
+      "type": "list"
     }
   ]
 };

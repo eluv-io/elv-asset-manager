@@ -345,7 +345,7 @@ const InfoField = observer(({
       );
     } else if(fieldType === "rich_text") {
       return (
-        <LabelledField key={key} label={hintLabel || field.label || FormatName(field.name)} className="text-editor-labelled-field">
+        <LabelledField key={key} label={hintLabel || field.label || FormatName(field.name)}>
           <TextEditor
             value={entry[field.name] || ""}
             onChange={newValue => Update(field.name, newValue)}
