@@ -253,6 +253,11 @@ const mainSiteSelectorSpec = {
         {
           "name": "text",
           "type": "rich_text"
+        },
+        {
+          "name": "initially_expanded",
+          "type": "checkbox",
+          "hint": "Unless checked, this entry will be initially contracted unless it is the most recent"
         }
       ],
       "name": "release_notes",
