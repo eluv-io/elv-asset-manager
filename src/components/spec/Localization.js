@@ -74,7 +74,7 @@ class Localization extends React.Component {
             }
             fields={[
               { name: "key" },
-              { name: "depth", label: "Format", type: "select", options: [["List", 2], ["Key -> List", 3]], hint: hints.depth },
+              { name: "depth", label: "Format", type: "select", options: [["List", "2"], ["Key -> List", "3"]], hint: hints.depth },
               {
                 name: "options",
                 only: ({depth}) => parseInt(depth) === 2,
