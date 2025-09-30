@@ -92,8 +92,16 @@ const mainSiteSelectorSpec = {
           "type": "text"
         },
         {
-          "name": "text",
-          "type": "rich_text"
+          "name": "plain_text",
+          "type": "textarea"
+        },
+        {
+          "name": "link_text",
+          "type": "text"
+        },
+        {
+          "name": "link",
+          "type": "text"
         }
       ]
     },
