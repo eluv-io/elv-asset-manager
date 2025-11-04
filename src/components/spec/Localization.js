@@ -1,6 +1,7 @@
 import React from "react";
-import {inject, observer} from "mobx-react";
+import {observer} from "mobx-react";
 import {RecursiveField} from "../Inputs";
+import {specStore} from "../../stores";
 
 const hints = {
   localization: (
@@ -56,46 +57,43 @@ or a map of key -> list (e.g. a list of territories, each containing a list of l
   )
 };
 
-@inject("specStore")
-@observer
-class Localization extends React.Component {
-  render() {
-    return (
-      <div className="asset-form-section-container">
-        <h3>Localization Options</h3>
-        <div className="asset-info-container">
-          <RecursiveField
-            list
-            name="Localization"
-            values={this.props.specStore.localizations}
-            hint={hints.localization}
-            defaultValue={
-              { key: "New Localization", depth: 2, options: [] }
+
+const Localization = observer(() => {
+  return (
+    <div className="asset-form-section-container">
+      <h3>Localization Options</h3>
+      <div className="asset-info-container">
+        <RecursiveField
+          list
+          name="Localization"
+          values={specStore.localizations}
+          hint={hints.localization}
+          defaultValue={
+            { key: "New Localization", depth: 2, options: [] }
+          }
+          fields={[
+            { name: "key" },
+            { name: "depth", label: "Format", type: "select", options: [["List", 2], ["Key -> List", 3]], hint: hints.depth },
+            {
+              name: "options",
+              only: ({depth}) => parseInt(depth) === 2,
+              type: "list"
+            },
+            {
+              name: "options",
+              only: ({depth}) => parseInt(depth) === 3,
+              type: "list",
+              fields: [
+                { name: "key" },
+                { name: "options", type: "list" }
+              ]
             }
-            fields={[
-              { name: "key" },
-              { name: "depth", label: "Format", type: "select", options: [["List", "2"], ["Key -> List", "3"]], hint: hints.depth },
-              {
-                name: "options",
-                only: ({depth}) => parseInt(depth) === 2,
-                type: "list"
-              },
-              {
-                name: "options",
-                only: ({depth}) => parseInt(depth) === 3,
-                type: "list",
-                fields: [
-                  { name: "key" },
-                  { name: "options", type: "list" }
-                ]
-              }
-            ]}
-            Update={(_, newValues, operation) => this.props.specStore.UpdateLocalizations(newValues, operation)}
-          />
-        </div>
+          ]}
+          Update={(_, newValues, operation) => specStore.UpdateLocalizations(newValues, operation)}
+        />
       </div>
-    );
-  }
-}
+    </div>
+  );
+});
 
 export default Localization;

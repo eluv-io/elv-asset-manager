@@ -76,7 +76,10 @@ class AssetInfo extends React.Component {
       marketplacePreviewUrl = marketplacePreviewUrl.toString();
     }
 
-    const assetInfo = this.props.formStore.currentLocalizedData.assetInfo;
+    const assetInfo = (this.props.formStore.currentLocalizedData || {}).assetInfo;
+
+    if(!assetInfo) { return null; }
+
     return (
       <div className="asset-form-section-container asset-info-section-container">
         <h3>Asset Info</h3>

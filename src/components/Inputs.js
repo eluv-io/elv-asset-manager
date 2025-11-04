@@ -212,13 +212,20 @@ export const Selection = ({label, name, value, onChange, options, className=""})
     } catch (error) {}
   }, [value]);
 
+  const availableValues = (options || []).map(option => Array.isArray(option) ? option[1] : option);
+
   return (
     <div className={`-elv-input -elv-select ${className}`}>
       <label htmlFor={name}>{label || FormatName(name)}</label>
       <select
         name={name}
         value={value}
-        onChange={event => onChange(event.target.value)}
+        onChange={event => {
+          // Find the actual value by comparing strings - numbers don't natively work
+          const matchingValue = availableValues.find(value => (value || "").toString() === event.target.value);
+
+          onChange(matchingValue);
+        }}
       >
         {options.map(option => {
           let name = option;

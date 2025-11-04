@@ -279,6 +279,8 @@ class FormStore {
       target = this.localizedData[l0][l1];
     }
 
+    target = target || {};
+
     if(!target._loaded) {
       target.assetInfo = yield this.LoadAssetInfo(assetMetadata, !!l1);
       target.credits = this.LoadCredits((assetMetadata.info || {}).talent);
