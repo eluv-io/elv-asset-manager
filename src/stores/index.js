@@ -38,6 +38,7 @@ class RootStore {
 
   @observable linkStatus = {
     updatesAvailable: false,
+    errors: [],
     error: ""
   };
 
@@ -213,10 +214,31 @@ class RootStore {
 
       this.linkStatus = {
         updatesAvailable: Object.keys(status.auto_updates).length > 0,
+        errors: [],
         error: ""
       };
     } catch (error) {
-      this.linkStatus.error = error.toString();
+      const partialResult = (
+        error.partial_result ||
+        (error.body && error.body.errors && error.body.errors[0] &&
+          error.body.errors[0].cause &&
+          error.body.errors[0].cause.cause &&
+          error.body.errors[0].cause.cause.partial_result)
+      );
+
+      if(partialResult) {
+        this.linkStatus = {
+          updatesAvailable: Object.keys(partialResult.auto_updates || {}).length > 0,
+          errors: partialResult.errors || [],
+          error: ""
+        };
+      } else {
+        this.linkStatus = {
+          updatesAvailable: false,
+          errors: [],
+          error: error.toString()
+        };
+      }
     }
   });
 
