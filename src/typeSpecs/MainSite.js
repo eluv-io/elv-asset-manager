@@ -40,7 +40,32 @@ const mainSiteSelectorSpec = {
       "type": "select"
     },
     {
+      "name": "main_page_property_lists",
+      "type": "list",
+      "hint": "Specify lists of properties to show on the main page of the media wallet site",
+      "buttonText": "Add Property List",
+      "fields": [
+        {
+          "name": "title",
+          "label": "Title (Optional)",
+          "type": "text"
+        },
+        {
+          "name": "featured",
+          "hint": "If specified, items in this list will be shown with the larger featured card style (web only)",
+          "type": "checkbox"
+        },
+        {
+          "name": "properties",
+          "type": "list",
+          "hint": "Specify media property slugs or object IDs",
+          "buttonText": "Add Property Slug or Id"
+        },
+      ]
+    },
+    {
       "name": "media_property_order",
+      "label": "Media Property Order (OLD)",
       "type": "list",
       "hint": "Specify media property slugs or object IDs. Any property not specified will be shown in a non-deterministic order after all specified properties",
       "buttonText": "Add Property Slug or Id"
