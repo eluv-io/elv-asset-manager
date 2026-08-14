@@ -8,7 +8,7 @@
   "scripts": {
     "bump-version": "npm --git-tag-version --no-commit-hooks version patch",
     "serve": "webpack-dev-server --hot --port 8085",
-    "build": "rm -rf dist/* && NODE_ENV=production node ./node_modules/webpack-cli/bin/cli.js -p --progress --colors --devtool none",
+    "build": "node ./node_modules/webpack-cli/bin/cli.js --mode=production --devtool false",
     "add-build": "COMMIT=`git rev-parse HEAD` ; echo $COMMIT > dist/version.txt ; git add dist",
     "lint": "npm run fix-scss ; npm run lint-scss ; npm run fix-js",
     "lint-show": "npm run lint-scss ; npm run lint-js",
@@ -18,7 +18,7 @@
     "fix-scss": "./node_modules/sass-lint-auto-fix/dist/index.js"
   },
   "dependencies": {
-    "@eluvio/elv-client-js": "^4.0.32",
+    "@eluvio/elv-client-js": "^4.2.27",
     "@eluvio/elv-player-js": "^1.0.102",
     "country-codes-list": "^1.6.8",
     "elv-components-js": "git+https://github.com/eluv-io/elv-components-js.git",
@@ -46,6 +46,7 @@
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/plugin-syntax-jsx": "^7.2.0",
     "@babel/plugin-syntax-object-rest-spread": "^7.2.0",
+    "@babel/plugin-transform-optional-chaining": "^7.29.7",
     "@babel/plugin-transform-react-jsx": "^7.3.0",
     "@babel/plugin-transform-regenerator": "^7.4.3",
     "@babel/plugin-transform-runtime": "^7.4.3",
@@ -60,12 +61,12 @@
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-preset-mobx": "^2.0.0",
     "copy-webpack-plugin": "^4.6.0",
-    "css-loader": "^1.0.1",
+    "crypto-browserify": "^3.12.1",
+    "css-loader": "^7.1.4",
     "eslint": "^5.16.0",
     "eslint-plugin-react": "^7.12.4",
-    "file-loader": "^2.0.0",
-    "html-webpack-inline-source-plugin": "0.0.10",
-    "html-webpack-plugin": "^3.2.0",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.6.8",
     "image-webpack-loader": "^4.6.0",
     "postcss-loader": "^3.0.0",
     "raw-loader": "^0.5.1",
@@ -78,10 +79,10 @@
     "style-loader": "^0.22.1",
     "svg-inline-loader": "^0.8.0",
     "svg-inline-react": "^3.1.0",
-    "webpack": "^4.46.0",
+    "webpack": "^5.109.2",
     "webpack-bundle-analyzer": "^3.3.2",
-    "webpack-cli": "^3.3.0",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.2"
   },
   "babel": {
     "comments": true,
@@ -97,7 +98,8 @@
       "@babel/plugin-syntax-object-rest-spread",
       "@babel/plugin-proposal-object-rest-spread",
       "@babel/plugin-transform-react-jsx",
-      "@babel/plugin-transform-regenerator"
+      "@babel/plugin-transform-regenerator",
+      "@babel/plugin-transform-optional-chaining"
     ]
   }
 }

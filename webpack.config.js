@@ -4,16 +4,16 @@ const autoprefixer = require("autoprefixer");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const TerserPlugin = require("terser-webpack-plugin");
-const HtmlWebpackInlineSourcePlugin = require("html-webpack-inline-source-plugin");
 
 module.exports = {
   entry: "./src/index.js",
   target: "web",
   output: {
     path: Path.resolve(__dirname, "dist"),
+    publicPath: "/",
+    clean: true,
     filename: "index.js",
-    chunkFilename: "[name].[contenthash].bundle.js"
+    chunkFilename: "bundle.[id].[chunkhash].js"
   },
   devServer: {
     disableHostCheck: true,
@@ -25,24 +25,11 @@ module.exports = {
       "Access-Control-Allow-Methods": "POST"
     }
   },
-  optimization: {
-    minimizer: [
-      new TerserPlugin({
-        terserOptions: {
-          keep_classnames: true,
-          keep_fnames: true
-        }
-      })
-    ],
-    splitChunks: {
-      chunks: "all"
-    }
-  },
-  node: {
-    fs: "empty"
-  },
   mode: "development",
   devtool: "eval-source-map",
+  externals: {
+    crypto: "crypto"
+  },
   plugins: [
     new CopyWebpackPlugin([{
       from: Path.join(__dirname, "configuration.js"),
@@ -88,7 +75,8 @@ module.exports = {
           plugins: [
             require("@babel/plugin-proposal-object-rest-spread"),
             require("@babel/plugin-transform-regenerator"),
-            require("@babel/plugin-transform-runtime")
+            require("@babel/plugin-transform-runtime"),
+            require("@babel/plugin-transform-optional-chaining")
           ]
         }
       },
