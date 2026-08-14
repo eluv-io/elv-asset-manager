@@ -38,7 +38,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: "Eluvio Video Asset Manager",
       template: Path.join(__dirname, "src", "index.html"),
-      inject: "body",
       cache: false,
       filename: "index.html",
       inlineSource: ".(js|css)$",
