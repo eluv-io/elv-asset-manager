@@ -4,6 +4,7 @@ const autoprefixer = require("autoprefixer");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const fs = require("fs");
 
 module.exports = {
   entry: "./src/index.js",
@@ -16,13 +17,23 @@ module.exports = {
     chunkFilename: "bundle.[id].[chunkhash].js"
   },
   devServer: {
-    disableHostCheck: true,
-    inline: true,
+    hot: true,
+    client: {
+      //webSocketURL: "auto://elv-test.io/ws",
+      overlay: false
+    },
+    historyApiFallback: true,
+    allowedHosts: "all",
     port: 8084,
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Headers": "Content-Type, Accept",
       "Access-Control-Allow-Methods": "POST"
+    },
+    // This is to allow configuration.js to be accessed
+    static: {
+      directory: Path.resolve(__dirname, "./config"),
+      publicPath: "/"
     }
   },
   mode: "development",
@@ -38,10 +49,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: "Eluvio Video Asset Manager",
       template: Path.join(__dirname, "src", "index.html"),
-      cache: false,
       filename: "index.html",
-      inlineSource: ".(js|css)$",
-      favicon: "node_modules/elv-components-js/src/icons/favicon.png"
+      favicon: "node_modules/elv-components-js/src/icons/favicon.png",
+      inject: "body"
     })
   ],
   module: {
@@ -53,16 +63,22 @@ module.exports = {
           {
             loader: "css-loader",
             options: {
-              importLoaders: 2
+              importLoaders: 2,
+              modules: {
+                mode: "local",
+                auto: true
+              }
             }
           },
+          { loader: "postcss-loader" },
           {
-            loader: "postcss-loader",
+            loader: "sass-loader",
             options: {
-              plugins: () => [autoprefixer({})]
+              sassOptions: {
+                silenceDeprecations: ["legacy-js-api", "import"]
+              }
             }
-          },
-          "sass-loader"
+          }
         ]
       },
       {
@@ -70,13 +86,7 @@ module.exports = {
         exclude: /node_modules\/(?!elv-components-js)/,
         loader: "babel-loader",
         options: {
-          presets: ["@babel/preset-env", "@babel/preset-react", "babel-preset-mobx"],
-          plugins: [
-            require("@babel/plugin-proposal-object-rest-spread"),
-            require("@babel/plugin-transform-regenerator"),
-            require("@babel/plugin-transform-runtime"),
-            require("@babel/plugin-transform-optional-chaining")
-          ]
+          presets: ["@babel/preset-env", "@babel/preset-react", "babel-preset-mobx"]
         }
       },
       {
