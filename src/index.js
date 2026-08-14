@@ -1,4 +1,12 @@
 import "./static/stylesheets/app.scss";
+import "elv-components-js/src/stylesheets/defaults.scss";
+import "./static/stylesheets/channels.scss";
+import "./static/stylesheets/vod_channels.scss";
+import "./static/stylesheets/file-browser.scss";
+import "./static/stylesheets/site-customization.scss";
+import "./static/stylesheets/spec.scss";
+import "./static/stylesheets/inputs.scss";
+
 import "elv-components-js/src/utils/LimitedMap";
 
 import React from "react";
